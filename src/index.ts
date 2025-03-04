@@ -1,19 +1,10 @@
-import axios, {
-  AxiosInstance,
-  AxiosResponse,
-  RawAxiosRequestConfig,
-} from "axios";
-import { useRef } from "react"; // Optional, remove if not React
-import {
-  Configuration,
-  FieldsApi,
-  AuthApi,
-  CreateField200Response, // Import if exported, otherwise define below
-} from "./generated";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { Configuration, FieldsApi, AuthApi } from "./generated";
 
 interface QuickBaseOptions {
   realm: string;
   userToken?: string;
+  mode?: "development" | "production";
 }
 
 interface TokenData {
@@ -23,12 +14,6 @@ interface TokenData {
 
 interface GetFieldsParams {
   tableId: string;
-  includeFieldPerms?: boolean;
-}
-
-interface GetFieldParams {
-  tableId: string;
-  fieldId: number;
   includeFieldPerms?: boolean;
 }
 
@@ -46,12 +31,14 @@ class QuickBaseClient {
   private userToken?: string;
 
   constructor(options: QuickBaseOptions) {
-    const { realm, userToken } = options;
+    const { realm, userToken, mode } = options;
 
     this.realm = realm;
     this.userToken = userToken;
     this.mode =
-      (process.env.NODE_ENV as "development" | "production") || "production";
+      mode ||
+      (process.env.NODE_ENV as "development" | "production") ||
+      "production";
     this.tokens = new Map();
 
     this.config = new Configuration({
@@ -96,7 +83,7 @@ class QuickBaseClient {
       );
       const token = response.data.temporaryAuthorization;
       if (!token) throw new Error("Temporary token missing in response");
-      this.tokens.set(dbid, { token, expiry: Date.now() + 240000 }); // 4 minutes
+      this.tokens.set(dbid, { token, expiry: Date.now() + 240000 });
       return token;
     }
     return tokenData.token;
@@ -178,27 +165,10 @@ class QuickBaseClient {
     params: GetFieldsParams,
     { queue = false } = {}
   ): Promise<any[]> {
-    // Refine later
     const { tableId, includeFieldPerms } = params;
     const apiCall = () =>
       this.fieldsApi.getFields(
         tableId,
-        `${this.realm}.quickbase.com`,
-        this.axiosInstance.defaults.headers["Authorization"] as string,
-        includeFieldPerms
-      );
-    return this.request(apiCall, tableId, queue);
-  }
-
-  async getField(
-    params: GetFieldParams,
-    { queue = false } = {}
-  ): Promise<CreateField200Response> {
-    const { tableId, fieldId, includeFieldPerms } = params;
-    const apiCall = () =>
-      this.fieldsApi.getField(
-        tableId,
-        fieldId,
         `${this.realm}.quickbase.com`,
         this.axiosInstance.defaults.headers["Authorization"] as string,
         includeFieldPerms
@@ -211,11 +181,6 @@ class QuickBaseClient {
       this.authApi.getTempTokenDBID(dbid, `${this.realm}.quickbase.com`);
     return this.request(apiCall, dbid, queue);
   }
-}
-
-export function useQuickBase(options: QuickBaseOptions) {
-  const clientRef = useRef(new QuickBaseClient(options));
-  return clientRef.current;
 }
 
 export default QuickBaseClient;
