@@ -1,0 +1,40 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+dist/
+
+# Generated files (optional, depending on versioning preference)
+/src/generated/
+/src/generated-old/
+generated/
+generated-old/
+
+# Environment variables
+.env
+.env.development
+.env.production
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+
+# OpenAPI Generator artifacts
+openapi-generator-cli.jar
+openapitools.json
+
+# Java installation tarball
+OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

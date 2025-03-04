@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["src/index.ts", "src/test.ts"],
+  "exclude": ["node_modules", "dist", "src/generated", "src/generated-old"]
+}
