@@ -8,7 +8,8 @@
     "regenerate": "node code-generation/regenerate-client.js",
     "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
     "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
-    "build": "npm run generate-types && tsc",
+    "build": "tsc",
+    "buildwithtypes": "npm run generate-types && tsc",
     "test": "node dist/test.js"
   },
   "main": "dist/QuickBaseClient.js",

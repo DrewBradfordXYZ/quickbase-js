@@ -1,7 +1,20 @@
+import {
+  FieldsApiFactory,
+  TablesApiFactory,
+  AppsApiFactory,
+} from "./generated/generated/api.js";
 import { Configuration } from "./generated/configuration.js";
-import * as GeneratedApis from "./generated/api.js";
-import axios, { AxiosInstance } from "axios";
-import type { QuickbaseMethods } from "../types/QuickbaseClient.d.ts";
+import axios from "axios";
+import type { Field, Table, App } from "./generated/generated/model.js";
+
+export interface QuickbaseMethods {
+  getFields(params: {
+    tableId: string;
+    includeFieldPerms?: boolean;
+  }): Promise<Field[]>;
+  getTable(params: { appId: string; tableId: string }): Promise<Table>;
+  getApp(params: { appId: string }): Promise<App>;
+}
 
 interface QuickbaseConfig {
   realm: string;
@@ -10,10 +23,11 @@ interface QuickbaseConfig {
   defaultDbid?: string;
 }
 
-type ApiMethod = (...args: any[]) => Promise<any>;
-type MethodMap = {
-  [key: string]: { api: any; method: ApiMethod; paramMap: string[] };
-};
+type ApiMethod = (...args: unknown[]) => Promise<unknown>;
+type MethodMap = Record<
+  string,
+  { api: unknown; method: ApiMethod; paramMap: string[] }
+>;
 
 const simplifyName = (name: string): string =>
   name
@@ -41,23 +55,10 @@ export function createQuickbaseClient(
     accessToken: token,
   });
 
-  const apis: { [key: string]: any } = {
-    fields: GeneratedApis.FieldsApiFactory(
-      configuration,
-      undefined,
-      axiosInstance
-    ),
-    apps: GeneratedApis.AppsApiFactory(configuration, undefined, axiosInstance),
-    records: GeneratedApis.RecordsApiFactory(
-      configuration,
-      undefined,
-      axiosInstance
-    ),
-    tables: GeneratedApis.TablesApiFactory(
-      configuration,
-      undefined,
-      axiosInstance
-    ),
+  const apis: Record<string, unknown> = {
+    fields: FieldsApiFactory(configuration, undefined, axiosInstance),
+    tables: TablesApiFactory(configuration, undefined, axiosInstance),
+    apps: AppsApiFactory(configuration, undefined, axiosInstance),
   };
 
   const methodMap = buildMethodMap();
@@ -66,11 +67,14 @@ export function createQuickbaseClient(
     const methodMap: MethodMap = {};
     for (const [apiName, api] of Object.entries(apis)) {
       const methods = Object.keys(api).filter(
-        (m) => typeof api[m] === "function" && !m.startsWith("_")
+        (m) =>
+          typeof api[m as keyof typeof api] === "function" && !m.startsWith("_")
       );
       for (const methodName of methods) {
         const friendlyName = simplifyName(methodName);
-        const paramNames = getParamNames(api[methodName]).filter(
+        const paramNames = getParamNames(
+          api[methodName as keyof typeof api] as ApiMethod
+        ).filter(
           (name) =>
             name !== "qBRealmHostname" &&
             name !== "authorization" &&
@@ -78,7 +82,7 @@ export function createQuickbaseClient(
         );
         methodMap[friendlyName] = {
           api,
-          method: api[methodName] as ApiMethod,
+          method: api[methodName as keyof typeof api] as ApiMethod,
           paramMap: paramNames,
         };
       }
@@ -86,7 +90,7 @@ export function createQuickbaseClient(
     return methodMap;
   }
 
-  function getParamNames(fn: Function): string[] {
+  function getParamNames(fn: ApiMethod): string[] {
     const fnStr = fn.toString();
     const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
     return paramStr
@@ -101,10 +105,10 @@ export function createQuickbaseClient(
   ): Promise<ReturnType<QuickbaseMethods[K]>> {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) throw new Error(`Method ${methodName} not found`);
-    const { api, method, paramMap } = methodInfo;
+    const { method, paramMap } = methodInfo;
 
-    const userParams: Record<string, any> = { ...params };
-    const args: any[] = [];
+    const userParams: Record<string, unknown> = { ...params };
+    const args: unknown[] = [];
 
     const fullSignature = [
       ...paramMap.filter((p) => p !== "includeFieldPerms" && p !== "userAgent"),
@@ -135,17 +139,16 @@ export function createQuickbaseClient(
     return method(...args).then((response) => response.data);
   }
 
-  const client = new Proxy({} as QuickbaseClient, {
+  return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
     get(_target, prop: string) {
-      if (methodMap[prop]) {
-        return (params: any) =>
-          invokeMethod(prop as keyof QuickbaseMethods, params || {});
+      if (prop in methodMap) {
+        return (
+          params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]
+        ) => invokeMethod(prop as keyof QuickbaseMethods, params || {});
       }
       return undefined;
     },
   });
-
-  return client;
 }
 
 export type QuickbaseClient = QuickbaseMethods;
