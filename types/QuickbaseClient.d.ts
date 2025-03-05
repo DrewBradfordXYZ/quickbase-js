@@ -9,9 +9,9 @@ export interface QuickbaseMethods {
   updateApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
   createField(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
   deleteFields(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
-  getField(params: { tableId: string, fieldId: string, includeFieldPerms: boolean, userAgent?: string }): Promise<any>;
+  getField(params: { tableId: string, fieldId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
   getFieldUsage(params: { tableId: string, fieldId: string, userAgent?: string }): Promise<any>;
-  getFields(params: { tableId: string, includeFieldPerms: boolean, userAgent?: string }): Promise<any>;
+  getFields(params: { tableId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
   getFieldsUsage(params: { tableId: string, skip: number, top: number, userAgent?: string }): Promise<any>;
   updateField(params: { tableId: string, fieldId: string, userAgent?: string, generated?: any }): Promise<any>;
   deleteRecords(params: { userAgent?: string, generated?: any }): Promise<any>;

@@ -26,7 +26,7 @@ export function createQuickbaseClient(
 ): QuickbaseClient {
   const token = config.tempToken || config.userToken;
   const axiosInstance = axios.create({
-    baseURL: "https://api.quickbase.com/v1", // Fixed API base URL
+    baseURL: "https://api.quickbase.com/v1",
   });
 
   axiosInstance.defaults.headers.common["Authorization"] = token
@@ -34,14 +34,10 @@ export function createQuickbaseClient(
     : undefined;
   axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
   axiosInstance.defaults.headers.common["QB-Realm-Hostname"] =
-    `${config.realm}.quickbase.com`; // Full realm hostname
-
-  console.error(
-    `Initial axios headers: ${JSON.stringify(axiosInstance.defaults.headers.common)}`
-  );
+    `${config.realm}.quickbase.com`;
 
   const configuration = new Configuration({
-    basePath: "https://api.quickbase.com/v1", // Fixed API base path
+    basePath: "https://api.quickbase.com/v1",
     accessToken: token,
   });
 
@@ -93,14 +89,10 @@ export function createQuickbaseClient(
   function getParamNames(fn: Function): string[] {
     const fnStr = fn.toString();
     const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
-    const params = paramStr
+    return paramStr
       .split(",")
       .map((p) => p.trim().split("=")[0].trim())
       .filter((p) => p && !p.match(/^\{/));
-    if (fn.name === "getFields") {
-      return ["tableId", "includeFieldPerms"];
-    }
-    return params;
   }
 
   async function invokeMethod<K extends keyof QuickbaseMethods>(
@@ -110,26 +102,37 @@ export function createQuickbaseClient(
     console.error(`Invoking method: ${String(methodName)}`);
     const methodInfo = methodMap[methodName];
     if (!methodInfo) throw new Error(`Method ${String(methodName)} not found`);
-    const { api, method } = methodInfo;
+    const { api, method, paramMap } = methodInfo;
 
-    const getFieldsParams = params as {
-      tableId: string;
-      includeFieldPerms?: boolean;
-    };
-    const args = [
-      getFieldsParams.tableId,
-      `${config.realm}.quickbase.com`, // Full realm hostname
-      token ? `QB-USER-TOKEN ${token}` : undefined,
-      getFieldsParams.includeFieldPerms,
-      undefined,
-      {
-        headers: {
-          Authorization: token ? `QB-USER-TOKEN ${token}` : undefined,
-          "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
-          "Content-Type": "application/json",
-        },
-      },
+    const userParams: Record<string, any> = { ...params };
+    const args: any[] = [];
+
+    // Full signature: [method-specific params], qBRealmHostname, authorization, [remaining params], options
+    const fullSignature = [
+      ...paramMap.filter((p) => p !== "includeFieldPerms" && p !== "userAgent"), // Core params (e.g., appId, tableId)
+      "qBRealmHostname",
+      "authorization",
+      ...paramMap.filter((p) => p === "includeFieldPerms" || p === "userAgent"), // Optional params
+      "options",
     ];
+
+    fullSignature.forEach((param) => {
+      if (param === "qBRealmHostname") {
+        args.push(`${config.realm}.quickbase.com`);
+      } else if (param === "authorization") {
+        args.push(token ? `QB-USER-TOKEN ${token}` : undefined);
+      } else if (param === "options") {
+        args.push({
+          headers: {
+            Authorization: token ? `QB-USER-TOKEN ${token}` : undefined,
+            "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        args.push(userParams[param] ?? undefined);
+      }
+    });
 
     console.error(`Args for ${String(methodName)}: ${JSON.stringify(args)}`);
     console.error(
@@ -161,11 +164,8 @@ export function createQuickbaseClient(
     get(_target, prop: string) {
       if (methodMap[prop]) {
         console.error(`Proxy get: ${prop}`);
-        console.error(
-          `Method map keys: ${JSON.stringify(Object.keys(methodMap))}`
-        );
         return (params: any) =>
-          invokeMethod(prop as keyof QuickbaseMethods, params);
+          invokeMethod(prop as keyof QuickbaseMethods, params || {});
       }
       return undefined;
     },

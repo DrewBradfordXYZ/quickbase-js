@@ -1,13 +1,12 @@
 TEST LOG
-Initial axios headers: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com"}
+Testing getFields...
 Proxy get: getFields
-Method map keys: ["createField","deleteFields","getField","getFieldUsage","getFields","getFieldsUsage","updateField","copyApp","createApp","deleteApp","getApp","getAppEvents","updateApp","deleteRecords","runQuery","upsert","createRelationship","createTable","deleteRelationship","deleteTable","getAppTables","getRelationships","getTable","updateRelationship","updateTable"]
 Invoking method: getFields
-Args for getFields: ["buwai2zud","builderprogram-dbradford6815.quickbase.com","QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",true,null,{"headers":{"Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","Content-Type":"application/json"}}]
+Args for getFields: ["buwai2zud","builderprogram-dbradford6815.quickbase.com","QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",null,null,{"headers":{"Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","Content-Type":"application/json"}}]
 Axios defaults: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com"}
 Request headers: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","User-Agent":"axios/1.8.1","Accept-Encoding":"gzip, compress, deflate, br"}
 Response status: 200
-[
+Fields: [
   {
     appearsByDefault: false,
     audited: false,
@@ -20,7 +19,6 @@ Response status: 200
     label: 'Date Created',
     mode: '',
     noWrap: true,
-    permissions: [ [Object], [Object], [Object] ],
     properties: {
       allowNewChoices: false,
       carryChoices: true,
@@ -51,7 +49,6 @@ Response status: 200
     label: 'Date Modified',
     mode: '',
     noWrap: true,
-    permissions: [ [Object], [Object], [Object] ],
     properties: {
       allowNewChoices: false,
       carryChoices: true,
@@ -82,7 +79,6 @@ Response status: 200
     label: 'Record ID#',
     mode: '',
     noWrap: true,
-    permissions: [ [Object], [Object], [Object] ],
     properties: {
       allowNewChoices: false,
       blankIsZero: true,
@@ -113,7 +109,6 @@ Response status: 200
     label: 'Record Owner',
     mode: '',
     noWrap: true,
-    permissions: [ [Object], [Object], [Object] ],
     properties: {
       allowNewChoices: true,
       carryChoices: true,
@@ -140,7 +135,6 @@ Response status: 200
     label: 'Last Modified By',
     mode: '',
     noWrap: true,
-    permissions: [ [Object], [Object], [Object] ],
     properties: {
       allowNewChoices: true,
       carryChoices: true,
@@ -156,3 +150,28 @@ Response status: 200
     unique: false
   }
 ]
+Testing getTable...
+Proxy get: getTable
+Invoking method: getTable
+Args for getTable: ["buwai2zpe","buwai2zws","builderprogram-dbradford6815.quickbase.com","QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",null,{"headers":{"Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","Content-Type":"application/json"}}]
+Axios defaults: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com"}
+Request headers: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","User-Agent":"axios/1.8.1","Accept-Encoding":"gzip, compress, deflate, br"}
+Response status: 200
+Table: {
+  alias: '_DBID_ELEMENTS',
+  created: '2025-02-13T18:22:33Z',
+  defaultSortFieldId: 2,
+  defaultSortOrder: 'DESC',
+  description: '',
+  id: 'buwai2zws',
+  keyFieldId: 3,
+  name: 'Elements',
+  nextFieldId: 7,
+  nextRecordId: 1,
+  pluralRecordName: 'Elements',
+  singleRecordName: 'Element',
+  sizeLimit: '500 MB',
+  spaceRemaining: '500 MB',
+  spaceUsed: '0 KB',
+  updated: '2025-02-14T22:23:15Z'
+}

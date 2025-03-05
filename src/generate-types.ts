@@ -1,6 +1,6 @@
 import {
   AppsApiAxiosParamCreator,
-  FieldsApiAxiosParamCreator, // Add other APIs as needed
+  FieldsApiAxiosParamCreator,
   RecordsApiAxiosParamCreator,
   TablesApiAxiosParamCreator,
 } from "./generated/api.js";
@@ -11,7 +11,6 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Define API method shape
 type ApiMethod = (...args: any[]) => Promise<{ url: string; options: any }>;
 type ApiMethods = { [key: string]: ApiMethod };
 
@@ -26,8 +25,8 @@ function getParamNames(fn: ApiMethod): string[] {
   const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
   const params = paramStr
     .split(",")
-    .map((p) => p.trim().split("=")[0].trim()) // Remove default values
-    .filter((p) => p && !p.match(/^\{/)); // Exclude junk like '{'
+    .map((p) => p.trim().split("=")[0].trim())
+    .filter((p) => p && !p.match(/^\{/));
   return params;
 }
 
@@ -40,8 +39,9 @@ function inferParamTypes(fn: ApiMethod, paramNames: string[]): string[] {
   return paramNames.map((name) => {
     const paramDef = paramDefs.find((p) => p.startsWith(name));
     if (!paramDef) return "any";
-    if (paramDef.includes("?:"))
-      return paramDef.split(":")[1].trim().replace("?", "") + " | undefined";
+    if (paramDef.includes("?:") || paramDef.includes("="))
+      // Optional if ? or default value
+      return paramDef.split(":")[1]?.trim().replace("?", "") + " | undefined";
     if (
       name === "appId" ||
       name === "tableId" ||
@@ -52,7 +52,7 @@ function inferParamTypes(fn: ApiMethod, paramNames: string[]): string[] {
     if (name === "userAgent") return "string";
     if (name === "includeFieldPerms") return "boolean";
     if (name === "skip" || name === "top") return "number";
-    if (name === "generated") return "any"; // Complex request bodies
+    if (name === "generated") return "any";
     return paramDef.split(":")[1]?.trim() || "any";
   });
 }
@@ -63,7 +63,6 @@ function generateTypeDeclarations() {
     const config = new Configuration();
     console.log("Config created:", config);
 
-    // Explicitly list the AxiosParamCreators we want
     const paramCreators: ((config?: Configuration) => ApiMethods)[] = [
       AppsApiAxiosParamCreator,
       FieldsApiAxiosParamCreator,
@@ -113,7 +112,8 @@ function generateTypeDeclarations() {
           const isOptional =
             type.includes("| undefined") ||
             name === "generated" ||
-            name === "userAgent";
+            name === "userAgent" ||
+            name === "includeFieldPerms";
           return `${name}${isOptional ? "?" : ""}: ${type.replace("| undefined", "")}`;
         })
         .join(", ");
