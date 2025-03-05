@@ -1,0 +1,672 @@
+[quickbase-js] Tree - 3/5/2025
+Root: /home/drew/Projects/quickbase-js
+
+Project Goals:
+- Implement a QuickBase API client in TypeScript.
+- Generate client methods from the QuickBase RESTful API spec.
+- Provide a simple and intuitive interface for interacting with QuickBase.
+- This libray should not have to manually update the client methods when the QuickBase API changes.
+- Generate aegonomic client methods from the QuickBase RESTful API spec that does not require manual updates.
+- Support both Node.js and browser environments.
+- The intent is to use this in JS frameworks like React, Vue, and Angular.
+- use fetch API for making HTTP requests and avoid axios with the openapi generator.
+
+
+├─ .env.development
+├─ .env.production
+├─ .gitignore
+├─ LICENSE
+├─ README.md
+├─ aiupdate.js
+├─ aiupdate.txt
+├─ build.js
+├─ code-generation/
+│ ├─ fix-spec.js
+│ │   Contents:
+│ │     #!/usr/bin/env node
+│ │     import { promises as fs } from "fs";
+│ │     import path from "path";
+│ │     import * as glob from "glob";
+│ │     
+│ │     async function fixQuickBaseSpec() {
+│ │       try {
+│ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
+│ │         const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
+│ │         console.log("Finding latest QuickBase RESTful API spec...");
+│ │         const specFiles = glob.sync(
+│ │           path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
+│ │         );
+│ │         if (specFiles.length === 0) {
+│ │           console.error(
+│ │             "No QuickBase_RESTful_*.json files found in specs/ folder."
+│ │           );
+│ │           process.exit(1);
+│ │         }
+│ │         const inputFile = specFiles.sort().pop();
+│ │         const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
+│ │     
+│ │         console.log(`Reading ${path.basename(inputFile)} from specs/...`);
+│ │         const specContent = await fs.readFile(inputFile, "utf8");
+│ │         const spec = JSON.parse(specContent);
+│ │     
+│ │         console.log("Fixing parameters...");
+│ │         for (const pathKey in spec.paths) {
+│ │           for (const method in spec.paths[pathKey]) {
+│ │             const operation = spec.paths[pathKey][method];
+│ │             if (operation.parameters) {
+│ │               operation.parameters = operation.parameters.map((param) => {
+│ │                 if ("example" in param) delete param.example;
+│ │                 if ("schema" in param && param.in !== "body") delete param.schema;
+│ │                 if (!param.type && param.in !== "body") param.type = "string";
+│ │                 if (
+│ │                   param.name === "generated" &&
+│ │                   param.schema?.type === "array" &&
+│ │                   !param.schema.items
+│ │                 ) {
+│ │                   param.schema.items = { $ref: "#/definitions/Record" }; // Fix generated param if array
+│ │                 }
+│ │                 return param;
+│ │               });
+│ │             }
+│ │           }
+│ │         }
+│ │     
+│ │         console.log("Adding responses and schemas...");
+│ │         if (spec.paths["/fields"]?.get) {
+│ │           spec.paths["/fields"].get.parameters = [
+│ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │             {
+│ │               name: "includeFieldPerms",
+│ │               in: "query",
+│ │               required: false,
+│ │               type: "boolean",
+│ │             },
+│ │           ];
+│ │           spec.paths["/fields"].get.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { type: "array", items: { $ref: "#/definitions/Field" } },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/fields/{fieldId}"]?.get) {
+│ │           spec.paths["/fields/{fieldId}"].get.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { $ref: "#/definitions/Field" },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/tables/{tableId}"]?.get) {
+│ │           spec.paths["/tables/{tableId}"].get.parameters = [
+│ │             { name: "appId", in: "query", required: true, type: "string" },
+│ │             { name: "tableId", in: "path", required: true, type: "string" },
+│ │           ];
+│ │           spec.paths["/tables/{tableId}"].get.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { $ref: "#/definitions/Table" },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/apps/{appId}"]?.get) {
+│ │           spec.paths["/apps/{appId}"].get.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { $ref: "#/definitions/App" },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/records"]?.post) {
+│ │           spec.paths["/records"].post.parameters = [
+│ │             {
+│ │               name: "generated",
+│ │               in: "body",
+│ │               required: true,
+│ │               schema: {
+│ │                 type: "array",
+│ │                 items: { $ref: "#/definitions/RecordRequest" },
+│ │               },
+│ │             },
+│ │           ];
+│ │           spec.paths["/records"].post.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
+│ │             },
+│ │             207: {
+│ │               description: "Partial success",
+│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/records/query"]?.post) {
+│ │           spec.paths["/records/query"].post.parameters = [
+│ │             {
+│ │               name: "generated",
+│ │               in: "body",
+│ │               required: true,
+│ │               schema: { type: "object", additionalProperties: true }, // Query body is complex, adjust as needed
+│ │             },
+│ │           ];
+│ │           spec.paths["/records/query"].post.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
+│ │             },
+│ │           };
+│ │         }
+│ │         if (spec.paths["/reports/{reportId}/run"]?.post) {
+│ │           spec.paths["/reports/{reportId}/run"].post.responses = {
+│ │             200: {
+│ │               description: "Successful response",
+│ │               schema: {
+│ │                 type: "array",
+│ │                 items: { $ref: "#/definitions/ReportData" },
+│ │               },
+│ │             },
+│ │           };
+│ │         }
+│ │     
+│ │         console.log("Adding definitions...");
+│ │         if (!spec.definitions) spec.definitions = {};
+│ │         spec.definitions.Field = {
+│ │           type: "object",
+│ │           properties: {
+│ │             appearsByDefault: { type: "boolean" },
+│ │             audited: { type: "boolean" },
+│ │             bold: { type: "boolean" },
+│ │             doesDataCopy: { type: "boolean" },
+│ │             fieldHelp: { type: "string" },
+│ │             fieldType: { type: "string" },
+│ │             findEnabled: { type: "boolean" },
+│ │             id: { type: "integer" },
+│ │             label: { type: "string" },
+│ │             mode: { type: "string" },
+│ │             noWrap: { type: "boolean" },
+│ │             properties: { type: "object", additionalProperties: true },
+│ │             required: { type: "boolean" },
+│ │             unique: { type: "boolean" },
+│ │           },
+│ │         };
+│ │         spec.definitions.Table = {
+│ │           type: "object",
+│ │           properties: {
+│ │             alias: { type: "string" },
+│ │             created: { type: "string" },
+│ │             defaultSortFieldId: { type: "integer" },
+│ │             defaultSortOrder: { type: "string", enum: ["ASC", "DESC"] },
+│ │             description: { type: "string" },
+│ │             id: { type: "string" },
+│ │             keyFieldId: { type: "integer" },
+│ │             name: { type: "string" },
+│ │             nextFieldId: { type: "integer" },
+│ │             nextRecordId: { type: "integer" },
+│ │             pluralRecordName: { type: "string" },
+│ │             singleRecordName: { type: "string" },
+│ │             sizeLimit: { type: "string" },
+│ │             spaceRemaining: { type: "string" },
+│ │             spaceUsed: { type: "string" },
+│ │             updated: { type: "string" },
+│ │           },
+│ │         };
+│ │         spec.definitions.App = {
+│ │           type: "object",
+│ │           properties: {
+│ │             created: { type: "string" },
+│ │             dateFormat: { type: "string" },
+│ │             description: { type: "string" },
+│ │             hasEveryoneOnTheInternet: { type: "boolean" },
+│ │             id: { type: "string" },
+│ │             memoryInfo: {
+│ │               type: "object",
+│ │               properties: {
+│ │                 estMemory: { type: "integer" },
+│ │                 estMemoryInclDependentApps: { type: "integer" },
+│ │               },
+│ │             },
+│ │             name: { type: "string" },
+│ │             securityProperties: {
+│ │               type: "object",
+│ │               additionalProperties: { type: "boolean" },
+│ │             },
+│ │             timeZone: { type: "string" },
+│ │             updated: { type: "string" },
+│ │           },
+│ │         };
+│ │         spec.definitions.Record = {
+│ │           type: "object",
+│ │           properties: {
+│ │             metadata: {
+│ │               type: "object",
+│ │               properties: {
+│ │                 createdRecordId: { type: "integer" },
+│ │                 updatedRecordId: { type: "integer" },
+│ │                 lineErrors: { type: "array", items: { type: "string" } },
+│ │               },
+│ │             },
+│ │             data: { type: "object", additionalProperties: true },
+│ │           },
+│ │         };
+│ │         spec.definitions.RecordRequest = {
+│ │           type: "object",
+│ │           properties: {
+│ │             to: { type: "string" },
+│ │             data: {
+│ │               type: "array",
+│ │               items: { type: "object", additionalProperties: true },
+│ │             },
+│ │           },
+│ │         };
+│ │         spec.definitions.ReportData = {
+│ │           type: "object",
+│ │           properties: {
+│ │             id: { type: "string" },
+│ │             data: {
+│ │               type: "array",
+│ │               items: { type: "object", additionalProperties: true },
+│ │             },
+│ │           },
+│ │         };
+│ │     
+│ │         console.log("Removing unexpected top-level attributes...");
+│ │         delete spec.operations;
+│ │         delete spec.groups;
+│ │         delete spec.components;
+│ │     
+│ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+│ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
+│ │         console.log("Spec fixed successfully!");
+│ │       } catch (error) {
+│ │         console.error("Failed to fix spec:", error);
+│ │         process.exit(1);
+│ │       }
+│ │     }
+│ │     
+│ │     fixQuickBaseSpec();
+│ │     
+│ ├─ openapi-generator-cli.jar
+│ ├─ quickbase-fixed.json
+│ └─ regenerate-client.js
+│     Contents:
+│       import { execSync } from "child_process";
+│       import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
+│       import { join, dirname, basename } from "path";
+│       import { fileURLToPath } from "url";
+│       
+│       const __dirname = dirname(fileURLToPath(import.meta.url));
+│       const CODEGEN_DIR = __dirname;
+│       const SPEC_FILE = join(CODEGEN_DIR, "quickbase-fixed.json");
+│       const GENERATED_DIR = join(__dirname, "..", "src", "generated");
+│       const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
+│       const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
+│       
+│       function backupGeneratedDir() {
+│         console.log("Backing up existing src/generated/...");
+│         if (existsSync(GENERATED_DIR)) {
+│           if (existsSync(BACKUP_DIR))
+│             execSync(`rm -rf ${BACKUP_DIR}`, { stdio: "inherit" });
+│           execSync(`mv ${GENERATED_DIR} ${BACKUP_DIR}`, { stdio: "inherit" });
+│           console.log(`Moved src/generated/ to ${basename(BACKUP_DIR)}`);
+│         } else {
+│           console.log("No existing src/generated/ to backup.");
+│         }
+│       }
+│       
+│       function generateClient() {
+│         if (!existsSync(SPEC_FILE)) {
+│           console.error(
+│             `Fixed spec file ${basename(SPEC_FILE)} not found. Run 'npm run fix-spec' first.`
+│           );
+│           process.exit(1);
+│         }
+│         console.log("Generating TypeScript client with models using JAR...");
+│         execSync(
+│           `java -jar ${JAR_PATH} generate \
+│             -i ${SPEC_FILE} \
+│             -g typescript-axios \
+│             -o ${GENERATED_DIR} \
+│             --skip-validate-spec \
+│             --additional-properties=supportsES6=true,modelPropertyNaming=original,withSeparateModelsAndApi=true,generateAliasAsModel=true,apiPackage=generated.api,modelPackage=generated.model`,
+│           { stdio: "inherit" }
+│         );
+│         console.log(`Client generated successfully in ${GENERATED_DIR}`);
+│       }
+│       
+│       function fixImports() {
+│         console.log("Fixing ESM imports in generated files...");
+│         const files = readdirSync(GENERATED_DIR).filter((f) => f.endsWith(".ts"));
+│         for (const file of files) {
+│           const filePath = join(GENERATED_DIR, file);
+│           let content = readFileSync(filePath, "utf8");
+│           content = content.replace(/(from\s+['"])(\.\/[^'"]+)(['"])/g, "$1$2.js$3");
+│           writeFileSync(filePath, content, "utf8");
+│         }
+│         console.log("Imports fixed.");
+│       }
+│       
+│       function main() {
+│         try {
+│           execSync("java -version", { stdio: "ignore" });
+│         } catch (error) {
+│           console.error(
+│             "Java is not installed or not in PATH. Install Java (e.g., OpenJDK 17)."
+│           );
+│           process.exit(1);
+│         }
+│         backupGeneratedDir();
+│         generateClient();
+│         fixImports();
+│       }
+│       
+│       main();
+│       
+├─ openapitools.json
+├─ package-lock.json
+├─ package.json
+│   Contents:
+│     {
+│       "name": "quickbase-js",
+│       "version": "1.0.0",
+│       "description": "",
+│       "type": "module",
+│       "scripts": {
+│         "fix-spec": "node code-generation/fix-spec.js",
+│         "regenerate": "node code-generation/regenerate-client.js",
+│         "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
+│         "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
+│         "build": "tsc",
+│         "buildwithtypes": "npm run generate-types && tsc",
+│         "test": "node dist/test.js",
+│         "aiupdate": "node aiupdate.js"
+│       },
+│       "main": "dist/QuickBaseClient.js",
+│       "browser": "dist/quickbase-client.browser.min.js",
+│       "types": "dist/QuickBaseClient.d.ts",
+│       "keywords": [
+│         "quickbase",
+│         "api",
+│         "client",
+│         "javascript",
+│         "typescript"
+│       ],
+│       "author": "Drew Bradford",
+│       "license": "ISC",
+│       "dependencies": {
+│         "axios": "^1.8.1",
+│         "typescript": "^5.8.2"
+│       },
+│       "devDependencies": {
+│         "@openapitools/openapi-generator-cli": "^2.17.0",
+│         "@types/node": "^22.13.9",
+│         "@types/react": "^19.0.10",
+│         "glob": "^10.4.5",
+│         "prettier": "^3.5.3",
+│         "react": "^19.0.0",
+│         "ts-node": "^10.9.2"
+│       }
+│     }
+│     
+├─ specs/
+│ └─ QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
+├─ src/
+│ ├─ QuickbaseClient.ts
+│ ├─ generate-types.ts
+│ ├─ generated/
+│ │ ├─ .openapi-generator/
+│ │ │ ├─ FILES
+│ │ │ └─ VERSION
+│ │ ├─ .openapi-generator-ignore
+│ │ ├─ QuickbaseMethods.ts
+│ │ │   Contents:
+│ │ │     // Generated by regenerate-client.ts
+│ │ │     import type { CopyApp200Response, CreateApp200Response, DeleteApp200Response, App, Array<{ [key: string]: any> }, UpdateApp200Response, Audit200Response, ExchangeSsoToken200Response, GetTempTokenDBID200Response, GenerateDocument200Response, CreateField200Response, DeleteFields200Response, Field, Array<Field, DeleteFile200Response, object, RunFormula200Response, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, DeleteRecords200Response, Array<Record, GetReport200Response, Array<ReportData, CreateRelationship200Response, CreateTable200Response, DeleteRelationship200Response, DeleteTable200Response, GetRelationships200Response, Table, CloneUserToken200Response, DeactivateUserToken200Response, TransferUserToken200Response, AddMembersToGroup200Response, AddSubgroupsToGroup200Response, DenyUsers200Response, GetUsers200Response, RemoveMembersFromGroup200Response, RemoveSubgroupsFromGroup200Response, UndenyUsers200Response } from "./models/index.js";
+│ │ │     
+│ │ │     export interface QuickbaseMethods {
+│ │ │       copyApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CopyAppRequest }): Promise<CopyApp200Response>;
+│ │ │       createApp(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateAppRequest }): Promise<CreateApp200Response>;
+│ │ │       deleteApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteAppRequest }): Promise<DeleteApp200Response>;
+│ │ │       getApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<App>;
+│ │ │       getAppEvents(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
+│ │ │       updateApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateAppRequest }): Promise<UpdateApp200Response>;
+│ │ │       audit(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: AuditRequest }): Promise<Audit200Response>;
+│ │ │       exchangeSsoToken(params: { qBRealmHostname: string, userAgent?: string, generated?: ExchangeSsoTokenRequest }): Promise<ExchangeSsoToken200Response>;
+│ │ │       getTempTokenDBID(params: { dbid: string, qBRealmHostname: string, userAgent?: string, qBAppToken?: string }): Promise<GetTempTokenDBID200Response>;
+│ │ │       generateDocument(params: { templateId: number, tableId: string, filename: string, recordId?: number, qBRealmHostname?: string, userAgent?: string, authorization?: string, accept?: string, format?: string, margin?: string, unit?: string, pageSize?: string, orientation?: string, realm?: string }): Promise<GenerateDocument200Response>;
+│ │ │       createField(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateFieldRequest }): Promise<CreateField200Response>;
+│ │ │       deleteFields(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteFieldsRequest }): Promise<DeleteFields200Response>;
+│ │ │       getField(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<Field>;
+│ │ │       getFieldUsage(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
+│ │ │       getFields(params: { tableId: string, includeFieldPerms?: boolean }): Promise<Array<Field>;
+│ │ │       getFieldsUsage(params: { tableId: string, qBRealmHostname: string, authorization: string, skip?: number, top?: number, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
+│ │ │       updateField(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateFieldRequest }): Promise<CreateField200Response>;
+│ │ │       deleteFile(params: { tableId: string, recordId: number, fieldId: number, versionNumber: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteFile200Response>;
+│ │ │       downloadFile(params: { tableId: string, recordId: number, fieldId: number, versionNumber: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<object>;
+│ │ │       runFormula(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: RunFormulaRequest }): Promise<RunFormula200Response>;
+│ │ │       platformAnalyticEventSummaries(params: { qBRealmHostname: string, authorization: string, userAgent?: string, accountId?: number, generated?: PlatformAnalyticEventSummariesRequest }): Promise<PlatformAnalyticEventSummaries200Response>;
+│ │ │       platformAnalyticReads(params: { qBRealmHostname: string, authorization: string, day?: Date, userAgent?: string }): Promise<PlatformAnalyticReads200Response>;
+│ │ │       deleteRecords(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteRecordsRequest }): Promise<DeleteRecords200Response>;
+│ │ │       runQuery(params: { generated: { [key }): Promise<Array<Record>;
+│ │ │       upsert(params: { generated: Array<RecordRequest> }): Promise<Array<Record>;
+│ │ │       getReport(params: { tableId: string, reportId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<GetReport200Response>;
+│ │ │       getTableReports(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
+│ │ │       runReport(params: { tableId: string, reportId: string, qBRealmHostname: string, authorization: string, skip?: number, top?: number, userAgent?: string, generated?: object }): Promise<Array<ReportData>;
+│ │ │       changesetSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
+│ │ │       changesetSolutionFromRecord(params: { solutionId: string, tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
+│ │ │       createSolution(params: { qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
+│ │ │       createSolutionFromRecord(params: { tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
+│ │ │       exportSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, qBLVersion?: string, userAgent?: string }): Promise<object>;
+│ │ │       exportSolutionToRecord(params: { solutionId: string, tableId: string, fieldId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, qBLVersion?: string, userAgent?: string }): Promise<object>;
+│ │ │       updateSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
+│ │ │       updateSolutionToRecord(params: { solutionId: string, tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
+│ │ │       createRelationship(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateRelationshipRequest }): Promise<CreateRelationship200Response>;
+│ │ │       createTable(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateTableRequest }): Promise<CreateTable200Response>;
+│ │ │       deleteRelationship(params: { tableId: string, relationshipId: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteRelationship200Response>;
+│ │ │       deleteTable(params: { appId: string, tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteTable200Response>;
+│ │ │       getAppTables(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
+│ │ │       getRelationships(params: { tableId: string, qBRealmHostname: string, authorization: string, skip?: number, userAgent?: string }): Promise<GetRelationships200Response>;
+│ │ │       getTable(params: { appId: string, tableId: string }): Promise<Table>;
+│ │ │       updateRelationship(params: { tableId: string, relationshipId: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateRelationshipRequest }): Promise<CreateRelationship200Response>;
+│ │ │       updateTable(params: { appId: string, tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateTableRequest }): Promise<CreateTable200Response>;
+│ │ │       cloneUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CloneUserTokenRequest }): Promise<CloneUserToken200Response>;
+│ │ │       deactivateUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeactivateUserToken200Response>;
+│ │ │       deleteUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeactivateUserToken200Response>;
+│ │ │       transferUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: TransferUserTokenRequest }): Promise<TransferUserToken200Response>;
+│ │ │       addManagersToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddMembersToGroup200Response>;
+│ │ │       addMembersToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddMembersToGroup200Response>;
+│ │ │       addSubgroupsToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddSubgroupsToGroup200Response>;
+│ │ │       denyUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<DenyUsers200Response>;
+│ │ │       denyUsersAndGroups(params: { shouldDeleteFromGroups: boolean, qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<DenyUsers200Response>;
+│ │ │       getUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: GetUsersRequest }): Promise<GetUsers200Response>;
+│ │ │       removeManagersFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveMembersFromGroup200Response>;
+│ │ │       removeMembersFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveMembersFromGroup200Response>;
+│ │ │       removeSubgroupsFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveSubgroupsFromGroup200Response>;
+│ │ │       undenyUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<UndenyUsers200Response>;
+│ │ │     }
+│ │ │     
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.ts
+│ │ │ ├─ AuditApi.ts
+│ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DocumentTemplatesApi.ts
+│ │ │ ├─ FieldsApi.ts
+│ │ │ ├─ FilesApi.ts
+│ │ │ ├─ FormulasApi.ts
+│ │ │ ├─ PlatformAnalyticsApi.ts
+│ │ │ ├─ RecordsApi.ts
+│ │ │ ├─ ReportsApi.ts
+│ │ │ ├─ SolutionsApi.ts
+│ │ │ ├─ TablesApi.ts
+│ │ │ ├─ UserTokenApi.ts
+│ │ │ ├─ UsersApi.ts
+│ │ │ └─ index.ts
+│ │ ├─ index.ts
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.ts
+│ │ │ ├─ App.ts
+│ │ │ ├─ AppMemoryInfo.ts
+│ │ │ ├─ Audit200Response.ts
+│ │ │ ├─ Audit202Response.ts
+│ │ │ ├─ AuditRequest.ts
+│ │ │ ├─ CloneUserToken200Response.ts
+│ │ │ ├─ CloneUserTokenRequest.ts
+│ │ │ ├─ CopyApp200Response.ts
+│ │ │ ├─ CopyAppRequest.ts
+│ │ │ ├─ CreateApp200Response.ts
+│ │ │ ├─ CreateAppRequest.ts
+│ │ │ ├─ CreateField200Response.ts
+│ │ │ ├─ CreateFieldRequest.ts
+│ │ │ ├─ CreateRelationship200Response.ts
+│ │ │ ├─ CreateRelationshipRequest.ts
+│ │ │ ├─ CreateTable200Response.ts
+│ │ │ ├─ CreateTableRequest.ts
+│ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
+│ │ │ ├─ DeleteAppRequest.ts
+│ │ │ ├─ DeleteFields200Response.ts
+│ │ │ ├─ DeleteFieldsRequest.ts
+│ │ │ ├─ DeleteFile200Response.ts
+│ │ │ ├─ DeleteRecords200Response.ts
+│ │ │ ├─ DeleteRecordsRequest.ts
+│ │ │ ├─ DeleteRelationship200Response.ts
+│ │ │ ├─ DeleteTable200Response.ts
+│ │ │ ├─ DenyUsers200Response.ts
+│ │ │ ├─ ExchangeSsoToken200Response.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.ts
+│ │ │ ├─ Field.ts
+│ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetRelationships200Response.ts
+│ │ │ ├─ GetReport200Response.ts
+│ │ │ ├─ GetTempTokenDBID200Response.ts
+│ │ │ ├─ GetUsers200Response.ts
+│ │ │ ├─ GetUsersRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.ts
+│ │ │ ├─ Record.ts
+│ │ │ ├─ RecordMetadata.ts
+│ │ │ ├─ RecordRequest.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
+│ │ │ ├─ ReportData.ts
+│ │ │ ├─ RunFormula200Response.ts
+│ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ Table.ts
+│ │ │ ├─ TransferUserToken200Response.ts
+│ │ │ ├─ TransferUserTokenRequest.ts
+│ │ │ ├─ UndenyUsers200Response.ts
+│ │ │ ├─ UpdateApp200Response.ts
+│ │ │ ├─ UpdateAppRequest.ts
+│ │ │ ├─ UpdateFieldRequest.ts
+│ │ │ ├─ UpdateRelationshipRequest.ts
+│ │ │ ├─ UpdateTableRequest.ts
+│ │ │ └─ index.ts
+│ │ └─ runtime.ts
+│ ├─ generated-old/
+│ │ ├─ .openapi-generator/
+│ │ │ ├─ FILES
+│ │ │ └─ VERSION
+│ │ ├─ .openapi-generator-ignore
+│ │ ├─ QuickbaseMethods.ts
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.ts
+│ │ │ ├─ AuditApi.ts
+│ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DocumentTemplatesApi.ts
+│ │ │ ├─ FieldsApi.ts
+│ │ │ ├─ FilesApi.ts
+│ │ │ ├─ FormulasApi.ts
+│ │ │ ├─ PlatformAnalyticsApi.ts
+│ │ │ ├─ RecordsApi.ts
+│ │ │ ├─ ReportsApi.ts
+│ │ │ ├─ SolutionsApi.ts
+│ │ │ ├─ TablesApi.ts
+│ │ │ ├─ UserTokenApi.ts
+│ │ │ ├─ UsersApi.ts
+│ │ │ └─ index.ts
+│ │ ├─ index.ts
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.ts
+│ │ │ ├─ App.ts
+│ │ │ ├─ AppMemoryInfo.ts
+│ │ │ ├─ Audit200Response.ts
+│ │ │ ├─ Audit202Response.ts
+│ │ │ ├─ AuditRequest.ts
+│ │ │ ├─ CloneUserToken200Response.ts
+│ │ │ ├─ CloneUserTokenRequest.ts
+│ │ │ ├─ CopyApp200Response.ts
+│ │ │ ├─ CopyAppRequest.ts
+│ │ │ ├─ CreateApp200Response.ts
+│ │ │ ├─ CreateAppRequest.ts
+│ │ │ ├─ CreateField200Response.ts
+│ │ │ ├─ CreateFieldRequest.ts
+│ │ │ ├─ CreateRelationship200Response.ts
+│ │ │ ├─ CreateRelationshipRequest.ts
+│ │ │ ├─ CreateTable200Response.ts
+│ │ │ ├─ CreateTableRequest.ts
+│ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
+│ │ │ ├─ DeleteAppRequest.ts
+│ │ │ ├─ DeleteFields200Response.ts
+│ │ │ ├─ DeleteFieldsRequest.ts
+│ │ │ ├─ DeleteFile200Response.ts
+│ │ │ ├─ DeleteRecords200Response.ts
+│ │ │ ├─ DeleteRecordsRequest.ts
+│ │ │ ├─ DeleteRelationship200Response.ts
+│ │ │ ├─ DeleteTable200Response.ts
+│ │ │ ├─ DenyUsers200Response.ts
+│ │ │ ├─ ExchangeSsoToken200Response.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.ts
+│ │ │ ├─ Field.ts
+│ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetRelationships200Response.ts
+│ │ │ ├─ GetReport200Response.ts
+│ │ │ ├─ GetTempTokenDBID200Response.ts
+│ │ │ ├─ GetUsers200Response.ts
+│ │ │ ├─ GetUsersRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.ts
+│ │ │ ├─ Record.ts
+│ │ │ ├─ RecordMetadata.ts
+│ │ │ ├─ RecordRequest.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
+│ │ │ ├─ ReportData.ts
+│ │ │ ├─ RunFormula200Response.ts
+│ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ Table.ts
+│ │ │ ├─ TransferUserToken200Response.ts
+│ │ │ ├─ TransferUserTokenRequest.ts
+│ │ │ ├─ UndenyUsers200Response.ts
+│ │ │ ├─ UpdateApp200Response.ts
+│ │ │ ├─ UpdateAppRequest.ts
+│ │ │ ├─ UpdateFieldRequest.ts
+│ │ │ ├─ UpdateRelationshipRequest.ts
+│ │ │ ├─ UpdateTableRequest.ts
+│ │ │ └─ index.ts
+│ │ └─ runtime.ts
+│ ├─ index.ts
+│ ├─ test-esm.ts
+│ └─ test.ts
+├─ test-output.txt
+├─ tsconfig.json
+├─ tsconfig.json.bak
+└─ types/
+  └─ QuickbaseClient.d.ts
