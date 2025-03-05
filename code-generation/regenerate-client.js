@@ -1,31 +1,30 @@
-#!/usr/bin/env node
-const { execSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
+import { execSync } from "child_process";
+import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
+import { join, dirname, basename } from "path"; // Added basename
+import { fileURLToPath } from "url";
 
-const CODEGEN_DIR = __dirname; // code-generation folder
-const SPEC_FILE = path.join(CODEGEN_DIR, "quickbase-fixed.json");
-const GENERATED_DIR = path.join(__dirname, "..", "src", "generated"); // Up to src/
-const BACKUP_DIR = path.join(__dirname, "..", "src", "generated-old");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const CODEGEN_DIR = __dirname;
+const SPEC_FILE = join(CODEGEN_DIR, "quickbase-fixed.json");
+const GENERATED_DIR = join(__dirname, "..", "src", "generated");
+const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
 
 function backupGeneratedDir() {
   console.log("Backing up existing src/generated/...");
-  if (fs.existsSync(GENERATED_DIR)) {
-    if (fs.existsSync(BACKUP_DIR))
+  if (existsSync(GENERATED_DIR)) {
+    if (existsSync(BACKUP_DIR))
       execSync(`rm -rf ${BACKUP_DIR}`, { stdio: "inherit" });
     execSync(`mv ${GENERATED_DIR} ${BACKUP_DIR}`, { stdio: "inherit" });
-    console.log(`Moved src/generated/ to ${path.basename(BACKUP_DIR)}`);
+    console.log(`Moved src/generated/ to ${basename(BACKUP_DIR)}`);
   } else {
     console.log("No existing src/generated/ to backup.");
   }
 }
 
 function generateClient() {
-  if (!fs.existsSync(SPEC_FILE)) {
+  if (!existsSync(SPEC_FILE)) {
     console.error(
-      `Fixed spec file ${path.basename(
-        SPEC_FILE
-      )} not found in code-generation folder. Run 'npm run fix-spec' first.`
+      `Fixed spec file ${basename(SPEC_FILE)} not found in code-generation folder. Run 'npm run fix-spec' first.`
     );
     process.exit(1);
   }
@@ -41,6 +40,19 @@ function generateClient() {
   console.log(`Client generated successfully in ${GENERATED_DIR}`);
 }
 
+function fixImports() {
+  console.log("Fixing ESM imports in generated files...");
+  const files = readdirSync(GENERATED_DIR).filter((f) => f.endsWith(".ts"));
+  for (const file of files) {
+    const filePath = join(GENERATED_DIR, file);
+    let content = readFileSync(filePath, "utf8");
+    // Replace relative imports without extensions (e.g., './common' -> './common.js')
+    content = content.replace(/(from\s+['"])(\.\/[^'"]+)(['"])/g, "$1$2.js$3");
+    writeFileSync(filePath, content, "utf8");
+  }
+  console.log("Imports fixed.");
+}
+
 function main() {
   try {
     execSync("java -version", { stdio: "ignore" });
@@ -52,6 +64,7 @@ function main() {
   }
   backupGeneratedDir();
   generateClient();
+  fixImports();
 }
 
 main();
