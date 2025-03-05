@@ -4,8 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "fix-spec": "node code-generation/fix-spec.js",
-    "regenerate": "node code-generation/regenerate-client.js",
+    "fix-spec": "node --loader ts-node/esm code-generation/fix-spec.ts",
+    "regenerate": "node --loader ts-node/esm code-generation/regenerate-client.js",
     "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
     "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
     "build": "tsc",

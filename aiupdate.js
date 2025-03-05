@@ -11,10 +11,14 @@ const excludeDirs = ["node_modules", "dist", ".git"];
 // List of important files whose contents you want to include (modify this list as needed)
 const importantFiles = [
   "package.json",
+  "tsconfig.json",
   "src/QuickBaseClient.ts",
+  "/types/QuickBaseTypes.ts",
   "code-generation/fix-spec.js",
   "code-generation/regenerate-client.js",
   "src/generated/QuickbaseMethods.ts",
+  "src/generate-types.ts",
+
   // Add more files here, e.g., "src/index.ts", "config.json", etc.
 ];
 
@@ -28,6 +32,8 @@ const projectGoals = `Project Goals:
 - Support both Node.js and browser environments.
 - The intent is to use this in JS frameworks like React, Vue, and Angular.
 - use fetch API for making HTTP requests and avoid axios with the openapi generator.
+- Use the OpenAPI to generate the typescript types and methods.
+- Use the lates ES6+ features and TypeScript features.
 `;
 // End of editable text block
 

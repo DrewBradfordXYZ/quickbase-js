@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { execSync } from "child_process";
 import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, dirname, basename } from "path";
@@ -10,7 +11,7 @@ const GENERATED_DIR = join(__dirname, "..", "src", "generated");
 const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
 const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
 
-function backupGeneratedDir() {
+function backupGeneratedDir(): void {
   console.log("Backing up existing src/generated/...");
   if (existsSync(GENERATED_DIR)) {
     if (existsSync(BACKUP_DIR))
@@ -22,7 +23,7 @@ function backupGeneratedDir() {
   }
 }
 
-function generateClient() {
+function generateClient(): void {
   if (!existsSync(SPEC_FILE)) {
     console.error(
       `Fixed spec file ${basename(SPEC_FILE)} not found. Run 'npm run fix-spec' first.`
@@ -42,9 +43,11 @@ function generateClient() {
   console.log(`Client generated successfully in ${GENERATED_DIR}`);
 }
 
-function fixImports() {
+function fixImports(): void {
   console.log("Fixing ESM imports in generated files...");
-  const files = readdirSync(GENERATED_DIR).filter((f) => f.endsWith(".ts"));
+  const files = readdirSync(GENERATED_DIR).filter((f: string) =>
+    f.endsWith(".ts")
+  );
   for (const file of files) {
     const filePath = join(GENERATED_DIR, file);
     let content = readFileSync(filePath, "utf8");
@@ -54,7 +57,7 @@ function fixImports() {
   console.log("Imports fixed.");
 }
 
-function main() {
+function main(): void {
   try {
     execSync("java -version", { stdio: "ignore" });
   } catch (error) {
