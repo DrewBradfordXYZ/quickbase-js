@@ -369,182 +369,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Successful response",
             "schema": {
-              "x-amf-examples": {
-                "Simple Application": {
-                  "ancestorId": "bqhskthaq",
-                  "created": "2020-03-27T18:34:12Z",
-                  "dateFormat": "MM-DD-YYYY",
-                  "description": "My testing app",
-                  "hasEveryoneOnTheInternet": true,
-                  "memoryInfo": {
-                    "estMemory": 1,
-                    "estMemoryInclDependentApps": 2
-                  },
-                  "id": "bpqe82s1",
-                  "name": "Testing App",
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                  "updated": "2020-04-03T19:12:20Z",
-                  "dataClassification": "Confidential"
-                },
-                "Application with defined variables": {
-                  "description": "This examples shows the response of an application that contains one or more variables.",
-                  "value": {
-                    "ancestorId": "bqhskthaq",
-                    "created": "2020-03-27T18:34:12Z",
-                    "dateFormat": "MM-DD-YYYY",
-                    "description": "My testing app",
-                    "hasEveryoneOnTheInternet": true,
-                    "id": "bpqe82s1",
-                    "memoryInfo": {
-                      "estMemory": 1,
-                      "estMemoryInclDependentApps": 2
-                    },
-                    "name": "Testing App",
-                    "securityProperties": {
-                      "allowClone": false,
-                      "allowExport": false,
-                      "enableAppTokens": false,
-                      "hideFromPublic": false,
-                      "mustBeRealmApproved": true,
-                      "useIPFilter": true
-                    },
-                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                    "variables": [
-                      {
-                        "name": "Project End Date",
-                        "value": "7-16-2025"
-                      },
-                      {
-                        "name": "Project Manager Email",
-                        "value": "p.diaz@company.com"
-                      }
-                    ],
-                    "updated": "2020-04-03T19:12:20Z"
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "ancestorId": {
-                  "description": "The id of the app from which this app was copied",
-                  "type": "string"
-                },
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "memoryInfo": {
-                  "type": "object",
-                  "description": "Application memory info",
-                  "additionalProperties": false,
-                  "properties": {
-                    "estMemory": {
-                      "type": "number",
-                      "description": "The estimated memory of this application in gigabytes"
-                    },
-                    "estMemoryInclDependentApps": {
-                      "type": "number",
-                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
-                    }
-                  }
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Security properties of the application",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/App"
             }
           }
         },
@@ -1698,135 +1525,22 @@
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "query",
+            "required": true,
             "type": "string"
           },
           {
             "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Successful response",
             "schema": {
-              "example": {
-                "name": "Example Table",
-                "created": "2020-03-27T18:34:40Z",
-                "updated": "2020-04-03T19:12:40Z",
-                "alias": "_dbid_example_table",
-                "description": "Table as an example.",
-                "id": "bpqe82s0",
-                "nextRecordId": 1,
-                "nextFieldId": 1,
-                "defaultSortFieldId": 2,
-                "defaultSortOrder": "ASC",
-                "keyFieldId": 3,
-                "singleRecordName": "Example Record",
-                "pluralRecordName": "Example Records",
-                "sizeLimit": "150 MB",
-                "spaceUsed": "17 MB",
-                "spaceRemaining": "133 MB"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name of the table.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier (dbid) of the table.",
-                  "type": "string"
-                },
-                "alias": {
-                  "description": "The automatically-created table alias for the table.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the table, as configured by an application administrator.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "nextRecordId": {
-                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "nextFieldId": {
-                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "defaultSortFieldId": {
-                  "description": "The id of the field that is configured for default sorting.",
-                  "type": "integer"
-                },
-                "defaultSortOrder": {
-                  "description": "The configuration of the default sort order on the table.",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ],
-                  "type": "string"
-                },
-                "keyFieldId": {
-                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                  "type": "integer"
-                },
-                "singleRecordName": {
-                  "description": "The builder-configured singular noun of the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The builder-configured plural noun of the table.",
-                  "type": "string"
-                },
-                "sizeLimit": {
-                  "description": "The size limit for the table.",
-                  "type": "string"
-                },
-                "spaceUsed": {
-                  "description": "The amount of space currently being used by the table.",
-                  "type": "string"
-                },
-                "spaceRemaining": {
-                  "description": "The amount of space remaining for use by the table.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Table"
             }
           }
         },
@@ -4625,456 +4339,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Successful response",
             "schema": {
-              "example": {
-                "id": 123,
-                "label": "Field1",
-                "fieldType": "text",
-                "mode": "",
-                "noWrap": false,
-                "bold": false,
-                "required": false,
-                "appearsByDefault": false,
-                "findEnabled": false,
-                "unique": false,
-                "doesDataCopy": false,
-                "fieldHelp": "field help",
-                "audited": false,
-                "properties": {
-                  "primaryKey": false,
-                  "foreignKey": false,
-                  "numLines": 1,
-                  "maxLength": 0,
-                  "appendOnly": false,
-                  "allowHTML": false,
-                  "allowMentions": false,
-                  "sortAsGiven": false,
-                  "carryChoices": true,
-                  "allowNewChoices": false,
-                  "formula": "",
-                  "defaultValue": ""
-                },
-                "permissions": [
-                  {
-                    "permissionType": "View",
-                    "role": "Viewer",
-                    "roleId": 10
-                  },
-                  {
-                    "permissionType": "None",
-                    "role": "Participant",
-                    "roleId": 11
-                  },
-                  {
-                    "permissionType": "Modify",
-                    "role": "Administrator",
-                    "roleId": 12
-                  }
-                ]
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "id"
-              ],
-              "properties": {
-                "id": {
-                  "description": "The id of the field, unique to this table.",
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "fieldType": {
-                  "description": "The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html).",
-                  "type": "string"
-                },
-                "mode": {
-                  "description": "For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank.",
-                  "type": "string"
-                },
-                "label": {
-                  "description": "The label (name) of the field.",
-                  "type": "string"
-                },
-                "noWrap": {
-                  "description": "Indicates if the field is configured to not wrap when displayed in the product.",
-                  "type": "boolean"
-                },
-                "bold": {
-                  "description": "Indicates if the field is configured to display in bold in the product.",
-                  "type": "boolean"
-                },
-                "required": {
-                  "description": "Indicates if the field is marked required.",
-                  "type": "boolean"
-                },
-                "appearsByDefault": {
-                  "description": "Indicates if the field is marked as a default in reports.",
-                  "type": "boolean"
-                },
-                "findEnabled": {
-                  "description": "Indicates if the field is marked as searchable.",
-                  "type": "boolean"
-                },
-                "unique": {
-                  "description": "Indicates if the field is marked unique.",
-                  "type": "boolean"
-                },
-                "doesDataCopy": {
-                  "description": "Indicates if the field data will copy when a user copies the record.",
-                  "type": "boolean"
-                },
-                "fieldHelp": {
-                  "description": "The configured help text shown to users within the product.",
-                  "type": "string"
-                },
-                "audited": {
-                  "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs.",
-                  "type": "boolean"
-                },
-                "properties": {
-                  "description": "Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "allowMentions": {
-                      "description": "If someone can @mention users in the rich text field to generate an email notification.",
-                      "type": "boolean"
-                    },
-                    "comments": {
-                      "description": "The comments entered on the field properties by an administrator.",
-                      "type": "string"
-                    },
-                    "doesTotal": {
-                      "description": "Whether this field totals in reports within the product.",
-                      "type": "boolean"
-                    },
-                    "autoSave": {
-                      "description": "Whether the link field will auto save.",
-                      "type": "boolean"
-                    },
-                    "defaultValueLuid": {
-                      "description": "Default user id value.",
-                      "type": "integer"
-                    },
-                    "useI18NFormat": {
-                      "description": "Whether phone numbers should be in E.164 standard international format.",
-                      "type": "boolean"
-                    },
-                    "maxVersions": {
-                      "description": "The maximum number of versions configured for a file attachment.",
-                      "type": "integer"
-                    },
-                    "carryChoices": {
-                      "description": "Whether the field should carry its multiple choice fields when copied.",
-                      "type": "boolean"
-                    },
-                    "format": {
-                      "description": "The format to display time.",
-                      "type": "integer"
-                    },
-                    "maxLength": {
-                      "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
-                      "type": "integer"
-                    },
-                    "linkText": {
-                      "description": "The configured text value that replaces the URL that users see within the product.",
-                      "type": "string"
-                    },
-                    "parentFieldId": {
-                      "description": "The id of the parent composite field, when applicable.",
-                      "type": "integer"
-                    },
-                    "displayTimezone": {
-                      "description": "Indicates whether to display the timezone within the product.",
-                      "type": "boolean"
-                    },
-                    "summaryTargetFieldId": {
-                      "description": "The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count).",
-                      "type": "integer"
-                    },
-                    "allowNewChoices": {
-                      "description": "Indicates if users can add new choices to a selection list.",
-                      "type": "boolean"
-                    },
-                    "masterChoiceFieldId": {
-                      "description": "The id of the field that is the reference in the relationship.",
-                      "type": "integer"
-                    },
-                    "defaultToday": {
-                      "description": "Indicates if the field value is defaulted today for new records.",
-                      "type": "boolean"
-                    },
-                    "units": {
-                      "description": "The units label.",
-                      "type": "string"
-                    },
-                    "lookupTargetFieldId": {
-                      "description": "The id of the field that is the target on the master table for this lookup.",
-                      "type": "integer"
-                    },
-                    "summaryFunction": {
-                      "description": "The summary accumulation function type.",
-                      "enum": [
-                        "AVG",
-                        "SUM",
-                        "MAX",
-                        "MIN",
-                        "STD-DEV",
-                        "COUNT",
-                        "COMBINED-TEXT",
-                        "COMBINED-USER",
-                        "DISTINCT-COUNT"
-                      ],
-                      "type": "string"
-                    },
-                    "sourceFieldId": {
-                      "description": "The id of the source field.",
-                      "type": "integer"
-                    },
-                    "masterTableTag": {
-                      "description": "The table alias for the master table in the relationship this field is part of.",
-                      "type": "string"
-                    },
-                    "doesAverage": {
-                      "description": "Whether this field averages in reports within the product.",
-                      "type": "boolean"
-                    },
-                    "formula": {
-                      "description": "The formula of the field as configured in Quickbase.",
-                      "type": "string"
-                    },
-                    "decimalPlaces": {
-                      "description": "The number of decimal places displayed in the product for this field.",
-                      "type": "integer"
-                    },
-                    "defaultCountryCode": {
-                      "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
-                      "type": "string"
-                    },
-                    "seeVersions": {
-                      "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
-                      "type": "boolean"
-                    },
-                    "displayMonth": {
-                      "description": "How to display months.",
-                      "type": "string"
-                    },
-                    "numLines": {
-                      "description": "The number of lines shown in Quickbase for this text field.",
-                      "type": "integer"
-                    },
-                    "displayEmail": {
-                      "description": "How the email is displayed.",
-                      "type": "string"
-                    },
-                    "defaultKind": {
-                      "description": "The user default type.",
-                      "type": "string"
-                    },
-                    "coverText": {
-                      "description": "An alternate user friendly text that can be used to display a link in the browser.",
-                      "type": "string"
-                    },
-                    "currencySymbol": {
-                      "description": "The current symbol used when displaying field values within the product.",
-                      "type": "string"
-                    },
-                    "masterChoiceTableId": {
-                      "description": "The id of the table that is the master in this relationship.",
-                      "type": "string"
-                    },
-                    "targetFieldId": {
-                      "description": "The id of the target field.",
-                      "type": "integer"
-                    },
-                    "displayUser": {
-                      "description": "The configured option for how users display within the product.",
-                      "type": "string"
-                    },
-                    "blankIsZero": {
-                      "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
-                      "type": "boolean"
-                    },
-                    "exact": {
-                      "description": "Whether an exact match is required for a report link.",
-                      "type": "boolean"
-                    },
-                    "startField": {
-                      "description": "The start field id.",
-                      "type": "integer"
-                    },
-                    "defaultDomain": {
-                      "description": "Default email domain.",
-                      "type": "string"
-                    },
-                    "defaultValue": {
-                      "description": "The default value configured for a field when a new record is added.",
-                      "type": "string"
-                    },
-                    "choicesLuid": {
-                      "description": "List of user choices.",
-                      "type": "array"
-                    },
-                    "abbreviate": {
-                      "description": "Don't show the URL protocol when showing the URL.",
-                      "type": "boolean"
-                    },
-                    "xmlTag": {
-                      "description": "The field's xml tag.",
-                      "type": "string"
-                    },
-                    "targetTableName": {
-                      "description": "The field's target table name.",
-                      "type": "string"
-                    },
-                    "numberFormat": {
-                      "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
-                      "type": "integer"
-                    },
-                    "appearsAs": {
-                      "description": "The link text, if empty, the url will be used as link text.",
-                      "type": "string"
-                    },
-                    "width": {
-                      "description": "The field's html input width in the product.",
-                      "type": "integer"
-                    },
-                    "currencyFormat": {
-                      "description": "The currency format used when displaying field values within the product.",
-                      "enum": [
-                        "left",
-                        "right",
-                        "middle"
-                      ],
-                      "type": "string"
-                    },
-                    "foreignKey": {
-                      "description": "Indicates if the field is a foreign key (or reference field) in a relationship.",
-                      "type": "boolean"
-                    },
-                    "displayDayOfWeek": {
-                      "description": "Indicates whether to display the day of the week within the product.",
-                      "type": "boolean"
-                    },
-                    "summaryReferenceFieldId": {
-                      "description": "The id of the field that is the reference in the relationship for this summary.",
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "commaStart": {
-                      "description": "The number of digits before commas display in the product, when applicable.",
-                      "type": "integer"
-                    },
-                    "choices": {
-                      "description": "An array of entries that exist for a field that offers choices to the user.",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "targetTableId": {
-                      "description": "The id of the target table.",
-                      "type": "string"
-                    },
-                    "displayRelative": {
-                      "description": "Whether to display time as relative.",
-                      "type": "boolean"
-                    },
-                    "compositeFields": {
-                      "description": "An array of the fields that make up a composite field (e.g., address).",
-                      "type": "array"
-                    },
-                    "displayCheckboxAsText": {
-                      "description": "Indicates whether the checkbox values will be shown as text in reports.",
-                      "type": "boolean"
-                    },
-                    "versionMode": {
-                      "description": "Version modes for files. Keep all versions vs keep last version.",
-                      "enum": [
-                        "keepallversions",
-                        "keeplastversions"
-                      ],
-                      "type": "string"
-                    },
-                    "displayTime": {
-                      "description": "Indicates whether to display the time, in addition to the date.",
-                      "type": "boolean"
-                    },
-                    "durationField": {
-                      "description": "The duration field id.",
-                      "type": "integer"
-                    },
-                    "snapFieldId": {
-                      "description": "The id of the field that is used to snapshot values from, when applicable.",
-                      "type": "integer"
-                    },
-                    "hours24": {
-                      "description": "Indicates whether or not to display time in the 24-hour format within the product.",
-                      "type": "boolean"
-                    },
-                    "sortAlpha": {
-                      "description": "Whether to sort alphabetically, default sort is by record ID.",
-                      "type": "boolean"
-                    },
-                    "sortAsGiven": {
-                      "description": "Indicates if the listed entries sort as entered vs alphabetically.",
-                      "type": "boolean"
-                    },
-                    "hasExtension": {
-                      "description": "Whether this field has a phone extension.",
-                      "type": "boolean"
-                    },
-                    "workWeek": {
-                      "description": "The work week type.",
-                      "type": "integer"
-                    },
-                    "useNewWindow": {
-                      "description": "Indicates if the URL should open a new window when a user clicks it within the product.",
-                      "type": "boolean"
-                    },
-                    "appendOnly": {
-                      "description": "Whether this field is append only.",
-                      "type": "boolean"
-                    },
-                    "displayAsLink": {
-                      "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
-                      "type": "boolean"
-                    },
-                    "allowHTML": {
-                      "description": "Whether this field allows html.",
-                      "type": "boolean"
-                    },
-                    "lookupReferenceFieldId": {
-                      "description": "The id of the field that is the reference in the relationship for this lookup.",
-                      "type": "integer"
-                    }
-                  }
-                },
-                "permissions": {
-                  "description": "Field Permissions for different roles.",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "role": {
-                        "description": "The role associated with a given permission for the field",
-                        "type": "string"
-                      },
-                      "permissionType": {
-                        "description": "The permission given to the role for this field",
-                        "type": "string"
-                      },
-                      "roleId": {
-                        "description": "The Id of the given role",
-                        "type": "integer"
-                      }
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/Field"
             }
           }
         },
@@ -11553,6 +10820,77 @@
           "type": "boolean"
         }
       }
+    },
+    "Table": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the table"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the table"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last updated timestamp"
+        },
+        "description": {
+          "type": "string",
+          "description": "Table description"
+        },
+        "keyFieldId": {
+          "type": "integer",
+          "description": "ID of the key field"
+        },
+        "nextFieldId": {
+          "type": "integer",
+          "description": "Next available field ID"
+        },
+        "nextRecordId": {
+          "type": "integer",
+          "description": "Next available record ID"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "App": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the app"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the app"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     }
   }
 }

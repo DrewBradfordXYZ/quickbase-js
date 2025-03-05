@@ -1,11 +1,13 @@
-import {
-  FieldsApiFactory,
-  TablesApiFactory,
-  AppsApiFactory,
-} from "./generated/generated/api.js";
-import { Configuration } from "./generated/configuration.js";
-import axios from "axios";
-import type { Field, Table, App } from "./generated/generated/model.js";
+import { Configuration, HTTPHeaders } from "./generated/runtime";
+import { FieldsApi } from "./generated/apis/FieldsApi";
+import { TablesApi } from "./generated/apis/TablesApi";
+import { AppsApi } from "./generated/apis/AppsApi";
+import { Field } from "./generated/models/Field";
+import { App } from "./generated/models/App"; // Use App instead of GetApp200Response
+import { CreateField200Response } from "./generated/models/CreateField200Response";
+import { DeleteFields200Response } from "./generated/models/DeleteFields200Response";
+import { Upsert200Response } from "./generated/models/Upsert200Response";
+import { Table } from "./generated/models/Table";
 
 export interface QuickbaseMethods {
   getFields(params: {
@@ -14,6 +16,15 @@ export interface QuickbaseMethods {
   }): Promise<Field[]>;
   getTable(params: { appId: string; tableId: string }): Promise<Table>;
   getApp(params: { appId: string }): Promise<App>;
+  createField(params: {
+    tableId: string;
+    generated: any;
+  }): Promise<CreateField200Response>;
+  deleteFields(params: {
+    tableId: string;
+    generated: any;
+  }): Promise<DeleteFields200Response>;
+  upsert(params: { generated: any }): Promise<Upsert200Response>;
 }
 
 interface QuickbaseConfig {
@@ -26,7 +37,11 @@ interface QuickbaseConfig {
 type ApiMethod = (...args: unknown[]) => Promise<unknown>;
 type MethodMap = Record<
   string,
-  { api: unknown; method: ApiMethod; paramMap: string[] }
+  {
+    api: FieldsApi | TablesApi | AppsApi;
+    method: ApiMethod;
+    paramMap: string[];
+  }
 >;
 
 const simplifyName = (name: string): string =>
@@ -38,27 +53,24 @@ const simplifyName = (name: string): string =>
 export function createQuickbaseClient(
   config: QuickbaseConfig
 ): QuickbaseClient {
-  const token = config.tempToken || config.userToken;
-  const axiosInstance = axios.create({
-    baseURL: "https://api.quickbase.com/v1",
-  });
-
-  axiosInstance.defaults.headers.common["Authorization"] = token
-    ? `QB-USER-TOKEN ${token}`
-    : undefined;
-  axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
-  axiosInstance.defaults.headers.common["QB-Realm-Hostname"] =
-    `${config.realm}.quickbase.com`;
+  const token = config.tempToken || config.userToken || ""; // Default to empty string
+  const baseUrl = `https://api.quickbase.com/v1`;
+  const headers: HTTPHeaders = {
+    Authorization: `QB-USER-TOKEN ${token}`,
+    "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
+    "Content-Type": "application/json",
+  };
 
   const configuration = new Configuration({
-    basePath: "https://api.quickbase.com/v1",
-    accessToken: token,
+    basePath: baseUrl,
+    headers,
+    fetchApi: typeof window !== "undefined" ? window.fetch.bind(window) : fetch,
   });
 
-  const apis: Record<string, unknown> = {
-    fields: FieldsApiFactory(configuration, undefined, axiosInstance),
-    tables: TablesApiFactory(configuration, undefined, axiosInstance),
-    apps: AppsApiFactory(configuration, undefined, axiosInstance),
+  const apis: Record<string, FieldsApi | TablesApi | AppsApi> = {
+    fields: new FieldsApi(configuration),
+    tables: new TablesApi(configuration),
+    apps: new AppsApi(configuration),
   };
 
   const methodMap = buildMethodMap();
@@ -74,12 +86,7 @@ export function createQuickbaseClient(
         const friendlyName = simplifyName(methodName);
         const paramNames = getParamNames(
           api[methodName as keyof typeof api] as ApiMethod
-        ).filter(
-          (name) =>
-            name !== "qBRealmHostname" &&
-            name !== "authorization" &&
-            name !== "options"
-        );
+        ).filter((name) => name !== "options");
         methodMap[friendlyName] = {
           api,
           method: api[methodName as keyof typeof api] as ApiMethod,
@@ -109,34 +116,12 @@ export function createQuickbaseClient(
 
     const userParams: Record<string, unknown> = { ...params };
     const args: unknown[] = [];
-
-    const fullSignature = [
-      ...paramMap.filter((p) => p !== "includeFieldPerms" && p !== "userAgent"),
-      "qBRealmHostname",
-      "authorization",
-      ...paramMap.filter((p) => p === "includeFieldPerms" || p === "userAgent"),
-      "options",
-    ];
-
-    fullSignature.forEach((param) => {
-      if (param === "qBRealmHostname") {
-        args.push(`${config.realm}.quickbase.com`);
-      } else if (param === "authorization") {
-        args.push(token ? `QB-USER-TOKEN ${token}` : undefined);
-      } else if (param === "options") {
-        args.push({
-          headers: {
-            Authorization: token ? `QB-USER-TOKEN ${token}` : undefined,
-            "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
-            "Content-Type": "application/json",
-          },
-        });
-      } else {
-        args.push(userParams[param] ?? undefined);
-      }
+    paramMap.forEach((param) => {
+      args.push(userParams[param] ?? undefined);
     });
 
-    return method(...args).then((response) => response.data);
+    const response = await (method(...args) as Promise<Response>);
+    return response.json() as Promise<ReturnType<QuickbaseMethods[K]>>;
   }
 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {

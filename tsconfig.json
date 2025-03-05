@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ESNext", // Use latest ECMAScript features
-    "module": "ESNext", // Use ES modules
-    "moduleResolution": "Bundler", // Modern resolution for Node.js and bundlers
-    "outDir": "dist", // Output directory
-    "rootDir": "src", // Source directory
-    "esModuleInterop": true, // Compatibility with CommonJS modules
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist",
+    "rootDir": ".", // Include root-level files
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true, // Enable all strict type-checking options
-    "skipLibCheck": true, // Skip checking of declaration files
-    "declaration": true, // Generate .d.ts files
-    "types": ["node"], // Include Node.js types
-    "noEmit": false, // Emit JS files
-    "resolveJsonModule": true, // Allow importing JSON files
-    "isolatedModules": false, // Allow non-isolated modules
-    "lib": ["ESNext", "DOM"] // Include ESNext and browser APIs
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "types": ["node"],
+    "noEmit": false,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*", "code-generation/**/*", "types/QuickbaseClient.d.ts"],
+  "include": [
+    "src/**/*",
+    "code-generation/**/*",
+    "aiupdate.ts",
+    "types/QuickbaseClient.d.ts"
+  ],
   "exclude": ["node_modules", "dist", "src/generated-old"]
 }

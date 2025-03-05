@@ -30,14 +30,14 @@ function generateClient(): void {
     );
     process.exit(1);
   }
-  console.log("Generating TypeScript client with models using JAR...");
+  console.log("Generating TypeScript client with Fetch API using JAR...");
   execSync(
     `java -jar ${JAR_PATH} generate \
       -i ${SPEC_FILE} \
-      -g typescript-axios \
+      -g typescript-fetch \
       -o ${GENERATED_DIR} \
       --skip-validate-spec \
-      --additional-properties=supportsES6=true,modelPropertyNaming=original,withSeparateModelsAndApi=true,generateAliasAsModel=true,apiPackage=generated.api,modelPackage=generated.model`,
+      --additional-properties=supportsES6=true,modelPropertyNaming=original,typescriptThreePlus=true,apiPackage=generated.api,modelPackage=generated.model`,
     { stdio: "inherit" }
   );
   console.log(`Client generated successfully in ${GENERATED_DIR}`);

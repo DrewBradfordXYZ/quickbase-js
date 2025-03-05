@@ -5,13 +5,13 @@ Project Goals:
 - Implement a QuickBase API client in TypeScript.
 - Generate client methods from the QuickBase RESTful API spec.
 - Provide a simple and intuitive interface for interacting with QuickBase.
-- This libray should not have to manually update the client methods when the QuickBase API changes.
-- Generate aegonomic client methods from the QuickBase RESTful API spec that does not require manual updates.
+- This library should not have to manually update the client methods when the QuickBase API changes.
+- Generate ergonomic client methods from the QuickBase RESTful API spec that do not require manual updates.
 - Support both Node.js and browser environments.
 - The intent is to use this in JS frameworks like React, Vue, and Angular.
-- use fetch API for making HTTP requests and avoid axios with the openapi generator.
-- Use the OpenAPI to generate the typescript types and methods.
-- Use the lates ES6+ features and TypeScript features.
+- Use the Fetch API for making HTTP requests and avoid Axios with the OpenAPI Generator.
+- Use OpenAPI to generate the TypeScript types and methods.
+- Use the latest ES6+ features and TypeScript features.
 
 
 ├─ .env.development
@@ -19,18 +19,41 @@ Project Goals:
 ├─ .gitignore
 ├─ LICENSE
 ├─ README.md
-├─ aiupdate.js
+├─ aiupdate.ts
 ├─ aiupdate.txt
 ├─ build.js
 ├─ code-generation/
-│ ├─ fix-spec.js
+│ ├─ fix-spec.ts
 │ │   Contents:
 │ │     #!/usr/bin/env node
 │ │     import { promises as fs } from "fs";
 │ │     import path from "path";
 │ │     import * as glob from "glob";
 │ │     
-│ │     async function fixQuickBaseSpec() {
+│ │     // Define types for the spec structure (simplified for brevity)
+│ │     interface Parameter {
+│ │       name: string;
+│ │       in: string;
+│ │       required?: boolean;
+│ │       type?: string;
+│ │       schema?: { type?: string; items?: any };
+│ │       example?: any;
+│ │     }
+│ │     
+│ │     interface Operation {
+│ │       parameters?: Parameter[];
+│ │       responses?: Record<string, { description: string; schema?: any }>;
+│ │     }
+│ │     
+│ │     interface Spec {
+│ │       paths: Record<string, Record<string, Operation>>;
+│ │       definitions?: Record<string, any>;
+│ │       operations?: any;
+│ │       groups?: any;
+│ │       components?: any;
+│ │     }
+│ │     
+│ │     async function fixQuickBaseSpec(): Promise<void> {
 │ │       try {
 │ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
 │ │         const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
@@ -44,36 +67,39 @@ Project Goals:
 │ │           );
 │ │           process.exit(1);
 │ │         }
-│ │         const inputFile = specFiles.sort().pop();
+│ │         const inputFile = specFiles.sort().pop() as string;
 │ │         const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
 │ │     
 │ │         console.log(`Reading ${path.basename(inputFile)} from specs/...`);
 │ │         const specContent = await fs.readFile(inputFile, "utf8");
-│ │         const spec = JSON.parse(specContent);
+│ │         const spec: Spec = JSON.parse(specContent);
 │ │     
 │ │         console.log("Fixing parameters...");
 │ │         for (const pathKey in spec.paths) {
 │ │           for (const method in spec.paths[pathKey]) {
 │ │             const operation = spec.paths[pathKey][method];
 │ │             if (operation.parameters) {
-│ │               operation.parameters = operation.parameters.map((param) => {
-│ │                 if ("example" in param) delete param.example;
-│ │                 if ("schema" in param && param.in !== "body") delete param.schema;
-│ │                 if (!param.type && param.in !== "body") param.type = "string";
-│ │                 if (
-│ │                   param.name === "generated" &&
-│ │                   param.schema?.type === "array" &&
-│ │                   !param.schema.items
-│ │                 ) {
-│ │                   param.schema.items = { $ref: "#/definitions/Record" }; // Fix generated param if array
+│ │               operation.parameters = operation.parameters.map(
+│ │                 (param: Parameter) => {
+│ │                   if ("example" in param) delete param.example;
+│ │                   if ("schema" in param && param.in !== "body") delete param.schema;
+│ │                   if (!param.type && param.in !== "body") param.type = "string";
+│ │                   if (
+│ │                     param.name === "generated" &&
+│ │                     param.schema?.type === "array" &&
+│ │                     !param.schema.items
+│ │                   ) {
+│ │                     param.schema!.items = { $ref: "#/definitions/Record" };
+│ │                   }
+│ │                   return param;
 │ │                 }
-│ │                 return param;
-│ │               });
+│ │               );
 │ │             }
 │ │           }
 │ │         }
 │ │     
 │ │         console.log("Adding responses and schemas...");
+│ │         // Fix /fields endpoint
 │ │         if (spec.paths["/fields"]?.get) {
 │ │           spec.paths["/fields"].get.parameters = [
 │ │             { name: "tableId", in: "query", required: true, type: "string" },
@@ -91,6 +117,8 @@ Project Goals:
 │ │             },
 │ │           };
 │ │         }
+│ │     
+│ │         // Fix /fields/{fieldId} endpoint (example)
 │ │         if (spec.paths["/fields/{fieldId}"]?.get) {
 │ │           spec.paths["/fields/{fieldId}"].get.responses = {
 │ │             200: {
@@ -99,6 +127,8 @@ Project Goals:
 │ │             },
 │ │           };
 │ │         }
+│ │     
+│ │         // Add /tables/{tableId} endpoint with Table definition
 │ │         if (spec.paths["/tables/{tableId}"]?.get) {
 │ │           spec.paths["/tables/{tableId}"].get.parameters = [
 │ │             { name: "appId", in: "query", required: true, type: "string" },
@@ -111,6 +141,8 @@ Project Goals:
 │ │             },
 │ │           };
 │ │         }
+│ │     
+│ │         // Fix /apps/{appId} endpoint (example)
 │ │         if (spec.paths["/apps/{appId}"]?.get) {
 │ │           spec.paths["/apps/{appId}"].get.responses = {
 │ │             200: {
@@ -119,59 +151,13 @@ Project Goals:
 │ │             },
 │ │           };
 │ │         }
-│ │         if (spec.paths["/records"]?.post) {
-│ │           spec.paths["/records"].post.parameters = [
-│ │             {
-│ │               name: "generated",
-│ │               in: "body",
-│ │               required: true,
-│ │               schema: {
-│ │                 type: "array",
-│ │                 items: { $ref: "#/definitions/RecordRequest" },
-│ │               },
-│ │             },
-│ │           ];
-│ │           spec.paths["/records"].post.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
-│ │             },
-│ │             207: {
-│ │               description: "Partial success",
-│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
-│ │             },
-│ │           };
-│ │         }
-│ │         if (spec.paths["/records/query"]?.post) {
-│ │           spec.paths["/records/query"].post.parameters = [
-│ │             {
-│ │               name: "generated",
-│ │               in: "body",
-│ │               required: true,
-│ │               schema: { type: "object", additionalProperties: true }, // Query body is complex, adjust as needed
-│ │             },
-│ │           ];
-│ │           spec.paths["/records/query"].post.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { type: "array", items: { $ref: "#/definitions/Record" } },
-│ │             },
-│ │           };
-│ │         }
-│ │         if (spec.paths["/reports/{reportId}/run"]?.post) {
-│ │           spec.paths["/reports/{reportId}/run"].post.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: {
-│ │                 type: "array",
-│ │                 items: { $ref: "#/definitions/ReportData" },
-│ │               },
-│ │             },
-│ │           };
-│ │         }
+│ │     
+│ │         // Add more endpoints as needed...
 │ │     
 │ │         console.log("Adding definitions...");
 │ │         if (!spec.definitions) spec.definitions = {};
+│ │     
+│ │         // Field definition (already present)
 │ │         spec.definitions.Field = {
 │ │           type: "object",
 │ │           properties: {
@@ -191,85 +177,53 @@ Project Goals:
 │ │             unique: { type: "boolean" },
 │ │           },
 │ │         };
+│ │     
+│ │         // Add Table definition
 │ │         spec.definitions.Table = {
 │ │           type: "object",
 │ │           properties: {
-│ │             alias: { type: "string" },
-│ │             created: { type: "string" },
-│ │             defaultSortFieldId: { type: "integer" },
-│ │             defaultSortOrder: { type: "string", enum: ["ASC", "DESC"] },
-│ │             description: { type: "string" },
-│ │             id: { type: "string" },
-│ │             keyFieldId: { type: "integer" },
-│ │             name: { type: "string" },
-│ │             nextFieldId: { type: "integer" },
-│ │             nextRecordId: { type: "integer" },
-│ │             pluralRecordName: { type: "string" },
-│ │             singleRecordName: { type: "string" },
-│ │             sizeLimit: { type: "string" },
-│ │             spaceRemaining: { type: "string" },
-│ │             spaceUsed: { type: "string" },
-│ │             updated: { type: "string" },
+│ │             id: { type: "string", description: "Unique identifier for the table" },
+│ │             name: { type: "string", description: "Name of the table" },
+│ │             created: {
+│ │               type: "string",
+│ │               format: "date-time",
+│ │               description: "Creation timestamp",
+│ │             },
+│ │             updated: {
+│ │               type: "string",
+│ │               format: "date-time",
+│ │               description: "Last updated timestamp",
+│ │             },
+│ │             description: { type: "string", description: "Table description" },
+│ │             keyFieldId: { type: "integer", description: "ID of the key field" },
+│ │             nextFieldId: {
+│ │               type: "integer",
+│ │               description: "Next available field ID",
+│ │             },
+│ │             nextRecordId: {
+│ │               type: "integer",
+│ │               description: "Next available record ID",
+│ │             },
+│ │             // Add more properties based on QuickBase API docs
 │ │           },
+│ │           required: ["id", "name"],
 │ │         };
+│ │     
+│ │         // Add App definition (example)
 │ │         spec.definitions.App = {
 │ │           type: "object",
 │ │           properties: {
-│ │             created: { type: "string" },
-│ │             dateFormat: { type: "string" },
+│ │             id: { type: "string", description: "Unique identifier for the app" },
+│ │             name: { type: "string", description: "Name of the app" },
+│ │             created: { type: "string", format: "date-time" },
+│ │             updated: { type: "string", format: "date-time" },
 │ │             description: { type: "string" },
-│ │             hasEveryoneOnTheInternet: { type: "boolean" },
-│ │             id: { type: "string" },
-│ │             memoryInfo: {
-│ │               type: "object",
-│ │               properties: {
-│ │                 estMemory: { type: "integer" },
-│ │                 estMemoryInclDependentApps: { type: "integer" },
-│ │               },
-│ │             },
-│ │             name: { type: "string" },
-│ │             securityProperties: {
-│ │               type: "object",
-│ │               additionalProperties: { type: "boolean" },
-│ │             },
-│ │             timeZone: { type: "string" },
-│ │             updated: { type: "string" },
+│ │             // Add more properties as needed
 │ │           },
+│ │           required: ["id", "name"],
 │ │         };
-│ │         spec.definitions.Record = {
-│ │           type: "object",
-│ │           properties: {
-│ │             metadata: {
-│ │               type: "object",
-│ │               properties: {
-│ │                 createdRecordId: { type: "integer" },
-│ │                 updatedRecordId: { type: "integer" },
-│ │                 lineErrors: { type: "array", items: { type: "string" } },
-│ │               },
-│ │             },
-│ │             data: { type: "object", additionalProperties: true },
-│ │           },
-│ │         };
-│ │         spec.definitions.RecordRequest = {
-│ │           type: "object",
-│ │           properties: {
-│ │             to: { type: "string" },
-│ │             data: {
-│ │               type: "array",
-│ │               items: { type: "object", additionalProperties: true },
-│ │             },
-│ │           },
-│ │         };
-│ │         spec.definitions.ReportData = {
-│ │           type: "object",
-│ │           properties: {
-│ │             id: { type: "string" },
-│ │             data: {
-│ │               type: "array",
-│ │               items: { type: "object", additionalProperties: true },
-│ │             },
-│ │           },
-│ │         };
+│ │     
+│ │         // Add more definitions as needed (e.g., Record, ReportData)...
 │ │     
 │ │         console.log("Removing unexpected top-level attributes...");
 │ │         delete spec.operations;
@@ -289,8 +243,9 @@ Project Goals:
 │ │     
 │ ├─ openapi-generator-cli.jar
 │ ├─ quickbase-fixed.json
-│ └─ regenerate-client.js
+│ └─ regenerate-client.ts
 │     Contents:
+│       #!/usr/bin/env node
 │       import { execSync } from "child_process";
 │       import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
 │       import { join, dirname, basename } from "path";
@@ -303,7 +258,7 @@ Project Goals:
 │       const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
 │       const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
 │       
-│       function backupGeneratedDir() {
+│       function backupGeneratedDir(): void {
 │         console.log("Backing up existing src/generated/...");
 │         if (existsSync(GENERATED_DIR)) {
 │           if (existsSync(BACKUP_DIR))
@@ -315,29 +270,31 @@ Project Goals:
 │         }
 │       }
 │       
-│       function generateClient() {
+│       function generateClient(): void {
 │         if (!existsSync(SPEC_FILE)) {
 │           console.error(
 │             `Fixed spec file ${basename(SPEC_FILE)} not found. Run 'npm run fix-spec' first.`
 │           );
 │           process.exit(1);
 │         }
-│         console.log("Generating TypeScript client with models using JAR...");
+│         console.log("Generating TypeScript client with Fetch API using JAR...");
 │         execSync(
 │           `java -jar ${JAR_PATH} generate \
 │             -i ${SPEC_FILE} \
-│             -g typescript-axios \
+│             -g typescript-fetch \
 │             -o ${GENERATED_DIR} \
 │             --skip-validate-spec \
-│             --additional-properties=supportsES6=true,modelPropertyNaming=original,withSeparateModelsAndApi=true,generateAliasAsModel=true,apiPackage=generated.api,modelPackage=generated.model`,
+│             --additional-properties=supportsES6=true,modelPropertyNaming=original,typescriptThreePlus=true,apiPackage=generated.api,modelPackage=generated.model`,
 │           { stdio: "inherit" }
 │         );
 │         console.log(`Client generated successfully in ${GENERATED_DIR}`);
 │       }
 │       
-│       function fixImports() {
+│       function fixImports(): void {
 │         console.log("Fixing ESM imports in generated files...");
-│         const files = readdirSync(GENERATED_DIR).filter((f) => f.endsWith(".ts"));
+│         const files = readdirSync(GENERATED_DIR).filter((f: string) =>
+│           f.endsWith(".ts")
+│         );
 │         for (const file of files) {
 │           const filePath = join(GENERATED_DIR, file);
 │           let content = readFileSync(filePath, "utf8");
@@ -347,7 +304,7 @@ Project Goals:
 │         console.log("Imports fixed.");
 │       }
 │       
-│       function main() {
+│       function main(): void {
 │         try {
 │           execSync("java -version", { stdio: "ignore" });
 │         } catch (error) {
@@ -373,14 +330,14 @@ Project Goals:
 │       "description": "",
 │       "type": "module",
 │       "scripts": {
-│         "fix-spec": "node code-generation/fix-spec.js",
-│         "regenerate": "node code-generation/regenerate-client.js",
+│         "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/fix-spec.ts",
+│         "regenerate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/regenerate-client.ts",
+│         "aiupdate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' aiupdate.ts",
 │         "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
-│         "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
+│         "generate-types": "node --no-warnings --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/generate-types.ts",
 │         "build": "tsc",
 │         "buildwithtypes": "npm run generate-types && tsc",
-│         "test": "node dist/test.js",
-│         "aiupdate": "node aiupdate.js"
+│         "test": "node dist/test.js"
 │       },
 │       "main": "dist/QuickBaseClient.js",
 │       "browser": "dist/quickbase-client.browser.min.js",
@@ -395,7 +352,6 @@ Project Goals:
 │       "author": "Drew Bradford",
 │       "license": "ISC",
 │       "dependencies": {
-│         "axios": "^1.8.1",
 │         "typescript": "^5.8.2"
 │       },
 │       "devDependencies": {
@@ -413,78 +369,158 @@ Project Goals:
 │ └─ QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
 ├─ src/
 │ ├─ QuickbaseClient.ts
+│ │   Contents:
+│ │     import { Configuration, HTTPHeaders } from "./generated/runtime";
+│ │     import { FieldsApi } from "./generated/apis/FieldsApi";
+│ │     import { TablesApi } from "./generated/apis/TablesApi";
+│ │     import { AppsApi } from "./generated/apis/AppsApi";
+│ │     import { Field } from "./generated/models/Field";
+│ │     import { GetApp200Response } from "./generated/models/GetApp200Response";
+│ │     import { CreateField200Response } from "./generated/models/CreateField200Response";
+│ │     import { DeleteFields200Response } from "./generated/models/DeleteFields200Response";
+│ │     import { Upsert200Response } from "./generated/models/Upsert200Response";
+│ │     import { Table } from "./generated/models/Table";
+│ │     // Add this if Table type is missing; we'll fix spec later
+│ │     interface Table {
+│ │       id: string;
+│ │       name: string;
+│ │       // Add more properties as needed
+│ │     }
+│ │     
+│ │     export interface QuickbaseMethods {
+│ │       getFields(params: {
+│ │         tableId: string;
+│ │         includeFieldPerms?: boolean;
+│ │       }): Promise<Field[]>;
+│ │       getTable(params: { appId: string; tableId: string }): Promise<Table>; // Temporary until spec fix
+│ │       getApp(params: { appId: string }): Promise<GetApp200Response>;
+│ │       createField(params: {
+│ │         tableId: string;
+│ │         generated: any;
+│ │       }): Promise<CreateField200Response>;
+│ │       deleteFields(params: {
+│ │         tableId: string;
+│ │         generated: any;
+│ │       }): Promise<DeleteFields200Response>;
+│ │       upsert(params: { generated: any }): Promise<Upsert200Response>;
+│ │     }
+│ │     
+│ │     interface QuickbaseConfig {
+│ │       realm: string;
+│ │       userToken?: string;
+│ │       tempToken?: string;
+│ │       defaultDbid?: string;
+│ │     }
+│ │     
+│ │     type ApiMethod = (...args: unknown[]) => Promise<unknown>;
+│ │     type MethodMap = Record<
+│ │       string,
+│ │       {
+│ │         api: FieldsApi | TablesApi | AppsApi;
+│ │         method: ApiMethod;
+│ │         paramMap: string[];
+│ │       }
+│ │     >;
+│ │     
+│ │     const simplifyName = (name: string): string =>
+│ │       name
+│ │         .replace(/ById$/, "")
+│ │         .replace(/Api$/, "")
+│ │         .replace(/^(\w)/, (_, c) => c.toLowerCase());
+│ │     
+│ │     export function createQuickbaseClient(
+│ │       config: QuickbaseConfig
+│ │     ): QuickbaseClient {
+│ │       const token = config.tempToken || config.userToken || ""; // Default to empty string
+│ │       const baseUrl = `https://api.quickbase.com/v1`;
+│ │       const headers: HTTPHeaders = {
+│ │         Authorization: `QB-USER-TOKEN ${token}`,
+│ │         "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
+│ │         "Content-Type": "application/json",
+│ │       };
+│ │     
+│ │       const configuration = new Configuration({
+│ │         basePath: baseUrl,
+│ │         headers,
+│ │         fetchApi: typeof window !== "undefined" ? window.fetch.bind(window) : fetch,
+│ │       });
+│ │     
+│ │       const apis: Record<string, FieldsApi | TablesApi | AppsApi> = {
+│ │         fields: new FieldsApi(configuration),
+│ │         tables: new TablesApi(configuration),
+│ │         apps: new AppsApi(configuration),
+│ │       };
+│ │     
+│ │       const methodMap = buildMethodMap();
+│ │     
+│ │       function buildMethodMap(): MethodMap {
+│ │         const methodMap: MethodMap = {};
+│ │         for (const [apiName, api] of Object.entries(apis)) {
+│ │           const methods = Object.keys(api).filter(
+│ │             (m) =>
+│ │               typeof api[m as keyof typeof api] === "function" && !m.startsWith("_")
+│ │           );
+│ │           for (const methodName of methods) {
+│ │             const friendlyName = simplifyName(methodName);
+│ │             const paramNames = getParamNames(
+│ │               api[methodName as keyof typeof api] as ApiMethod
+│ │             ).filter((name) => name !== "options");
+│ │             methodMap[friendlyName] = {
+│ │               api,
+│ │               method: api[methodName as keyof typeof api] as ApiMethod,
+│ │               paramMap: paramNames,
+│ │             };
+│ │           }
+│ │         }
+│ │         return methodMap;
+│ │       }
+│ │     
+│ │       function getParamNames(fn: ApiMethod): string[] {
+│ │         const fnStr = fn.toString();
+│ │         const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
+│ │         return paramStr
+│ │           .split(",")
+│ │           .map((p) => p.trim().split("=")[0].trim())
+│ │           .filter((p) => p && !p.match(/^\{/));
+│ │       }
+│ │     
+│ │       async function invokeMethod<K extends keyof QuickbaseMethods>(
+│ │         methodName: K,
+│ │         params: Parameters<QuickbaseMethods[K]>[0]
+│ │       ): Promise<ReturnType<QuickbaseMethods[K]>> {
+│ │         const methodInfo = methodMap[methodName];
+│ │         if (!methodInfo) throw new Error(`Method ${methodName} not found`);
+│ │         const { method, paramMap } = methodInfo;
+│ │     
+│ │         const userParams: Record<string, unknown> = { ...params };
+│ │         const args: unknown[] = [];
+│ │         paramMap.forEach((param) => {
+│ │           args.push(userParams[param] ?? undefined);
+│ │         });
+│ │     
+│ │         const response = await (method(...args) as Promise<Response>);
+│ │         return response.json() as Promise<ReturnType<QuickbaseMethods[K]>>;
+│ │       }
+│ │     
+│ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
+│ │         get(_target, prop: string) {
+│ │           if (prop in methodMap) {
+│ │             return (
+│ │               params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]
+│ │             ) => invokeMethod(prop as keyof QuickbaseMethods, params || {});
+│ │           }
+│ │           return undefined;
+│ │         },
+│ │       });
+│ │     }
+│ │     
+│ │     export type QuickbaseClient = QuickbaseMethods;
+│ │     
 │ ├─ generated/
 │ │ ├─ .openapi-generator/
 │ │ │ ├─ FILES
 │ │ │ └─ VERSION
 │ │ ├─ .openapi-generator-ignore
-│ │ ├─ QuickbaseMethods.ts
-│ │ │   Contents:
-│ │ │     // Generated by regenerate-client.ts
-│ │ │     import type { CopyApp200Response, CreateApp200Response, DeleteApp200Response, App, Array<{ [key: string]: any> }, UpdateApp200Response, Audit200Response, ExchangeSsoToken200Response, GetTempTokenDBID200Response, GenerateDocument200Response, CreateField200Response, DeleteFields200Response, Field, Array<Field, DeleteFile200Response, object, RunFormula200Response, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, DeleteRecords200Response, Array<Record, GetReport200Response, Array<ReportData, CreateRelationship200Response, CreateTable200Response, DeleteRelationship200Response, DeleteTable200Response, GetRelationships200Response, Table, CloneUserToken200Response, DeactivateUserToken200Response, TransferUserToken200Response, AddMembersToGroup200Response, AddSubgroupsToGroup200Response, DenyUsers200Response, GetUsers200Response, RemoveMembersFromGroup200Response, RemoveSubgroupsFromGroup200Response, UndenyUsers200Response } from "./models/index.js";
-│ │ │     
-│ │ │     export interface QuickbaseMethods {
-│ │ │       copyApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CopyAppRequest }): Promise<CopyApp200Response>;
-│ │ │       createApp(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateAppRequest }): Promise<CreateApp200Response>;
-│ │ │       deleteApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteAppRequest }): Promise<DeleteApp200Response>;
-│ │ │       getApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<App>;
-│ │ │       getAppEvents(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
-│ │ │       updateApp(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateAppRequest }): Promise<UpdateApp200Response>;
-│ │ │       audit(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: AuditRequest }): Promise<Audit200Response>;
-│ │ │       exchangeSsoToken(params: { qBRealmHostname: string, userAgent?: string, generated?: ExchangeSsoTokenRequest }): Promise<ExchangeSsoToken200Response>;
-│ │ │       getTempTokenDBID(params: { dbid: string, qBRealmHostname: string, userAgent?: string, qBAppToken?: string }): Promise<GetTempTokenDBID200Response>;
-│ │ │       generateDocument(params: { templateId: number, tableId: string, filename: string, recordId?: number, qBRealmHostname?: string, userAgent?: string, authorization?: string, accept?: string, format?: string, margin?: string, unit?: string, pageSize?: string, orientation?: string, realm?: string }): Promise<GenerateDocument200Response>;
-│ │ │       createField(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateFieldRequest }): Promise<CreateField200Response>;
-│ │ │       deleteFields(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteFieldsRequest }): Promise<DeleteFields200Response>;
-│ │ │       getField(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<Field>;
-│ │ │       getFieldUsage(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
-│ │ │       getFields(params: { tableId: string, includeFieldPerms?: boolean }): Promise<Array<Field>;
-│ │ │       getFieldsUsage(params: { tableId: string, qBRealmHostname: string, authorization: string, skip?: number, top?: number, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
-│ │ │       updateField(params: { tableId: string, fieldId: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateFieldRequest }): Promise<CreateField200Response>;
-│ │ │       deleteFile(params: { tableId: string, recordId: number, fieldId: number, versionNumber: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteFile200Response>;
-│ │ │       downloadFile(params: { tableId: string, recordId: number, fieldId: number, versionNumber: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<object>;
-│ │ │       runFormula(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: RunFormulaRequest }): Promise<RunFormula200Response>;
-│ │ │       platformAnalyticEventSummaries(params: { qBRealmHostname: string, authorization: string, userAgent?: string, accountId?: number, generated?: PlatformAnalyticEventSummariesRequest }): Promise<PlatformAnalyticEventSummaries200Response>;
-│ │ │       platformAnalyticReads(params: { qBRealmHostname: string, authorization: string, day?: Date, userAgent?: string }): Promise<PlatformAnalyticReads200Response>;
-│ │ │       deleteRecords(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: DeleteRecordsRequest }): Promise<DeleteRecords200Response>;
-│ │ │       runQuery(params: { generated: { [key }): Promise<Array<Record>;
-│ │ │       upsert(params: { generated: Array<RecordRequest> }): Promise<Array<Record>;
-│ │ │       getReport(params: { tableId: string, reportId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<GetReport200Response>;
-│ │ │       getTableReports(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
-│ │ │       runReport(params: { tableId: string, reportId: string, qBRealmHostname: string, authorization: string, skip?: number, top?: number, userAgent?: string, generated?: object }): Promise<Array<ReportData>;
-│ │ │       changesetSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
-│ │ │       changesetSolutionFromRecord(params: { solutionId: string, tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
-│ │ │       createSolution(params: { qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
-│ │ │       createSolutionFromRecord(params: { tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
-│ │ │       exportSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, qBLVersion?: string, userAgent?: string }): Promise<object>;
-│ │ │       exportSolutionToRecord(params: { solutionId: string, tableId: string, fieldId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, qBLVersion?: string, userAgent?: string }): Promise<object>;
-│ │ │       updateSolution(params: { solutionId: string, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string, generated?: object }): Promise<object>;
-│ │ │       updateSolutionToRecord(params: { solutionId: string, tableId: string, fieldId: any, recordId: any, qBRealmHostname: string, authorization: string, xQBLErrorsAsSuccess?: boolean, userAgent?: string }): Promise<object>;
-│ │ │       createRelationship(params: { tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateRelationshipRequest }): Promise<CreateRelationship200Response>;
-│ │ │       createTable(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CreateTableRequest }): Promise<CreateTable200Response>;
-│ │ │       deleteRelationship(params: { tableId: string, relationshipId: number, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteRelationship200Response>;
-│ │ │       deleteTable(params: { appId: string, tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeleteTable200Response>;
-│ │ │       getAppTables(params: { appId: string, qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<Array<{ [key: string]: any> }>;
-│ │ │       getRelationships(params: { tableId: string, qBRealmHostname: string, authorization: string, skip?: number, userAgent?: string }): Promise<GetRelationships200Response>;
-│ │ │       getTable(params: { appId: string, tableId: string }): Promise<Table>;
-│ │ │       updateRelationship(params: { tableId: string, relationshipId: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateRelationshipRequest }): Promise<CreateRelationship200Response>;
-│ │ │       updateTable(params: { appId: string, tableId: string, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: UpdateTableRequest }): Promise<CreateTable200Response>;
-│ │ │       cloneUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: CloneUserTokenRequest }): Promise<CloneUserToken200Response>;
-│ │ │       deactivateUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeactivateUserToken200Response>;
-│ │ │       deleteUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string }): Promise<DeactivateUserToken200Response>;
-│ │ │       transferUserToken(params: { qBRealmHostname: string, authorization: string, userAgent?: string, generated?: TransferUserTokenRequest }): Promise<TransferUserToken200Response>;
-│ │ │       addManagersToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddMembersToGroup200Response>;
-│ │ │       addMembersToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddMembersToGroup200Response>;
-│ │ │       addSubgroupsToGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<AddSubgroupsToGroup200Response>;
-│ │ │       denyUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<DenyUsers200Response>;
-│ │ │       denyUsersAndGroups(params: { shouldDeleteFromGroups: boolean, qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<DenyUsers200Response>;
-│ │ │       getUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: GetUsersRequest }): Promise<GetUsers200Response>;
-│ │ │       removeManagersFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveMembersFromGroup200Response>;
-│ │ │       removeMembersFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveMembersFromGroup200Response>;
-│ │ │       removeSubgroupsFromGroup(params: { gid: number, qBRealmHostname: string, authorization: string, userAgent?: string, generated?: Set<string> }): Promise<RemoveSubgroupsFromGroup200Response>;
-│ │ │       undenyUsers(params: { qBRealmHostname: string, authorization: string, accountId?: number, userAgent?: string, generated?: Set<string> }): Promise<UndenyUsers200Response>;
-│ │ │     }
-│ │ │     
 │ │ ├─ apis/
 │ │ │ ├─ AppsApi.ts
 │ │ │ ├─ AuditApi.ts
@@ -506,7 +542,6 @@ Project Goals:
 │ │ │ ├─ AddMembersToGroup200Response.ts
 │ │ │ ├─ AddSubgroupsToGroup200Response.ts
 │ │ │ ├─ App.ts
-│ │ │ ├─ AppMemoryInfo.ts
 │ │ │ ├─ Audit200Response.ts
 │ │ │ ├─ Audit202Response.ts
 │ │ │ ├─ AuditRequest.ts
@@ -552,15 +587,139 @@ Project Goals:
 │ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
 │ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
 │ │ │ ├─ PlatformAnalyticReads200Response.ts
-│ │ │ ├─ Record.ts
-│ │ │ ├─ RecordMetadata.ts
-│ │ │ ├─ RecordRequest.ts
 │ │ │ ├─ RemoveMembersFromGroup200Response.ts
 │ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
-│ │ │ ├─ ReportData.ts
 │ │ │ ├─ RunFormula200Response.ts
 │ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ RunQuery200Response.ts
+│ │ │ ├─ RunQueryRequest.ts
+│ │ │ ├─ RunReport200Response.ts
 │ │ │ ├─ Table.ts
+│ │ │ │   Contents:
+│ │ │ │     /* tslint:disable */
+│ │ │ │     /* eslint-disable */
+│ │ │ │     /**
+│ │ │ │      * Quick Base API
+│ │ │ │      * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+│ │ │ │      *
+│ │ │ │      * The version of the OpenAPI document: 1.0.0
+│ │ │ │      * 
+│ │ │ │      *
+│ │ │ │      * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+│ │ │ │      * https://openapi-generator.tech
+│ │ │ │      * Do not edit the class manually.
+│ │ │ │      */
+│ │ │ │     
+│ │ │ │     import { mapValues } from '../runtime';
+│ │ │ │     /**
+│ │ │ │      * 
+│ │ │ │      * @export
+│ │ │ │      * @interface Table
+│ │ │ │      */
+│ │ │ │     export interface Table {
+│ │ │ │         /**
+│ │ │ │          * Unique identifier for the table
+│ │ │ │          * @type {string}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         id: string;
+│ │ │ │         /**
+│ │ │ │          * Name of the table
+│ │ │ │          * @type {string}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         name: string;
+│ │ │ │         /**
+│ │ │ │          * Creation timestamp
+│ │ │ │          * @type {Date}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         created?: Date;
+│ │ │ │         /**
+│ │ │ │          * Last updated timestamp
+│ │ │ │          * @type {Date}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         updated?: Date;
+│ │ │ │         /**
+│ │ │ │          * Table description
+│ │ │ │          * @type {string}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         description?: string;
+│ │ │ │         /**
+│ │ │ │          * ID of the key field
+│ │ │ │          * @type {number}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         keyFieldId?: number;
+│ │ │ │         /**
+│ │ │ │          * Next available field ID
+│ │ │ │          * @type {number}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         nextFieldId?: number;
+│ │ │ │         /**
+│ │ │ │          * Next available record ID
+│ │ │ │          * @type {number}
+│ │ │ │          * @memberof Table
+│ │ │ │          */
+│ │ │ │         nextRecordId?: number;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     /**
+│ │ │ │      * Check if a given object implements the Table interface.
+│ │ │ │      */
+│ │ │ │     export function instanceOfTable(value: object): value is Table {
+│ │ │ │         if (!('id' in value) || value['id'] === undefined) return false;
+│ │ │ │         if (!('name' in value) || value['name'] === undefined) return false;
+│ │ │ │         return true;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export function TableFromJSON(json: any): Table {
+│ │ │ │         return TableFromJSONTyped(json, false);
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export function TableFromJSONTyped(json: any, ignoreDiscriminator: boolean): Table {
+│ │ │ │         if (json == null) {
+│ │ │ │             return json;
+│ │ │ │         }
+│ │ │ │         return {
+│ │ │ │             
+│ │ │ │             'id': json['id'],
+│ │ │ │             'name': json['name'],
+│ │ │ │             'created': json['created'] == null ? undefined : (new Date(json['created'])),
+│ │ │ │             'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
+│ │ │ │             'description': json['description'] == null ? undefined : json['description'],
+│ │ │ │             'keyFieldId': json['keyFieldId'] == null ? undefined : json['keyFieldId'],
+│ │ │ │             'nextFieldId': json['nextFieldId'] == null ? undefined : json['nextFieldId'],
+│ │ │ │             'nextRecordId': json['nextRecordId'] == null ? undefined : json['nextRecordId'],
+│ │ │ │         };
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export function TableToJSON(json: any): Table {
+│ │ │ │         return TableToJSONTyped(json, false);
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export function TableToJSONTyped(value?: Table | null, ignoreDiscriminator: boolean = false): any {
+│ │ │ │         if (value == null) {
+│ │ │ │             return value;
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         return {
+│ │ │ │             
+│ │ │ │             'id': value['id'],
+│ │ │ │             'name': value['name'],
+│ │ │ │             'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
+│ │ │ │             'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
+│ │ │ │             'description': value['description'],
+│ │ │ │             'keyFieldId': value['keyFieldId'],
+│ │ │ │             'nextFieldId': value['nextFieldId'],
+│ │ │ │             'nextRecordId': value['nextRecordId'],
+│ │ │ │         };
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     
 │ │ │ ├─ TransferUserToken200Response.ts
 │ │ │ ├─ TransferUserTokenRequest.ts
 │ │ │ ├─ UndenyUsers200Response.ts
@@ -569,6 +728,10 @@ Project Goals:
 │ │ │ ├─ UpdateFieldRequest.ts
 │ │ │ ├─ UpdateRelationshipRequest.ts
 │ │ │ ├─ UpdateTableRequest.ts
+│ │ │ ├─ Upsert200Response.ts
+│ │ │ ├─ Upsert207Response.ts
+│ │ │ ├─ Upsert400Response.ts
+│ │ │ ├─ UpsertRequest.ts
 │ │ │ └─ index.ts
 │ │ └─ runtime.ts
 │ ├─ generated-old/
@@ -576,7 +739,6 @@ Project Goals:
 │ │ │ ├─ FILES
 │ │ │ └─ VERSION
 │ │ ├─ .openapi-generator-ignore
-│ │ ├─ QuickbaseMethods.ts
 │ │ ├─ apis/
 │ │ │ ├─ AppsApi.ts
 │ │ │ ├─ AuditApi.ts
@@ -597,8 +759,6 @@ Project Goals:
 │ │ ├─ models/
 │ │ │ ├─ AddMembersToGroup200Response.ts
 │ │ │ ├─ AddSubgroupsToGroup200Response.ts
-│ │ │ ├─ App.ts
-│ │ │ ├─ AppMemoryInfo.ts
 │ │ │ ├─ Audit200Response.ts
 │ │ │ ├─ Audit202Response.ts
 │ │ │ ├─ AuditRequest.ts
@@ -629,6 +789,7 @@ Project Goals:
 │ │ │ ├─ ExchangeSsoTokenRequest.ts
 │ │ │ ├─ Field.ts
 │ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetApp200Response.ts
 │ │ │ ├─ GetRelationships200Response.ts
 │ │ │ ├─ GetReport200Response.ts
 │ │ │ ├─ GetTempTokenDBID200Response.ts
@@ -644,23 +805,24 @@ Project Goals:
 │ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
 │ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
 │ │ │ ├─ PlatformAnalyticReads200Response.ts
-│ │ │ ├─ Record.ts
-│ │ │ ├─ RecordMetadata.ts
-│ │ │ ├─ RecordRequest.ts
 │ │ │ ├─ RemoveMembersFromGroup200Response.ts
 │ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
-│ │ │ ├─ ReportData.ts
 │ │ │ ├─ RunFormula200Response.ts
 │ │ │ ├─ RunFormulaRequest.ts
-│ │ │ ├─ Table.ts
+│ │ │ ├─ RunQuery200Response.ts
+│ │ │ ├─ RunQueryRequest.ts
+│ │ │ ├─ RunReport200Response.ts
 │ │ │ ├─ TransferUserToken200Response.ts
 │ │ │ ├─ TransferUserTokenRequest.ts
 │ │ │ ├─ UndenyUsers200Response.ts
-│ │ │ ├─ UpdateApp200Response.ts
 │ │ │ ├─ UpdateAppRequest.ts
 │ │ │ ├─ UpdateFieldRequest.ts
 │ │ │ ├─ UpdateRelationshipRequest.ts
 │ │ │ ├─ UpdateTableRequest.ts
+│ │ │ ├─ Upsert200Response.ts
+│ │ │ ├─ Upsert207Response.ts
+│ │ │ ├─ Upsert400Response.ts
+│ │ │ ├─ UpsertRequest.ts
 │ │ │ └─ index.ts
 │ │ └─ runtime.ts
 │ ├─ index.ts
@@ -671,11 +833,11 @@ Project Goals:
 │   Contents:
 │     {
 │       "compilerOptions": {
-│         "target": "es2017",
-│         "module": "node16",
-│         "moduleResolution": "node16",
+│         "target": "ESNext",
+│         "module": "ESNext",
+│         "moduleResolution": "Bundler",
 │         "outDir": "dist",
-│         "rootDir": "src",
+│         "rootDir": ".", // Include root-level files
 │         "esModuleInterop": true,
 │         "forceConsistentCasingInFileNames": true,
 │         "strict": true,
@@ -684,12 +846,51 @@ Project Goals:
 │         "types": ["node"],
 │         "noEmit": false,
 │         "resolveJsonModule": true,
-│         "isolatedModules": false
+│         "isolatedModules": false,
+│         "lib": ["ESNext", "DOM"]
 │       },
-│       "include": ["src/**/*", "types/QuickbaseClient.d.ts"],
-│       "exclude": ["node_modules", "dist", "src/generated", "src/generated-old"]
+│       "include": [
+│         "src/**/*",
+│         "code-generation/**/*",
+│         "aiupdate.ts",
+│         "types/QuickbaseClient.d.ts"
+│       ],
+│       "exclude": ["node_modules", "dist", "src/generated-old"]
 │     }
 │     
 ├─ tsconfig.json.bak
 └─ types/
   └─ QuickbaseClient.d.ts
+      Contents:
+        // Auto-generated type declarations for QuickbaseClient
+        
+        export interface QuickbaseMethods {
+          copyApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
+          createApp(params: { userAgent?: string, generated?: any }): Promise<any>;
+          deleteApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
+          getApp(params: { appId: string, userAgent?: string }): Promise<any>;
+          getAppEvents(params: { appId: string, userAgent?: string }): Promise<any>;
+          updateApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
+          createField(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
+          deleteFields(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
+          getField(params: { tableId: string, fieldId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
+          getFieldUsage(params: { tableId: string, fieldId: string, userAgent?: string }): Promise<any>;
+          getFields(params: { tableId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
+          getFieldsUsage(params: { tableId: string, skip: number, top: number, userAgent?: string }): Promise<any>;
+          updateField(params: { tableId: string, fieldId: string, userAgent?: string, generated?: any }): Promise<any>;
+          deleteRecords(params: { userAgent?: string, generated?: any }): Promise<any>;
+          runQuery(params: { userAgent?: string, generated?: any }): Promise<any>;
+          upsert(params: { userAgent?: string, generated?: any }): Promise<any>;
+          createRelationship(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
+          createTable(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
+          deleteRelationship(params: { tableId: string, relationshipId: string, userAgent?: string }): Promise<any>;
+          deleteTable(params: { appId: string, tableId: string, userAgent?: string }): Promise<any>;
+          getAppTables(params: { appId: string, userAgent?: string }): Promise<any>;
+          getRelationships(params: { tableId: string, skip: number, userAgent?: string }): Promise<any>;
+          getTable(params: { appId: string, tableId: string, userAgent?: string }): Promise<any>;
+          updateRelationship(params: { tableId: string, relationshipId: string, userAgent?: string, generated?: any }): Promise<any>;
+          updateTable(params: { appId: string, tableId: string, userAgent?: string, generated?: any }): Promise<any>;
+        }
+        
+        export class QuickbaseClient implements QuickbaseMethods {}
+        

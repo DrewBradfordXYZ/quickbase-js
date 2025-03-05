@@ -4,14 +4,14 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "fix-spec": "node --loader ts-node/esm code-generation/fix-spec.ts",
-    "regenerate": "node --loader ts-node/esm code-generation/regenerate-client.js",
+    "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/fix-spec.ts",
+    "regenerate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/regenerate-client.ts",
+    "aiupdate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' aiupdate.ts",
     "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
-    "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
-    "build": "tsc",
+    "generate-types": "node --no-warnings --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/generate-types.ts",
+    "build": "tsc && aiupdate",
     "buildwithtypes": "npm run generate-types && tsc",
-    "test": "node dist/test.js",
-    "aiupdate": "node aiupdate.js"
+    "test": "node dist/test.js"
   },
   "main": "dist/QuickBaseClient.js",
   "browser": "dist/quickbase-client.browser.min.js",
@@ -26,7 +26,6 @@
   "author": "Drew Bradford",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.8.1",
     "typescript": "^5.8.2"
   },
   "devDependencies": {

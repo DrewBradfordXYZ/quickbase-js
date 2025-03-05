@@ -72,6 +72,7 @@ async function fixQuickBaseSpec(): Promise<void> {
     }
 
     console.log("Adding responses and schemas...");
+    // Fix /fields endpoint
     if (spec.paths["/fields"]?.get) {
       spec.paths["/fields"].get.parameters = [
         { name: "tableId", in: "query", required: true, type: "string" },
@@ -89,10 +90,47 @@ async function fixQuickBaseSpec(): Promise<void> {
         },
       };
     }
-    // ... (rest of the paths logic remains unchanged, just typed)
+
+    // Fix /fields/{fieldId} endpoint (example)
+    if (spec.paths["/fields/{fieldId}"]?.get) {
+      spec.paths["/fields/{fieldId}"].get.responses = {
+        200: {
+          description: "Successful response",
+          schema: { $ref: "#/definitions/Field" },
+        },
+      };
+    }
+
+    // Add /tables/{tableId} endpoint with Table definition
+    if (spec.paths["/tables/{tableId}"]?.get) {
+      spec.paths["/tables/{tableId}"].get.parameters = [
+        { name: "appId", in: "query", required: true, type: "string" },
+        { name: "tableId", in: "path", required: true, type: "string" },
+      ];
+      spec.paths["/tables/{tableId}"].get.responses = {
+        200: {
+          description: "Successful response",
+          schema: { $ref: "#/definitions/Table" },
+        },
+      };
+    }
+
+    // Fix /apps/{appId} endpoint (example)
+    if (spec.paths["/apps/{appId}"]?.get) {
+      spec.paths["/apps/{appId}"].get.responses = {
+        200: {
+          description: "Successful response",
+          schema: { $ref: "#/definitions/App" },
+        },
+      };
+    }
+
+    // Add more endpoints as needed...
 
     console.log("Adding definitions...");
     if (!spec.definitions) spec.definitions = {};
+
+    // Field definition (already present)
     spec.definitions.Field = {
       type: "object",
       properties: {
@@ -112,7 +150,53 @@ async function fixQuickBaseSpec(): Promise<void> {
         unique: { type: "boolean" },
       },
     };
-    // ... (rest of the definitions remain unchanged)
+
+    // Add Table definition
+    spec.definitions.Table = {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Unique identifier for the table" },
+        name: { type: "string", description: "Name of the table" },
+        created: {
+          type: "string",
+          format: "date-time",
+          description: "Creation timestamp",
+        },
+        updated: {
+          type: "string",
+          format: "date-time",
+          description: "Last updated timestamp",
+        },
+        description: { type: "string", description: "Table description" },
+        keyFieldId: { type: "integer", description: "ID of the key field" },
+        nextFieldId: {
+          type: "integer",
+          description: "Next available field ID",
+        },
+        nextRecordId: {
+          type: "integer",
+          description: "Next available record ID",
+        },
+        // Add more properties based on QuickBase API docs
+      },
+      required: ["id", "name"],
+    };
+
+    // Add App definition (example)
+    spec.definitions.App = {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Unique identifier for the app" },
+        name: { type: "string", description: "Name of the app" },
+        created: { type: "string", format: "date-time" },
+        updated: { type: "string", format: "date-time" },
+        description: { type: "string" },
+        // Add more properties as needed
+      },
+      required: ["id", "name"],
+    };
+
+    // Add more definitions as needed (e.g., Record, ReportData)...
 
     console.log("Removing unexpected top-level attributes...");
     delete spec.operations;
