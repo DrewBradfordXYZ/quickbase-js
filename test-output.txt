@@ -1,11 +1,5 @@
 TEST LOG
 Testing getFields...
-Proxy get: getFields
-Invoking method: getFields
-Args for getFields: ["buwai2zud","builderprogram-dbradford6815.quickbase.com","QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",null,null,{"headers":{"Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","Content-Type":"application/json"}}]
-Axios defaults: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com"}
-Request headers: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","User-Agent":"axios/1.8.1","Accept-Encoding":"gzip, compress, deflate, br"}
-Response status: 200
 Fields: [
   {
     appearsByDefault: false,
@@ -151,12 +145,6 @@ Fields: [
   }
 ]
 Testing getTable...
-Proxy get: getTable
-Invoking method: getTable
-Args for getTable: ["buwai2zpe","buwai2zws","builderprogram-dbradford6815.quickbase.com","QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",null,{"headers":{"Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","Content-Type":"application/json"}}]
-Axios defaults: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com"}
-Request headers: {"Accept":"application/json, text/plain, */*","Content-Type":"application/json","Authorization":"QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3","QB-Realm-Hostname":"builderprogram-dbradford6815.quickbase.com","User-Agent":"axios/1.8.1","Accept-Encoding":"gzip, compress, deflate, br"}
-Response status: 200
 Table: {
   alias: '_DBID_ELEMENTS',
   created: '2025-02-13T18:22:33Z',
@@ -174,4 +162,24 @@ Table: {
   spaceRemaining: '500 MB',
   spaceUsed: '0 KB',
   updated: '2025-02-14T22:23:15Z'
+}
+Testing getApp...
+App: {
+  created: '2025-02-13T18:22:33Z',
+  dateFormat: 'MM-DD-YYYY',
+  description: '',
+  hasEveryoneOnTheInternet: false,
+  id: 'buwai2zpe',
+  memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+  name: 'qb-copy',
+  securityProperties: {
+    allowClone: false,
+    allowExport: true,
+    enableAppTokens: true,
+    hideFromPublic: false,
+    mustBeRealmApproved: false,
+    useIPFilter: false
+  },
+  timeZone: '(UTC-08:00) Pacific Time (US & Canada)',
+  updated: '2025-03-04T04:25:51Z'
 }

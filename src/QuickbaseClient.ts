@@ -99,20 +99,18 @@ export function createQuickbaseClient(
     methodName: K,
     params: Parameters<QuickbaseMethods[K]>[0]
   ): Promise<ReturnType<QuickbaseMethods[K]>> {
-    console.error(`Invoking method: ${String(methodName)}`);
     const methodInfo = methodMap[methodName];
-    if (!methodInfo) throw new Error(`Method ${String(methodName)} not found`);
+    if (!methodInfo) throw new Error(`Method ${methodName} not found`);
     const { api, method, paramMap } = methodInfo;
 
     const userParams: Record<string, any> = { ...params };
     const args: any[] = [];
 
-    // Full signature: [method-specific params], qBRealmHostname, authorization, [remaining params], options
     const fullSignature = [
-      ...paramMap.filter((p) => p !== "includeFieldPerms" && p !== "userAgent"), // Core params (e.g., appId, tableId)
+      ...paramMap.filter((p) => p !== "includeFieldPerms" && p !== "userAgent"),
       "qBRealmHostname",
       "authorization",
-      ...paramMap.filter((p) => p === "includeFieldPerms" || p === "userAgent"), // Optional params
+      ...paramMap.filter((p) => p === "includeFieldPerms" || p === "userAgent"),
       "options",
     ];
 
@@ -134,36 +132,12 @@ export function createQuickbaseClient(
       }
     });
 
-    console.error(`Args for ${String(methodName)}: ${JSON.stringify(args)}`);
-    console.error(
-      `Axios defaults: ${JSON.stringify(axiosInstance.defaults.headers.common)}`
-    );
-
-    let response;
-    try {
-      response = await method(...args);
-      console.error(
-        `Request headers: ${JSON.stringify(response.config.headers)}`
-      );
-      console.error(`Response status: ${response.status}`);
-    } catch (error: any) {
-      console.error(`Request failed: ${error.message}`);
-      if (error.response) {
-        console.error(
-          `Failed request headers: ${JSON.stringify(error.response.config.headers)}`
-        );
-        console.error(`Failed response status: ${error.response.status}`);
-      }
-      throw error;
-    }
-
-    return response.data;
+    return method(...args).then((response) => response.data);
   }
 
   const client = new Proxy({} as QuickbaseClient, {
     get(_target, prop: string) {
       if (methodMap[prop]) {
-        console.error(`Proxy get: ${prop}`);
         return (params: any) =>
           invokeMethod(prop as keyof QuickbaseMethods, params || {});
       }

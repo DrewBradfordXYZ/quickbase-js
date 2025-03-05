@@ -23,11 +23,10 @@ const simplifyName = (name: string): string =>
 function getParamNames(fn: ApiMethod): string[] {
   const fnStr = fn.toString();
   const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
-  const params = paramStr
+  return paramStr
     .split(",")
     .map((p) => p.trim().split("=")[0].trim())
     .filter((p) => p && !p.match(/^\{/));
-  return params;
 }
 
 function inferParamTypes(fn: ApiMethod, paramNames: string[]): string[] {
@@ -40,7 +39,6 @@ function inferParamTypes(fn: ApiMethod, paramNames: string[]): string[] {
     const paramDef = paramDefs.find((p) => p.startsWith(name));
     if (!paramDef) return "any";
     if (paramDef.includes("?:") || paramDef.includes("="))
-      // Optional if ? or default value
       return paramDef.split(":")[1]?.trim().replace("?", "") + " | undefined";
     if (
       name === "appId" ||
@@ -59,10 +57,7 @@ function inferParamTypes(fn: ApiMethod, paramNames: string[]): string[] {
 
 function generateTypeDeclarations() {
   try {
-    console.log("Starting generation...");
     const config = new Configuration();
-    console.log("Config created:", config);
-
     const paramCreators: ((config?: Configuration) => ApiMethods)[] = [
       AppsApiAxiosParamCreator,
       FieldsApiAxiosParamCreator,
@@ -75,12 +70,6 @@ function generateTypeDeclarations() {
     } = {};
     for (const creator of paramCreators) {
       const apiMethods = creator(config);
-      console.log(
-        "API methods from",
-        creator.name,
-        ":",
-        Object.keys(apiMethods)
-      );
       for (const [methodName, method] of Object.entries(apiMethods) as [
         string,
         ApiMethod,
@@ -93,13 +82,9 @@ function generateTypeDeclarations() {
             name !== "options"
         );
         const paramTypes = inferParamTypes(method, paramNames);
-        console.log(
-          `Method ${friendlyName}: params=${paramNames}, types=${paramTypes}`
-        );
         methodMap[friendlyName] = { paramMap: paramNames, paramTypes };
       }
     }
-    console.log("Method map:", methodMap);
 
     let dtsContent = `// Auto-generated type declarations for QuickbaseClient\n\n`;
     dtsContent += `export interface QuickbaseMethods {\n`;
@@ -124,7 +109,6 @@ function generateTypeDeclarations() {
 
     const outputPath = join(__dirname, "..", "types", "QuickbaseClient.d.ts");
     writeFileSync(outputPath, dtsContent, "utf8");
-    console.log(`Generated type declarations at ${outputPath}`);
   } catch (error) {
     console.error("Error in generateTypeDeclarations:", error);
   }

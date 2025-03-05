@@ -7,7 +7,7 @@
     "fix-spec": "node code-generation/fix-spec.js",
     "regenerate": "node code-generation/regenerate-client.js",
     "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
-    "generate-types": "node --loader ts-node/esm src/generate-types.ts",
+    "generate-types": "node --no-warnings --loader ts-node/esm src/generate-types.ts",
     "build": "npm run generate-types && tsc",
     "test": "node dist/test.js"
   },
