@@ -57,7 +57,7 @@ function generateClient(): void {
       ).toString()
     );
   } catch (error) {
-    console.error("Generation failed:", error.message);
+    console.error("Generation failed:", (error as Error).message);
     process.exit(1);
   }
 }

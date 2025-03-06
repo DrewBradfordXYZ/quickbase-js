@@ -1,26 +1,18 @@
-#!/usr/bin/env node
-import { config } from "dotenv";
-import { createQuickbaseClient } from "./QuickbaseClient.ts"; // Add .ts
-import type { App } from "./generated/models/App.ts"; // Add .ts
+import { createQuickbaseClient } from "./QuickbaseClient.ts";
+import dotenv from "dotenv";
 
-config({ path: ".env.development" });
+dotenv.config({ path: ".env.development" });
 
-const realm = process.env.QB_REALM;
-const token = process.env.QB_USER_TOKEN;
-const appId = process.env.QB_APP_ID;
+async function runTest() {
+  const client = createQuickbaseClient({
+    realm: process.env.QB_REALM!,
+    userToken: process.env.QB_USER_TOKEN!,
+    debug: false, // Set to true for verbose logs
+  });
 
-const client = createQuickbaseClient({
-  realm: realm || "",
-  userToken: token || "",
-});
-
-async function test() {
-  try {
-    const app: App = await client.getApp({ appId: appId || "" });
-    console.log("App:", app);
-  } catch (error) {
-    console.error("Error:", (error as Error).message);
-  }
+  const appId = process.env.QB_APP_ID!;
+  const app = await client.getApp({ appId });
+  console.log("App:", app);
 }
 
-test();
+runTest().catch(console.error);
