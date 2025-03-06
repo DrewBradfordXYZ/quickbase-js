@@ -15,8 +15,9 @@
     "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
     "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
+    "log-gen": "node --loader ts-node/esm src/log-gen.ts",
     "build": "rollup -c",
-    "build:prod": "NODE_ENV=production rollup -c",
+    "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
     "test": "vitest run --environment jsdom"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^20.11.20",
+    "dotenv": "^16.4.7",
     "glob": "^11.0.1",
     "jsdom": "^24.1.3",
     "openapi-types": "^12.1.3",

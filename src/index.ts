@@ -1,1 +1,1 @@
-export * from "./QuickbaseClient.js.ts";
+export * from "./quickbaseClient.ts";

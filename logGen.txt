@@ -20,206 +20,109 @@ Project Goals:
 ├─ README.md
 ├─ build.js
 ├─ dist/
-│ ├─ QuickbaseClient.d.ts
-│ ├─ QuickbaseClient.js
 │ ├─ code-generation/
 │ │ ├─ fix-dist-imports.d.ts
-│ │ ├─ fix-dist-imports.js
 │ │ ├─ fix-spec.d.ts
-│ │ ├─ fix-spec.js
 │ │ ├─ generate-unified-interface.d.ts
-│ │ ├─ generate-unified-interface.js
-│ │ ├─ regenerate-client.d.ts
-│ │ └─ regenerate-client.js
+│ │ └─ regenerate-client.d.ts
 │ ├─ generated/
 │ │ ├─ apis/
 │ │ │ ├─ AppsApi.d.ts
-│ │ │ ├─ AppsApi.js
 │ │ │ ├─ AuditApi.d.ts
-│ │ │ ├─ AuditApi.js
 │ │ │ ├─ AuthApi.d.ts
-│ │ │ ├─ AuthApi.js
-│ │ │ ├─ DefaultApi.d.ts
-│ │ │ ├─ DefaultApi.js
 │ │ │ ├─ DocumentTemplatesApi.d.ts
-│ │ │ ├─ DocumentTemplatesApi.js
 │ │ │ ├─ FieldsApi.d.ts
-│ │ │ ├─ FieldsApi.js
 │ │ │ ├─ FilesApi.d.ts
-│ │ │ ├─ FilesApi.js
 │ │ │ ├─ FormulasApi.d.ts
-│ │ │ ├─ FormulasApi.js
 │ │ │ ├─ PlatformAnalyticsApi.d.ts
-│ │ │ ├─ PlatformAnalyticsApi.js
 │ │ │ ├─ RecordsApi.d.ts
-│ │ │ ├─ RecordsApi.js
 │ │ │ ├─ ReportsApi.d.ts
-│ │ │ ├─ ReportsApi.js
 │ │ │ ├─ SolutionsApi.d.ts
-│ │ │ ├─ SolutionsApi.js
 │ │ │ ├─ TablesApi.d.ts
-│ │ │ ├─ TablesApi.js
 │ │ │ ├─ UserTokenApi.d.ts
-│ │ │ ├─ UserTokenApi.js
 │ │ │ ├─ UsersApi.d.ts
-│ │ │ ├─ UsersApi.js
-│ │ │ ├─ index.d.ts
-│ │ │ └─ index.js
+│ │ │ └─ index.d.ts
 │ │ ├─ index.d.ts
-│ │ ├─ index.js
 │ │ ├─ models/
 │ │ │ ├─ AddMembersToGroup200Response.d.ts
-│ │ │ ├─ AddMembersToGroup200Response.js
 │ │ │ ├─ AddSubgroupsToGroup200Response.d.ts
-│ │ │ ├─ AddSubgroupsToGroup200Response.js
 │ │ │ ├─ App.d.ts
-│ │ │ ├─ App.js
 │ │ │ ├─ Audit200Response.d.ts
-│ │ │ ├─ Audit200Response.js
 │ │ │ ├─ Audit202Response.d.ts
-│ │ │ ├─ Audit202Response.js
 │ │ │ ├─ AuditRequest.d.ts
-│ │ │ ├─ AuditRequest.js
 │ │ │ ├─ CloneUserToken200Response.d.ts
-│ │ │ ├─ CloneUserToken200Response.js
 │ │ │ ├─ CloneUserTokenRequest.d.ts
-│ │ │ ├─ CloneUserTokenRequest.js
 │ │ │ ├─ CopyApp200Response.d.ts
-│ │ │ ├─ CopyApp200Response.js
 │ │ │ ├─ CopyAppRequest.d.ts
-│ │ │ ├─ CopyAppRequest.js
 │ │ │ ├─ CreateApp200Response.d.ts
-│ │ │ ├─ CreateApp200Response.js
 │ │ │ ├─ CreateAppRequest.d.ts
-│ │ │ ├─ CreateAppRequest.js
 │ │ │ ├─ CreateField200Response.d.ts
-│ │ │ ├─ CreateField200Response.js
 │ │ │ ├─ CreateRelationship200Response.d.ts
-│ │ │ ├─ CreateRelationship200Response.js
 │ │ │ ├─ CreateRelationshipRequest.d.ts
-│ │ │ ├─ CreateRelationshipRequest.js
 │ │ │ ├─ CreateTable200Response.d.ts
-│ │ │ ├─ CreateTable200Response.js
 │ │ │ ├─ CreateTableRequest.d.ts
-│ │ │ ├─ CreateTableRequest.js
 │ │ │ ├─ DeactivateUserToken200Response.d.ts
-│ │ │ ├─ DeactivateUserToken200Response.js
 │ │ │ ├─ DeleteApp200Response.d.ts
-│ │ │ ├─ DeleteApp200Response.js
 │ │ │ ├─ DeleteAppRequest.d.ts
-│ │ │ ├─ DeleteAppRequest.js
 │ │ │ ├─ DeleteFields200Response.d.ts
-│ │ │ ├─ DeleteFields200Response.js
 │ │ │ ├─ DeleteFile200Response.d.ts
-│ │ │ ├─ DeleteFile200Response.js
 │ │ │ ├─ DeleteRecords200Response.d.ts
-│ │ │ ├─ DeleteRecords200Response.js
 │ │ │ ├─ DeleteRecordsRequest.d.ts
-│ │ │ ├─ DeleteRecordsRequest.js
 │ │ │ ├─ DeleteRelationship200Response.d.ts
-│ │ │ ├─ DeleteRelationship200Response.js
 │ │ │ ├─ DeleteTable200Response.d.ts
-│ │ │ ├─ DeleteTable200Response.js
 │ │ │ ├─ DenyUsers200Response.d.ts
-│ │ │ ├─ DenyUsers200Response.js
 │ │ │ ├─ ExchangeSsoToken200Response.d.ts
-│ │ │ ├─ ExchangeSsoToken200Response.js
 │ │ │ ├─ ExchangeSsoTokenRequest.d.ts
-│ │ │ ├─ ExchangeSsoTokenRequest.js
 │ │ │ ├─ Field.d.ts
-│ │ │ ├─ Field.js
 │ │ │ ├─ GenerateDocument200Response.d.ts
-│ │ │ ├─ GenerateDocument200Response.js
 │ │ │ ├─ GetField200Response.d.ts
-│ │ │ ├─ GetField200Response.js
 │ │ │ ├─ GetRelationships200Response.d.ts
-│ │ │ ├─ GetRelationships200Response.js
 │ │ │ ├─ GetReport200Response.d.ts
-│ │ │ ├─ GetReport200Response.js
 │ │ │ ├─ GetTempTokenDBID200Response.d.ts
-│ │ │ ├─ GetTempTokenDBID200Response.js
 │ │ │ ├─ GetUsers200Response.d.ts
-│ │ │ ├─ GetUsers200Response.js
 │ │ │ ├─ GetUsersRequest.d.ts
-│ │ │ ├─ GetUsersRequest.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200Response.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200Response.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.js
 │ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.js
 │ │ │ ├─ PlatformAnalyticEventSummariesRequest.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequest.js
 │ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.js
 │ │ │ ├─ PlatformAnalyticReads200Response.d.ts
-│ │ │ ├─ PlatformAnalyticReads200Response.js
 │ │ │ ├─ RemoveMembersFromGroup200Response.d.ts
-│ │ │ ├─ RemoveMembersFromGroup200Response.js
 │ │ │ ├─ RemoveSubgroupsFromGroup200Response.d.ts
-│ │ │ ├─ RemoveSubgroupsFromGroup200Response.js
 │ │ │ ├─ RunFormula200Response.d.ts
-│ │ │ ├─ RunFormula200Response.js
 │ │ │ ├─ RunFormulaRequest.d.ts
-│ │ │ ├─ RunFormulaRequest.js
 │ │ │ ├─ RunQuery200Response.d.ts
-│ │ │ ├─ RunQuery200Response.js
 │ │ │ ├─ RunQueryRequest.d.ts
-│ │ │ ├─ RunQueryRequest.js
 │ │ │ ├─ RunReport200Response.d.ts
-│ │ │ ├─ RunReport200Response.js
 │ │ │ ├─ Table.d.ts
-│ │ │ ├─ Table.js
 │ │ │ ├─ TransferUserToken200Response.d.ts
-│ │ │ ├─ TransferUserToken200Response.js
 │ │ │ ├─ TransferUserTokenRequest.d.ts
-│ │ │ ├─ TransferUserTokenRequest.js
 │ │ │ ├─ UndenyUsers200Response.d.ts
-│ │ │ ├─ UndenyUsers200Response.js
 │ │ │ ├─ UpdateApp200Response.d.ts
-│ │ │ ├─ UpdateApp200Response.js
 │ │ │ ├─ UpdateAppRequest.d.ts
-│ │ │ ├─ UpdateAppRequest.js
 │ │ │ ├─ UpdateFieldRequest.d.ts
-│ │ │ ├─ UpdateFieldRequest.js
 │ │ │ ├─ UpdateRelationshipRequest.d.ts
-│ │ │ ├─ UpdateRelationshipRequest.js
 │ │ │ ├─ UpdateTableRequest.d.ts
-│ │ │ ├─ UpdateTableRequest.js
 │ │ │ ├─ Upsert200Response.d.ts
-│ │ │ ├─ Upsert200Response.js
-│ │ │ ├─ index.d.ts
-│ │ │ └─ index.js
-│ │ ├─ runtime.d.ts
-│ │ └─ runtime.js
+│ │ │ └─ index.d.ts
+│ │ └─ runtime.d.ts
 │ ├─ generated-unified/
-│ │ ├─ QuickbaseClient.d.ts
-│ │ └─ QuickbaseClient.js
-│ ├─ generated-unified-interface.d.ts
-│ ├─ generated-unified-interface.js
+│ │ └─ QuickbaseClient.d.ts
 │ ├─ index.d.ts
-│ ├─ index.js
 │ ├─ logGen.d.ts
-│ ├─ logGen.js
 │ ├─ quickbaseClient.d.ts
 │ ├─ quickbaseClient.js
+│ ├─ quickbaseClient.js.map
 │ ├─ test-esm.d.ts
-│ ├─ test-esm.js
 │ ├─ test.d.ts
-│ ├─ test.js
-│ ├─ types/
-│ │ ├─ QuickbaseMethods.d.ts
-│ │ └─ QuickbaseMethods.js
-│ ├─ utils.d.ts
-│ └─ utils.js
+│ └─ utils.d.ts
+├─ examples/
+│ ├─ react.js
+│ └─ vanillajs.html
 ├─ logGen.txt
 ├─ openapitools.json
 ├─ package-lock.json
@@ -228,22 +131,26 @@ Project Goals:
 │     {
 │       "name": "quickbase-js",
 │       "version": "1.0.0",
-│       "description": "QuickBase JavaScript client",
-│       "main": "dist/QuickbaseClient.js",
-│       "types": "dist/QuickbaseClient.d.ts",
+│       "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+│       "module": "dist/quickbaseClient.js",
+│       "types": "dist/quickbaseClient.d.ts",
 │       "type": "module",
+│       "exports": {
+│         ".": {
+│           "import": "./dist/quickbaseClient.js",
+│           "types": "./dist/quickbaseClient.d.ts"
+│         }
+│       },
 │       "scripts": {
 │         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
 │         "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
 │         "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
-│         "test": "node --loader ts-node/esm src/test.ts",
+│         "log-gen": "node --loader ts-node/esm src/log-gen.ts",
 │         "build": "rollup -c",
 │         "build:prod": "NODE_ENV=production rollup -c",
-│         "log-gen": "node --loader ts-node/esm src/logGen.ts"
+│         "test": "vitest run --environment jsdom"
 │       },
 │       "dependencies": {
-│         "dotenv": "^16.4.7",
-│         "node-fetch": "^3.3.2",
 │         "typescript": "^5.8.2"
 │       },
 │       "devDependencies": {
@@ -252,17 +159,73 @@ Project Goals:
 │         "@rollup/plugin-terser": "^0.4.4",
 │         "@rollup/plugin-typescript": "^12.1.2",
 │         "@types/node": "^20.11.20",
-│         "@types/node-fetch": "^2.6.11",
+│         "dotenv": "^16.4.7",
 │         "glob": "^11.0.1",
+│         "jsdom": "^24.1.3",
 │         "openapi-types": "^12.1.3",
 │         "rollup": "^4.34.9",
 │         "rollup-plugin-dts": "^6.1.1",
 │         "ts-morph": "^23.0.0",
-│         "ts-node": "^10.9.2"
+│         "ts-node": "^10.9.2",
+│         "tslib": "^2.8.1",
+│         "vitest": "^1.6.0"
 │       }
 │     }
 │     
 ├─ rollup.config.js
+│   Contents:
+│     import typescript from "@rollup/plugin-typescript";
+│     import terser from "@rollup/plugin-terser";
+│     import nodeResolve from "@rollup/plugin-node-resolve";
+│     import commonjs from "@rollup/plugin-commonjs";
+│     import dts from "rollup-plugin-dts";
+│     
+│     const isProd = process.env.NODE_ENV === "production";
+│     
+│     export default [
+│       {
+│         input: "src/quickbaseClient.ts",
+│         output: {
+│           file: "dist/quickbaseClient.js",
+│           format: "esm",
+│           sourcemap: true,
+│           compact: isProd,
+│         },
+│         plugins: [
+│           nodeResolve({ browser: true, preferBuiltins: false }),
+│           commonjs(),
+│           typescript({
+│             tsconfig: "./tsconfig.build.json",
+│           }),
+│           isProd && terser(),
+│         ],
+│       },
+│       {
+│         input: "src/quickbaseClient.ts",
+│         output: {
+│           file: "dist/quickbaseClient.d.ts",
+│           format: "esm",
+│         },
+│         plugins: [
+│           dts({
+│             tsconfig: "./tsconfig.build.json",
+│           }),
+│         ],
+│       },
+│     ].map((config) => ({
+│       ...config,
+│       onwarn(warning, warn) {
+│         if (
+│           warning.code === "PLUGIN_WARNING" &&
+│           warning.plugin === "typescript" &&
+│           warning.message.includes("TS5096")
+│         ) {
+│           return; // Suppress TS5096 from typescript plugin
+│         }
+│         warn(warning);
+│       },
+│     }));
+│     
 ├─ src/
 │ ├─ code-generation/
 │ │ ├─ fix-dist-imports.ts
@@ -298,6 +261,13 @@ Project Goals:
 │ │ │       components?: any;
 │ │ │     }
 │ │ │     
+│ │ │     // Function to convert hyphenated names to camelCase
+│ │ │     function toCamelCase(str: string): string {
+│ │ │       return str
+│ │ │         .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
+│ │ │         .replace(/^./, (str) => str.toLowerCase());
+│ │ │     }
+│ │ │     
 │ │ │     async function fixQuickBaseSpec(): Promise<void> {
 │ │ │       try {
 │ │ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
@@ -326,6 +296,8 @@ Project Goals:
 │ │ │             if (operation.parameters) {
 │ │ │               operation.parameters = operation.parameters.map(
 │ │ │                 (param: Parameter) => {
+│ │ │                   // Transform hyphenated parameter names to camelCase
+│ │ │                   param.name = toCamelCase(param.name);
 │ │ │                   if ("example" in param) delete param.example;
 │ │ │                   if ("schema" in param && param.in !== "body") delete param.schema;
 │ │ │                   if (!param.type && param.in !== "body") param.type = "string";
@@ -721,7 +693,7 @@ Project Goals:
 │ │ │       }
 │ │ │     
 │ │ │       const importLines = Array.from(modelImports)
-│ │ │         .map((m) => `import { ${m} } from "../generated/models/${m}";`)
+│ │ │         .map((m) => `import { ${m} } from "../generated/models/${m}.ts";`) // Add .ts extension
 │ │ │         .join("\n");
 │ │ │       const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importLines}\n\nexport interface QuickbaseClient {\n${methods.join(
 │ │ │         "\n"
@@ -936,6 +908,7 @@ Project Goals:
 │ │ │ ├─ CreateTable200Response.ts
 │ │ │ ├─ CreateTableRequest.ts
 │ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
 │ │ │ ├─ DeleteFile200Response.ts
@@ -1024,6 +997,7 @@ Project Goals:
 │ │ │ ├─ CreateTable200Response.ts
 │ │ │ ├─ CreateTableRequest.ts
 │ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
 │ │ │ ├─ DeleteFile200Response.ts
@@ -1074,16 +1048,15 @@ Project Goals:
 │ ├─ generated-unified/
 │ │ └─ QuickbaseClient.ts
 │ ├─ index.ts
-│ ├─ logGen.ts
+│ ├─ log-gen.ts
 │ ├─ quickbaseClient.ts
 │ │   Contents:
 │ │     import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 │ │     import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 │ │     import * as apis from "./generated/apis/index.ts";
-│ │     import fetch from "node-fetch";
 │ │     import { simplifyName } from "./utils.ts";
 │ │     
-│ │     interface QuickbaseConfig {
+│ │     export interface QuickbaseConfig {
 │ │       realm: string;
 │ │       userToken?: string;
 │ │       tempToken?: string;
@@ -1120,7 +1093,7 @@ Project Goals:
 │ │       const configuration = new Configuration({
 │ │         basePath: baseUrl,
 │ │         headers,
-│ │         fetchApi: window.fetch.bind(window),
+│ │         fetchApi: window.fetch.bind(window), // Use browser-native fetch
 │ │       });
 │ │     
 │ │       const apiInstances = Object.fromEntries(
@@ -1150,12 +1123,14 @@ Project Goals:
 │ │             )
 │ │             .forEach((methodName) => {
 │ │               const friendlyName = simplifyName(methodName);
-│ │               const originalMethod = api[methodName as keyof typeof api];
-│ │               const boundMethod = originalMethod.bind(api) as unknown as ApiMethod;
+│ │               const componenteMethod = api[methodName as keyof typeof api];
+│ │               const boundMethod = componenteMethod.bind(
+│ │                 api
+│ │               ) as unknown as ApiMethod;
 │ │               methodMap[friendlyName] = {
 │ │                 api,
 │ │                 method: boundMethod,
-│ │                 paramMap: getParamNames(originalMethod),
+│ │                 paramMap: getParamNames(componenteMethod),
 │ │               };
 │ │             });
 │ │         }
@@ -1173,7 +1148,9 @@ Project Goals:
 │ │           methodInfo.paramMap[0] === "requestParameters"
 │ │             ? [params, undefined]
 │ │             : [params, undefined];
-│ │         return methodInfo.method(...args) as ReturnType<QuickbaseClient[K]>;
+│ │         return methodInfo.method(...args) as Promise<
+│ │           ReturnType<QuickbaseClient[K]>
+│ │         >;
 │ │       };
 │ │     
 │ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
@@ -1202,7 +1179,7 @@ Project Goals:
 │ │         debug: true,
 │ │       });
 │ │     
-│ │       const app = await client.getAppById({ appId: process.env.QB_APP_ID! });
+│ │       const app = await client.getApp({ appId: process.env.QB_APP_ID! });
 │ │       const fields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
 │ │       console.log("App:", app);
 │ │       console.log("Fields:", fields);
@@ -1211,6 +1188,8 @@ Project Goals:
 │ │     runTest().catch(console.error);
 │ │     
 │ └─ utils.ts
+├─ test/
+│ └─ client.test.ts
 ├─ text.txt
 ├─ tsconfig.build.json
 │   Contents:
@@ -1219,14 +1198,15 @@ Project Goals:
 │       "compilerOptions": {
 │         "outDir": "dist",
 │         "rootDir": "src",
+│         "module": "NodeNext",
+│         "moduleResolution": "NodeNext",
 │         "declaration": true,
-│         "allowImportingTsExtensions": false, // Override to false
-│         "noEmit": false // Emit .js and .d.ts
+│         "allowImportingTsExtensions": true,
+│         "noEmit": true
 │       },
 │       "include": ["src/**/*"],
 │       "exclude": ["node_modules", "dist", "src/generated-old"]
 │     }
-│     
 └─ tsconfig.json
     Contents:
       {
@@ -1240,7 +1220,7 @@ Project Goals:
           "esModuleInterop": true,
           "resolveJsonModule": true,
           "allowImportingTsExtensions": true,
-          "noEmit": true // Required for allowImportingTsExtensions
+          "noEmit": true
         },
         "include": ["src/**/*"],
         "exclude": ["node_modules", "dist", "src/generated-old"],
@@ -1249,4 +1229,3 @@ Project Goals:
           "transpileOnly": true
         }
       }
-      

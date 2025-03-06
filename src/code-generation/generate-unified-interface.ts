@@ -70,7 +70,7 @@ function generateInterface() {
   }
 
   const importLines = Array.from(modelImports)
-    .map((m) => `import { ${m} } from "../generated/models/${m}";`)
+    .map((m) => `import { ${m} } from "../generated/models/${m}.ts";`) // Add .ts extension
     .join("\n");
   const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importLines}\n\nexport interface QuickbaseClient {\n${methods.join(
     "\n"

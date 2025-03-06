@@ -1,10 +1,9 @@
 import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
-import fetch from "node-fetch";
 import { simplifyName } from "./utils.ts";
 
-interface QuickbaseConfig {
+export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
@@ -41,7 +40,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi: window.fetch.bind(window),
+    fetchApi: window.fetch.bind(window), // Use browser-native fetch
   });
 
   const apiInstances = Object.fromEntries(
@@ -71,12 +70,14 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         )
         .forEach((methodName) => {
           const friendlyName = simplifyName(methodName);
-          const originalMethod = api[methodName as keyof typeof api];
-          const boundMethod = originalMethod.bind(api) as unknown as ApiMethod;
+          const componenteMethod = api[methodName as keyof typeof api];
+          const boundMethod = componenteMethod.bind(
+            api
+          ) as unknown as ApiMethod;
           methodMap[friendlyName] = {
             api,
             method: boundMethod,
-            paramMap: getParamNames(originalMethod),
+            paramMap: getParamNames(componenteMethod),
           };
         });
     }
@@ -94,7 +95,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       methodInfo.paramMap[0] === "requestParameters"
         ? [params, undefined]
         : [params, undefined];
-    return methodInfo.method(...args) as ReturnType<QuickbaseClient[K]>;
+    return methodInfo.method(...args) as Promise<
+      ReturnType<QuickbaseClient[K]>
+    >;
   };
 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {

@@ -10,7 +10,7 @@ async function runTest() {
     debug: true,
   });
 
-  const app = await client.getAppById({ appId: process.env.QB_APP_ID! });
+  const app = await client.getApp({ appId: process.env.QB_APP_ID! });
   const fields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
   console.log("App:", app);
   console.log("Fields:", fields);

@@ -28,6 +28,13 @@ interface Spec {
   components?: any;
 }
 
+// Function to convert hyphenated names to camelCase
+function toCamelCase(str: string): string {
+  return str
+    .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
+    .replace(/^./, (str) => str.toLowerCase());
+}
+
 async function fixQuickBaseSpec(): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
@@ -56,6 +63,8 @@ async function fixQuickBaseSpec(): Promise<void> {
         if (operation.parameters) {
           operation.parameters = operation.parameters.map(
             (param: Parameter) => {
+              // Transform hyphenated parameter names to camelCase
+              param.name = toCamelCase(param.name);
               if ("example" in param) delete param.example;
               if ("schema" in param && param.in !== "body") delete param.schema;
               if (!param.type && param.in !== "body") param.type = "string";

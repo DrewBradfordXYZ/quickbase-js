@@ -3,10 +3,12 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "declaration": true,
-    "allowImportingTsExtensions": false, // Override to false
-    "noEmit": false // Emit .js and .d.ts
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": false, // Disable individual .d.ts generation
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/quickbaseClient.ts"], // Only process the entry point
   "exclude": ["node_modules", "dist", "src/generated-old"]
 }
