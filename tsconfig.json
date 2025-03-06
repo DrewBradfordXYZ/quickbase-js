@@ -1,26 +1,20 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "outDir": "dist",
-    "rootDir": ".", // Include root-level files
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
-    "skipLibCheck": true,
-    "declaration": true,
+    "lib": ["ESNext", "DOM"],
     "types": ["node"],
-    "noEmit": false,
+    "esModuleInterop": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
-    "lib": ["ESNext", "DOM"]
+    "allowImportingTsExtensions": true,
+    "noEmit": true // Required for allowImportingTsExtensions
   },
-  "include": [
-    "src/**/*",
-    "code-generation/**/*",
-    "aiupdate.ts",
-    "types/QuickbaseClient.d.ts"
-  ],
-  "exclude": ["node_modules", "dist", "src/generated-old"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/generated-old"],
+  "ts-node": {
+    "esm": true,
+    "transpileOnly": true
+  }
 }

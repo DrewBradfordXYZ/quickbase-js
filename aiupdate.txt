@@ -19,307 +19,185 @@ Project Goals:
 ├─ .gitignore
 ├─ LICENSE
 ├─ README.md
-├─ aiupdate.ts
-├─ aiupdate.txt
 ├─ build.js
-├─ code-generation/
-│ ├─ fix-spec.ts
-│ │   Contents:
-│ │     #!/usr/bin/env node
-│ │     import { promises as fs } from "fs";
-│ │     import path from "path";
-│ │     import * as glob from "glob";
-│ │     
-│ │     // Define types for the spec structure (simplified for brevity)
-│ │     interface Parameter {
-│ │       name: string;
-│ │       in: string;
-│ │       required?: boolean;
-│ │       type?: string;
-│ │       schema?: { type?: string; items?: any };
-│ │       example?: any;
-│ │     }
-│ │     
-│ │     interface Operation {
-│ │       parameters?: Parameter[];
-│ │       responses?: Record<string, { description: string; schema?: any }>;
-│ │     }
-│ │     
-│ │     interface Spec {
-│ │       paths: Record<string, Record<string, Operation>>;
-│ │       definitions?: Record<string, any>;
-│ │       operations?: any;
-│ │       groups?: any;
-│ │       components?: any;
-│ │     }
-│ │     
-│ │     async function fixQuickBaseSpec(): Promise<void> {
-│ │       try {
-│ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
-│ │         const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
-│ │         console.log("Finding latest QuickBase RESTful API spec...");
-│ │         const specFiles = glob.sync(
-│ │           path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
-│ │         );
-│ │         if (specFiles.length === 0) {
-│ │           console.error(
-│ │             "No QuickBase_RESTful_*.json files found in specs/ folder."
-│ │           );
-│ │           process.exit(1);
-│ │         }
-│ │         const inputFile = specFiles.sort().pop() as string;
-│ │         const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
-│ │     
-│ │         console.log(`Reading ${path.basename(inputFile)} from specs/...`);
-│ │         const specContent = await fs.readFile(inputFile, "utf8");
-│ │         const spec: Spec = JSON.parse(specContent);
-│ │     
-│ │         console.log("Fixing parameters...");
-│ │         for (const pathKey in spec.paths) {
-│ │           for (const method in spec.paths[pathKey]) {
-│ │             const operation = spec.paths[pathKey][method];
-│ │             if (operation.parameters) {
-│ │               operation.parameters = operation.parameters.map(
-│ │                 (param: Parameter) => {
-│ │                   if ("example" in param) delete param.example;
-│ │                   if ("schema" in param && param.in !== "body") delete param.schema;
-│ │                   if (!param.type && param.in !== "body") param.type = "string";
-│ │                   if (
-│ │                     param.name === "generated" &&
-│ │                     param.schema?.type === "array" &&
-│ │                     !param.schema.items
-│ │                   ) {
-│ │                     param.schema!.items = { $ref: "#/definitions/Record" };
-│ │                   }
-│ │                   return param;
-│ │                 }
-│ │               );
-│ │             }
-│ │           }
-│ │         }
-│ │     
-│ │         console.log("Adding responses and schemas...");
-│ │         // Fix /fields endpoint
-│ │         if (spec.paths["/fields"]?.get) {
-│ │           spec.paths["/fields"].get.parameters = [
-│ │             { name: "tableId", in: "query", required: true, type: "string" },
-│ │             {
-│ │               name: "includeFieldPerms",
-│ │               in: "query",
-│ │               required: false,
-│ │               type: "boolean",
-│ │             },
-│ │           ];
-│ │           spec.paths["/fields"].get.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { type: "array", items: { $ref: "#/definitions/Field" } },
-│ │             },
-│ │           };
-│ │         }
-│ │     
-│ │         // Fix /fields/{fieldId} endpoint (example)
-│ │         if (spec.paths["/fields/{fieldId}"]?.get) {
-│ │           spec.paths["/fields/{fieldId}"].get.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { $ref: "#/definitions/Field" },
-│ │             },
-│ │           };
-│ │         }
-│ │     
-│ │         // Add /tables/{tableId} endpoint with Table definition
-│ │         if (spec.paths["/tables/{tableId}"]?.get) {
-│ │           spec.paths["/tables/{tableId}"].get.parameters = [
-│ │             { name: "appId", in: "query", required: true, type: "string" },
-│ │             { name: "tableId", in: "path", required: true, type: "string" },
-│ │           ];
-│ │           spec.paths["/tables/{tableId}"].get.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { $ref: "#/definitions/Table" },
-│ │             },
-│ │           };
-│ │         }
-│ │     
-│ │         // Fix /apps/{appId} endpoint (example)
-│ │         if (spec.paths["/apps/{appId}"]?.get) {
-│ │           spec.paths["/apps/{appId}"].get.responses = {
-│ │             200: {
-│ │               description: "Successful response",
-│ │               schema: { $ref: "#/definitions/App" },
-│ │             },
-│ │           };
-│ │         }
-│ │     
-│ │         // Add more endpoints as needed...
-│ │     
-│ │         console.log("Adding definitions...");
-│ │         if (!spec.definitions) spec.definitions = {};
-│ │     
-│ │         // Field definition (already present)
-│ │         spec.definitions.Field = {
-│ │           type: "object",
-│ │           properties: {
-│ │             appearsByDefault: { type: "boolean" },
-│ │             audited: { type: "boolean" },
-│ │             bold: { type: "boolean" },
-│ │             doesDataCopy: { type: "boolean" },
-│ │             fieldHelp: { type: "string" },
-│ │             fieldType: { type: "string" },
-│ │             findEnabled: { type: "boolean" },
-│ │             id: { type: "integer" },
-│ │             label: { type: "string" },
-│ │             mode: { type: "string" },
-│ │             noWrap: { type: "boolean" },
-│ │             properties: { type: "object", additionalProperties: true },
-│ │             required: { type: "boolean" },
-│ │             unique: { type: "boolean" },
-│ │           },
-│ │         };
-│ │     
-│ │         // Add Table definition
-│ │         spec.definitions.Table = {
-│ │           type: "object",
-│ │           properties: {
-│ │             id: { type: "string", description: "Unique identifier for the table" },
-│ │             name: { type: "string", description: "Name of the table" },
-│ │             created: {
-│ │               type: "string",
-│ │               format: "date-time",
-│ │               description: "Creation timestamp",
-│ │             },
-│ │             updated: {
-│ │               type: "string",
-│ │               format: "date-time",
-│ │               description: "Last updated timestamp",
-│ │             },
-│ │             description: { type: "string", description: "Table description" },
-│ │             keyFieldId: { type: "integer", description: "ID of the key field" },
-│ │             nextFieldId: {
-│ │               type: "integer",
-│ │               description: "Next available field ID",
-│ │             },
-│ │             nextRecordId: {
-│ │               type: "integer",
-│ │               description: "Next available record ID",
-│ │             },
-│ │             // Add more properties based on QuickBase API docs
-│ │           },
-│ │           required: ["id", "name"],
-│ │         };
-│ │     
-│ │         // Add App definition (example)
-│ │         spec.definitions.App = {
-│ │           type: "object",
-│ │           properties: {
-│ │             id: { type: "string", description: "Unique identifier for the app" },
-│ │             name: { type: "string", description: "Name of the app" },
-│ │             created: { type: "string", format: "date-time" },
-│ │             updated: { type: "string", format: "date-time" },
-│ │             description: { type: "string" },
-│ │             // Add more properties as needed
-│ │           },
-│ │           required: ["id", "name"],
-│ │         };
-│ │     
-│ │         // Add more definitions as needed (e.g., Record, ReportData)...
-│ │     
-│ │         console.log("Removing unexpected top-level attributes...");
-│ │         delete spec.operations;
-│ │         delete spec.groups;
-│ │         delete spec.components;
-│ │     
-│ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
-│ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
-│ │         console.log("Spec fixed successfully!");
-│ │       } catch (error) {
-│ │         console.error("Failed to fix spec:", error);
-│ │         process.exit(1);
-│ │       }
-│ │     }
-│ │     
-│ │     fixQuickBaseSpec();
-│ │     
-│ ├─ openapi-generator-cli.jar
-│ ├─ quickbase-fixed.json
-│ └─ regenerate-client.ts
-│     Contents:
-│       #!/usr/bin/env node
-│       import { execSync } from "child_process";
-│       import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs";
-│       import { join, dirname, basename } from "path";
-│       import { fileURLToPath } from "url";
-│       
-│       const __dirname = dirname(fileURLToPath(import.meta.url));
-│       const CODEGEN_DIR = __dirname;
-│       const SPEC_FILE = join(CODEGEN_DIR, "quickbase-fixed.json");
-│       const GENERATED_DIR = join(__dirname, "..", "src", "generated");
-│       const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
-│       const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
-│       
-│       function backupGeneratedDir(): void {
-│         console.log("Backing up existing src/generated/...");
-│         if (existsSync(GENERATED_DIR)) {
-│           if (existsSync(BACKUP_DIR))
-│             execSync(`rm -rf ${BACKUP_DIR}`, { stdio: "inherit" });
-│           execSync(`mv ${GENERATED_DIR} ${BACKUP_DIR}`, { stdio: "inherit" });
-│           console.log(`Moved src/generated/ to ${basename(BACKUP_DIR)}`);
-│         } else {
-│           console.log("No existing src/generated/ to backup.");
-│         }
-│       }
-│       
-│       function generateClient(): void {
-│         if (!existsSync(SPEC_FILE)) {
-│           console.error(
-│             `Fixed spec file ${basename(SPEC_FILE)} not found. Run 'npm run fix-spec' first.`
-│           );
-│           process.exit(1);
-│         }
-│         console.log("Generating TypeScript client with Fetch API using JAR...");
-│         execSync(
-│           `java -jar ${JAR_PATH} generate \
-│             -i ${SPEC_FILE} \
-│             -g typescript-fetch \
-│             -o ${GENERATED_DIR} \
-│             --skip-validate-spec \
-│             --additional-properties=supportsES6=true,modelPropertyNaming=original,typescriptThreePlus=true,apiPackage=generated.api,modelPackage=generated.model`,
-│           { stdio: "inherit" }
-│         );
-│         console.log(`Client generated successfully in ${GENERATED_DIR}`);
-│       }
-│       
-│       function fixImports(): void {
-│         console.log("Fixing ESM imports in generated files...");
-│         const files = readdirSync(GENERATED_DIR).filter((f: string) =>
-│           f.endsWith(".ts")
-│         );
-│         for (const file of files) {
-│           const filePath = join(GENERATED_DIR, file);
-│           let content = readFileSync(filePath, "utf8");
-│           content = content.replace(/(from\s+['"])(\.\/[^'"]+)(['"])/g, "$1$2.js$3");
-│           writeFileSync(filePath, content, "utf8");
-│         }
-│         console.log("Imports fixed.");
-│       }
-│       
-│       function main(): void {
-│         try {
-│           execSync("java -version", { stdio: "ignore" });
-│         } catch (error) {
-│           console.error(
-│             "Java is not installed or not in PATH. Install Java (e.g., OpenJDK 17)."
-│           );
-│           process.exit(1);
-│         }
-│         backupGeneratedDir();
-│         generateClient();
-│         fixImports();
-│       }
-│       
-│       main();
-│       
+├─ dist/
+│ ├─ QuickbaseClient.d.ts
+│ ├─ QuickbaseClient.js
+│ ├─ generated/
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.d.ts
+│ │ │ ├─ AppsApi.js
+│ │ │ ├─ AuditApi.d.ts
+│ │ │ ├─ AuditApi.js
+│ │ │ ├─ AuthApi.d.ts
+│ │ │ ├─ AuthApi.js
+│ │ │ ├─ DefaultApi.d.ts
+│ │ │ ├─ DefaultApi.js
+│ │ │ ├─ DocumentTemplatesApi.d.ts
+│ │ │ ├─ DocumentTemplatesApi.js
+│ │ │ ├─ FieldsApi.d.ts
+│ │ │ ├─ FieldsApi.js
+│ │ │ ├─ FilesApi.d.ts
+│ │ │ ├─ FilesApi.js
+│ │ │ ├─ FormulasApi.d.ts
+│ │ │ ├─ FormulasApi.js
+│ │ │ ├─ PlatformAnalyticsApi.d.ts
+│ │ │ ├─ PlatformAnalyticsApi.js
+│ │ │ ├─ RecordsApi.d.ts
+│ │ │ ├─ RecordsApi.js
+│ │ │ ├─ ReportsApi.d.ts
+│ │ │ ├─ ReportsApi.js
+│ │ │ ├─ SolutionsApi.d.ts
+│ │ │ ├─ SolutionsApi.js
+│ │ │ ├─ TablesApi.d.ts
+│ │ │ ├─ TablesApi.js
+│ │ │ ├─ UserTokenApi.d.ts
+│ │ │ ├─ UserTokenApi.js
+│ │ │ ├─ UsersApi.d.ts
+│ │ │ ├─ UsersApi.js
+│ │ │ ├─ index.d.ts
+│ │ │ └─ index.js
+│ │ ├─ index.d.ts
+│ │ ├─ index.js
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.d.ts
+│ │ │ ├─ AddMembersToGroup200Response.js
+│ │ │ ├─ AddSubgroupsToGroup200Response.d.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.js
+│ │ │ ├─ App.d.ts
+│ │ │ ├─ App.js
+│ │ │ ├─ Audit200Response.d.ts
+│ │ │ ├─ Audit200Response.js
+│ │ │ ├─ Audit202Response.d.ts
+│ │ │ ├─ Audit202Response.js
+│ │ │ ├─ AuditRequest.d.ts
+│ │ │ ├─ AuditRequest.js
+│ │ │ ├─ CloneUserToken200Response.d.ts
+│ │ │ ├─ CloneUserToken200Response.js
+│ │ │ ├─ CloneUserTokenRequest.d.ts
+│ │ │ ├─ CloneUserTokenRequest.js
+│ │ │ ├─ CopyApp200Response.d.ts
+│ │ │ ├─ CopyApp200Response.js
+│ │ │ ├─ CopyAppRequest.d.ts
+│ │ │ ├─ CopyAppRequest.js
+│ │ │ ├─ CreateApp200Response.d.ts
+│ │ │ ├─ CreateApp200Response.js
+│ │ │ ├─ CreateAppRequest.d.ts
+│ │ │ ├─ CreateAppRequest.js
+│ │ │ ├─ CreateField200Response.d.ts
+│ │ │ ├─ CreateField200Response.js
+│ │ │ ├─ CreateRelationship200Response.d.ts
+│ │ │ ├─ CreateRelationship200Response.js
+│ │ │ ├─ CreateRelationshipRequest.d.ts
+│ │ │ ├─ CreateRelationshipRequest.js
+│ │ │ ├─ CreateTable200Response.d.ts
+│ │ │ ├─ CreateTable200Response.js
+│ │ │ ├─ CreateTableRequest.d.ts
+│ │ │ ├─ CreateTableRequest.js
+│ │ │ ├─ DeactivateUserToken200Response.d.ts
+│ │ │ ├─ DeactivateUserToken200Response.js
+│ │ │ ├─ DeleteApp200Response.d.ts
+│ │ │ ├─ DeleteApp200Response.js
+│ │ │ ├─ DeleteAppRequest.d.ts
+│ │ │ ├─ DeleteAppRequest.js
+│ │ │ ├─ DeleteFields200Response.d.ts
+│ │ │ ├─ DeleteFields200Response.js
+│ │ │ ├─ DeleteFile200Response.d.ts
+│ │ │ ├─ DeleteFile200Response.js
+│ │ │ ├─ DeleteRecords200Response.d.ts
+│ │ │ ├─ DeleteRecords200Response.js
+│ │ │ ├─ DeleteRecordsRequest.d.ts
+│ │ │ ├─ DeleteRecordsRequest.js
+│ │ │ ├─ DeleteRelationship200Response.d.ts
+│ │ │ ├─ DeleteRelationship200Response.js
+│ │ │ ├─ DeleteTable200Response.d.ts
+│ │ │ ├─ DeleteTable200Response.js
+│ │ │ ├─ DenyUsers200Response.d.ts
+│ │ │ ├─ DenyUsers200Response.js
+│ │ │ ├─ ExchangeSsoToken200Response.d.ts
+│ │ │ ├─ ExchangeSsoToken200Response.js
+│ │ │ ├─ ExchangeSsoTokenRequest.d.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.js
+│ │ │ ├─ Field.d.ts
+│ │ │ ├─ Field.js
+│ │ │ ├─ GenerateDocument200Response.d.ts
+│ │ │ ├─ GenerateDocument200Response.js
+│ │ │ ├─ GetField200Response.d.ts
+│ │ │ ├─ GetField200Response.js
+│ │ │ ├─ GetRelationships200Response.d.ts
+│ │ │ ├─ GetRelationships200Response.js
+│ │ │ ├─ GetReport200Response.d.ts
+│ │ │ ├─ GetReport200Response.js
+│ │ │ ├─ GetTempTokenDBID200Response.d.ts
+│ │ │ ├─ GetTempTokenDBID200Response.js
+│ │ │ ├─ GetUsers200Response.d.ts
+│ │ │ ├─ GetUsers200Response.js
+│ │ │ ├─ GetUsersRequest.d.ts
+│ │ │ ├─ GetUsersRequest.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.js
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.js
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.js
+│ │ │ ├─ PlatformAnalyticReads200Response.d.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.js
+│ │ │ ├─ RemoveMembersFromGroup200Response.d.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.js
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.d.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.js
+│ │ │ ├─ RunFormula200Response.d.ts
+│ │ │ ├─ RunFormula200Response.js
+│ │ │ ├─ RunFormulaRequest.d.ts
+│ │ │ ├─ RunFormulaRequest.js
+│ │ │ ├─ RunQuery200Response.d.ts
+│ │ │ ├─ RunQuery200Response.js
+│ │ │ ├─ RunQueryRequest.d.ts
+│ │ │ ├─ RunQueryRequest.js
+│ │ │ ├─ RunReport200Response.d.ts
+│ │ │ ├─ RunReport200Response.js
+│ │ │ ├─ Table.d.ts
+│ │ │ ├─ Table.js
+│ │ │ ├─ TransferUserToken200Response.d.ts
+│ │ │ ├─ TransferUserToken200Response.js
+│ │ │ ├─ TransferUserTokenRequest.d.ts
+│ │ │ ├─ TransferUserTokenRequest.js
+│ │ │ ├─ UndenyUsers200Response.d.ts
+│ │ │ ├─ UndenyUsers200Response.js
+│ │ │ ├─ UpdateApp200Response.d.ts
+│ │ │ ├─ UpdateApp200Response.js
+│ │ │ ├─ UpdateAppRequest.d.ts
+│ │ │ ├─ UpdateAppRequest.js
+│ │ │ ├─ UpdateFieldRequest.d.ts
+│ │ │ ├─ UpdateFieldRequest.js
+│ │ │ ├─ UpdateRelationshipRequest.d.ts
+│ │ │ ├─ UpdateRelationshipRequest.js
+│ │ │ ├─ UpdateTableRequest.d.ts
+│ │ │ ├─ UpdateTableRequest.js
+│ │ │ ├─ Upsert200Response.d.ts
+│ │ │ ├─ Upsert200Response.js
+│ │ │ ├─ index.d.ts
+│ │ │ └─ index.js
+│ │ ├─ runtime.d.ts
+│ │ └─ runtime.js
+│ ├─ index.d.ts
+│ ├─ index.js
+│ ├─ test-esm.d.ts
+│ ├─ test-esm.js
+│ ├─ test.d.ts
+│ └─ test.js
 ├─ openapitools.json
 ├─ package-lock.json
 ├─ package.json
@@ -327,41 +205,27 @@ Project Goals:
 │     {
 │       "name": "quickbase-js",
 │       "version": "1.0.0",
-│       "description": "",
+│       "description": "QuickBase JavaScript client",
+│       "main": "dist/QuickbaseClient.js",
+│       "types": "dist/QuickbaseClient.d.ts",
 │       "type": "module",
 │       "scripts": {
-│         "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/fix-spec.ts",
-│         "regenerate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/regenerate-client.ts",
-│         "aiupdate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' aiupdate.ts",
-│         "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
-│         "generate-types": "node --no-warnings --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/generate-types.ts",
-│         "build": "tsc",
-│         "buildwithtypes": "npm run generate-types && tsc",
-│         "test": "node dist/test.js"
+│         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
+│         "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
+│         "test": "node --loader ts-node/esm src/test.ts",
+│         "build": "tsc -p tsconfig.build.json && npm run aiupdate",
+│         "aiupdate": "node --loader ts-node/esm src/aiupdate.ts"
 │       },
-│       "main": "dist/QuickBaseClient.js",
-│       "browser": "dist/quickbase-client.browser.min.js",
-│       "types": "dist/QuickBaseClient.d.ts",
-│       "keywords": [
-│         "quickbase",
-│         "api",
-│         "client",
-│         "javascript",
-│         "typescript"
-│       ],
-│       "author": "Drew Bradford",
-│       "license": "ISC",
 │       "dependencies": {
+│         "dotenv": "^16.4.7",
+│         "node-fetch": "^3.3.2",
 │         "typescript": "^5.8.2"
 │       },
 │       "devDependencies": {
-│         "@openapitools/openapi-generator-cli": "^2.17.0",
-│         "@types/node": "^22.13.9",
-│         "@types/react": "^19.0.10",
-│         "glob": "^10.4.5",
-│         "prettier": "^3.5.3",
-│         "react": "^19.0.0",
-│         "ts-node": "^10.9.2"
+│         "@types/node": "^20.11.20",
+│         "@types/node-fetch": "^2.6.11",
+│         "ts-node": "^10.9.2",
+│         "ts-morph": "^23.0.0"
 │       }
 │     }
 │     
@@ -375,25 +239,20 @@ Project Goals:
 │ │     import { TablesApi } from "./generated/apis/TablesApi";
 │ │     import { AppsApi } from "./generated/apis/AppsApi";
 │ │     import { Field } from "./generated/models/Field";
-│ │     import { GetApp200Response } from "./generated/models/GetApp200Response";
+│ │     import { App } from "./generated/models/App";
 │ │     import { CreateField200Response } from "./generated/models/CreateField200Response";
 │ │     import { DeleteFields200Response } from "./generated/models/DeleteFields200Response";
 │ │     import { Upsert200Response } from "./generated/models/Upsert200Response";
 │ │     import { Table } from "./generated/models/Table";
-│ │     // Add this if Table type is missing; we'll fix spec later
-│ │     interface Table {
-│ │       id: string;
-│ │       name: string;
-│ │       // Add more properties as needed
-│ │     }
+│ │     import fetch from "node-fetch";
 │ │     
 │ │     export interface QuickbaseMethods {
 │ │       getFields(params: {
 │ │         tableId: string;
 │ │         includeFieldPerms?: boolean;
 │ │       }): Promise<Field[]>;
-│ │       getTable(params: { appId: string; tableId: string }): Promise<Table>; // Temporary until spec fix
-│ │       getApp(params: { appId: string }): Promise<GetApp200Response>;
+│ │       getTable(params: { appId: string; tableId: string }): Promise<Table>;
+│ │       getApp(params: { appId: string }): Promise<App>;
 │ │       createField(params: {
 │ │         tableId: string;
 │ │         generated: any;
@@ -431,7 +290,7 @@ Project Goals:
 │ │     export function createQuickbaseClient(
 │ │       config: QuickbaseConfig
 │ │     ): QuickbaseClient {
-│ │       const token = config.tempToken || config.userToken || ""; // Default to empty string
+│ │       const token = config.tempToken || config.userToken || "";
 │ │       const baseUrl = `https://api.quickbase.com/v1`;
 │ │       const headers: HTTPHeaders = {
 │ │         Authorization: `QB-USER-TOKEN ${token}`,
@@ -439,10 +298,19 @@ Project Goals:
 │ │         "Content-Type": "application/json",
 │ │       };
 │ │     
+│ │       type FetchApi = (
+│ │         input: RequestInfo | URL,
+│ │         init?: RequestInit
+│ │       ) => Promise<Response>;
+│ │       const fetchApi: FetchApi =
+│ │         typeof window !== "undefined" && window.fetch
+│ │           ? window.fetch.bind(window)
+│ │           : (fetch as unknown as FetchApi);
+│ │     
 │ │       const configuration = new Configuration({
 │ │         basePath: baseUrl,
 │ │         headers,
-│ │         fetchApi: typeof window !== "undefined" ? window.fetch.bind(window) : fetch,
+│ │         fetchApi,
 │ │       });
 │ │     
 │ │       const apis: Record<string, FieldsApi | TablesApi | AppsApi> = {
@@ -481,7 +349,7 @@ Project Goals:
 │ │         return paramStr
 │ │           .split(",")
 │ │           .map((p) => p.trim().split("=")[0].trim())
-│ │           .filter((p) => p && !p.match(/^\{/));
+│ │           .filter((p) => p && !p.match(/^\{/) && p !== "options");
 │ │       }
 │ │     
 │ │       async function invokeMethod<K extends keyof QuickbaseMethods>(
@@ -492,14 +360,22 @@ Project Goals:
 │ │         if (!methodInfo) throw new Error(`Method ${methodName} not found`);
 │ │         const { method, paramMap } = methodInfo;
 │ │     
+│ │         console.log(`Calling ${methodName} with params:`, params);
 │ │         const userParams: Record<string, unknown> = { ...params };
 │ │         const args: unknown[] = [];
-│ │         paramMap.forEach((param) => {
-│ │           args.push(userParams[param] ?? undefined);
-│ │         });
+│ │         paramMap.forEach((param) => args.push(userParams[param] ?? undefined));
+│ │         console.log(`Mapped args for ${methodName}:`, args);
 │ │     
 │ │         const response = await (method(...args) as Promise<Response>);
-│ │         return response.json() as Promise<ReturnType<QuickbaseMethods[K]>>;
+│ │         if (!response.ok) {
+│ │           const errorText = await response.text();
+│ │           console.error(`API error for ${methodName}:`, response.status, errorText);
+│ │           throw new Error(`API request failed: ${response.status} - ${errorText}`);
+│ │         }
+│ │     
+│ │         const json = await response.json();
+│ │         console.log(`Response JSON for ${methodName}:`, json);
+│ │         return json as ReturnType<QuickbaseMethods[K]>;
 │ │       }
 │ │     
 │ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
@@ -516,6 +392,304 @@ Project Goals:
 │ │     
 │ │     export type QuickbaseClient = QuickbaseMethods;
 │ │     
+│ ├─ aiupdate.ts
+│ ├─ code-generation/
+│ │ ├─ fix-spec.ts
+│ │ │   Contents:
+│ │ │     #!/usr/bin/env node
+│ │ │     import { promises as fs } from "fs";
+│ │ │     import path from "path";
+│ │ │     import * as glob from "glob";
+│ │ │     
+│ │ │     interface Parameter {
+│ │ │       name: string;
+│ │ │       in: string;
+│ │ │       required?: boolean;
+│ │ │       type?: string;
+│ │ │       schema?: { type?: string; items?: any };
+│ │ │       example?: any;
+│ │ │     }
+│ │ │     
+│ │ │     interface Operation {
+│ │ │       parameters?: Parameter[];
+│ │ │       responses?: Record<string, { description: string; schema?: any }>;
+│ │ │     }
+│ │ │     
+│ │ │     interface Spec {
+│ │ │       paths: Record<string, Record<string, Operation>>;
+│ │ │       definitions?: Record<string, any>;
+│ │ │       operations?: any;
+│ │ │       groups?: any;
+│ │ │       components?: any;
+│ │ │     }
+│ │ │     
+│ │ │     async function fixQuickBaseSpec(): Promise<void> {
+│ │ │       try {
+│ │ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
+│ │ │         const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
+│ │ │         console.log("Finding latest QuickBase RESTful API spec...");
+│ │ │         const specFiles = glob.sync(
+│ │ │           path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
+│ │ │         );
+│ │ │         if (specFiles.length === 0) {
+│ │ │           console.error(
+│ │ │             "No QuickBase_RESTful_*.json files found in specs/ folder."
+│ │ │           );
+│ │ │           process.exit(1);
+│ │ │         }
+│ │ │         const inputFile = specFiles.sort().pop() as string;
+│ │ │         const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
+│ │ │     
+│ │ │         console.log(`Reading ${path.basename(inputFile)} from specs/...`);
+│ │ │         const specContent = await fs.readFile(inputFile, "utf8");
+│ │ │         const spec: Spec = JSON.parse(specContent);
+│ │ │     
+│ │ │         console.log("Fixing parameters...");
+│ │ │         for (const pathKey in spec.paths) {
+│ │ │           for (const method in spec.paths[pathKey]) {
+│ │ │             const operation = spec.paths[pathKey][method];
+│ │ │             if (operation.parameters) {
+│ │ │               operation.parameters = operation.parameters.map(
+│ │ │                 (param: Parameter) => {
+│ │ │                   if ("example" in param) delete param.example;
+│ │ │                   if ("schema" in param && param.in !== "body") delete param.schema;
+│ │ │                   if (!param.type && param.in !== "body") param.type = "string";
+│ │ │                   if (
+│ │ │                     param.name === "generated" &&
+│ │ │                     param.schema?.type === "array" &&
+│ │ │                     !param.schema.items
+│ │ │                   ) {
+│ │ │                     param.schema!.items = { $ref: "#/definitions/Record" };
+│ │ │                   }
+│ │ │                   return param;
+│ │ │                 }
+│ │ │               );
+│ │ │             }
+│ │ │           }
+│ │ │         }
+│ │ │     
+│ │ │         console.log("Ensuring required endpoints...");
+│ │ │         spec.paths["/fields"] = spec.paths["/fields"] || {};
+│ │ │         spec.paths["/fields"].get = {
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "includeFieldPerms",
+│ │ │               in: "query",
+│ │ │               required: false,
+│ │ │               type: "boolean",
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { type: "array", items: { $ref: "#/definitions/Field" } },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/tables/{tableId}"] = spec.paths["/tables/{tableId}"] || {};
+│ │ │         spec.paths["/tables/{tableId}"].get = {
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "query", required: true, type: "string" },
+│ │ │             { name: "tableId", in: "path", required: true, type: "string" },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/Table" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/apps/{appId}"] = spec.paths["/apps/{appId}"] || {};
+│ │ │         spec.paths["/apps/{appId}"].get = {
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: { description: "Success", schema: { $ref: "#/definitions/App" } },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/fields"] = spec.paths["/fields"] || {};
+│ │ │         spec.paths["/fields"].post = {
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/CreateField200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/fields"] = spec.paths["/fields"] || {};
+│ │ │         spec.paths["/fields"].delete = {
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/DeleteFields200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/records"] = spec.paths["/records"] || {};
+│ │ │         spec.paths["/records"].post = {
+│ │ │           parameters: [
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/Upsert200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         console.log("Adding definitions...");
+│ │ │         if (!spec.definitions) spec.definitions = {};
+│ │ │         spec.definitions.Field = {
+│ │ │           type: "object",
+│ │ │           properties: {
+│ │ │             id: { type: "integer" },
+│ │ │             label: { type: "string" },
+│ │ │             // ... other properties ...
+│ │ │           },
+│ │ │         };
+│ │ │         spec.definitions.Table = {
+│ │ │           type: "object",
+│ │ │           properties: {
+│ │ │             id: { type: "string" },
+│ │ │             name: { type: "string" },
+│ │ │             // ... other properties ...
+│ │ │           },
+│ │ │           required: ["id", "name"],
+│ │ │         };
+│ │ │         spec.definitions.App = {
+│ │ │           type: "object",
+│ │ │           properties: {
+│ │ │             id: { type: "string" },
+│ │ │             name: { type: "string" },
+│ │ │             // ... other properties ...
+│ │ │           },
+│ │ │           required: ["id", "name"],
+│ │ │         };
+│ │ │         spec.definitions.Record = { type: "object", additionalProperties: true };
+│ │ │         spec.definitions.CreateField200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "integer" } },
+│ │ │         };
+│ │ │         spec.definitions.DeleteFields200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { deleted: { type: "boolean" } },
+│ │ │         };
+│ │ │         spec.definitions.Upsert200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { metadata: { type: "object" } },
+│ │ │         };
+│ │ │     
+│ │ │         console.log("Removing unexpected top-level attributes...");
+│ │ │         delete spec.operations;
+│ │ │         delete spec.groups;
+│ │ │         delete spec.components;
+│ │ │     
+│ │ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+│ │ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
+│ │ │         console.log("Spec fixed successfully!");
+│ │ │       } catch (error) {
+│ │ │         console.error("Failed to fix spec:", error);
+│ │ │         process.exit(1);
+│ │ │       }
+│ │ │     }
+│ │ │     
+│ │ │     fixQuickBaseSpec();
+│ │ │     
+│ │ ├─ openapi-generator-cli.jar
+│ │ ├─ quickbase-fixed.json
+│ │ └─ regenerate-client.ts
+│ │     Contents:
+│ │       #!/usr/bin/env node
+│ │       import { execSync } from "child_process";
+│ │       import { existsSync } from "fs";
+│ │       import { join, dirname, basename } from "path";
+│ │       import { fileURLToPath } from "url";
+│ │       
+│ │       const __dirname = dirname(fileURLToPath(import.meta.url));
+│ │       const CODEGEN_DIR = __dirname;
+│ │       const SPEC_FILE = join(CODEGEN_DIR, "quickbase-fixed.json");
+│ │       const GENERATED_DIR = join(__dirname, "..", "src", "generated");
+│ │       const BACKUP_DIR = join(__dirname, "..", "src", "generated-old");
+│ │       const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
+│ │       
+│ │       function backupGeneratedDir(): void {
+│ │         console.log("Backing up existing src/generated/...");
+│ │         if (existsSync(GENERATED_DIR)) {
+│ │           if (existsSync(BACKUP_DIR))
+│ │             execSync(`rm -rf ${BACKUP_DIR}`, { stdio: "inherit" });
+│ │           execSync(`mv ${GENERATED_DIR} ${BACKUP_DIR}`, { stdio: "inherit" });
+│ │           console.log(`Moved src/generated/ to ${basename(BACKUP_DIR)}`);
+│ │         } else {
+│ │           console.log("No existing src/generated/ to backup.");
+│ │         }
+│ │       }
+│ │       
+│ │       function generateClient(): void {
+│ │         if (!existsSync(SPEC_FILE)) {
+│ │           console.error(
+│ │             `Fixed spec file ${basename(SPEC_FILE)} not found. Run 'npm run fix-spec' first.`
+│ │           );
+│ │           process.exit(1);
+│ │         }
+│ │         console.log("Generating TypeScript client with Fetch API using JAR...");
+│ │         execSync(
+│ │           `java -jar ${JAR_PATH} generate \
+│ │             -i ${SPEC_FILE} \
+│ │             -g typescript-fetch \
+│ │             -o ${GENERATED_DIR} \
+│ │             --skip-validate-spec \
+│ │             --additional-properties=supportsES6=true,modelPropertyNaming=original,typescriptThreePlus=true,apiPackage=generated.api,modelPackage=generated.model`,
+│ │           { stdio: "inherit" }
+│ │         );
+│ │         console.log(`Client generated successfully in ${GENERATED_DIR}`);
+│ │       }
+│ │       
+│ │       function main(): void {
+│ │         try {
+│ │           execSync("java -version", { stdio: "ignore" });
+│ │         } catch (error) {
+│ │           console.error(
+│ │             "Java is not installed or not in PATH. Install Java (e.g., OpenJDK 17)."
+│ │           );
+│ │           process.exit(1);
+│ │         }
+│ │         backupGeneratedDir();
+│ │         generateClient();
+│ │       }
+│ │       
+│ │       main();
+│ │       
 │ ├─ generated/
 │ │ ├─ .openapi-generator/
 │ │ │ ├─ FILES
@@ -525,6 +699,463 @@ Project Goals:
 │ │ │ ├─ AppsApi.ts
 │ │ │ ├─ AuditApi.ts
 │ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DefaultApi.ts
+│ │ │ ├─ DocumentTemplatesApi.ts
+│ │ │ ├─ FieldsApi.ts
+│ │ │ │   Contents:
+│ │ │ │     /* tslint:disable */
+│ │ │ │     /* eslint-disable */
+│ │ │ │     /**
+│ │ │ │      * Quick Base API
+│ │ │ │      * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+│ │ │ │      *
+│ │ │ │      * The version of the OpenAPI document: 1.0.0
+│ │ │ │      * 
+│ │ │ │      *
+│ │ │ │      * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+│ │ │ │      * https://openapi-generator.tech
+│ │ │ │      * Do not edit the class manually.
+│ │ │ │      */
+│ │ │ │     
+│ │ │ │     
+│ │ │ │     import * as runtime from '../runtime';
+│ │ │ │     import type {
+│ │ │ │       GetField200Response,
+│ │ │ │       UpdateFieldRequest,
+│ │ │ │     } from '../models/index';
+│ │ │ │     import {
+│ │ │ │         GetField200ResponseFromJSON,
+│ │ │ │         GetField200ResponseToJSON,
+│ │ │ │         UpdateFieldRequestFromJSON,
+│ │ │ │         UpdateFieldRequestToJSON,
+│ │ │ │     } from '../models/index';
+│ │ │ │     
+│ │ │ │     export interface GetFieldRequest {
+│ │ │ │         tableId: string;
+│ │ │ │         fieldId: number;
+│ │ │ │         qBRealmHostname: string;
+│ │ │ │         authorization: string;
+│ │ │ │         includeFieldPerms?: boolean;
+│ │ │ │         userAgent?: string;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export interface GetFieldUsageRequest {
+│ │ │ │         tableId: string;
+│ │ │ │         fieldId: number;
+│ │ │ │         qBRealmHostname: string;
+│ │ │ │         authorization: string;
+│ │ │ │         userAgent?: string;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export interface GetFieldsUsageRequest {
+│ │ │ │         tableId: string;
+│ │ │ │         qBRealmHostname: string;
+│ │ │ │         authorization: string;
+│ │ │ │         skip?: number;
+│ │ │ │         top?: number;
+│ │ │ │         userAgent?: string;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     export interface UpdateFieldOperationRequest {
+│ │ │ │         tableId: string;
+│ │ │ │         fieldId: number;
+│ │ │ │         qBRealmHostname: string;
+│ │ │ │         authorization: string;
+│ │ │ │         userAgent?: string;
+│ │ │ │         generated?: UpdateFieldRequest;
+│ │ │ │     }
+│ │ │ │     
+│ │ │ │     /**
+│ │ │ │      * 
+│ │ │ │      */
+│ │ │ │     export class FieldsApi extends runtime.BaseAPI {
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+│ │ │ │          * Get field
+│ │ │ │          */
+│ │ │ │         async getFieldRaw(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetField200Response>> {
+│ │ │ │             if (requestParameters['tableId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'tableId',
+│ │ │ │                     'Required parameter "tableId" was null or undefined when calling getField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['fieldId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'fieldId',
+│ │ │ │                     'Required parameter "fieldId" was null or undefined when calling getField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'qBRealmHostname',
+│ │ │ │                     'Required parameter "qBRealmHostname" was null or undefined when calling getField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'authorization',
+│ │ │ │                     'Required parameter "authorization" was null or undefined when calling getField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const queryParameters: any = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['tableId'] != null) {
+│ │ │ │                 queryParameters['tableId'] = requestParameters['tableId'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['includeFieldPerms'] != null) {
+│ │ │ │                 queryParameters['includeFieldPerms'] = requestParameters['includeFieldPerms'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const headerParameters: runtime.HTTPHeaders = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] != null) {
+│ │ │ │                 headerParameters['QB-Realm-Hostname'] = String(requestParameters['qBRealmHostname']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['userAgent'] != null) {
+│ │ │ │                 headerParameters['User-Agent'] = String(requestParameters['userAgent']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] != null) {
+│ │ │ │                 headerParameters['Authorization'] = String(requestParameters['authorization']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const response = await this.request({
+│ │ │ │                 path: `/fields/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+│ │ │ │                 method: 'GET',
+│ │ │ │                 headers: headerParameters,
+│ │ │ │                 query: queryParameters,
+│ │ │ │             }, initOverrides);
+│ │ │ │     
+│ │ │ │             return new runtime.JSONApiResponse(response, (jsonValue) => GetField200ResponseFromJSON(jsonValue));
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+│ │ │ │          * Get field
+│ │ │ │          */
+│ │ │ │         async getField(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetField200Response> {
+│ │ │ │             const response = await this.getFieldRaw(requestParameters, initOverrides);
+│ │ │ │             return await response.value();
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+│ │ │ │          * Get usage for a field
+│ │ │ │          */
+│ │ │ │         async getFieldUsageRaw(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<{ [key: string]: any; }>>> {
+│ │ │ │             if (requestParameters['tableId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'tableId',
+│ │ │ │                     'Required parameter "tableId" was null or undefined when calling getFieldUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['fieldId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'fieldId',
+│ │ │ │                     'Required parameter "fieldId" was null or undefined when calling getFieldUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'qBRealmHostname',
+│ │ │ │                     'Required parameter "qBRealmHostname" was null or undefined when calling getFieldUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'authorization',
+│ │ │ │                     'Required parameter "authorization" was null or undefined when calling getFieldUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const queryParameters: any = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['tableId'] != null) {
+│ │ │ │                 queryParameters['tableId'] = requestParameters['tableId'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const headerParameters: runtime.HTTPHeaders = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] != null) {
+│ │ │ │                 headerParameters['QB-Realm-Hostname'] = String(requestParameters['qBRealmHostname']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['userAgent'] != null) {
+│ │ │ │                 headerParameters['User-Agent'] = String(requestParameters['userAgent']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] != null) {
+│ │ │ │                 headerParameters['Authorization'] = String(requestParameters['authorization']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const response = await this.request({
+│ │ │ │                 path: `/fields/usage/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+│ │ │ │                 method: 'GET',
+│ │ │ │                 headers: headerParameters,
+│ │ │ │                 query: queryParameters,
+│ │ │ │             }, initOverrides);
+│ │ │ │     
+│ │ │ │             return new runtime.JSONApiResponse<any>(response);
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+│ │ │ │          * Get usage for a field
+│ │ │ │          */
+│ │ │ │         async getFieldUsage(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<{ [key: string]: any; }>> {
+│ │ │ │             const response = await this.getFieldUsageRaw(requestParameters, initOverrides);
+│ │ │ │             return await response.value();
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+│ │ │ │          * Get usage for all fields
+│ │ │ │          */
+│ │ │ │         async getFieldsUsageRaw(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<{ [key: string]: any; }>>> {
+│ │ │ │             if (requestParameters['tableId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'tableId',
+│ │ │ │                     'Required parameter "tableId" was null or undefined when calling getFieldsUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'qBRealmHostname',
+│ │ │ │                     'Required parameter "qBRealmHostname" was null or undefined when calling getFieldsUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'authorization',
+│ │ │ │                     'Required parameter "authorization" was null or undefined when calling getFieldsUsage().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const queryParameters: any = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['tableId'] != null) {
+│ │ │ │                 queryParameters['tableId'] = requestParameters['tableId'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['skip'] != null) {
+│ │ │ │                 queryParameters['skip'] = requestParameters['skip'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['top'] != null) {
+│ │ │ │                 queryParameters['top'] = requestParameters['top'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const headerParameters: runtime.HTTPHeaders = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] != null) {
+│ │ │ │                 headerParameters['QB-Realm-Hostname'] = String(requestParameters['qBRealmHostname']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['userAgent'] != null) {
+│ │ │ │                 headerParameters['User-Agent'] = String(requestParameters['userAgent']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] != null) {
+│ │ │ │                 headerParameters['Authorization'] = String(requestParameters['authorization']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const response = await this.request({
+│ │ │ │                 path: `/fields/usage`,
+│ │ │ │                 method: 'GET',
+│ │ │ │                 headers: headerParameters,
+│ │ │ │                 query: queryParameters,
+│ │ │ │             }, initOverrides);
+│ │ │ │     
+│ │ │ │             return new runtime.JSONApiResponse<any>(response);
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+│ │ │ │          * Get usage for all fields
+│ │ │ │          */
+│ │ │ │         async getFieldsUsage(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<{ [key: string]: any; }>> {
+│ │ │ │             const response = await this.getFieldsUsageRaw(requestParameters, initOverrides);
+│ │ │ │             return await response.value();
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+│ │ │ │          * Update a field
+│ │ │ │          */
+│ │ │ │         async updateFieldRaw(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetField200Response>> {
+│ │ │ │             if (requestParameters['tableId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'tableId',
+│ │ │ │                     'Required parameter "tableId" was null or undefined when calling updateField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['fieldId'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'fieldId',
+│ │ │ │                     'Required parameter "fieldId" was null or undefined when calling updateField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'qBRealmHostname',
+│ │ │ │                     'Required parameter "qBRealmHostname" was null or undefined when calling updateField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] == null) {
+│ │ │ │                 throw new runtime.RequiredError(
+│ │ │ │                     'authorization',
+│ │ │ │                     'Required parameter "authorization" was null or undefined when calling updateField().'
+│ │ │ │                 );
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const queryParameters: any = {};
+│ │ │ │     
+│ │ │ │             if (requestParameters['tableId'] != null) {
+│ │ │ │                 queryParameters['tableId'] = requestParameters['tableId'];
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const headerParameters: runtime.HTTPHeaders = {};
+│ │ │ │     
+│ │ │ │             headerParameters['Content-Type'] = 'application/json';
+│ │ │ │     
+│ │ │ │             if (requestParameters['qBRealmHostname'] != null) {
+│ │ │ │                 headerParameters['QB-Realm-Hostname'] = String(requestParameters['qBRealmHostname']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['userAgent'] != null) {
+│ │ │ │                 headerParameters['User-Agent'] = String(requestParameters['userAgent']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             if (requestParameters['authorization'] != null) {
+│ │ │ │                 headerParameters['Authorization'] = String(requestParameters['authorization']);
+│ │ │ │             }
+│ │ │ │     
+│ │ │ │             const response = await this.request({
+│ │ │ │                 path: `/fields/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+│ │ │ │                 method: 'POST',
+│ │ │ │                 headers: headerParameters,
+│ │ │ │                 query: queryParameters,
+│ │ │ │                 body: UpdateFieldRequestToJSON(requestParameters['generated']),
+│ │ │ │             }, initOverrides);
+│ │ │ │     
+│ │ │ │             return new runtime.JSONApiResponse(response, (jsonValue) => GetField200ResponseFromJSON(jsonValue));
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │         /**
+│ │ │ │          * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+│ │ │ │          * Update a field
+│ │ │ │          */
+│ │ │ │         async updateField(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetField200Response> {
+│ │ │ │             const response = await this.updateFieldRaw(requestParameters, initOverrides);
+│ │ │ │             return await response.value();
+│ │ │ │         }
+│ │ │ │     
+│ │ │ │     }
+│ │ │ │     
+│ │ │ ├─ FilesApi.ts
+│ │ │ ├─ FormulasApi.ts
+│ │ │ ├─ PlatformAnalyticsApi.ts
+│ │ │ ├─ RecordsApi.ts
+│ │ │ ├─ ReportsApi.ts
+│ │ │ ├─ SolutionsApi.ts
+│ │ │ ├─ TablesApi.ts
+│ │ │ ├─ UserTokenApi.ts
+│ │ │ ├─ UsersApi.ts
+│ │ │ └─ index.ts
+│ │ ├─ index.ts
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.ts
+│ │ │ ├─ App.ts
+│ │ │ ├─ Audit200Response.ts
+│ │ │ ├─ Audit202Response.ts
+│ │ │ ├─ AuditRequest.ts
+│ │ │ ├─ CloneUserToken200Response.ts
+│ │ │ ├─ CloneUserTokenRequest.ts
+│ │ │ ├─ CopyApp200Response.ts
+│ │ │ ├─ CopyAppRequest.ts
+│ │ │ ├─ CreateApp200Response.ts
+│ │ │ ├─ CreateAppRequest.ts
+│ │ │ ├─ CreateField200Response.ts
+│ │ │ ├─ CreateRelationship200Response.ts
+│ │ │ ├─ CreateRelationshipRequest.ts
+│ │ │ ├─ CreateTable200Response.ts
+│ │ │ ├─ CreateTableRequest.ts
+│ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
+│ │ │ ├─ DeleteAppRequest.ts
+│ │ │ ├─ DeleteFields200Response.ts
+│ │ │ ├─ DeleteFile200Response.ts
+│ │ │ ├─ DeleteRecords200Response.ts
+│ │ │ ├─ DeleteRecordsRequest.ts
+│ │ │ ├─ DeleteRelationship200Response.ts
+│ │ │ ├─ DeleteTable200Response.ts
+│ │ │ ├─ DenyUsers200Response.ts
+│ │ │ ├─ ExchangeSsoToken200Response.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.ts
+│ │ │ ├─ Field.ts
+│ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetField200Response.ts
+│ │ │ ├─ GetRelationships200Response.ts
+│ │ │ ├─ GetReport200Response.ts
+│ │ │ ├─ GetTempTokenDBID200Response.ts
+│ │ │ ├─ GetUsers200Response.ts
+│ │ │ ├─ GetUsersRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
+│ │ │ ├─ RunFormula200Response.ts
+│ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ RunQuery200Response.ts
+│ │ │ ├─ RunQueryRequest.ts
+│ │ │ ├─ RunReport200Response.ts
+│ │ │ ├─ Table.ts
+│ │ │ ├─ TransferUserToken200Response.ts
+│ │ │ ├─ TransferUserTokenRequest.ts
+│ │ │ ├─ UndenyUsers200Response.ts
+│ │ │ ├─ UpdateApp200Response.ts
+│ │ │ ├─ UpdateAppRequest.ts
+│ │ │ ├─ UpdateFieldRequest.ts
+│ │ │ ├─ UpdateRelationshipRequest.ts
+│ │ │ ├─ UpdateTableRequest.ts
+│ │ │ ├─ Upsert200Response.ts
+│ │ │ └─ index.ts
+│ │ └─ runtime.ts
+│ ├─ generated-old/
+│ │ ├─ .openapi-generator/
+│ │ │ ├─ FILES
+│ │ │ └─ VERSION
+│ │ ├─ .openapi-generator-ignore
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.ts
+│ │ │ ├─ AuditApi.ts
+│ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DefaultApi.ts
 │ │ │ ├─ DocumentTemplatesApi.ts
 │ │ │ ├─ FieldsApi.ts
 │ │ │ ├─ FilesApi.ts
@@ -552,7 +1183,6 @@ Project Goals:
 │ │ │ ├─ CreateApp200Response.ts
 │ │ │ ├─ CreateAppRequest.ts
 │ │ │ ├─ CreateField200Response.ts
-│ │ │ ├─ CreateFieldRequest.ts
 │ │ │ ├─ CreateRelationship200Response.ts
 │ │ │ ├─ CreateRelationshipRequest.ts
 │ │ │ ├─ CreateTable200Response.ts
@@ -561,7 +1191,6 @@ Project Goals:
 │ │ │ ├─ DeleteApp200Response.ts
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
-│ │ │ ├─ DeleteFieldsRequest.ts
 │ │ │ ├─ DeleteFile200Response.ts
 │ │ │ ├─ DeleteRecords200Response.ts
 │ │ │ ├─ DeleteRecordsRequest.ts
@@ -572,6 +1201,7 @@ Project Goals:
 │ │ │ ├─ ExchangeSsoTokenRequest.ts
 │ │ │ ├─ Field.ts
 │ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetField200Response.ts
 │ │ │ ├─ GetRelationships200Response.ts
 │ │ │ ├─ GetReport200Response.ts
 │ │ │ ├─ GetTempTokenDBID200Response.ts
@@ -595,131 +1225,6 @@ Project Goals:
 │ │ │ ├─ RunQueryRequest.ts
 │ │ │ ├─ RunReport200Response.ts
 │ │ │ ├─ Table.ts
-│ │ │ │   Contents:
-│ │ │ │     /* tslint:disable */
-│ │ │ │     /* eslint-disable */
-│ │ │ │     /**
-│ │ │ │      * Quick Base API
-│ │ │ │      * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
-│ │ │ │      *
-│ │ │ │      * The version of the OpenAPI document: 1.0.0
-│ │ │ │      * 
-│ │ │ │      *
-│ │ │ │      * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
-│ │ │ │      * https://openapi-generator.tech
-│ │ │ │      * Do not edit the class manually.
-│ │ │ │      */
-│ │ │ │     
-│ │ │ │     import { mapValues } from '../runtime';
-│ │ │ │     /**
-│ │ │ │      * 
-│ │ │ │      * @export
-│ │ │ │      * @interface Table
-│ │ │ │      */
-│ │ │ │     export interface Table {
-│ │ │ │         /**
-│ │ │ │          * Unique identifier for the table
-│ │ │ │          * @type {string}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         id: string;
-│ │ │ │         /**
-│ │ │ │          * Name of the table
-│ │ │ │          * @type {string}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         name: string;
-│ │ │ │         /**
-│ │ │ │          * Creation timestamp
-│ │ │ │          * @type {Date}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         created?: Date;
-│ │ │ │         /**
-│ │ │ │          * Last updated timestamp
-│ │ │ │          * @type {Date}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         updated?: Date;
-│ │ │ │         /**
-│ │ │ │          * Table description
-│ │ │ │          * @type {string}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         description?: string;
-│ │ │ │         /**
-│ │ │ │          * ID of the key field
-│ │ │ │          * @type {number}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         keyFieldId?: number;
-│ │ │ │         /**
-│ │ │ │          * Next available field ID
-│ │ │ │          * @type {number}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         nextFieldId?: number;
-│ │ │ │         /**
-│ │ │ │          * Next available record ID
-│ │ │ │          * @type {number}
-│ │ │ │          * @memberof Table
-│ │ │ │          */
-│ │ │ │         nextRecordId?: number;
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     /**
-│ │ │ │      * Check if a given object implements the Table interface.
-│ │ │ │      */
-│ │ │ │     export function instanceOfTable(value: object): value is Table {
-│ │ │ │         if (!('id' in value) || value['id'] === undefined) return false;
-│ │ │ │         if (!('name' in value) || value['name'] === undefined) return false;
-│ │ │ │         return true;
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     export function TableFromJSON(json: any): Table {
-│ │ │ │         return TableFromJSONTyped(json, false);
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     export function TableFromJSONTyped(json: any, ignoreDiscriminator: boolean): Table {
-│ │ │ │         if (json == null) {
-│ │ │ │             return json;
-│ │ │ │         }
-│ │ │ │         return {
-│ │ │ │             
-│ │ │ │             'id': json['id'],
-│ │ │ │             'name': json['name'],
-│ │ │ │             'created': json['created'] == null ? undefined : (new Date(json['created'])),
-│ │ │ │             'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
-│ │ │ │             'description': json['description'] == null ? undefined : json['description'],
-│ │ │ │             'keyFieldId': json['keyFieldId'] == null ? undefined : json['keyFieldId'],
-│ │ │ │             'nextFieldId': json['nextFieldId'] == null ? undefined : json['nextFieldId'],
-│ │ │ │             'nextRecordId': json['nextRecordId'] == null ? undefined : json['nextRecordId'],
-│ │ │ │         };
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     export function TableToJSON(json: any): Table {
-│ │ │ │         return TableToJSONTyped(json, false);
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     export function TableToJSONTyped(value?: Table | null, ignoreDiscriminator: boolean = false): any {
-│ │ │ │         if (value == null) {
-│ │ │ │             return value;
-│ │ │ │         }
-│ │ │ │     
-│ │ │ │         return {
-│ │ │ │             
-│ │ │ │             'id': value['id'],
-│ │ │ │             'name': value['name'],
-│ │ │ │             'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
-│ │ │ │             'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
-│ │ │ │             'description': value['description'],
-│ │ │ │             'keyFieldId': value['keyFieldId'],
-│ │ │ │             'nextFieldId': value['nextFieldId'],
-│ │ │ │             'nextRecordId': value['nextRecordId'],
-│ │ │ │         };
-│ │ │ │     }
-│ │ │ │     
-│ │ │ │     
 │ │ │ ├─ TransferUserToken200Response.ts
 │ │ │ ├─ TransferUserTokenRequest.ts
 │ │ │ ├─ UndenyUsers200Response.ts
@@ -729,168 +1234,77 @@ Project Goals:
 │ │ │ ├─ UpdateRelationshipRequest.ts
 │ │ │ ├─ UpdateTableRequest.ts
 │ │ │ ├─ Upsert200Response.ts
-│ │ │ ├─ Upsert207Response.ts
-│ │ │ ├─ Upsert400Response.ts
-│ │ │ ├─ UpsertRequest.ts
-│ │ │ └─ index.ts
-│ │ └─ runtime.ts
-│ ├─ generated-old/
-│ │ ├─ .openapi-generator/
-│ │ │ ├─ FILES
-│ │ │ └─ VERSION
-│ │ ├─ .openapi-generator-ignore
-│ │ ├─ apis/
-│ │ │ ├─ AppsApi.ts
-│ │ │ ├─ AuditApi.ts
-│ │ │ ├─ AuthApi.ts
-│ │ │ ├─ DocumentTemplatesApi.ts
-│ │ │ ├─ FieldsApi.ts
-│ │ │ ├─ FilesApi.ts
-│ │ │ ├─ FormulasApi.ts
-│ │ │ ├─ PlatformAnalyticsApi.ts
-│ │ │ ├─ RecordsApi.ts
-│ │ │ ├─ ReportsApi.ts
-│ │ │ ├─ SolutionsApi.ts
-│ │ │ ├─ TablesApi.ts
-│ │ │ ├─ UserTokenApi.ts
-│ │ │ ├─ UsersApi.ts
-│ │ │ └─ index.ts
-│ │ ├─ index.ts
-│ │ ├─ models/
-│ │ │ ├─ AddMembersToGroup200Response.ts
-│ │ │ ├─ AddSubgroupsToGroup200Response.ts
-│ │ │ ├─ Audit200Response.ts
-│ │ │ ├─ Audit202Response.ts
-│ │ │ ├─ AuditRequest.ts
-│ │ │ ├─ CloneUserToken200Response.ts
-│ │ │ ├─ CloneUserTokenRequest.ts
-│ │ │ ├─ CopyApp200Response.ts
-│ │ │ ├─ CopyAppRequest.ts
-│ │ │ ├─ CreateApp200Response.ts
-│ │ │ ├─ CreateAppRequest.ts
-│ │ │ ├─ CreateField200Response.ts
-│ │ │ ├─ CreateFieldRequest.ts
-│ │ │ ├─ CreateRelationship200Response.ts
-│ │ │ ├─ CreateRelationshipRequest.ts
-│ │ │ ├─ CreateTable200Response.ts
-│ │ │ ├─ CreateTableRequest.ts
-│ │ │ ├─ DeactivateUserToken200Response.ts
-│ │ │ ├─ DeleteApp200Response.ts
-│ │ │ ├─ DeleteAppRequest.ts
-│ │ │ ├─ DeleteFields200Response.ts
-│ │ │ ├─ DeleteFieldsRequest.ts
-│ │ │ ├─ DeleteFile200Response.ts
-│ │ │ ├─ DeleteRecords200Response.ts
-│ │ │ ├─ DeleteRecordsRequest.ts
-│ │ │ ├─ DeleteRelationship200Response.ts
-│ │ │ ├─ DeleteTable200Response.ts
-│ │ │ ├─ DenyUsers200Response.ts
-│ │ │ ├─ ExchangeSsoToken200Response.ts
-│ │ │ ├─ ExchangeSsoTokenRequest.ts
-│ │ │ ├─ Field.ts
-│ │ │ ├─ GenerateDocument200Response.ts
-│ │ │ ├─ GetApp200Response.ts
-│ │ │ ├─ GetRelationships200Response.ts
-│ │ │ ├─ GetReport200Response.ts
-│ │ │ ├─ GetTempTokenDBID200Response.ts
-│ │ │ ├─ GetUsers200Response.ts
-│ │ │ ├─ GetUsersRequest.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
-│ │ │ ├─ PlatformAnalyticReads200Response.ts
-│ │ │ ├─ RemoveMembersFromGroup200Response.ts
-│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
-│ │ │ ├─ RunFormula200Response.ts
-│ │ │ ├─ RunFormulaRequest.ts
-│ │ │ ├─ RunQuery200Response.ts
-│ │ │ ├─ RunQueryRequest.ts
-│ │ │ ├─ RunReport200Response.ts
-│ │ │ ├─ TransferUserToken200Response.ts
-│ │ │ ├─ TransferUserTokenRequest.ts
-│ │ │ ├─ UndenyUsers200Response.ts
-│ │ │ ├─ UpdateAppRequest.ts
-│ │ │ ├─ UpdateFieldRequest.ts
-│ │ │ ├─ UpdateRelationshipRequest.ts
-│ │ │ ├─ UpdateTableRequest.ts
-│ │ │ ├─ Upsert200Response.ts
-│ │ │ ├─ Upsert207Response.ts
-│ │ │ ├─ Upsert400Response.ts
-│ │ │ ├─ UpsertRequest.ts
 │ │ │ └─ index.ts
 │ │ └─ runtime.ts
 │ ├─ index.ts
 │ ├─ test-esm.ts
-│ └─ test.ts
+│ ├─ test.ts
+│ │   Contents:
+│ │     #!/usr/bin/env node
+│ │     import { config } from "dotenv";
+│ │     import { createQuickbaseClient } from "./QuickbaseClient"; // Added .ts extension
+│ │     import type { App } from "./generated/models/App";
+│ │     
+│ │     config({ path: ".env.development" });
+│ │     
+│ │     const realm = process.env.QB_REALM;
+│ │     const token = process.env.QB_USER_TOKEN;
+│ │     const appId = process.env.QB_APP_ID;
+│ │     
+│ │     const client = createQuickbaseClient({
+│ │       realm: realm || "",
+│ │       userToken: token || "",
+│ │     });
+│ │     
+│ │     async function test() {
+│ │       try {
+│ │         const app: App = await client.getApp({ appId: appId || "" });
+│ │         console.log("App:", app);
+│ │       } catch (error) {
+│ │         console.error("Error:", (error as Error).message);
+│ │       }
+│ │     }
+│ │     
+│ │     test();
+│ │     
+│ └─ types/
 ├─ test-output.txt
+├─ tsconfig.build.json
+│   Contents:
+│     {
+│       "extends": "./tsconfig.json",
+│       "compilerOptions": {
+│         "outDir": "dist",
+│         "rootDir": "src",
+│         "declaration": true,
+│         "allowImportingTsExtensions": false, // Override to false
+│         "noEmit": false // Emit .js and .d.ts
+│       },
+│       "include": ["src/**/*"],
+│       "exclude": ["node_modules", "dist", "src/generated-old"]
+│     }
+│     
 ├─ tsconfig.json
 │   Contents:
 │     {
 │       "compilerOptions": {
 │         "target": "ESNext",
-│         "module": "ESNext",
-│         "moduleResolution": "Bundler",
-│         "outDir": "dist",
-│         "rootDir": ".", // Include root-level files
-│         "esModuleInterop": true,
-│         "forceConsistentCasingInFileNames": true,
+│         "module": "NodeNext",
+│         "moduleResolution": "NodeNext",
 │         "strict": true,
-│         "skipLibCheck": true,
-│         "declaration": true,
+│         "lib": ["ESNext", "DOM"],
 │         "types": ["node"],
-│         "noEmit": false,
+│         "esModuleInterop": true,
 │         "resolveJsonModule": true,
-│         "isolatedModules": false,
-│         "lib": ["ESNext", "DOM"]
+│         "allowImportingTsExtensions": true,
+│         "noEmit": true // Required for allowImportingTsExtensions
 │       },
-│       "include": [
-│         "src/**/*",
-│         "code-generation/**/*",
-│         "aiupdate.ts",
-│         "types/QuickbaseClient.d.ts"
-│       ],
-│       "exclude": ["node_modules", "dist", "src/generated-old"]
+│       "include": ["src/**/*"],
+│       "exclude": ["node_modules", "dist", "src/generated-old"],
+│       "ts-node": {
+│         "esm": true,
+│         "transpileOnly": true
+│       }
 │     }
 │     
-├─ tsconfig.json.bak
-└─ types/
-  └─ QuickbaseClient.d.ts
-      Contents:
-        // Auto-generated type declarations for QuickbaseClient
-        
-        export interface QuickbaseMethods {
-          copyApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
-          createApp(params: { userAgent?: string, generated?: any }): Promise<any>;
-          deleteApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
-          getApp(params: { appId: string, userAgent?: string }): Promise<any>;
-          getAppEvents(params: { appId: string, userAgent?: string }): Promise<any>;
-          updateApp(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
-          createField(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
-          deleteFields(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
-          getField(params: { tableId: string, fieldId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
-          getFieldUsage(params: { tableId: string, fieldId: string, userAgent?: string }): Promise<any>;
-          getFields(params: { tableId: string, includeFieldPerms?: boolean, userAgent?: string }): Promise<any>;
-          getFieldsUsage(params: { tableId: string, skip: number, top: number, userAgent?: string }): Promise<any>;
-          updateField(params: { tableId: string, fieldId: string, userAgent?: string, generated?: any }): Promise<any>;
-          deleteRecords(params: { userAgent?: string, generated?: any }): Promise<any>;
-          runQuery(params: { userAgent?: string, generated?: any }): Promise<any>;
-          upsert(params: { userAgent?: string, generated?: any }): Promise<any>;
-          createRelationship(params: { tableId: string, userAgent?: string, generated?: any }): Promise<any>;
-          createTable(params: { appId: string, userAgent?: string, generated?: any }): Promise<any>;
-          deleteRelationship(params: { tableId: string, relationshipId: string, userAgent?: string }): Promise<any>;
-          deleteTable(params: { appId: string, tableId: string, userAgent?: string }): Promise<any>;
-          getAppTables(params: { appId: string, userAgent?: string }): Promise<any>;
-          getRelationships(params: { tableId: string, skip: number, userAgent?: string }): Promise<any>;
-          getTable(params: { appId: string, tableId: string, userAgent?: string }): Promise<any>;
-          updateRelationship(params: { tableId: string, relationshipId: string, userAgent?: string, generated?: any }): Promise<any>;
-          updateTable(params: { appId: string, tableId: string, userAgent?: string, generated?: any }): Promise<any>;
-        }
-        
-        export class QuickbaseClient implements QuickbaseMethods {}
-        
+└─ tsconfig.json.bak

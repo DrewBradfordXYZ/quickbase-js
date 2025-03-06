@@ -1,40 +1,27 @@
 {
   "name": "quickbase-js",
   "version": "1.0.0",
-  "description": "",
+  "description": "QuickBase JavaScript client",
+  "main": "dist/QuickbaseClient.js",
+  "types": "dist/QuickbaseClient.d.ts",
   "type": "module",
   "scripts": {
-    "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/fix-spec.ts",
-    "regenerate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' code-generation/regenerate-client.ts",
-    "aiupdate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' aiupdate.ts",
-    "prepublishOnly": "npm run fix-spec && npm run regenerate && npm run build",
-    "generate-types": "node --no-warnings --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' src/generate-types.ts",
-    "build": "tsc && aiupdate",
-    "buildwithtypes": "npm run generate-types && tsc",
-    "test": "node dist/test.js"
+    "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
+    "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
+    "test": "node --loader ts-node/esm src/test.ts",
+    "build": "tsc -p tsconfig.build.json && npm run aiupdate",
+    "aiupdate": "node --loader ts-node/esm src/aiupdate.ts"
   },
-  "main": "dist/QuickBaseClient.js",
-  "browser": "dist/quickbase-client.browser.min.js",
-  "types": "dist/QuickBaseClient.d.ts",
-  "keywords": [
-    "quickbase",
-    "api",
-    "client",
-    "javascript",
-    "typescript"
-  ],
-  "author": "Drew Bradford",
-  "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-fetch": "^3.3.2",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.17.0",
-    "@types/node": "^22.13.9",
-    "@types/react": "^19.0.10",
-    "glob": "^10.4.5",
-    "prettier": "^3.5.3",
-    "react": "^19.0.0",
+    "@types/node": "^20.11.20",
+    "@types/node-fetch": "^2.6.11",
+    "glob": "^11.0.1",
+    "ts-morph": "^23.0.0",
     "ts-node": "^10.9.2"
   }
 }

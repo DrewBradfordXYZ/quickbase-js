@@ -7,19 +7,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const rootDir: string = "./";
-const excludeDirs: string[] = ["node_modules", "dist", ".git"];
+const excludeDirs: string[] = ["node_modules", ".git"];
 
 // List of important files whose contents you want to include
 const importantFiles: string[] = [
+  "aiupdate.ts",
   "package.json",
   "tsconfig.json",
+  "tsconfig.build.json",
+  "src/code-generation/fix-spec.ts",
+  "src/code-generation/regenerate-client.ts",
+  "src/test.ts",
   "src/QuickbaseClient.ts",
-  "types/QuickbaseClient.d.ts", // Fixed typo from "/types/QuickBaseTypes.ts"
-  "code-generation/fix-spec.ts", // Updated to .ts
-  "code-generation/regenerate-client.ts", // Updated to .ts
-  "src/generated/QuickbaseMethods.ts",
-  "src/generate-types.ts",
-  "src/generated/models/Table.ts",
+  "src/types/QuickbaseClient.d.ts", // Fixed typo from "/types/QuickBaseTypes.ts"
+  "src/generated/apis/FieldsApi.ts",
 ];
 
 // Project Goals as plain text

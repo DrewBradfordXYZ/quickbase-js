@@ -12,1138 +12,177 @@
   "paths": {
     "/apps": {
       "post": {
-        "description": "Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.",
-        "summary": "Create an app",
         "operationId": "createApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Create an app",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
             "name": "generated",
+            "in": "body",
+            "required": true,
             "schema": {
-              "description": "The example below shows all the properties that can be set with this request. Additional properties that you can see, with the corresponding GET request, cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
-              "example": {
-                "value": {
-                  "name": "My App",
-                  "description": "My first app",
-                  "assignToken": true,
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "variables": [
-                    {
-                      "name": "Variable1",
-                      "value": "Value1"
-                    }
-                  ]
-                }
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "assignToken": {
-                  "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
-                  "example": false,
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "name",
-                      "value"
-                    ],
-                    "properties": {
-                      "name": {
-                        "description": "The name for the variable.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "The value for the variable.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Application security properties.",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    },
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/CreateAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "x-amf-examples": {
-                "Simple Application": {
-                  "created": "2020-03-27T18:34:12Z",
-                  "dateFormat": "MM-DD-YYYY",
-                  "description": "My testing app",
-                  "hasEveryoneOnTheInternet": true,
-                  "id": "bpqe82s1",
-                  "memoryInfo": {
-                    "estMemory": 1,
-                    "estMemoryInclDependentApps": 2
-                  },
-                  "name": "Testing App",
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                  "updated": "2020-04-03T19:12:20Z",
-                  "dataClassification": "Confidential"
-                },
-                "Application with defined variables": {
-                  "description": "This examples shows the response of an application that contains one or more variables.",
-                  "value": {
-                    "created": "2020-03-27T18:34:12Z",
-                    "dateFormat": "MM-DD-YYYY",
-                    "description": "My testing app",
-                    "hasEveryoneOnTheInternet": true,
-                    "id": "bpqe82s1",
-                    "memoryInfo": {
-                      "estMemory": 1,
-                      "estMemoryInclDependentApps": 2
-                    },
-                    "name": "Testing App",
-                    "securityProperties": {
-                      "allowClone": false,
-                      "allowExport": false,
-                      "enableAppTokens": false,
-                      "hideFromPublic": false,
-                      "mustBeRealmApproved": true,
-                      "useIPFilter": true
-                    },
-                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                    "variables": [
-                      {
-                        "name": "Project End Date",
-                        "value": "7-16-2025"
-                      },
-                      {
-                        "name": "Project Manager Email",
-                        "value": "p.diaz@company.com"
-                      }
-                    ],
-                    "updated": "2020-04-03T19:12:20Z"
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "memoryInfo": {
-                  "type": "object",
-                  "description": "Application memory info",
-                  "additionalProperties": false,
-                  "properties": {
-                    "estMemory": {
-                      "type": "number",
-                      "description": "The estimated memory of this application in gigabytes"
-                    },
-                    "estMemoryInclDependentApps": {
-                      "type": "number",
-                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
-                    }
-                  }
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Security properties of the application",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/CreateApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/apps/{appId}": {
       "get": {
-        "description": "Returns the main properties of an application, including application variables.",
-        "summary": "Get an app",
-        "operationId": "getApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "operationId": "getAppById",
+        "summary": "Get application details by ID",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Success",
             "schema": {
               "$ref": "#/definitions/App"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       },
       "post": {
-        "description": "Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.",
-        "summary": "Update an app",
         "operationId": "updateApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Update an app",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
             "type": "string"
           },
           {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
             "name": "generated",
+            "in": "body",
+            "required": true,
             "schema": {
-              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
-              "example": {
-                "value": {
-                  "name": "My App",
-                  "description": "My first app",
-                  "variables": [
-                    {
-                      "name": "Variable1",
-                      "value": "Value1"
-                    }
-                  ]
-                }
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "variables": {
-                  "description": "The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "name",
-                      "value"
-                    ],
-                    "properties": {
-                      "name": {
-                        "description": "The name for the variable.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "The value for the variable.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "name": {
-                  "description": "The name for the app.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Security properties of the application",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    },
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "description": {
-                  "description": "The description for the app.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/UpdateAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "x-amf-examples": {
-                "Simple Application": {
-                  "ancestorId": "bqhskthaq",
-                  "created": "2020-03-27T18:34:12Z",
-                  "dateFormat": "MM-DD-YYYY",
-                  "description": "My testing app",
-                  "hasEveryoneOnTheInternet": true,
-                  "memoryInfo": {
-                    "estMemory": 1,
-                    "estMemoryInclDependentApps": 2
-                  },
-                  "id": "bpqe82s1",
-                  "name": "Testing App",
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                  "updated": "2020-04-03T19:12:20Z",
-                  "dataClassification": "Confidential"
-                },
-                "Application with defined variables": {
-                  "description": "This examples shows the response of an application that contains one or more variables.",
-                  "value": {
-                    "ancestorId": "bqhskthaq",
-                    "created": "2020-03-27T18:34:12Z",
-                    "dateFormat": "MM-DD-YYYY",
-                    "description": "My testing app",
-                    "hasEveryoneOnTheInternet": true,
-                    "id": "bpqe82s1",
-                    "memoryInfo": {
-                      "estMemory": 1,
-                      "estMemoryInclDependentApps": 2
-                    },
-                    "name": "Testing App",
-                    "securityProperties": {
-                      "allowClone": false,
-                      "allowExport": false,
-                      "enableAppTokens": false,
-                      "hideFromPublic": false,
-                      "mustBeRealmApproved": true,
-                      "useIPFilter": true
-                    },
-                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                    "variables": [
-                      {
-                        "name": "Project End Date",
-                        "value": "7-16-2025"
-                      },
-                      {
-                        "name": "Project Manager Email",
-                        "value": "p.diaz@company.com"
-                      }
-                    ],
-                    "updated": "2020-04-03T19:12:20Z"
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "ancestorId": {
-                  "description": "The id of the app from which this app was copied",
-                  "type": "string"
-                },
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "memoryInfo": {
-                  "description": "Application memory info",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "estMemory": {
-                      "type": "number",
-                      "description": "The estimated memory of this application in gigabytes"
-                    },
-                    "estMemoryInclDependentApps": {
-                      "type": "number",
-                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
-                    }
-                  }
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Security properties of the application",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/UpdateApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       },
       "delete": {
-        "description": "Deletes an entire application, including all of the tables and data.",
-        "summary": "Delete an app",
         "operationId": "deleteApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Delete an app",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
             "type": "string"
           },
           {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
             "name": "generated",
+            "in": "body",
+            "required": true,
             "schema": {
-              "example": {
-                "name": "Name of an application to delete"
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "To confirm application deletion we ask for application name.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/DeleteAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "deletedAppId": "bqhskthaq"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "deletedAppId": {
-                  "description": "An ID of deleted application.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/DeleteApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/apps/{appId}/events": {
       "get": {
-        "description": "Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).",
-        "summary": "Get app events",
         "operationId": "getAppEvents",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Get app events",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "type": "qb-action",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Quick Base Action"
-                },
-                {
-                  "type": "webhook",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": false,
-                  "tableId": "bqwriv8bw",
-                  "name": "Webhook"
-                },
-                {
-                  "type": "email-notification",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": false,
-                  "tableId": "bqwriv8bw",
-                  "name": "Notification"
-                },
-                {
-                  "type": "subscription",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Subscription"
-                },
-                {
-                  "type": "reminder",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Reminder"
-                },
-                {
-                  "type": "automation",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "url": "https://realm.quickbase.com/ui/automation/qb/db/bqwria893/automations/70eecab9-634f-42d9-9037-9340a1a9e8ce"
-                }
-              ],
               "type": "array",
               "items": {
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "isActive": {
-                    "description": "Indication of whether current event is active.",
-                    "type": "boolean"
-                  },
-                  "type": {
-                    "description": "Type of an event.",
-                    "enum": [
-                      "webhook",
-                      "qb-action",
-                      "email-notification",
-                      "subscription",
-                      "reminder",
-                      "automation"
-                    ],
-                    "type": "string"
-                  },
-                  "name": {
-                    "description": "The name of the event. This property is not returned for automations.",
-                    "type": "string"
-                  },
-                  "url": {
-                    "description": "The url to automation that can be accessed from the browser. Only returned for automations.",
-                    "type": "string"
-                  },
-                  "owner": {
-                    "description": "The user that owns the event.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "User full name.",
-                        "type": "string"
-                      },
-                      "id": {
-                        "description": "User Id.",
-                        "type": "string"
-                      },
-                      "email": {
-                        "description": "User email.",
-                        "type": "string"
-                      },
-                      "userName": {
-                        "description": "User Name as updated in user properties. Optional, appears if not the same as user email.",
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "tableId": {
-                    "description": "The unique identifier of the table to which event belongs to.",
-                    "type": "string"
-                  }
-                }
+                "type": "object"
               }
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/apps/{appId}/copy": {
       "post": {
-        "description": "Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.",
-        "summary": "Copy an app",
         "operationId": "copyApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Copy an app",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
             "type": "string"
           },
           {
-            "name": "User-Agent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
             "name": "generated",
+            "in": "body",
+            "required": true,
             "schema": {
-              "example": {
-                "name": "my copied app",
-                "description": "copied from my original app",
-                "properties": {
-                  "keepData": false,
-                  "excludeFiles": true,
-                  "usersAndRoles": false,
-                  "assignUserToken": true
-                }
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The name of the newly copied app",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the newly copied app",
-                  "type": "string"
-                },
-                "properties": {
-                  "description": "The configuration properties for performing the app copy",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "assignUserToken": {
-                      "description": "Whether to add the user token used to make this request to the new app",
-                      "type": "boolean"
-                    },
-                    "excludeFiles": {
-                      "description": "If keepData is true, whether to copy the file attachments as well. If keepData is false, this property is ignored",
-                      "type": "boolean"
-                    },
-                    "keepData": {
-                      "description": "Whether to copy the app's data along with the schema",
-                      "type": "boolean"
-                    },
-                    "usersAndRoles": {
-                      "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/CopyAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "ancestorId": "bqhskthaq",
-                "created": "2020-03-27T18:34:12Z",
-                "dateFormat": "MM-DD-YYYY",
-                "description": "My testing app",
-                "hasEveryoneOnTheInternet": true,
-                "id": "bpqe82s1",
-                "name": "Testing App",
-                "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                "updated": "2020-04-03T19:12:20Z",
-                "dataClassification": "None"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "ancestorId": {
-                  "description": "The id of the app from which this app was copied",
-                  "type": "string"
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/CopyApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/tables": {
@@ -1513,14 +552,10 @@
     },
     "/tables/{tableId}": {
       "get": {
-        "description": "Gets the properties of an individual table that is part of an application.",
         "operationId": "getTable",
-        "summary": "Get a table",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Get table details",
+        "tags": [
+          "Tables"
         ],
         "parameters": [
           {
@@ -1538,15 +573,12 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Success",
             "schema": {
               "$ref": "#/definitions/Table"
             }
           }
-        },
-        "tags": [
-          "Tables"
-        ]
+        }
       },
       "post": {
         "description": "Updates the main properties of a specific table. Any properties of the table that you do not specify in the request body will remain unchanged.",
@@ -3244,14 +2276,10 @@
     },
     "/fields": {
       "get": {
-        "description": "Gets the properties for all fields in a specific table. The properties for each field are the same as in Get field.",
-        "summary": "Get fields for a table",
         "operationId": "getFields",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Get fields for a table",
+        "tags": [
+          "Fields"
         ],
         "parameters": [
           {
@@ -3269,7 +2297,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Success",
             "schema": {
               "type": "array",
               "items": {
@@ -3277,15 +2305,76 @@
               }
             }
           }
-        },
-        "tags": [
-          "Fields"
-        ]
+        }
       },
       "post": {
-        "description": "Creates a field within a table, including the custom permissions of that field.",
-        "summary": "Create a field",
         "operationId": "createField",
+        "summary": "Create a field",
+        "tags": [
+          "Fields"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/CreateField200Response"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteFields",
+        "summary": "Delete fields",
+        "tags": [
+          "Fields"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/DeleteFields200Response"
+            }
+          }
+        }
+      }
+    },
+    "/fields/{fieldId}": {
+      "get": {
+        "description": "Gets the properties of an individual field, based on field id.  \nProperties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the 'properties' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.",
+        "summary": "Get field",
+        "operationId": "getField",
         "consumes": [
           "application/json"
         ],
@@ -3295,10 +2384,25 @@
         "parameters": [
           {
             "name": "tableId",
-            "description": "The unique identifier of the table.",
+            "description": "The unique identifier (dbid) of the table.",
             "required": true,
             "in": "query",
             "type": "string"
+          },
+          {
+            "name": "includeFieldPerms",
+            "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s).",
+            "required": false,
+            "in": "query",
+            "default": false,
+            "type": "boolean"
+          },
+          {
+            "name": "fieldId",
+            "description": "The unique identifier (fid) of the field.",
+            "required": true,
+            "in": "path",
+            "type": "integer"
           },
           {
             "name": "QB-Realm-Hostname",
@@ -3320,394 +2424,6 @@
             "required": true,
             "in": "header",
             "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-              "example": {
-                "label": "Field1",
-                "fieldType": "text",
-                "noWrap": false,
-                "bold": false,
-                "appearsByDefault": false,
-                "findEnabled": false,
-                "fieldHelp": "field help",
-                "addToForms": true,
-                "properties": {
-                  "maxLength": 0,
-                  "appendOnly": false,
-                  "sortAsGiven": false
-                },
-                "permissions": [
-                  {
-                    "role": "Viewer",
-                    "permissionType": "View",
-                    "roleId": 10
-                  },
-                  {
-                    "role": "Participant",
-                    "permissionType": "None",
-                    "roleId": 11
-                  },
-                  {
-                    "role": "Administrator",
-                    "permissionType": "Modify",
-                    "roleId": 12
-                  }
-                ]
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "fieldType",
-                "label"
-              ],
-              "properties": {
-                "audited": {
-                  "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to \"true\" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html). Defaults to false.",
-                  "type": "boolean"
-                },
-                "fieldHelp": {
-                  "description": "The configured help text shown to users within the product.",
-                  "type": "string"
-                },
-                "bold": {
-                  "description": "Indicates if the field is configured to display in bold in the product. Defaults to false.",
-                  "type": "boolean"
-                },
-                "properties": {
-                  "description": "Specific field properties.",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "allowMentions": {
-                      "description": "If someone can @mention users in the rich text field to generate an email notification.",
-                      "type": "boolean"
-                    },
-                    "comments": {
-                      "description": "The comments entered on the field properties by an administrator.",
-                      "type": "string"
-                    },
-                    "doesTotal": {
-                      "description": "Whether this field totals in reports within the product.",
-                      "type": "boolean"
-                    },
-                    "autoSave": {
-                      "description": "Whether the link field will auto save.",
-                      "type": "boolean"
-                    },
-                    "defaultValueLuid": {
-                      "description": "Default user id value.",
-                      "type": "integer"
-                    },
-                    "useI18NFormat": {
-                      "description": "Whether phone numbers should be in E.164 standard international format",
-                      "type": "boolean"
-                    },
-                    "maxVersions": {
-                      "description": "The maximum number of versions configured for a file attachment.",
-                      "type": "integer",
-                      "format": "int32",
-                      "minimum": 1
-                    },
-                    "format": {
-                      "description": "The format to display time.",
-                      "type": "integer"
-                    },
-                    "carryChoices": {
-                      "description": "Whether the field should carry its multiple choice fields when copied.",
-                      "type": "boolean"
-                    },
-                    "maxLength": {
-                      "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
-                      "type": "integer"
-                    },
-                    "linkText": {
-                      "description": "The configured text value that replaces the URL that users see within the product.",
-                      "type": "string"
-                    },
-                    "parentFieldId": {
-                      "description": "The id of the parent composite field, when applicable.",
-                      "type": "integer"
-                    },
-                    "displayTimezone": {
-                      "description": "Indicates whether to display the timezone within the product.",
-                      "type": "boolean"
-                    },
-                    "allowNewChoices": {
-                      "description": "Indicates if users can add new choices to a selection list.",
-                      "type": "boolean"
-                    },
-                    "defaultToday": {
-                      "description": "Indicates if the field value is defaulted today for new records.",
-                      "type": "boolean"
-                    },
-                    "units": {
-                      "description": "The units label.",
-                      "type": "string"
-                    },
-                    "openTargetIn": {
-                      "description": "Indicates which target the URL should open in when a user clicks it within the product.",
-                      "enum": [
-                        "sameWindow",
-                        "newWindow",
-                        "popup"
-                      ],
-                      "type": "string"
-                    },
-                    "sourceFieldId": {
-                      "description": "The id of the source field.",
-                      "type": "integer"
-                    },
-                    "doesAverage": {
-                      "description": "Whether this field averages in reports within the product.",
-                      "type": "boolean"
-                    },
-                    "formula": {
-                      "description": "The formula of the field as configured in Quickbase.",
-                      "type": "string"
-                    },
-                    "decimalPlaces": {
-                      "description": "The number of decimal places displayed in the product for this field.",
-                      "type": "integer"
-                    },
-                    "defaultCountryCode": {
-                      "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
-                      "type": "string"
-                    },
-                    "displayMonth": {
-                      "description": "How to display months.",
-                      "type": "string"
-                    },
-                    "seeVersions": {
-                      "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
-                      "type": "boolean"
-                    },
-                    "numLines": {
-                      "description": "The number of lines shown in Quickbase for this text field.",
-                      "type": "integer"
-                    },
-                    "defaultKind": {
-                      "description": "The user default type.",
-                      "type": "string"
-                    },
-                    "displayEmail": {
-                      "description": "How the email is displayed.",
-                      "type": "string"
-                    },
-                    "coverText": {
-                      "description": "An alternate user friendly text that can be used to display a link in the browser.",
-                      "type": "string"
-                    },
-                    "currencySymbol": {
-                      "description": "The current symbol used when displaying field values within the product.",
-                      "type": "string"
-                    },
-                    "targetFieldId": {
-                      "description": "The id of the target field.",
-                      "type": "integer"
-                    },
-                    "displayUser": {
-                      "description": "The configured option for how users display within the product.",
-                      "type": "string"
-                    },
-                    "blankIsZero": {
-                      "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
-                      "type": "boolean"
-                    },
-                    "exact": {
-                      "description": "Whether an exact match is required for a report link.",
-                      "type": "boolean"
-                    },
-                    "defaultDomain": {
-                      "description": "Default email domain.",
-                      "type": "string"
-                    },
-                    "defaultValue": {
-                      "description": "The default value configured for a field when a new record is added.",
-                      "type": "string"
-                    },
-                    "abbreviate": {
-                      "description": "Don't show the URL protocol when showing the URL.",
-                      "type": "boolean"
-                    },
-                    "numberFormat": {
-                      "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
-                      "type": "integer"
-                    },
-                    "targetTableName": {
-                      "description": "The field's target table name.",
-                      "type": "string"
-                    },
-                    "appearsAs": {
-                      "description": "The link text, if empty, the url will be used as link text.",
-                      "type": "string"
-                    },
-                    "width": {
-                      "description": "The field's html input width in the product.",
-                      "type": "integer"
-                    },
-                    "currencyFormat": {
-                      "description": "The currency format used when displaying field values within the product.",
-                      "enum": [
-                        "left",
-                        "right",
-                        "middle"
-                      ],
-                      "type": "string"
-                    },
-                    "displayDayOfWeek": {
-                      "description": "Indicates whether to display the day of the week within the product.",
-                      "type": "boolean"
-                    },
-                    "commaStart": {
-                      "description": "The number of digits before commas display in the product, when applicable.",
-                      "type": "integer"
-                    },
-                    "choices": {
-                      "description": "An array of entries that exist for a field that offers choices to the user. Note that these choices refer to the valid values of any records added in the future. You are allowed to remove values from the list of choices even if there are existing records with those values in this field. They will be displayed in red when users look at the data in the browser but there is no other effect. While updating a field with this property, the old choices are removed and replaced by the new choices.",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "targetTableId": {
-                      "description": "The id of the target table.",
-                      "type": "string"
-                    },
-                    "displayRelative": {
-                      "description": "Whether to display time as relative.",
-                      "type": "boolean"
-                    },
-                    "compositeFields": {
-                      "description": "An array of the fields that make up a composite field (e.g., address).",
-                      "type": "array"
-                    },
-                    "displayCheckboxAsText": {
-                      "description": "Indicates whether the checkbox values will be shown as text in reports.",
-                      "type": "boolean"
-                    },
-                    "displayTime": {
-                      "description": "Indicates whether to display the time, in addition to the date.",
-                      "type": "boolean"
-                    },
-                    "versionMode": {
-                      "description": "Version modes for files. Keep all versions vs keep last version.",
-                      "enum": [
-                        "keepallversions",
-                        "keeplastversions"
-                      ],
-                      "type": "string"
-                    },
-                    "snapFieldId": {
-                      "description": "The id of the field that is used to snapshot values from, when applicable.",
-                      "type": "integer"
-                    },
-                    "hours24": {
-                      "description": "Indicates whether or not to display time in the 24-hour format within the product.",
-                      "type": "boolean"
-                    },
-                    "sortAlpha": {
-                      "description": "Whether to sort alphabetically, default sort is by record ID.",
-                      "type": "boolean"
-                    },
-                    "sortAsGiven": {
-                      "description": "Indicates if the listed entries sort as entered vs alphabetically.",
-                      "type": "boolean"
-                    },
-                    "hasExtension": {
-                      "description": "Whether this field has a phone extension.",
-                      "type": "boolean"
-                    },
-                    "useNewWindow": {
-                      "description": "Indicates if the file should open a new window when a user clicks it within the product.",
-                      "type": "boolean"
-                    },
-                    "appendOnly": {
-                      "description": "Whether this field is append only.",
-                      "type": "boolean"
-                    },
-                    "displayAsLink": {
-                      "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "appearsByDefault": {
-                  "description": "Indicates if the field is marked as a default in reports. Defaults to true.",
-                  "type": "boolean"
-                },
-                "fieldType": {
-                  "description": "The [field types](https://help.quickbase.com/user-assistance/field_types.html), click on any of the field type links for more info.",
-                  "enum": [
-                    "text",
-                    "text-multiple-choice",
-                    "text-multi-line",
-                    "rich-text",
-                    "numeric",
-                    "currency",
-                    "rating",
-                    "percent",
-                    "multitext",
-                    "email",
-                    "url",
-                    "duration",
-                    "date",
-                    "datetime",
-                    "timestamp",
-                    "timeofday",
-                    "checkbox",
-                    "user",
-                    "multiuser",
-                    "address",
-                    "phone",
-                    "file"
-                  ],
-                  "type": "string"
-                },
-                "permissions": {
-                  "description": "Field Permissions for different roles.",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "role": {
-                        "description": "The role associated with a given permission for the field",
-                        "type": "string"
-                      },
-                      "permissionType": {
-                        "description": "The permission given to the role for this field",
-                        "type": "string"
-                      },
-                      "roleId": {
-                        "description": "The Id of the given role",
-                        "type": "integer"
-                      }
-                    }
-                  }
-                },
-                "addToForms": {
-                  "description": "Whether the field you are adding should appear on forms. Defaults to false.",
-                  "type": "boolean"
-                },
-                "label": {
-                  "description": "The label (name) of the field.",
-                  "type": "string"
-                },
-                "findEnabled": {
-                  "description": "Indicates if the field is marked as searchable. Defaults to true.",
-                  "type": "boolean"
-                },
-                "noWrap": {
-                  "description": "Indicates if the field is configured to not wrap when displayed in the product. Defaults to false.",
-                  "type": "boolean"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -4162,186 +2878,6 @@
                   }
                 }
               }
-            }
-          }
-        },
-        "tags": [
-          "Fields"
-        ]
-      },
-      "delete": {
-        "description": "Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.",
-        "summary": "Delete field(s)",
-        "operationId": "deleteFields",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "tableId",
-            "description": "The unique identifier of the table.",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "example": {
-                "fieldIds": [
-                  6,
-                  7,
-                  8
-                ]
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "fieldIds"
-              ],
-              "properties": {
-                "fieldIds": {
-                  "description": "List of field ids to be deleted.",
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "deletedFieldIds": [
-                  6,
-                  8
-                ],
-                "errors": [
-                  "Error found with fid: 7"
-                ]
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "deletedFieldIds",
-                "errors"
-              ],
-              "properties": {
-                "deletedFieldIds": {
-                  "description": "List of field ids to were deleted.",
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                },
-                "errors": {
-                  "description": "List of errors found.",
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Fields"
-        ]
-      }
-    },
-    "/fields/{fieldId}": {
-      "get": {
-        "description": "Gets the properties of an individual field, based on field id.  \nProperties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the 'properties' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.",
-        "summary": "Get field",
-        "operationId": "getField",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "includeFieldPerms",
-            "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s).",
-            "required": false,
-            "in": "query",
-            "default": false,
-            "type": "boolean"
-          },
-          {
-            "name": "fieldId",
-            "description": "The unique identifier (fid) of the field.",
-            "required": true,
-            "in": "path",
-            "type": "integer"
-          },
-          {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "schema": {
-              "$ref": "#/definitions/Field"
             }
           }
         },
@@ -6200,380 +4736,29 @@
     },
     "/records": {
       "post": {
-        "description": "Insert and/or update record(s) in a table. In this single API call, inserts and updates can be submitted. Update can use the key field on the table, or any other supported unique field. Refer to the [Field types page](../fieldInfo) for more information about how each field type should be formatted. This operation allows for incremental processing of successful records, even when some of the records fail.  \n**Note:** This endpoint supports a maximum payload size of 40MB.",
-        "summary": "Insert/Update record(s)",
         "operationId": "upsert",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Upsert records",
+        "tags": [
+          "Records"
         ],
         "parameters": [
           {
-            "name": "QB-Realm-Hostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "User-Agent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
             "name": "generated",
+            "in": "body",
+            "required": true,
             "schema": {
-              "x-amf-examples": {
-                "Insert record": {
-                  "value": {
-                    "to": "bck7gp3q2",
-                    "data": [
-                      {
-                        "6": {
-                          "value": "This is my text"
-                        },
-                        "7": {
-                          "value": 10
-                        },
-                        "8": {
-                          "value": "2019-12-18T08:00:00Z"
-                        },
-                        "9": {
-                          "value": [
-                            "a",
-                            "b"
-                          ]
-                        },
-                        "10": {
-                          "value": true
-                        },
-                        "11": {
-                          "value": "user@quickbase.com"
-                        },
-                        "12": {
-                          "value": "www.quickbase.com"
-                        },
-                        "13": {
-                          "value": [
-                            {
-                              "id": "123456.ab1s"
-                            },
-                            {
-                              "id": "254789.mkgp"
-                            },
-                            {
-                              "id": "789654.vc2s"
-                            }
-                          ]
-                        }
-                      }
-                    ],
-                    "fieldsToReturn": [
-                      6,
-                      7,
-                      8,
-                      9,
-                      10,
-                      11,
-                      12,
-                      13
-                    ]
-                  }
-                },
-                "Update existing record": {
-                  "description": "For updating an existing record, add a mapping of the table key field ID (defaults to '3') to the record ID, in the data array. In the following example, we update the first record.",
-                  "value": {
-                    "to": "bck7gp3q2",
-                    "data": [
-                      {
-                        "3": {
-                          "value": 1
-                        },
-                        "6": {
-                          "value": "This is my new text"
-                        },
-                        "7": {
-                          "value": 20
-                        },
-                        "9": {
-                          "value": [
-                            "c",
-                            "d"
-                          ]
-                        },
-                        "10": {
-                          "value": false
-                        },
-                        "11": {
-                          "value": "newuser@quickbase.com"
-                        }
-                      }
-                    ],
-                    "fieldsToReturn": [
-                      6,
-                      7,
-                      9,
-                      10,
-                      11
-                    ]
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "to"
-              ],
-              "properties": {
-                "to": {
-                  "description": "The table identifier.",
-                  "example": "bck7gp3q2",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "data": {
-                  "description": "Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.",
-                  "type": "array"
-                },
-                "mergeFieldId": {
-                  "description": "The merge field id.",
-                  "example": 7,
-                  "type": "integer"
-                },
-                "fieldsToReturn": {
-                  "description": "Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested.",
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              }
+              "type": "object"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
+            "description": "Success",
             "schema": {
-              "description": "A successful response that includes details on the records added, updated or unchanged. In the example below, the table previously had ten records with IDs from 1 through 10. The user posts an upsert that updates the value of record 1 and adds two new records, all successfully.",
-              "example": {
-                "value": {
-                  "data": [
-                    {
-                      "3": {
-                        "value": 1
-                      },
-                      "6": {
-                        "value": "Updating this record"
-                      },
-                      "7": {
-                        "value": 10
-                      },
-                      "8": {
-                        "value": "2019-12-18T08:00:00.000Z"
-                      }
-                    },
-                    {
-                      "3": {
-                        "value": 11
-                      },
-                      "6": {
-                        "value": "This is my text"
-                      },
-                      "7": {
-                        "value": 15
-                      },
-                      "8": {
-                        "value": "2019-12-19T08:00:00.000Z"
-                      }
-                    },
-                    {
-                      "3": {
-                        "value": 12
-                      },
-                      "6": {
-                        "value": "This is my other text"
-                      },
-                      "7": {
-                        "value": 20
-                      },
-                      "8": {
-                        "value": "2019-12-20T08:00:00.000Z"
-                      }
-                    }
-                  ],
-                  "metadata": {
-                    "createdRecordIds": [
-                      11,
-                      12
-                    ],
-                    "totalNumberOfRecordsProcessed": 3,
-                    "unchangedRecordIds": [],
-                    "updatedRecordIds": [
-                      1
-                    ]
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "metadata": {
-                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "createdRecordIds": {
-                      "description": "Array containing the created record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "lineErrors": {
-                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
-                      "type": "object",
-                      "additionalProperties": true
-                    },
-                    "unchangedRecordIds": {
-                      "description": "Array containing the unchanged record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "updatedRecordIds": {
-                      "description": "Array containing the updated record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "totalNumberOfRecordsProcessed": {
-                      "description": "Number of records processed. Includes successful and failed record updates.",
-                      "type": "integer"
-                    }
-                  }
-                },
-                "data": {
-                  "description": "The data that is expected to be returned.",
-                  "type": "array"
-                }
-              }
-            }
-          },
-          "207": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "description": "Receiving this status code indicates that some (or all) of the individual records being handled had problems and were not processed successfully. The response will be reported under the 'lineErrors' element and indicate the total number of records processed and the errors that occurred with each record. The record IDs of records created, updated, and referenced but unchanged, will be returned in the 'createdRecordIds', 'updatedRecordIds', and 'unchangedRecordIds' elements respectively.  \nIn the example below, a user tries to add three records to a table that previously had ten records with IDs from 1 through 10. The first and third records of the request are valid and create the 11th and 12th records in the table; the second record has a problem that prevents it from being processed.",
-              "example": {
-                "value": {
-                  "data": [],
-                  "metadata": {
-                    "createdRecordIds": [
-                      11,
-                      12
-                    ],
-                    "lineErrors": {
-                      "2": [
-                        "Incompatible value for field with ID \"6\"."
-                      ]
-                    },
-                    "totalNumberOfRecordsProcessed": 3,
-                    "unchangedRecordIds": [],
-                    "updatedRecordIds": []
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "metadata": {
-                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "createdRecordIds": {
-                      "description": "Array containing the created record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "lineErrors": {
-                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
-                      "type": "object",
-                      "additionalProperties": true
-                    },
-                    "unchangedRecordIds": {
-                      "description": "Array containing the unchanged record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "updatedRecordIds": {
-                      "description": "Array containing the updated record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "totalNumberOfRecordsProcessed": {
-                      "description": "Number of records processed. Includes successful and failed record updates.",
-                      "type": "integer"
-                    }
-                  }
-                },
-                "data": {
-                  "description": "The data that is expected to be returned.",
-                  "type": "array"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "description": "There was problem in the format of the request. This prevented the entire request from processing any records. The error response will be in the [standard format](../errors).",
-              "example": {
-                "message": "Bad request",
-                "description": "Data object cannot be empty."
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "message": {
-                  "description": "The type of error found.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the occurence of the error.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Upsert200Response"
             }
           }
-        },
-        "tags": [
-          "Records"
-        ]
+        }
       },
       "delete": {
         "description": "Deletes record(s) in a table based on a query. Alternatively, all records in the table can be deleted.",
@@ -10776,48 +8961,11 @@
     "Field": {
       "type": "object",
       "properties": {
-        "appearsByDefault": {
-          "type": "boolean"
-        },
-        "audited": {
-          "type": "boolean"
-        },
-        "bold": {
-          "type": "boolean"
-        },
-        "doesDataCopy": {
-          "type": "boolean"
-        },
-        "fieldHelp": {
-          "type": "string"
-        },
-        "fieldType": {
-          "type": "string"
-        },
-        "findEnabled": {
-          "type": "boolean"
-        },
         "id": {
           "type": "integer"
         },
         "label": {
           "type": "string"
-        },
-        "mode": {
-          "type": "string"
-        },
-        "noWrap": {
-          "type": "boolean"
-        },
-        "properties": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "required": {
-          "type": "boolean"
-        },
-        "unique": {
-          "type": "boolean"
         }
       }
     },
@@ -10825,38 +8973,10 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the table"
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Name of the table"
-        },
-        "created": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Creation timestamp"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Last updated timestamp"
-        },
-        "description": {
-          "type": "string",
-          "description": "Table description"
-        },
-        "keyFieldId": {
-          "type": "integer",
-          "description": "ID of the key field"
-        },
-        "nextFieldId": {
-          "type": "integer",
-          "description": "Next available field ID"
-        },
-        "nextRecordId": {
-          "type": "integer",
-          "description": "Next available record ID"
+          "type": "string"
         }
       },
       "required": [
@@ -10868,22 +8988,9 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the app"
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Name of the app"
-        },
-        "created": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "description": {
           "type": "string"
         }
       },
@@ -10891,6 +8998,98 @@
         "id",
         "name"
       ]
+    },
+    "Record": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "CreateField200Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        }
+      }
+    },
+    "DeleteFields200Response": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Upsert200Response": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "CopyAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CopyApp200Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateApp200Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "DeleteAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "DeleteApp200Response": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UpdateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "UpdateApp200Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
     }
   }
 }
