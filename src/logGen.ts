@@ -11,7 +11,7 @@ const excludeDirs: string[] = ["node_modules", ".git"];
 
 // List of important files whose contents you want to include
 const importantFiles: string[] = [
-  "aiupdate.ts",
+  "logGen.ts",
   "package.json",
   "tsconfig.json",
   "tsconfig.build.json",
@@ -63,7 +63,9 @@ function buildTree(dir: string, prefix: string = ""): string {
           .join("\n");
         tree += "\n";
       } catch (err: unknown) {
-        tree += `${prefix}${isLast ? "  " : "│ "}  [Error reading file: ${(err as Error).message}]\n`;
+        tree += `${prefix}${isLast ? "  " : "│ "}  [Error reading file: ${
+          (err as Error).message
+        }]\n`;
       }
     }
 
@@ -87,9 +89,9 @@ function generateTreeSnapshot(): string {
 
 try {
   const output: string = generateTreeSnapshot();
-  fs.writeFileSync("aiupdate.txt", output, "utf8");
+  fs.writeFileSync("logGen.txt", output, "utf8");
   const lineCount: number = output.split("\n").length - 1; // Exclude trailing newline
-  console.log("aiupdate.txt");
+  console.log("logGen.txt");
   console.log(`Lines: ${lineCount}`);
 } catch (error: unknown) {
   console.error("Failed to generate tree snapshot:", (error as Error).message);
