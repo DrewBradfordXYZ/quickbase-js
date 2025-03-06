@@ -14,7 +14,7 @@ interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
-  debug?: boolean; // Add debug flag
+  debug?: boolean;
 }
 
 type ApiMethod<T = any> = (requestParameters: any, initOverrides?: RequestInit | ((...args: any[]) => any)) => Promise<T>;
@@ -60,7 +60,7 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
     "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
     "Content-Type": "application/json",
   };
-  const debug = config.debug || false; // Default to false
+  const debug = config.debug || false;
 
   type FetchApi = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   const fetchApi: FetchApi =
@@ -97,7 +97,7 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
                !m.includes("Pre") && 
                !m.includes("Post")
       );
-      if (debug) console.log(`Methods for ${apiName}:`, methods); // Conditional
+      if (debug) console.log(`Methods for ${apiName}:`, methods);
       for (const methodName of methods) {
         const friendlyName = simplifyName(methodName);
         const paramNames = getParamNames(api[methodName as keyof typeof api] as (...args: any[]) => any).filter(
@@ -108,10 +108,10 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
           method: (api[methodName as keyof typeof api] as unknown as ApiMethod).bind(api),
           paramMap: paramNames,
         };
-        if (debug) console.log(`Mapped ${methodName} to ${friendlyName}`); // Conditional
+        if (debug) console.log(`Mapped ${methodName} to ${friendlyName}`);
       }
     }
-    if (debug) console.log("Full methodMap:", Object.keys(methodMap)); // Conditional
+    if (debug) console.log("Full methodMap:", Object.keys(methodMap));
     return methodMap;
   }
 
@@ -123,12 +123,12 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
     if (!methodInfo) throw new Error(`Method ${methodName} not found`);
     const { method, paramMap } = methodInfo;
 
-    console.log(`Calling ${methodName} with params:`, params); // Keep for normal use
+    console.log(`Calling ${methodName} with params:`, params);
     const args: [any] = paramMap.length === 1 && paramMap[0] === "requestParameters" ? [params] : [params];
-    if (debug) console.log(`Mapped args for ${methodName}:`, args); // Conditional
+    if (debug) console.log(`Mapped args for ${methodName}:`, args);
 
     const json = await method(...args);
-    console.log(`Response JSON for ${methodName}:`, json); // Keep for normal use
+    if (debug) console.log(`Response JSON for ${methodName}:`, json); // Conditionalize this
     return json as ReturnType<QuickbaseMethods[K]>;
   }
 
@@ -138,7 +138,7 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
         return (params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]) =>
           invokeMethod(prop as keyof QuickbaseMethods, params || {});
       }
-      console.warn(`Method ${prop} not found in methodMap`); // Keep as warning
+      console.warn(`Method ${prop} not found in methodMap`);
       return undefined;
     },
   });

@@ -12,7 +12,9 @@ async function runTest() {
 
   const appId = process.env.QB_APP_ID!;
   const app = await client.getApp({ appId });
+    const tableFields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
   console.log("App:", app);
+  console.log("Table Fields:", tableFields);
 }
 
 runTest().catch(console.error);
