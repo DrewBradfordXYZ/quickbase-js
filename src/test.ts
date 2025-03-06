@@ -7,14 +7,13 @@ async function runTest() {
   const client = quickbaseClient({
     realm: process.env.QB_REALM!,
     userToken: process.env.QB_USER_TOKEN!,
-    debug: false, // Set to true for verbose logs
+    debug: true,
   });
 
-  const appId = process.env.QB_APP_ID!;
-  const app = await client.getApp({ appId });
-    const tableFields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
+  const app = await client.getAppById({ appId: process.env.QB_APP_ID! });
+  const fields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
   console.log("App:", app);
-  console.log("Table Fields:", tableFields);
+  console.log("Fields:", fields);
 }
 
 runTest().catch(console.error);

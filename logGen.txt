@@ -1,0 +1,1175 @@
+[quickbase-js] Tree - 3/5/2025
+Root: /home/drew/Projects/quickbase-js
+
+Project Goals:
+- Implement a QuickBase API client in TypeScript.
+- Generate client methods from the QuickBase RESTful API spec.
+- Provide a simple and intuitive interface for interacting with QuickBase.
+- This library should not have to manually update the client methods when the QuickBase API changes.
+- Generate ergonomic client methods from the QuickBase RESTful API spec that do not require manual updates.
+- Support both Node.js and browser environments.
+- The intent is to use this in JS frameworks like React, Vue, and Angular.
+- Use the Fetch API for making HTTP requests and avoid Axios with the OpenAPI Generator.
+- Use OpenAPI to generate the TypeScript types and methods.
+- Use the latest ES6+ features and TypeScript features.
+
+
+├─ .env.development
+├─ .env.production
+├─ .gitignore
+├─ LICENSE
+├─ README.md
+├─ aiupdate.txt
+├─ build.js
+├─ dist/
+│ ├─ QuickbaseClient.d.ts
+│ ├─ QuickbaseClient.js
+│ ├─ generated/
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.d.ts
+│ │ │ ├─ AppsApi.js
+│ │ │ ├─ AuditApi.d.ts
+│ │ │ ├─ AuditApi.js
+│ │ │ ├─ AuthApi.d.ts
+│ │ │ ├─ AuthApi.js
+│ │ │ ├─ DefaultApi.d.ts
+│ │ │ ├─ DefaultApi.js
+│ │ │ ├─ DocumentTemplatesApi.d.ts
+│ │ │ ├─ DocumentTemplatesApi.js
+│ │ │ ├─ FieldsApi.d.ts
+│ │ │ ├─ FieldsApi.js
+│ │ │ ├─ FilesApi.d.ts
+│ │ │ ├─ FilesApi.js
+│ │ │ ├─ FormulasApi.d.ts
+│ │ │ ├─ FormulasApi.js
+│ │ │ ├─ PlatformAnalyticsApi.d.ts
+│ │ │ ├─ PlatformAnalyticsApi.js
+│ │ │ ├─ RecordsApi.d.ts
+│ │ │ ├─ RecordsApi.js
+│ │ │ ├─ ReportsApi.d.ts
+│ │ │ ├─ ReportsApi.js
+│ │ │ ├─ SolutionsApi.d.ts
+│ │ │ ├─ SolutionsApi.js
+│ │ │ ├─ TablesApi.d.ts
+│ │ │ ├─ TablesApi.js
+│ │ │ ├─ UserTokenApi.d.ts
+│ │ │ ├─ UserTokenApi.js
+│ │ │ ├─ UsersApi.d.ts
+│ │ │ ├─ UsersApi.js
+│ │ │ ├─ index.d.ts
+│ │ │ └─ index.js
+│ │ ├─ index.d.ts
+│ │ ├─ index.js
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.d.ts
+│ │ │ ├─ AddMembersToGroup200Response.js
+│ │ │ ├─ AddSubgroupsToGroup200Response.d.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.js
+│ │ │ ├─ App.d.ts
+│ │ │ ├─ App.js
+│ │ │ ├─ Audit200Response.d.ts
+│ │ │ ├─ Audit200Response.js
+│ │ │ ├─ Audit202Response.d.ts
+│ │ │ ├─ Audit202Response.js
+│ │ │ ├─ AuditRequest.d.ts
+│ │ │ ├─ AuditRequest.js
+│ │ │ ├─ CloneUserToken200Response.d.ts
+│ │ │ ├─ CloneUserToken200Response.js
+│ │ │ ├─ CloneUserTokenRequest.d.ts
+│ │ │ ├─ CloneUserTokenRequest.js
+│ │ │ ├─ CopyApp200Response.d.ts
+│ │ │ ├─ CopyApp200Response.js
+│ │ │ ├─ CopyAppRequest.d.ts
+│ │ │ ├─ CopyAppRequest.js
+│ │ │ ├─ CreateApp200Response.d.ts
+│ │ │ ├─ CreateApp200Response.js
+│ │ │ ├─ CreateAppRequest.d.ts
+│ │ │ ├─ CreateAppRequest.js
+│ │ │ ├─ CreateField200Response.d.ts
+│ │ │ ├─ CreateField200Response.js
+│ │ │ ├─ CreateRelationship200Response.d.ts
+│ │ │ ├─ CreateRelationship200Response.js
+│ │ │ ├─ CreateRelationshipRequest.d.ts
+│ │ │ ├─ CreateRelationshipRequest.js
+│ │ │ ├─ CreateTable200Response.d.ts
+│ │ │ ├─ CreateTable200Response.js
+│ │ │ ├─ CreateTableRequest.d.ts
+│ │ │ ├─ CreateTableRequest.js
+│ │ │ ├─ DeactivateUserToken200Response.d.ts
+│ │ │ ├─ DeactivateUserToken200Response.js
+│ │ │ ├─ DeleteApp200Response.d.ts
+│ │ │ ├─ DeleteApp200Response.js
+│ │ │ ├─ DeleteAppRequest.d.ts
+│ │ │ ├─ DeleteAppRequest.js
+│ │ │ ├─ DeleteFields200Response.d.ts
+│ │ │ ├─ DeleteFields200Response.js
+│ │ │ ├─ DeleteFile200Response.d.ts
+│ │ │ ├─ DeleteFile200Response.js
+│ │ │ ├─ DeleteRecords200Response.d.ts
+│ │ │ ├─ DeleteRecords200Response.js
+│ │ │ ├─ DeleteRecordsRequest.d.ts
+│ │ │ ├─ DeleteRecordsRequest.js
+│ │ │ ├─ DeleteRelationship200Response.d.ts
+│ │ │ ├─ DeleteRelationship200Response.js
+│ │ │ ├─ DeleteTable200Response.d.ts
+│ │ │ ├─ DeleteTable200Response.js
+│ │ │ ├─ DenyUsers200Response.d.ts
+│ │ │ ├─ DenyUsers200Response.js
+│ │ │ ├─ ExchangeSsoToken200Response.d.ts
+│ │ │ ├─ ExchangeSsoToken200Response.js
+│ │ │ ├─ ExchangeSsoTokenRequest.d.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.js
+│ │ │ ├─ Field.d.ts
+│ │ │ ├─ Field.js
+│ │ │ ├─ GenerateDocument200Response.d.ts
+│ │ │ ├─ GenerateDocument200Response.js
+│ │ │ ├─ GetField200Response.d.ts
+│ │ │ ├─ GetField200Response.js
+│ │ │ ├─ GetRelationships200Response.d.ts
+│ │ │ ├─ GetRelationships200Response.js
+│ │ │ ├─ GetReport200Response.d.ts
+│ │ │ ├─ GetReport200Response.js
+│ │ │ ├─ GetTempTokenDBID200Response.d.ts
+│ │ │ ├─ GetTempTokenDBID200Response.js
+│ │ │ ├─ GetUsers200Response.d.ts
+│ │ │ ├─ GetUsers200Response.js
+│ │ │ ├─ GetUsersRequest.d.ts
+│ │ │ ├─ GetUsersRequest.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.js
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.js
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.js
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.d.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.js
+│ │ │ ├─ PlatformAnalyticReads200Response.d.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.js
+│ │ │ ├─ RemoveMembersFromGroup200Response.d.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.js
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.d.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.js
+│ │ │ ├─ RunFormula200Response.d.ts
+│ │ │ ├─ RunFormula200Response.js
+│ │ │ ├─ RunFormulaRequest.d.ts
+│ │ │ ├─ RunFormulaRequest.js
+│ │ │ ├─ RunQuery200Response.d.ts
+│ │ │ ├─ RunQuery200Response.js
+│ │ │ ├─ RunQueryRequest.d.ts
+│ │ │ ├─ RunQueryRequest.js
+│ │ │ ├─ RunReport200Response.d.ts
+│ │ │ ├─ RunReport200Response.js
+│ │ │ ├─ Table.d.ts
+│ │ │ ├─ Table.js
+│ │ │ ├─ TransferUserToken200Response.d.ts
+│ │ │ ├─ TransferUserToken200Response.js
+│ │ │ ├─ TransferUserTokenRequest.d.ts
+│ │ │ ├─ TransferUserTokenRequest.js
+│ │ │ ├─ UndenyUsers200Response.d.ts
+│ │ │ ├─ UndenyUsers200Response.js
+│ │ │ ├─ UpdateApp200Response.d.ts
+│ │ │ ├─ UpdateApp200Response.js
+│ │ │ ├─ UpdateAppRequest.d.ts
+│ │ │ ├─ UpdateAppRequest.js
+│ │ │ ├─ UpdateFieldRequest.d.ts
+│ │ │ ├─ UpdateFieldRequest.js
+│ │ │ ├─ UpdateRelationshipRequest.d.ts
+│ │ │ ├─ UpdateRelationshipRequest.js
+│ │ │ ├─ UpdateTableRequest.d.ts
+│ │ │ ├─ UpdateTableRequest.js
+│ │ │ ├─ Upsert200Response.d.ts
+│ │ │ ├─ Upsert200Response.js
+│ │ │ ├─ index.d.ts
+│ │ │ └─ index.js
+│ │ ├─ runtime.d.ts
+│ │ └─ runtime.js
+│ ├─ index.d.ts
+│ ├─ index.js
+│ ├─ test-esm.d.ts
+│ ├─ test-esm.js
+│ ├─ test.d.ts
+│ └─ test.js
+├─ logGen.txt
+├─ openapitools.json
+├─ package-lock.json
+├─ package.json
+│   Contents:
+│     {
+│       "name": "quickbase-js",
+│       "version": "1.0.0",
+│       "description": "QuickBase JavaScript client",
+│       "main": "dist/QuickbaseClient.js",
+│       "types": "dist/QuickbaseClient.d.ts",
+│       "type": "module",
+│       "scripts": {
+│         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
+│         "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
+│          "generate-methods": "node --loader ts-node/esm src/code-generation/generate-methods.ts",
+│         "test": "node --loader ts-node/esm src/test.ts",
+│         "build": "tsc -p tsconfig.build.json && npm run log-gen",
+│         "log-gen": "node --loader ts-node/esm src/logGen.ts"
+│       },
+│       "dependencies": {
+│         "dotenv": "^16.4.7",
+│         "node-fetch": "^3.3.2",
+│         "typescript": "^5.8.2"
+│       },
+│       "devDependencies": {
+│         "@types/node": "^20.11.20",
+│         "@types/node-fetch": "^2.6.11",
+│         "glob": "^11.0.1",
+│         "ts-morph": "^23.0.0",
+│         "ts-node": "^10.9.2"
+│       }
+│     }
+│     
+├─ src/
+│ ├─ code-generation/
+│ │ ├─ fix-spec.ts
+│ │ │   Contents:
+│ │ │     #!/usr/bin/env node
+│ │ │     import { promises as fs } from "fs";
+│ │ │     import path from "path";
+│ │ │     import * as glob from "glob";
+│ │ │     
+│ │ │     interface Parameter {
+│ │ │       name: string;
+│ │ │       in: string;
+│ │ │       required?: boolean;
+│ │ │       type?: string;
+│ │ │       schema?: { type?: string; items?: any; $ref?: string };
+│ │ │       example?: any;
+│ │ │     }
+│ │ │     
+│ │ │     interface Operation {
+│ │ │       parameters?: Parameter[];
+│ │ │       responses?: Record<string, { description: string; schema?: any }>;
+│ │ │       operationId?: string;
+│ │ │       summary?: string;
+│ │ │       tags?: string[];
+│ │ │     }
+│ │ │     
+│ │ │     interface Spec {
+│ │ │       paths: Record<string, Record<string, Operation>>;
+│ │ │       definitions?: Record<string, any>;
+│ │ │       operations?: any;
+│ │ │       groups?: any;
+│ │ │       components?: any;
+│ │ │     }
+│ │ │     
+│ │ │     async function fixQuickBaseSpec(): Promise<void> {
+│ │ │       try {
+│ │ │         const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
+│ │ │         const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
+│ │ │         console.log("Finding latest QuickBase RESTful API spec...");
+│ │ │         const specFiles = glob.sync(
+│ │ │           path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
+│ │ │         );
+│ │ │         if (specFiles.length === 0) {
+│ │ │           console.error(
+│ │ │             "No QuickBase_RESTful_*.json files found in specs/ folder."
+│ │ │           );
+│ │ │           process.exit(1);
+│ │ │         }
+│ │ │         const inputFile = specFiles.sort().pop() as string;
+│ │ │         const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
+│ │ │     
+│ │ │         console.log(`Reading ${path.basename(inputFile)} from specs/...`);
+│ │ │         const specContent = await fs.readFile(inputFile, "utf8");
+│ │ │         const spec: Spec = JSON.parse(specContent);
+│ │ │     
+│ │ │         console.log("Fixing parameters...");
+│ │ │         for (const pathKey in spec.paths) {
+│ │ │           for (const method in spec.paths[pathKey]) {
+│ │ │             const operation = spec.paths[pathKey][method];
+│ │ │             if (operation.parameters) {
+│ │ │               operation.parameters = operation.parameters.map(
+│ │ │                 (param: Parameter) => {
+│ │ │                   if ("example" in param) delete param.example;
+│ │ │                   if ("schema" in param && param.in !== "body") delete param.schema;
+│ │ │                   if (!param.type && param.in !== "body") param.type = "string";
+│ │ │                   if (
+│ │ │                     param.name === "generated" &&
+│ │ │                     param.schema?.type === "array" &&
+│ │ │                     !param.schema.items
+│ │ │                   ) {
+│ │ │                     param.schema!.items = { $ref: "#/definitions/Record" };
+│ │ │                   }
+│ │ │                   return param;
+│ │ │                 }
+│ │ │               );
+│ │ │             }
+│ │ │           }
+│ │ │         }
+│ │ │     
+│ │ │         console.log("Ensuring required endpoints...");
+│ │ │         // Fields endpoints
+│ │ │         spec.paths["/fields"] = spec.paths["/fields"] || {};
+│ │ │         spec.paths["/fields"].get = {
+│ │ │           operationId: "getFields",
+│ │ │           summary: "Get fields for a table",
+│ │ │           tags: ["Fields"],
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "includeFieldPerms",
+│ │ │               in: "query",
+│ │ │               required: false,
+│ │ │               type: "boolean",
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { type: "array", items: { $ref: "#/definitions/Field" } },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/fields"].post = {
+│ │ │           operationId: "createField",
+│ │ │           summary: "Create a field",
+│ │ │           tags: ["Fields"],
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/CreateField200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/fields"].delete = {
+│ │ │           operationId: "deleteFields",
+│ │ │           summary: "Delete fields",
+│ │ │           tags: ["Fields"],
+│ │ │           parameters: [
+│ │ │             { name: "tableId", in: "query", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/DeleteFields200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         // Tables endpoint
+│ │ │         spec.paths["/tables/{tableId}"] = spec.paths["/tables/{tableId}"] || {};
+│ │ │         spec.paths["/tables/{tableId}"].get = {
+│ │ │           operationId: "getTable",
+│ │ │           summary: "Get table details",
+│ │ │           tags: ["Tables"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "query", required: true, type: "string" },
+│ │ │             { name: "tableId", in: "path", required: true, type: "string" },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/Table" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         // Apps endpoints (overwriting /apps/{appId} entirely)
+│ │ │         spec.paths["/apps/{appId}"] = {
+│ │ │           get: {
+│ │ │             operationId: "getAppById",
+│ │ │             summary: "Get application details by ID",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               { name: "appId", in: "path", required: true, type: "string" },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { $ref: "#/definitions/App" },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │           post: {
+│ │ │             operationId: "updateApp",
+│ │ │             summary: "Update an app",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               { name: "appId", in: "path", required: true, type: "string" },
+│ │ │               {
+│ │ │                 name: "generated",
+│ │ │                 in: "body",
+│ │ │                 required: true,
+│ │ │                 schema: { $ref: "#/definitions/UpdateAppRequest" },
+│ │ │               },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { $ref: "#/definitions/UpdateApp200Response" },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │           delete: {
+│ │ │             operationId: "deleteApp",
+│ │ │             summary: "Delete an app",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               { name: "appId", in: "path", required: true, type: "string" },
+│ │ │               {
+│ │ │                 name: "generated",
+│ │ │                 in: "body",
+│ │ │                 required: true,
+│ │ │                 schema: { $ref: "#/definitions/DeleteAppRequest" },
+│ │ │               },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { $ref: "#/definitions/DeleteApp200Response" },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/apps"] = {
+│ │ │           post: {
+│ │ │             operationId: "createApp",
+│ │ │             summary: "Create an app",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               {
+│ │ │                 name: "generated",
+│ │ │                 in: "body",
+│ │ │                 required: true,
+│ │ │                 schema: { $ref: "#/definitions/CreateAppRequest" },
+│ │ │               },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { $ref: "#/definitions/CreateApp200Response" },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/apps/{appId}/copy"] = {
+│ │ │           post: {
+│ │ │             operationId: "copyApp",
+│ │ │             summary: "Copy an app",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               { name: "appId", in: "path", required: true, type: "string" },
+│ │ │               {
+│ │ │                 name: "generated",
+│ │ │                 in: "body",
+│ │ │                 required: true,
+│ │ │                 schema: { $ref: "#/definitions/CopyAppRequest" },
+│ │ │               },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { $ref: "#/definitions/CopyApp200Response" },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         spec.paths["/apps/{appId}/events"] = {
+│ │ │           get: {
+│ │ │             operationId: "getAppEvents",
+│ │ │             summary: "Get app events",
+│ │ │             tags: ["Apps"],
+│ │ │             parameters: [
+│ │ │               { name: "appId", in: "path", required: true, type: "string" },
+│ │ │             ],
+│ │ │             responses: {
+│ │ │               200: {
+│ │ │                 description: "Success",
+│ │ │                 schema: { type: "array", items: { type: "object" } },
+│ │ │               },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         // Records endpoint
+│ │ │         spec.paths["/records"] = spec.paths["/records"] || {};
+│ │ │         spec.paths["/records"].post = {
+│ │ │           operationId: "upsert",
+│ │ │           summary: "Upsert records",
+│ │ │           tags: ["Records"],
+│ │ │           parameters: [
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { type: "object" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/Upsert200Response" },
+│ │ │             },
+│ │ │           },
+│ │ │         };
+│ │ │     
+│ │ │         console.log("Adding definitions...");
+│ │ │         if (!spec.definitions) spec.definitions = {};
+│ │ │         spec.definitions.Field = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "integer" }, label: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.Table = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "string" }, name: { type: "string" } },
+│ │ │           required: ["id", "name"],
+│ │ │         };
+│ │ │         spec.definitions.App = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "string" }, name: { type: "string" } },
+│ │ │           required: ["id", "name"],
+│ │ │         };
+│ │ │         spec.definitions.Record = { type: "object", additionalProperties: true };
+│ │ │         spec.definitions.CreateField200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "integer" } },
+│ │ │         };
+│ │ │         spec.definitions.DeleteFields200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { deleted: { type: "boolean" } },
+│ │ │         };
+│ │ │         spec.definitions.Upsert200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { metadata: { type: "object" } },
+│ │ │         };
+│ │ │         spec.definitions.CopyAppRequest = {
+│ │ │           type: "object",
+│ │ │           properties: { name: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.CopyApp200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.CreateAppRequest = {
+│ │ │           type: "object",
+│ │ │           properties: { name: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.CreateApp200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.DeleteAppRequest = {
+│ │ │           type: "object",
+│ │ │           properties: { name: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.DeleteApp200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { deleted: { type: "boolean" } },
+│ │ │         };
+│ │ │         spec.definitions.UpdateAppRequest = {
+│ │ │           type: "object",
+│ │ │           properties: { name: { type: "string" } },
+│ │ │         };
+│ │ │         spec.definitions.UpdateApp200Response = {
+│ │ │           type: "object",
+│ │ │           properties: { id: { type: "string" } },
+│ │ │         };
+│ │ │     
+│ │ │         console.log("Removing unexpected top-level attributes...");
+│ │ │         delete spec.operations;
+│ │ │         delete spec.groups;
+│ │ │         delete spec.components;
+│ │ │     
+│ │ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+│ │ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
+│ │ │         console.log("Spec fixed successfully!");
+│ │ │       } catch (error) {
+│ │ │         console.error("Failed to fix spec:", error);
+│ │ │         process.exit(1);
+│ │ │       }
+│ │ │     }
+│ │ │     
+│ │ │     fixQuickBaseSpec();
+│ │ │     
+│ │ ├─ generate-methods.ts
+│ │ ├─ openapi-generator-cli.jar
+│ │ ├─ quickbase-fixed.json
+│ │ └─ regenerate-client.ts
+│ │     Contents:
+│ │       #!/usr/bin/env node
+│ │       import { execSync } from "child_process";
+│ │       import { existsSync } from "fs";
+│ │       import { join, dirname, basename } from "path";
+│ │       import { fileURLToPath } from "url";
+│ │       import { Project } from "ts-morph";
+│ │       
+│ │       const __dirname = dirname(fileURLToPath(import.meta.url));
+│ │       const CODEGEN_DIR = __dirname;
+│ │       const SPEC_FILE = join(CODEGEN_DIR, "quickbase-fixed.json");
+│ │       const GENERATED_DIR = join(__dirname, "..", "generated");
+│ │       const BACKUP_DIR = join(__dirname, "..", "generated-old");
+│ │       const JAR_PATH = join(CODEGEN_DIR, "openapi-generator-cli.jar");
+│ │       
+│ │       function backupGeneratedDir(): void {
+│ │         console.log("Backing up existing src/generated/...");
+│ │         if (existsSync(GENERATED_DIR)) {
+│ │           if (existsSync(BACKUP_DIR))
+│ │             execSync(`rm -rf ${BACKUP_DIR}`, { stdio: "inherit" });
+│ │           execSync(`mv ${GENERATED_DIR} ${BACKUP_DIR}`, { stdio: "inherit" });
+│ │           console.log(`Moved src/generated/ to ${basename(BACKUP_DIR)}`);
+│ │         } else {
+│ │           console.log("No existing src/generated/ to backup.");
+│ │         }
+│ │       }
+│ │       
+│ │       function generateClient(): void {
+│ │         if (!existsSync(SPEC_FILE)) {
+│ │           console.error(
+│ │             `Fixed spec file ${basename(
+│ │               SPEC_FILE
+│ │             )} not found. Run 'npm run fix-spec' first.`
+│ │           );
+│ │           process.exit(1);
+│ │         }
+│ │         console.log("Generating TypeScript client with Fetch API using JAR...");
+│ │         const command = `java -jar ${JAR_PATH} generate \
+│ │           -i ${SPEC_FILE} \
+│ │           -g typescript-fetch \
+│ │           -o ${GENERATED_DIR} \
+│ │           --skip-validate-spec \
+│ │           --additional-properties=supportsES6=true,modelPropertyNaming=original,typescriptThreePlus=true,apiPackage=apis,modelPackage=models`;
+│ │         console.log("Executing command:", command);
+│ │         try {
+│ │           execSync(command, { stdio: "inherit" });
+│ │           console.log(`Client generated successfully in ${GENERATED_DIR}`);
+│ │           console.log(
+│ │             "Generated APIs:",
+│ │             execSync(
+│ │               `ls ${GENERATED_DIR}/apis/ || echo "No APIs generated"`
+│ │             ).toString()
+│ │           );
+│ │           console.log(
+│ │             "Checking for getAppById:",
+│ │             execSync(
+│ │               `grep "getAppById" ${GENERATED_DIR}/apis/AppsApi.ts || echo "Not found"`
+│ │             ).toString()
+│ │           );
+│ │         } catch (error) {
+│ │           console.error("Generation failed:", (error as Error).message);
+│ │           process.exit(1);
+│ │         }
+│ │       }
+│ │       
+│ │       function fixImportsAndExports(): void {
+│ │         console.log(
+│ │           "Fixing ESM imports and exports in generated files to use .ts extensions..."
+│ │         );
+│ │         const project = new Project({
+│ │           tsConfigFilePath: join(__dirname, "../../tsconfig.json"),
+│ │         });
+│ │         project.addSourceFilesAtPaths(`${GENERATED_DIR}/**/*.ts`);
+│ │         const sourceFiles = project.getSourceFiles();
+│ │       
+│ │         for (const sourceFile of sourceFiles) {
+│ │           const filePath = sourceFile.getFilePath();
+│ │           console.log(`Processing ${basename(filePath)}`);
+│ │           const imports = sourceFile.getImportDeclarations();
+│ │           const exports = sourceFile.getExportDeclarations();
+│ │       
+│ │           for (const importDecl of imports) {
+│ │             const moduleSpecifier = importDecl.getModuleSpecifierValue();
+│ │             if (
+│ │               moduleSpecifier.startsWith("./") ||
+│ │               moduleSpecifier.startsWith("../")
+│ │             ) {
+│ │               if (!moduleSpecifier.endsWith(".ts")) {
+│ │                 importDecl.setModuleSpecifier(`${moduleSpecifier}.ts`);
+│ │                 console.log(
+│ │                   `Updated import: ${moduleSpecifier} -> ${moduleSpecifier}.ts`
+│ │                 );
+│ │               }
+│ │             }
+│ │           }
+│ │       
+│ │           for (const exportDecl of exports) {
+│ │             const moduleSpecifier = exportDecl.getModuleSpecifierValue();
+│ │             if (
+│ │               moduleSpecifier &&
+│ │               (moduleSpecifier.startsWith("./") || moduleSpecifier.startsWith("../"))
+│ │             ) {
+│ │               if (!moduleSpecifier.endsWith(".ts")) {
+│ │                 exportDecl.setModuleSpecifier(`${moduleSpecifier}.ts`);
+│ │                 console.log(
+│ │                   `Updated export: ${moduleSpecifier} -> ${moduleSpecifier}.ts`
+│ │                 );
+│ │               }
+│ │             }
+│ │           }
+│ │           sourceFile.saveSync();
+│ │         }
+│ │         console.log("All imports and exports fixed with .ts extensions.");
+│ │       }
+│ │       
+│ │       function main(): void {
+│ │         try {
+│ │           execSync("java -version", { stdio: "ignore" });
+│ │         } catch (error) {
+│ │           console.error(
+│ │             "Java is not installed or not in PATH. Install Java (e.g., OpenJDK 17)."
+│ │           );
+│ │           process.exit(1);
+│ │         }
+│ │         backupGeneratedDir();
+│ │         generateClient();
+│ │         fixImportsAndExports();
+│ │       }
+│ │       
+│ │       main();
+│ │       
+│ ├─ generated/
+│ │ ├─ .openapi-generator/
+│ │ │ ├─ FILES
+│ │ │ └─ VERSION
+│ │ ├─ .openapi-generator-ignore
+│ │ ├─ apis/
+│ │ │ ├─ AppsApi.ts
+│ │ │ ├─ AuditApi.ts
+│ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DocumentTemplatesApi.ts
+│ │ │ ├─ FieldsApi.ts
+│ │ │ ├─ FilesApi.ts
+│ │ │ ├─ FormulasApi.ts
+│ │ │ ├─ PlatformAnalyticsApi.ts
+│ │ │ ├─ RecordsApi.ts
+│ │ │ ├─ ReportsApi.ts
+│ │ │ ├─ SolutionsApi.ts
+│ │ │ ├─ TablesApi.ts
+│ │ │ ├─ UserTokenApi.ts
+│ │ │ ├─ UsersApi.ts
+│ │ │ └─ index.ts
+│ │ ├─ index.ts
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.ts
+│ │ │ ├─ App.ts
+│ │ │ ├─ Audit200Response.ts
+│ │ │ ├─ Audit202Response.ts
+│ │ │ ├─ AuditRequest.ts
+│ │ │ ├─ CloneUserToken200Response.ts
+│ │ │ ├─ CloneUserTokenRequest.ts
+│ │ │ ├─ CopyApp200Response.ts
+│ │ │ ├─ CopyAppRequest.ts
+│ │ │ ├─ CreateApp200Response.ts
+│ │ │ ├─ CreateAppRequest.ts
+│ │ │ ├─ CreateField200Response.ts
+│ │ │ ├─ CreateRelationship200Response.ts
+│ │ │ ├─ CreateRelationshipRequest.ts
+│ │ │ ├─ CreateTable200Response.ts
+│ │ │ ├─ CreateTableRequest.ts
+│ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
+│ │ │ ├─ DeleteAppRequest.ts
+│ │ │ ├─ DeleteFields200Response.ts
+│ │ │ ├─ DeleteFile200Response.ts
+│ │ │ ├─ DeleteRecords200Response.ts
+│ │ │ ├─ DeleteRecordsRequest.ts
+│ │ │ ├─ DeleteRelationship200Response.ts
+│ │ │ ├─ DeleteTable200Response.ts
+│ │ │ ├─ DenyUsers200Response.ts
+│ │ │ ├─ ExchangeSsoToken200Response.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.ts
+│ │ │ ├─ Field.ts
+│ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetField200Response.ts
+│ │ │ ├─ GetRelationships200Response.ts
+│ │ │ ├─ GetReport200Response.ts
+│ │ │ ├─ GetTempTokenDBID200Response.ts
+│ │ │ ├─ GetUsers200Response.ts
+│ │ │ ├─ GetUsersRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
+│ │ │ ├─ RunFormula200Response.ts
+│ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ RunQuery200Response.ts
+│ │ │ ├─ RunQueryRequest.ts
+│ │ │ ├─ RunReport200Response.ts
+│ │ │ ├─ Table.ts
+│ │ │ ├─ TransferUserToken200Response.ts
+│ │ │ ├─ TransferUserTokenRequest.ts
+│ │ │ ├─ UndenyUsers200Response.ts
+│ │ │ ├─ UpdateApp200Response.ts
+│ │ │ ├─ UpdateAppRequest.ts
+│ │ │ ├─ UpdateFieldRequest.ts
+│ │ │ ├─ UpdateRelationshipRequest.ts
+│ │ │ ├─ UpdateTableRequest.ts
+│ │ │ ├─ Upsert200Response.ts
+│ │ │ └─ index.ts
+│ │ └─ runtime.ts
+│ ├─ generated-old/
+│ │ ├─ .openapi-generator/
+│ │ │ ├─ FILES
+│ │ │ └─ VERSION
+│ │ ├─ .openapi-generator-ignore
+│ │ ├─ apis/
+│ │ │ ├─ AuditApi.ts
+│ │ │ ├─ AuthApi.ts
+│ │ │ ├─ DefaultApi.ts
+│ │ │ ├─ DocumentTemplatesApi.ts
+│ │ │ ├─ FieldsApi.ts
+│ │ │ ├─ FilesApi.ts
+│ │ │ ├─ FormulasApi.ts
+│ │ │ ├─ PlatformAnalyticsApi.ts
+│ │ │ ├─ RecordsApi.ts
+│ │ │ ├─ ReportsApi.ts
+│ │ │ ├─ SolutionsApi.ts
+│ │ │ ├─ TablesApi.ts
+│ │ │ ├─ UserTokenApi.ts
+│ │ │ ├─ UsersApi.ts
+│ │ │ └─ index.ts
+│ │ ├─ index.ts
+│ │ ├─ models/
+│ │ │ ├─ AddMembersToGroup200Response.ts
+│ │ │ ├─ AddSubgroupsToGroup200Response.ts
+│ │ │ ├─ App.ts
+│ │ │ ├─ Audit200Response.ts
+│ │ │ ├─ Audit202Response.ts
+│ │ │ ├─ AuditRequest.ts
+│ │ │ ├─ CloneUserToken200Response.ts
+│ │ │ ├─ CloneUserTokenRequest.ts
+│ │ │ ├─ CopyApp200Response.ts
+│ │ │ ├─ CopyAppRequest.ts
+│ │ │ ├─ CreateApp200Response.ts
+│ │ │ ├─ CreateAppRequest.ts
+│ │ │ ├─ CreateField200Response.ts
+│ │ │ ├─ CreateRelationship200Response.ts
+│ │ │ ├─ CreateRelationshipRequest.ts
+│ │ │ ├─ CreateTable200Response.ts
+│ │ │ ├─ CreateTableRequest.ts
+│ │ │ ├─ DeactivateUserToken200Response.ts
+│ │ │ ├─ DeleteApp200Response.ts
+│ │ │ ├─ DeleteAppRequest.ts
+│ │ │ ├─ DeleteFields200Response.ts
+│ │ │ ├─ DeleteFile200Response.ts
+│ │ │ ├─ DeleteRecords200Response.ts
+│ │ │ ├─ DeleteRecordsRequest.ts
+│ │ │ ├─ DeleteRelationship200Response.ts
+│ │ │ ├─ DeleteTable200Response.ts
+│ │ │ ├─ DenyUsers200Response.ts
+│ │ │ ├─ ExchangeSsoToken200Response.ts
+│ │ │ ├─ ExchangeSsoTokenRequest.ts
+│ │ │ ├─ Field.ts
+│ │ │ ├─ GenerateDocument200Response.ts
+│ │ │ ├─ GetField200Response.ts
+│ │ │ ├─ GetRelationships200Response.ts
+│ │ │ ├─ GetReport200Response.ts
+│ │ │ ├─ GetTempTokenDBID200Response.ts
+│ │ │ ├─ GetUsers200Response.ts
+│ │ │ ├─ GetUsersRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200Response.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.ts
+│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequest.ts
+│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.ts
+│ │ │ ├─ PlatformAnalyticReads200Response.ts
+│ │ │ ├─ RemoveMembersFromGroup200Response.ts
+│ │ │ ├─ RemoveSubgroupsFromGroup200Response.ts
+│ │ │ ├─ RunFormula200Response.ts
+│ │ │ ├─ RunFormulaRequest.ts
+│ │ │ ├─ RunQuery200Response.ts
+│ │ │ ├─ RunQueryRequest.ts
+│ │ │ ├─ RunReport200Response.ts
+│ │ │ ├─ Table.ts
+│ │ │ ├─ TransferUserToken200Response.ts
+│ │ │ ├─ TransferUserTokenRequest.ts
+│ │ │ ├─ UndenyUsers200Response.ts
+│ │ │ ├─ UpdateApp200Response.ts
+│ │ │ ├─ UpdateAppRequest.ts
+│ │ │ ├─ UpdateFieldRequest.ts
+│ │ │ ├─ UpdateRelationshipRequest.ts
+│ │ │ ├─ UpdateTableRequest.ts
+│ │ │ ├─ Upsert200Response.ts
+│ │ │ └─ index.ts
+│ │ └─ runtime.ts
+│ ├─ index.ts
+│ ├─ logGen.ts
+│ ├─ quickbaseClient.ts
+│ │   Contents:
+│ │     import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
+│ │     import { FieldsApi } from "./generated/apis/FieldsApi.ts";
+│ │     import { TablesApi } from "./generated/apis/TablesApi.ts";
+│ │     import { AppsApi } from "./generated/apis/AppsApi.ts";
+│ │     import { Field } from "./generated/models/Field.ts";
+│ │     import { App } from "./generated/models/App.ts";
+│ │     import { CreateField200Response } from "./generated/models/CreateField200Response.ts";
+│ │     import { DeleteFields200Response } from "./generated/models/DeleteFields200Response.ts";
+│ │     import { Upsert200Response } from "./generated/models/Upsert200Response.ts";
+│ │     import { Table } from "./generated/models/Table.ts";
+│ │     import fetch from "node-fetch";
+│ │     
+│ │     interface QuickbaseConfig {
+│ │       realm: string;
+│ │       userToken?: string;
+│ │       tempToken?: string;
+│ │       debug?: boolean;
+│ │     }
+│ │     
+│ │     type ApiMethod<T = any> = (
+│ │       requestParameters: any,
+│ │       initOverrides?: RequestInit | ((...args: any[]) => any)
+│ │     ) => Promise<T>;
+│ │     
+│ │     interface MethodInfo {
+│ │       api: FieldsApi | TablesApi | AppsApi;
+│ │       method: ApiMethod;
+│ │       paramMap: string[];
+│ │     }
+│ │     
+│ │     type MethodMap = {
+│ │       [key: string]: MethodInfo;
+│ │     };
+│ │     
+│ │     interface QuickbaseMethods {
+│ │       getFields: (params: {
+│ │         tableId: string;
+│ │         includeFieldPerms?: boolean;
+│ │       }) => Promise<Field[]>;
+│ │       getTable: (params: { appId: string; tableId: string }) => Promise<Table>;
+│ │       getApp: (params: { appId: string }) => Promise<App>;
+│ │       createField: (params: {
+│ │         tableId: string;
+│ │         generated: object;
+│ │       }) => Promise<CreateField200Response>;
+│ │       deleteFields: (params: {
+│ │         tableId: string;
+│ │         generated: object;
+│ │       }) => Promise<DeleteFields200Response>;
+│ │       upsert: (params: { generated: object }) => Promise<Upsert200Response>;
+│ │     }
+│ │     
+│ │     export type QuickbaseClient = QuickbaseMethods;
+│ │     
+│ │     const simplifyName = (name: string): string =>
+│ │       name
+│ │         .replace(/ById$/, "")
+│ │         .replace(/Api$/, "")
+│ │         .replace(/^(\w)/, (_, c) => c.toLowerCase());
+│ │     
+│ │     function getParamNames(fn: (...args: any[]) => any): string[] {
+│ │       const fnStr = fn.toString();
+│ │       const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
+│ │       return paramStr
+│ │         .split(",")
+│ │         .map((p) => p.trim().split("=")[0].trim())
+│ │         .filter((p) => p && !p.match(/^\{/) && p !== "options");
+│ │     }
+│ │     
+│ │     export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
+│ │       const token = config.tempToken || config.userToken || "";
+│ │       const baseUrl = `https://api.quickbase.com/v1`;
+│ │       const headers: HTTPHeaders = {
+│ │         Authorization: `QB-USER-TOKEN ${token}`,
+│ │         "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
+│ │         "Content-Type": "application/json",
+│ │       };
+│ │       const debug = config.debug || false;
+│ │     
+│ │       type FetchApi = (
+│ │         input: RequestInfo | URL,
+│ │         init?: RequestInit
+│ │       ) => Promise<Response>;
+│ │       const fetchApi: FetchApi =
+│ │         typeof window !== "undefined" && window.fetch
+│ │           ? window.fetch.bind(window)
+│ │           : (fetch as unknown as FetchApi);
+│ │     
+│ │       const configuration = new Configuration({
+│ │         basePath: baseUrl,
+│ │         headers,
+│ │         fetchApi,
+│ │       });
+│ │     
+│ │       const apis: Record<string, FieldsApi | TablesApi | AppsApi> = {
+│ │         fields: new FieldsApi(configuration),
+│ │         tables: new TablesApi(configuration),
+│ │         apps: new AppsApi(configuration),
+│ │       };
+│ │     
+│ │       const methodMap = buildMethodMap();
+│ │     
+│ │       function buildMethodMap(): MethodMap {
+│ │         const methodMap: MethodMap = {};
+│ │         for (const [apiName, api] of Object.entries(apis)) {
+│ │           const proto = Object.getPrototypeOf(api);
+│ │           const methods = [
+│ │             ...Object.keys(api),
+│ │             ...Object.getOwnPropertyNames(proto),
+│ │           ].filter(
+│ │             (m) =>
+│ │               typeof api[m as keyof typeof api] === "function" &&
+│ │               !m.startsWith("_") &&
+│ │               m !== "constructor" &&
+│ │               !m.includes("Middleware") &&
+│ │               !m.includes("Pre") &&
+│ │               !m.includes("Post")
+│ │           );
+│ │           if (debug) console.log(`Methods for ${apiName}:`, methods);
+│ │           for (const methodName of methods) {
+│ │             const friendlyName = simplifyName(methodName);
+│ │             const paramNames = getParamNames(
+│ │               api[methodName as keyof typeof api] as (...args: any[]) => any
+│ │             ).filter((name) => name !== "options");
+│ │             methodMap[friendlyName] = {
+│ │               api,
+│ │               method: (
+│ │                 api[methodName as keyof typeof api] as unknown as ApiMethod
+│ │               ).bind(api),
+│ │               paramMap: paramNames,
+│ │             };
+│ │             if (debug) console.log(`Mapped ${methodName} to ${friendlyName}`);
+│ │           }
+│ │         }
+│ │         if (debug) console.log("Full methodMap:", Object.keys(methodMap));
+│ │         return methodMap;
+│ │       }
+│ │     
+│ │       async function invokeMethod<K extends keyof QuickbaseMethods>(
+│ │         methodName: K,
+│ │         params: Parameters<QuickbaseMethods[K]>[0]
+│ │       ): Promise<ReturnType<QuickbaseMethods[K]>> {
+│ │         const methodInfo = methodMap[methodName];
+│ │         if (!methodInfo) throw new Error(`Method ${methodName} not found`);
+│ │         const { method, paramMap } = methodInfo;
+│ │     
+│ │         console.log(`Calling ${methodName} with params:`, params);
+│ │         const args: [any] =
+│ │           paramMap.length === 1 && paramMap[0] === "requestParameters"
+│ │             ? [params]
+│ │             : [params];
+│ │         if (debug) console.log(`Mapped args for ${methodName}:`, args);
+│ │     
+│ │         const json = await method(...args);
+│ │         if (debug) console.log(`Response JSON for ${methodName}:`, json); // Conditionalize this
+│ │         return json as ReturnType<QuickbaseMethods[K]>;
+│ │       }
+│ │     
+│ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
+│ │         get(_target, prop: string) {
+│ │           if (prop in methodMap) {
+│ │             return (
+│ │               params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]
+│ │             ) => invokeMethod(prop as keyof QuickbaseMethods, params || {});
+│ │           }
+│ │           console.warn(`Method ${prop} not found in methodMap`);
+│ │           return undefined;
+│ │         },
+│ │       });
+│ │     }
+│ │     
+│ ├─ specs/
+│ │ └─ QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
+│ ├─ test-all-endpoints.ts
+│ ├─ test-esm.ts
+│ ├─ test.ts
+│ │   Contents:
+│ │     import { quickbaseClient } from "./quickbaseClient.ts";
+│ │     import dotenv from "dotenv";
+│ │     
+│ │     dotenv.config({ path: ".env.development" });
+│ │     
+│ │     async function runTest() {
+│ │       const client = quickbaseClient({
+│ │         realm: process.env.QB_REALM!,
+│ │         userToken: process.env.QB_USER_TOKEN!,
+│ │         debug: false, // Set to true for verbose logs
+│ │       });
+│ │     
+│ │       const appId = process.env.QB_APP_ID!;
+│ │       const app = await client.getApp({ appId });
+│ │         const tableFields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
+│ │       console.log("App:", app);
+│ │       console.log("Table Fields:", tableFields);
+│ │     }
+│ │     
+│ │     runTest().catch(console.error);
+│ └─ types/
+│   └─ QuickbaseMethods.ts
+├─ test-output.txt
+├─ text.txt
+├─ tsconfig.build.json
+│   Contents:
+│     {
+│       "extends": "./tsconfig.json",
+│       "compilerOptions": {
+│         "outDir": "dist",
+│         "rootDir": "src",
+│         "declaration": true,
+│         "allowImportingTsExtensions": false, // Override to false
+│         "noEmit": false // Emit .js and .d.ts
+│       },
+│       "include": ["src/**/*"],
+│       "exclude": ["node_modules", "dist", "src/generated-old"]
+│     }
+│     
+├─ tsconfig.json
+│   Contents:
+│     {
+│       "compilerOptions": {
+│         "target": "ESNext",
+│         "module": "NodeNext",
+│         "moduleResolution": "NodeNext",
+│         "strict": true,
+│         "lib": ["ESNext", "DOM"],
+│         "types": ["node"],
+│         "esModuleInterop": true,
+│         "resolveJsonModule": true,
+│         "allowImportingTsExtensions": true,
+│         "noEmit": true // Required for allowImportingTsExtensions
+│       },
+│       "include": ["src/**/*"],
+│       "exclude": ["node_modules", "dist", "src/generated-old"],
+│       "ts-node": {
+│         "esm": true,
+│         "transpileOnly": true
+│       }
+│     }
+│     
+└─ tsconfig.json.bak

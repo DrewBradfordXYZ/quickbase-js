@@ -18,9 +18,7 @@ const importantFiles: string[] = [
   "src/code-generation/fix-spec.ts",
   "src/code-generation/regenerate-client.ts",
   "src/test.ts",
-  "src/QuickbaseClient.ts",
-  "src/types/QuickbaseClient.d.ts", // Fixed typo from "/types/QuickBaseTypes.ts"
-  "src/generated/apis/FieldsApi.ts",
+  "src/quickbaseClient.ts",
 ];
 
 // Project Goals as plain text
@@ -32,7 +30,6 @@ const projectGoals: string = `Project Goals:
 - Generate ergonomic client methods from the QuickBase RESTful API spec that do not require manual updates.
 - Support both Node.js and browser environments.
 - The intent is to use this in JS frameworks like React, Vue, and Angular.
-- Use the Fetch API for making HTTP requests and avoid Axios with the OpenAPI Generator.
 - Use OpenAPI to generate the TypeScript types and methods.
 - Use the latest ES6+ features and TypeScript features.
 `;
