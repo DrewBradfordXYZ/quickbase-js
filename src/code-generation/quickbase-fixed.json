@@ -579,259 +579,6 @@
             }
           }
         }
-      },
-      "post": {
-        "description": "Updates the main properties of a specific table. Any properties of the table that you do not specify in the request body will remain unchanged.",
-        "summary": "Update a table",
-        "operationId": "updateTable",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
-            "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-              "example": {
-                "name": "My table",
-                "description": "my first table",
-                "singleRecordName": "record",
-                "pluralRecordName": "records"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name for the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
-                  "type": "string"
-                },
-                "singleRecordName": {
-                  "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the table. If this value is not passed the default value is blank.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "name": "Example Table",
-                "created": "2020-03-27T18:34:40Z",
-                "updated": "2020-04-03T19:12:40Z",
-                "alias": "_dbid_example_table",
-                "description": "Table as an example.",
-                "id": "bpqe82s0",
-                "nextRecordId": 1,
-                "nextFieldId": 1,
-                "defaultSortFieldId": 2,
-                "defaultSortOrder": "ASC",
-                "keyFieldId": 3,
-                "singleRecordName": "Example Record",
-                "pluralRecordName": "Example Records",
-                "sizeLimit": "150 MB",
-                "spaceUsed": "17 MB",
-                "spaceRemaining": "133 MB"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name of the table.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier (dbid) of the table.",
-                  "type": "string"
-                },
-                "alias": {
-                  "description": "The automatically-created table alias for the table.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the table, as configured by an application administrator.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "nextRecordId": {
-                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "nextFieldId": {
-                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "defaultSortFieldId": {
-                  "description": "The id of the field that is configured for default sorting.",
-                  "type": "integer"
-                },
-                "defaultSortOrder": {
-                  "description": "The configuration of the default sort order on the table.",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ],
-                  "type": "string"
-                },
-                "keyFieldId": {
-                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                  "type": "integer"
-                },
-                "singleRecordName": {
-                  "description": "The builder-configured singular noun of the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The builder-configured plural noun of the table.",
-                  "type": "string"
-                },
-                "sizeLimit": {
-                  "description": "The size limit for the table.",
-                  "type": "string"
-                },
-                "spaceUsed": {
-                  "description": "The amount of space currently being used by the table.",
-                  "type": "string"
-                },
-                "spaceRemaining": {
-                  "description": "The amount of space remaining for use by the table.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Tables"
-        ]
-      },
-      "delete": {
-        "description": "Deletes a specific table in an application, including all of the data within it.",
-        "operationId": "deleteTable",
-        "summary": "Delete a table",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
-            "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "deletedTableId": "bck7gp3q2"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "deletedTableId": {
-                  "description": "The deleted table id.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Tables"
-        ]
       }
     },
     "/tables/{tableId}/relationships": {
@@ -4759,94 +4506,6 @@
             }
           }
         }
-      },
-      "delete": {
-        "description": "Deletes record(s) in a table based on a query. Alternatively, all records in the table can be deleted.",
-        "summary": "Delete record(s)",
-        "operationId": "deleteRecords",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "example": {
-                "from": "bck7gp3q2",
-                "where": "{6.EX.'hello'}"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "from",
-                "where"
-              ],
-              "properties": {
-                "from": {
-                  "description": "The unique identifier of the table.",
-                  "example": "bck7gp3q2",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "where": {
-                  "description": "The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.",
-                  "example": "{6.EX.'hello'}",
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful delete records response.",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "numberDeleted": 1
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "numberDeleted": {
-                  "description": "The number of records deleted.",
-                  "example": 1,
-                  "type": "integer"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Records"
-        ]
       }
     },
     "/records/query": {
@@ -8966,8 +8625,154 @@
         },
         "label": {
           "type": "string"
+        },
+        "fieldType": {
+          "type": "string"
+        },
+        "appearsByDefault": {
+          "type": "boolean"
+        },
+        "audited": {
+          "type": "boolean"
+        },
+        "bold": {
+          "type": "boolean"
+        },
+        "doesDataCopy": {
+          "type": "boolean"
+        },
+        "fieldHelp": {
+          "type": "string"
+        },
+        "findEnabled": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "noWrap": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "unique": {
+          "type": "boolean"
+        },
+        "addToForms": {
+          "type": "boolean"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "permissionType": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "roleId": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "permissionType",
+              "role",
+              "roleId"
+            ]
+          }
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "primaryKey": {
+              "type": "boolean"
+            },
+            "foreignKey": {
+              "type": "boolean"
+            },
+            "formula": {
+              "type": "string"
+            },
+            "defaultValue": {
+              "type": "string"
+            },
+            "carryChoices": {
+              "type": "boolean"
+            },
+            "allowNewChoices": {
+              "type": "boolean"
+            },
+            "sortAsGiven": {
+              "type": "boolean"
+            },
+            "numLines": {
+              "type": "integer"
+            },
+            "maxLength": {
+              "type": "integer"
+            },
+            "appendOnly": {
+              "type": "boolean"
+            },
+            "allowHTML": {
+              "type": "boolean"
+            },
+            "allowMentions": {
+              "type": "boolean"
+            },
+            "numberFormat": {
+              "type": "integer"
+            },
+            "decimalPlaces": {
+              "type": "integer"
+            },
+            "doesAverage": {
+              "type": "boolean"
+            },
+            "doesTotal": {
+              "type": "boolean"
+            },
+            "blankIsZero": {
+              "type": "boolean"
+            },
+            "commaStart": {
+              "type": "integer"
+            },
+            "defaultToday": {
+              "type": "boolean"
+            },
+            "displayDayOfWeek": {
+              "type": "boolean"
+            },
+            "displayMonth": {
+              "type": "string"
+            },
+            "displayRelative": {
+              "type": "boolean"
+            },
+            "displayTime": {
+              "type": "boolean"
+            },
+            "displayTimezone": {
+              "type": "boolean"
+            },
+            "defaultKind": {
+              "type": "string"
+            },
+            "displayUser": {
+              "type": "string"
+            }
+          }
         }
-      }
+      },
+      "required": [
+        "id",
+        "label",
+        "fieldType"
+      ]
     },
     "Table": {
       "type": "object",

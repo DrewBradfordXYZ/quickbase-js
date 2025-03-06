@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
+    "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
+    "fix-spec-old": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
     "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
     "log-gen": "node --loader ts-node/esm src/log-gen.ts",
