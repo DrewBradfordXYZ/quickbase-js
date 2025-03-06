@@ -17,7 +17,10 @@ interface QuickbaseConfig {
   debug?: boolean;
 }
 
-type ApiMethod<T = any> = (requestParameters: any, initOverrides?: RequestInit | ((...args: any[]) => any)) => Promise<T>;
+type ApiMethod<T = any> = (
+  requestParameters: any,
+  initOverrides?: RequestInit | ((...args: any[]) => any)
+) => Promise<T>;
 
 interface MethodInfo {
   api: FieldsApi | TablesApi | AppsApi;
@@ -30,18 +33,30 @@ type MethodMap = {
 };
 
 interface QuickbaseMethods {
-  getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<Field[]>;
+  getFields: (params: {
+    tableId: string;
+    includeFieldPerms?: boolean;
+  }) => Promise<Field[]>;
   getTable: (params: { appId: string; tableId: string }) => Promise<Table>;
   getApp: (params: { appId: string }) => Promise<App>;
-  createField: (params: { tableId: string; generated: object }) => Promise<CreateField200Response>;
-  deleteFields: (params: { tableId: string; generated: object }) => Promise<DeleteFields200Response>;
+  createField: (params: {
+    tableId: string;
+    generated: object;
+  }) => Promise<CreateField200Response>;
+  deleteFields: (params: {
+    tableId: string;
+    generated: object;
+  }) => Promise<DeleteFields200Response>;
   upsert: (params: { generated: object }) => Promise<Upsert200Response>;
 }
 
 export type QuickbaseClient = QuickbaseMethods;
 
 const simplifyName = (name: string): string =>
-  name.replace(/ById$/, "").replace(/Api$/, "").replace(/^(\w)/, (_, c) => c.toLowerCase());
+  name
+    .replace(/ById$/, "")
+    .replace(/Api$/, "")
+    .replace(/^(\w)/, (_, c) => c.toLowerCase());
 
 function getParamNames(fn: (...args: any[]) => any): string[] {
   const fnStr = fn.toString();
@@ -52,7 +67,7 @@ function getParamNames(fn: (...args: any[]) => any): string[] {
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 }
 
-export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient {
+export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const token = config.tempToken || config.userToken || "";
   const baseUrl = `https://api.quickbase.com/v1`;
   const headers: HTTPHeaders = {
@@ -62,7 +77,10 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
   };
   const debug = config.debug || false;
 
-  type FetchApi = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+  type FetchApi = (
+    input: RequestInfo | URL,
+    init?: RequestInit
+  ) => Promise<Response>;
   const fetchApi: FetchApi =
     typeof window !== "undefined" && window.fetch
       ? window.fetch.bind(window)
@@ -90,22 +108,25 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
         ...Object.keys(api),
         ...Object.getOwnPropertyNames(proto),
       ].filter(
-        (m) => typeof api[m as keyof typeof api] === "function" && 
-               !m.startsWith("_") && 
-               m !== "constructor" && 
-               !m.includes("Middleware") && 
-               !m.includes("Pre") && 
-               !m.includes("Post")
+        (m) =>
+          typeof api[m as keyof typeof api] === "function" &&
+          !m.startsWith("_") &&
+          m !== "constructor" &&
+          !m.includes("Middleware") &&
+          !m.includes("Pre") &&
+          !m.includes("Post")
       );
       if (debug) console.log(`Methods for ${apiName}:`, methods);
       for (const methodName of methods) {
         const friendlyName = simplifyName(methodName);
-        const paramNames = getParamNames(api[methodName as keyof typeof api] as (...args: any[]) => any).filter(
-          (name) => name !== "options"
-        );
+        const paramNames = getParamNames(
+          api[methodName as keyof typeof api] as (...args: any[]) => any
+        ).filter((name) => name !== "options");
         methodMap[friendlyName] = {
           api,
-          method: (api[methodName as keyof typeof api] as unknown as ApiMethod).bind(api),
+          method: (
+            api[methodName as keyof typeof api] as unknown as ApiMethod
+          ).bind(api),
           paramMap: paramNames,
         };
         if (debug) console.log(`Mapped ${methodName} to ${friendlyName}`);
@@ -124,7 +145,10 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
     const { method, paramMap } = methodInfo;
 
     console.log(`Calling ${methodName} with params:`, params);
-    const args: [any] = paramMap.length === 1 && paramMap[0] === "requestParameters" ? [params] : [params];
+    const args: [any] =
+      paramMap.length === 1 && paramMap[0] === "requestParameters"
+        ? [params]
+        : [params];
     if (debug) console.log(`Mapped args for ${methodName}:`, args);
 
     const json = await method(...args);
@@ -135,8 +159,9 @@ export function createQuickbaseClient(config: QuickbaseConfig): QuickbaseClient 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
     get(_target, prop: string) {
       if (prop in methodMap) {
-        return (params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]) =>
-          invokeMethod(prop as keyof QuickbaseMethods, params || {});
+        return (
+          params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]
+        ) => invokeMethod(prop as keyof QuickbaseMethods, params || {});
       }
       console.warn(`Method ${prop} not found in methodMap`);
       return undefined;

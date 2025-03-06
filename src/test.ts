@@ -1,10 +1,10 @@
-import { createQuickbaseClient } from "./QuickbaseClient.ts";
+import { quickbaseClient } from "./quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.development" });
 
 async function runTest() {
-  const client = createQuickbaseClient({
+  const client = quickbaseClient({
     realm: process.env.QB_REALM!,
     userToken: process.env.QB_USER_TOKEN!,
     debug: false, // Set to true for verbose logs
