@@ -1,4 +1,4 @@
-[quickbase-js] Tree - 3/5/2025
+[quickbase-js] Tree - 3/6/2025
 Root: /home/drew/Projects/quickbase-js
 
 Project Goals:
@@ -9,7 +9,6 @@ Project Goals:
 - Generate ergonomic client methods from the QuickBase RESTful API spec that do not require manual updates.
 - Support both Node.js and browser environments.
 - The intent is to use this in JS frameworks like React, Vue, and Angular.
-- Use the Fetch API for making HTTP requests and avoid Axios with the OpenAPI Generator.
 - Use OpenAPI to generate the TypeScript types and methods.
 - Use the latest ES6+ features and TypeScript features.
 
@@ -19,11 +18,19 @@ Project Goals:
 ├─ .gitignore
 ├─ LICENSE
 ├─ README.md
-├─ aiupdate.txt
 ├─ build.js
 ├─ dist/
 │ ├─ QuickbaseClient.d.ts
 │ ├─ QuickbaseClient.js
+│ ├─ code-generation/
+│ │ ├─ fix-dist-imports.d.ts
+│ │ ├─ fix-dist-imports.js
+│ │ ├─ fix-spec.d.ts
+│ │ ├─ fix-spec.js
+│ │ ├─ generate-unified-interface.d.ts
+│ │ ├─ generate-unified-interface.js
+│ │ ├─ regenerate-client.d.ts
+│ │ └─ regenerate-client.js
 │ ├─ generated/
 │ │ ├─ apis/
 │ │ │ ├─ AppsApi.d.ts
@@ -193,12 +200,26 @@ Project Goals:
 │ │ │ └─ index.js
 │ │ ├─ runtime.d.ts
 │ │ └─ runtime.js
+│ ├─ generated-unified/
+│ │ ├─ QuickbaseClient.d.ts
+│ │ └─ QuickbaseClient.js
+│ ├─ generated-unified-interface.d.ts
+│ ├─ generated-unified-interface.js
 │ ├─ index.d.ts
 │ ├─ index.js
+│ ├─ logGen.d.ts
+│ ├─ logGen.js
+│ ├─ quickbaseClient.d.ts
+│ ├─ quickbaseClient.js
 │ ├─ test-esm.d.ts
 │ ├─ test-esm.js
 │ ├─ test.d.ts
-│ └─ test.js
+│ ├─ test.js
+│ ├─ types/
+│ │ ├─ QuickbaseMethods.d.ts
+│ │ └─ QuickbaseMethods.js
+│ ├─ utils.d.ts
+│ └─ utils.js
 ├─ logGen.txt
 ├─ openapitools.json
 ├─ package-lock.json
@@ -214,9 +235,10 @@ Project Goals:
 │       "scripts": {
 │         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
 │         "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
-│          "generate-methods": "node --loader ts-node/esm src/code-generation/generate-methods.ts",
+│         "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
 │         "test": "node --loader ts-node/esm src/test.ts",
-│         "build": "tsc -p tsconfig.build.json && npm run log-gen",
+│         "build": "rollup -c",
+│         "build:prod": "NODE_ENV=production rollup -c",
 │         "log-gen": "node --loader ts-node/esm src/logGen.ts"
 │       },
 │       "dependencies": {
@@ -225,16 +247,25 @@ Project Goals:
 │         "typescript": "^5.8.2"
 │       },
 │       "devDependencies": {
+│         "@rollup/plugin-commonjs": "^28.0.3",
+│         "@rollup/plugin-node-resolve": "^16.0.0",
+│         "@rollup/plugin-terser": "^0.4.4",
+│         "@rollup/plugin-typescript": "^12.1.2",
 │         "@types/node": "^20.11.20",
 │         "@types/node-fetch": "^2.6.11",
 │         "glob": "^11.0.1",
+│         "openapi-types": "^12.1.3",
+│         "rollup": "^4.34.9",
+│         "rollup-plugin-dts": "^6.1.1",
 │         "ts-morph": "^23.0.0",
 │         "ts-node": "^10.9.2"
 │       }
 │     }
 │     
+├─ rollup.config.js
 ├─ src/
 │ ├─ code-generation/
+│ │ ├─ fix-dist-imports.ts
 │ │ ├─ fix-spec.ts
 │ │ │   Contents:
 │ │ │     #!/usr/bin/env node
@@ -616,7 +647,120 @@ Project Goals:
 │ │ │     
 │ │ │     fixQuickBaseSpec();
 │ │ │     
-│ │ ├─ generate-methods.ts
+│ │ ├─ generate-unified-interface.ts
+│ │ │   Contents:
+│ │ │     #!/usr/bin/env node
+│ │ │     import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+│ │ │     import { join, dirname } from "path";
+│ │ │     import { fileURLToPath } from "url";
+│ │ │     import { simplifyName } from "../utils.ts";
+│ │ │     import { OpenAPIV3 } from "openapi-types";
+│ │ │     
+│ │ │     const __dirname = dirname(fileURLToPath(import.meta.url));
+│ │ │     const SPEC_FILE = join(__dirname, "quickbase-fixed.json");
+│ │ │     const OUTPUT_DIR = join(__dirname, "..", "generated-unified");
+│ │ │     const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
+│ │ │     
+│ │ │     function generateInterface() {
+│ │ │       if (!existsSync(SPEC_FILE)) {
+│ │ │         console.error(
+│ │ │           `Spec file ${SPEC_FILE} not found. Run 'npm run fix-spec' first.`
+│ │ │         );
+│ │ │         process.exit(1);
+│ │ │       }
+│ │ │     
+│ │ │       console.log("Generating unified QuickbaseClient interface...");
+│ │ │       const spec = JSON.parse(
+│ │ │         readFileSync(SPEC_FILE, "utf8")
+│ │ │       ) as OpenAPIV3.Document;
+│ │ │       const { paths } = spec;
+│ │ │     
+│ │ │       const modelImports = new Set<string>();
+│ │ │       const methods: string[] = [];
+│ │ │     
+│ │ │       for (const [path, methodsObj] of Object.entries(
+│ │ │         paths as OpenAPIV3.PathsObject
+│ │ │       )) {
+│ │ │         if (!methodsObj) continue; // Guard against undefined PathItemObject
+│ │ │     
+│ │ │         for (const [method, operation] of Object.entries(
+│ │ │           methodsObj as OpenAPIV3.PathItemObject
+│ │ │         )) {
+│ │ │           const op = operation as OpenAPIV3.OperationObject | undefined;
+│ │ │           if (!op || !op.operationId) continue;
+│ │ │     
+│ │ │           const opId = simplifyName(op.operationId);
+│ │ │           const params = (op.parameters || [])
+│ │ │             .filter((p) => {
+│ │ │               const param = p as OpenAPIV3.ParameterObject;
+│ │ │               return !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+│ │ │                 param.name
+│ │ │               );
+│ │ │             })
+│ │ │             .map((p) => {
+│ │ │               const param = p as OpenAPIV3.ParameterObject;
+│ │ │               const type = param.schema
+│ │ │                 ? mapRefToType(param.schema, modelImports)
+│ │ │                 : "any";
+│ │ │               return `${param.name}${param.required ? "" : "?"}: ${type}`;
+│ │ │             })
+│ │ │             .join("; ");
+│ │ │           const response = op.responses?.["200"] as
+│ │ │             | OpenAPIV3.ResponseObject
+│ │ │             | undefined;
+│ │ │           const returnType = response?.content?.["application/json"]?.schema
+│ │ │             ? mapRefToType(
+│ │ │                 response.content["application/json"].schema,
+│ │ │                 modelImports
+│ │ │               )
+│ │ │             : "void";
+│ │ │           methods.push(
+│ │ │             `  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
+│ │ │           );
+│ │ │         }
+│ │ │       }
+│ │ │     
+│ │ │       const importLines = Array.from(modelImports)
+│ │ │         .map((m) => `import { ${m} } from "../generated/models/${m}";`)
+│ │ │         .join("\n");
+│ │ │       const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importLines}\n\nexport interface QuickbaseClient {\n${methods.join(
+│ │ │         "\n"
+│ │ │       )}\n}\n`;
+│ │ │     
+│ │ │       if (!existsSync(OUTPUT_DIR)) {
+│ │ │         mkdirSync(OUTPUT_DIR, { recursive: true });
+│ │ │       }
+│ │ │       writeFileSync(OUTPUT_FILE, interfaceContent, "utf8");
+│ │ │       console.log(`Generated ${OUTPUT_FILE}`);
+│ │ │     }
+│ │ │     
+│ │ │     function mapRefToType(
+│ │ │       schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+│ │ │       modelImports: Set<string>
+│ │ │     ): string {
+│ │ │       if ("$ref" in schema) {
+│ │ │         const model = schema.$ref.split("/").pop()!;
+│ │ │         modelImports.add(model);
+│ │ │         return model;
+│ │ │       }
+│ │ │       if (schema.type === "array" && schema.items) {
+│ │ │         const itemType =
+│ │ │           "$ref" in schema.items
+│ │ │             ? schema.items.$ref.split("/").pop()!
+│ │ │             : schema.items.type || "any";
+│ │ │         if ("$ref" in schema.items) modelImports.add(itemType);
+│ │ │         return `${itemType}[]`;
+│ │ │       }
+│ │ │       return schema.type || "any";
+│ │ │     }
+│ │ │     
+│ │ │     try {
+│ │ │       generateInterface();
+│ │ │     } catch (error) {
+│ │ │       console.error("Generation failed:", error);
+│ │ │       process.exit(1);
+│ │ │     }
+│ │ │     
 │ │ ├─ openapi-generator-cli.jar
 │ │ ├─ quickbase-fixed.json
 │ │ └─ regenerate-client.ts
@@ -792,7 +936,6 @@ Project Goals:
 │ │ │ ├─ CreateTable200Response.ts
 │ │ │ ├─ CreateTableRequest.ts
 │ │ │ ├─ DeactivateUserToken200Response.ts
-│ │ │ ├─ DeleteApp200Response.ts
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
 │ │ │ ├─ DeleteFile200Response.ts
@@ -846,9 +989,9 @@ Project Goals:
 │ │ │ └─ VERSION
 │ │ ├─ .openapi-generator-ignore
 │ │ ├─ apis/
+│ │ │ ├─ AppsApi.ts
 │ │ │ ├─ AuditApi.ts
 │ │ │ ├─ AuthApi.ts
-│ │ │ ├─ DefaultApi.ts
 │ │ │ ├─ DocumentTemplatesApi.ts
 │ │ │ ├─ FieldsApi.ts
 │ │ │ ├─ FilesApi.ts
@@ -881,7 +1024,6 @@ Project Goals:
 │ │ │ ├─ CreateTable200Response.ts
 │ │ │ ├─ CreateTableRequest.ts
 │ │ │ ├─ DeactivateUserToken200Response.ts
-│ │ │ ├─ DeleteApp200Response.ts
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
 │ │ │ ├─ DeleteFile200Response.ts
@@ -929,21 +1071,17 @@ Project Goals:
 │ │ │ ├─ Upsert200Response.ts
 │ │ │ └─ index.ts
 │ │ └─ runtime.ts
+│ ├─ generated-unified/
+│ │ └─ QuickbaseClient.ts
 │ ├─ index.ts
 │ ├─ logGen.ts
 │ ├─ quickbaseClient.ts
 │ │   Contents:
+│ │     import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 │ │     import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
-│ │     import { FieldsApi } from "./generated/apis/FieldsApi.ts";
-│ │     import { TablesApi } from "./generated/apis/TablesApi.ts";
-│ │     import { AppsApi } from "./generated/apis/AppsApi.ts";
-│ │     import { Field } from "./generated/models/Field.ts";
-│ │     import { App } from "./generated/models/App.ts";
-│ │     import { CreateField200Response } from "./generated/models/CreateField200Response.ts";
-│ │     import { DeleteFields200Response } from "./generated/models/DeleteFields200Response.ts";
-│ │     import { Upsert200Response } from "./generated/models/Upsert200Response.ts";
-│ │     import { Table } from "./generated/models/Table.ts";
+│ │     import * as apis from "./generated/apis/index.ts";
 │ │     import fetch from "node-fetch";
+│ │     import { simplifyName } from "./utils.ts";
 │ │     
 │ │     interface QuickbaseConfig {
 │ │       realm: string;
@@ -952,55 +1090,24 @@ Project Goals:
 │ │       debug?: boolean;
 │ │     }
 │ │     
-│ │     type ApiMethod<T = any> = (
+│ │     type ApiMethod = (
 │ │       requestParameters: any,
-│ │       initOverrides?: RequestInit | ((...args: any[]) => any)
-│ │     ) => Promise<T>;
-│ │     
+│ │       initOverrides?: RequestInit
+│ │     ) => Promise<any>;
 │ │     interface MethodInfo {
-│ │       api: FieldsApi | TablesApi | AppsApi;
+│ │       api: any;
 │ │       method: ApiMethod;
 │ │       paramMap: string[];
 │ │     }
+│ │     type MethodMap = { [key: string]: MethodInfo };
 │ │     
-│ │     type MethodMap = {
-│ │       [key: string]: MethodInfo;
-│ │     };
-│ │     
-│ │     interface QuickbaseMethods {
-│ │       getFields: (params: {
-│ │         tableId: string;
-│ │         includeFieldPerms?: boolean;
-│ │       }) => Promise<Field[]>;
-│ │       getTable: (params: { appId: string; tableId: string }) => Promise<Table>;
-│ │       getApp: (params: { appId: string }) => Promise<App>;
-│ │       createField: (params: {
-│ │         tableId: string;
-│ │         generated: object;
-│ │       }) => Promise<CreateField200Response>;
-│ │       deleteFields: (params: {
-│ │         tableId: string;
-│ │         generated: object;
-│ │       }) => Promise<DeleteFields200Response>;
-│ │       upsert: (params: { generated: object }) => Promise<Upsert200Response>;
-│ │     }
-│ │     
-│ │     export type QuickbaseClient = QuickbaseMethods;
-│ │     
-│ │     const simplifyName = (name: string): string =>
-│ │       name
-│ │         .replace(/ById$/, "")
-│ │         .replace(/Api$/, "")
-│ │         .replace(/^(\w)/, (_, c) => c.toLowerCase());
-│ │     
-│ │     function getParamNames(fn: (...args: any[]) => any): string[] {
-│ │       const fnStr = fn.toString();
-│ │       const paramStr = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"));
-│ │       return paramStr
+│ │     const getParamNames = (fn: (...args: any[]) => any): string[] =>
+│ │       fn
+│ │         .toString()
+│ │         .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
 │ │         .split(",")
 │ │         .map((p) => p.trim().split("=")[0].trim())
 │ │         .filter((p) => p && !p.match(/^\{/) && p !== "options");
-│ │     }
 │ │     
 │ │     export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
 │ │       const token = config.tempToken || config.userToken || "";
@@ -1010,103 +1117,76 @@ Project Goals:
 │ │         "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
 │ │         "Content-Type": "application/json",
 │ │       };
-│ │       const debug = config.debug || false;
-│ │     
-│ │       type FetchApi = (
-│ │         input: RequestInfo | URL,
-│ │         init?: RequestInit
-│ │       ) => Promise<Response>;
-│ │       const fetchApi: FetchApi =
-│ │         typeof window !== "undefined" && window.fetch
-│ │           ? window.fetch.bind(window)
-│ │           : (fetch as unknown as FetchApi);
-│ │     
 │ │       const configuration = new Configuration({
 │ │         basePath: baseUrl,
 │ │         headers,
-│ │         fetchApi,
+│ │         fetchApi: window.fetch.bind(window),
 │ │       });
 │ │     
-│ │       const apis: Record<string, FieldsApi | TablesApi | AppsApi> = {
-│ │         fields: new FieldsApi(configuration),
-│ │         tables: new TablesApi(configuration),
-│ │         apps: new AppsApi(configuration),
-│ │       };
+│ │       const apiInstances = Object.fromEntries(
+│ │         Object.entries(apis)
+│ │           .filter(([name]) => name.endsWith("Api"))
+│ │           .map(([name, ApiClass]) => [
+│ │             name.replace("Api", "").toLowerCase(),
+│ │             new ApiClass(configuration),
+│ │           ])
+│ │       );
 │ │     
 │ │       const methodMap = buildMethodMap();
 │ │     
 │ │       function buildMethodMap(): MethodMap {
 │ │         const methodMap: MethodMap = {};
-│ │         for (const [apiName, api] of Object.entries(apis)) {
-│ │           const proto = Object.getPrototypeOf(api);
-│ │           const methods = [
-│ │             ...Object.keys(api),
-│ │             ...Object.getOwnPropertyNames(proto),
-│ │           ].filter(
-│ │             (m) =>
-│ │               typeof api[m as keyof typeof api] === "function" &&
-│ │               !m.startsWith("_") &&
-│ │               m !== "constructor" &&
-│ │               !m.includes("Middleware") &&
-│ │               !m.includes("Pre") &&
-│ │               !m.includes("Post")
-│ │           );
-│ │           if (debug) console.log(`Methods for ${apiName}:`, methods);
-│ │           for (const methodName of methods) {
-│ │             const friendlyName = simplifyName(methodName);
-│ │             const paramNames = getParamNames(
-│ │               api[methodName as keyof typeof api] as (...args: any[]) => any
-│ │             ).filter((name) => name !== "options");
-│ │             methodMap[friendlyName] = {
-│ │               api,
-│ │               method: (
-│ │                 api[methodName as keyof typeof api] as unknown as ApiMethod
-│ │               ).bind(api),
-│ │               paramMap: paramNames,
-│ │             };
-│ │             if (debug) console.log(`Mapped ${methodName} to ${friendlyName}`);
-│ │           }
+│ │         const isValidMethod = (name: string) =>
+│ │           !name.startsWith("_") &&
+│ │           name !== "constructor" &&
+│ │           !["Middleware", "Pre", "Post"].some((s) => name.includes(s));
+│ │     
+│ │         for (const [apiName, api] of Object.entries(apiInstances)) {
+│ │           Object.getOwnPropertyNames(Object.getPrototypeOf(api))
+│ │             .filter(
+│ │               (name) =>
+│ │                 isValidMethod(name) &&
+│ │                 typeof api[name as keyof typeof api] === "function"
+│ │             )
+│ │             .forEach((methodName) => {
+│ │               const friendlyName = simplifyName(methodName);
+│ │               const originalMethod = api[methodName as keyof typeof api];
+│ │               const boundMethod = originalMethod.bind(api) as unknown as ApiMethod;
+│ │               methodMap[friendlyName] = {
+│ │                 api,
+│ │                 method: boundMethod,
+│ │                 paramMap: getParamNames(originalMethod),
+│ │               };
+│ │             });
 │ │         }
-│ │         if (debug) console.log("Full methodMap:", Object.keys(methodMap));
 │ │         return methodMap;
 │ │       }
 │ │     
-│ │       async function invokeMethod<K extends keyof QuickbaseMethods>(
+│ │       const invokeMethod = <K extends keyof QuickbaseClient>(
 │ │         methodName: K,
-│ │         params: Parameters<QuickbaseMethods[K]>[0]
-│ │       ): Promise<ReturnType<QuickbaseMethods[K]>> {
-│ │         const methodInfo = methodMap[methodName];
+│ │         params: Parameters<QuickbaseClient[K]>[0]
+│ │       ): Promise<ReturnType<QuickbaseClient[K]>> => {
+│ │         const methodInfo = methodMap[methodName as string];
 │ │         if (!methodInfo) throw new Error(`Method ${methodName} not found`);
-│ │         const { method, paramMap } = methodInfo;
-│ │     
-│ │         console.log(`Calling ${methodName} with params:`, params);
-│ │         const args: [any] =
-│ │           paramMap.length === 1 && paramMap[0] === "requestParameters"
-│ │             ? [params]
-│ │             : [params];
-│ │         if (debug) console.log(`Mapped args for ${methodName}:`, args);
-│ │     
-│ │         const json = await method(...args);
-│ │         if (debug) console.log(`Response JSON for ${methodName}:`, json); // Conditionalize this
-│ │         return json as ReturnType<QuickbaseMethods[K]>;
-│ │       }
+│ │         const args: [any, RequestInit | undefined] =
+│ │           methodInfo.paramMap.length === 1 &&
+│ │           methodInfo.paramMap[0] === "requestParameters"
+│ │             ? [params, undefined]
+│ │             : [params, undefined];
+│ │         return methodInfo.method(...args) as ReturnType<QuickbaseClient[K]>;
+│ │       };
 │ │     
 │ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
-│ │         get(_target, prop: string) {
-│ │           if (prop in methodMap) {
-│ │             return (
-│ │               params: Parameters<QuickbaseMethods[keyof QuickbaseMethods]>[0]
-│ │             ) => invokeMethod(prop as keyof QuickbaseMethods, params || {});
-│ │           }
-│ │           console.warn(`Method ${prop} not found in methodMap`);
-│ │           return undefined;
-│ │         },
+│ │         get: (_, prop: string) =>
+│ │           prop in methodMap
+│ │             ? (params: any) =>
+│ │                 invokeMethod(prop as keyof QuickbaseClient, params || {})
+│ │             : (console.warn(`Method ${prop} not found in methodMap`), undefined),
 │ │       });
 │ │     }
 │ │     
 │ ├─ specs/
 │ │ └─ QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
-│ ├─ test-all-endpoints.ts
 │ ├─ test-esm.ts
 │ ├─ test.ts
 │ │   Contents:
@@ -1119,20 +1199,18 @@ Project Goals:
 │ │       const client = quickbaseClient({
 │ │         realm: process.env.QB_REALM!,
 │ │         userToken: process.env.QB_USER_TOKEN!,
-│ │         debug: false, // Set to true for verbose logs
+│ │         debug: true,
 │ │       });
 │ │     
-│ │       const appId = process.env.QB_APP_ID!;
-│ │       const app = await client.getApp({ appId });
-│ │         const tableFields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
+│ │       const app = await client.getAppById({ appId: process.env.QB_APP_ID! });
+│ │       const fields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
 │ │       console.log("App:", app);
-│ │       console.log("Table Fields:", tableFields);
+│ │       console.log("Fields:", fields);
 │ │     }
 │ │     
 │ │     runTest().catch(console.error);
-│ └─ types/
-│   └─ QuickbaseMethods.ts
-├─ test-output.txt
+│ │     
+│ └─ utils.ts
 ├─ text.txt
 ├─ tsconfig.build.json
 │   Contents:
@@ -1149,27 +1227,26 @@ Project Goals:
 │       "exclude": ["node_modules", "dist", "src/generated-old"]
 │     }
 │     
-├─ tsconfig.json
-│   Contents:
-│     {
-│       "compilerOptions": {
-│         "target": "ESNext",
-│         "module": "NodeNext",
-│         "moduleResolution": "NodeNext",
-│         "strict": true,
-│         "lib": ["ESNext", "DOM"],
-│         "types": ["node"],
-│         "esModuleInterop": true,
-│         "resolveJsonModule": true,
-│         "allowImportingTsExtensions": true,
-│         "noEmit": true // Required for allowImportingTsExtensions
-│       },
-│       "include": ["src/**/*"],
-│       "exclude": ["node_modules", "dist", "src/generated-old"],
-│       "ts-node": {
-│         "esm": true,
-│         "transpileOnly": true
-│       }
-│     }
-│     
-└─ tsconfig.json.bak
+└─ tsconfig.json
+    Contents:
+      {
+        "compilerOptions": {
+          "target": "ESNext",
+          "module": "NodeNext",
+          "moduleResolution": "NodeNext",
+          "strict": true,
+          "lib": ["ESNext", "DOM"],
+          "types": ["node"],
+          "esModuleInterop": true,
+          "resolveJsonModule": true,
+          "allowImportingTsExtensions": true,
+          "noEmit": true // Required for allowImportingTsExtensions
+        },
+        "include": ["src/**/*"],
+        "exclude": ["node_modules", "dist", "src/generated-old"],
+        "ts-node": {
+          "esm": true,
+          "transpileOnly": true
+        }
+      }
+      

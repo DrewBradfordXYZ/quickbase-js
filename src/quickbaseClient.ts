@@ -38,12 +38,10 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
     "Content-Type": "application/json",
   };
-  const fetchApi =
-    typeof window !== "undefined" ? window.fetch.bind(window) : (fetch as any);
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi,
+    fetchApi: window.fetch.bind(window),
   });
 
   const apiInstances = Object.fromEntries(
