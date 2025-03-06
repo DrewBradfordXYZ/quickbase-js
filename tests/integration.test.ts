@@ -31,8 +31,8 @@ describe("QuickbaseClient Integration", () => {
       expect(result).toEqual({
         id: appId,
         name: "qb-copy",
-        created: "2025-02-13T18:22:33Z",
-        updated: "2025-03-04T04:25:51Z",
+        created: new Date("2025-02-13T18:22:33Z"), // Expect Date object
+        updated: new Date("2025-03-04T04:25:51Z"), // Expect Date object
         description: "",
         timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
         dateFormat: "MM-DD-YYYY",

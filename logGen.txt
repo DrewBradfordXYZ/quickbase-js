@@ -13,113 +13,15 @@ Project Goals:
 - Use the latest ES6+ features and TypeScript features.
 
 
-├─ .env.development
-├─ .env.production
+├─ .env
 ├─ .gitignore
 ├─ LICENSE
 ├─ README.md
 ├─ build.js
 ├─ dist/
-│ ├─ code-generation/
-│ │ ├─ fix-dist-imports.d.ts
-│ │ ├─ fix-spec.d.ts
-│ │ ├─ generate-unified-interface.d.ts
-│ │ └─ regenerate-client.d.ts
-│ ├─ generated/
-│ │ ├─ apis/
-│ │ │ ├─ AppsApi.d.ts
-│ │ │ ├─ AuditApi.d.ts
-│ │ │ ├─ AuthApi.d.ts
-│ │ │ ├─ DocumentTemplatesApi.d.ts
-│ │ │ ├─ FieldsApi.d.ts
-│ │ │ ├─ FilesApi.d.ts
-│ │ │ ├─ FormulasApi.d.ts
-│ │ │ ├─ PlatformAnalyticsApi.d.ts
-│ │ │ ├─ RecordsApi.d.ts
-│ │ │ ├─ ReportsApi.d.ts
-│ │ │ ├─ SolutionsApi.d.ts
-│ │ │ ├─ TablesApi.d.ts
-│ │ │ ├─ UserTokenApi.d.ts
-│ │ │ ├─ UsersApi.d.ts
-│ │ │ └─ index.d.ts
-│ │ ├─ index.d.ts
-│ │ ├─ models/
-│ │ │ ├─ AddMembersToGroup200Response.d.ts
-│ │ │ ├─ AddSubgroupsToGroup200Response.d.ts
-│ │ │ ├─ App.d.ts
-│ │ │ ├─ Audit200Response.d.ts
-│ │ │ ├─ Audit202Response.d.ts
-│ │ │ ├─ AuditRequest.d.ts
-│ │ │ ├─ CloneUserToken200Response.d.ts
-│ │ │ ├─ CloneUserTokenRequest.d.ts
-│ │ │ ├─ CopyApp200Response.d.ts
-│ │ │ ├─ CopyAppRequest.d.ts
-│ │ │ ├─ CreateApp200Response.d.ts
-│ │ │ ├─ CreateAppRequest.d.ts
-│ │ │ ├─ CreateField200Response.d.ts
-│ │ │ ├─ CreateRelationship200Response.d.ts
-│ │ │ ├─ CreateRelationshipRequest.d.ts
-│ │ │ ├─ CreateTable200Response.d.ts
-│ │ │ ├─ CreateTableRequest.d.ts
-│ │ │ ├─ DeactivateUserToken200Response.d.ts
-│ │ │ ├─ DeleteApp200Response.d.ts
-│ │ │ ├─ DeleteAppRequest.d.ts
-│ │ │ ├─ DeleteFields200Response.d.ts
-│ │ │ ├─ DeleteFile200Response.d.ts
-│ │ │ ├─ DeleteRecords200Response.d.ts
-│ │ │ ├─ DeleteRecordsRequest.d.ts
-│ │ │ ├─ DeleteRelationship200Response.d.ts
-│ │ │ ├─ DeleteTable200Response.d.ts
-│ │ │ ├─ DenyUsers200Response.d.ts
-│ │ │ ├─ ExchangeSsoToken200Response.d.ts
-│ │ │ ├─ ExchangeSsoTokenRequest.d.ts
-│ │ │ ├─ Field.d.ts
-│ │ │ ├─ GenerateDocument200Response.d.ts
-│ │ │ ├─ GetField200Response.d.ts
-│ │ │ ├─ GetRelationships200Response.d.ts
-│ │ │ ├─ GetReport200Response.d.ts
-│ │ │ ├─ GetTempTokenDBID200Response.d.ts
-│ │ │ ├─ GetUsers200Response.d.ts
-│ │ │ ├─ GetUsersRequest.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200Response.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseMetadata.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseTotals.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummaries200ResponseWhereInner.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequest.d.ts
-│ │ │ ├─ PlatformAnalyticEventSummariesRequestWhereInner.d.ts
-│ │ │ ├─ PlatformAnalyticReads200Response.d.ts
-│ │ │ ├─ RemoveMembersFromGroup200Response.d.ts
-│ │ │ ├─ RemoveSubgroupsFromGroup200Response.d.ts
-│ │ │ ├─ RunFormula200Response.d.ts
-│ │ │ ├─ RunFormulaRequest.d.ts
-│ │ │ ├─ RunQuery200Response.d.ts
-│ │ │ ├─ RunQueryRequest.d.ts
-│ │ │ ├─ RunReport200Response.d.ts
-│ │ │ ├─ Table.d.ts
-│ │ │ ├─ TransferUserToken200Response.d.ts
-│ │ │ ├─ TransferUserTokenRequest.d.ts
-│ │ │ ├─ UndenyUsers200Response.d.ts
-│ │ │ ├─ UpdateApp200Response.d.ts
-│ │ │ ├─ UpdateAppRequest.d.ts
-│ │ │ ├─ UpdateFieldRequest.d.ts
-│ │ │ ├─ UpdateRelationshipRequest.d.ts
-│ │ │ ├─ UpdateTableRequest.d.ts
-│ │ │ ├─ Upsert200Response.d.ts
-│ │ │ └─ index.d.ts
-│ │ └─ runtime.d.ts
-│ ├─ generated-unified/
-│ │ └─ QuickbaseClient.d.ts
-│ ├─ index.d.ts
-│ ├─ logGen.d.ts
 │ ├─ quickbaseClient.d.ts
 │ ├─ quickbaseClient.js
-│ ├─ quickbaseClient.js.map
-│ ├─ test-esm.d.ts
-│ ├─ test.d.ts
-│ └─ utils.d.ts
+│ └─ quickbaseClient.js.map
 ├─ examples/
 │ ├─ react.js
 │ └─ vanillajs.html
@@ -147,8 +49,10 @@ Project Goals:
 │         "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
 │         "log-gen": "node --loader ts-node/esm src/log-gen.ts",
 │         "build": "rollup -c",
-│         "build:prod": "NODE_ENV=production rollup -c",
-│         "test": "vitest run --environment jsdom"
+│         "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
+│         "test": "vitest run --environment jsdom tests/quickbaseClient.test.ts",
+│         "test:integration": "vitest run --environment jsdom tests/integration.test.ts",
+│         "test:all": "vitest run --environment jsdom tests/quickbaseClient.test.ts tests/integration.test.ts"
 │       },
 │       "dependencies": {
 │         "typescript": "^5.8.2"
@@ -162,6 +66,7 @@ Project Goals:
 │         "dotenv": "^16.4.7",
 │         "glob": "^11.0.1",
 │         "jsdom": "^24.1.3",
+│         "node-fetch": "^3.3.2",
 │         "openapi-types": "^12.1.3",
 │         "rollup": "^4.34.9",
 │         "rollup-plugin-dts": "^6.1.1",
@@ -186,16 +91,31 @@ Project Goals:
 │       {
 │         input: "src/quickbaseClient.ts",
 │         output: {
-│           file: "dist/quickbaseClient.js",
+│           dir: "dist", // Switch to dir for multiple chunks
 │           format: "esm",
 │           sourcemap: true,
 │           compact: isProd,
+│           entryFileNames: "quickbaseClient.js", // Maintain output file name
 │         },
+│         external: [
+│           "node:http",
+│           "node:https",
+│           "node:zlib",
+│           "node:stream",
+│           "node:buffer",
+│           "node:util",
+│           "node:url",
+│           "node:net",
+│           "node:fs",
+│           "node:path",
+│           "node-fetch", // Externalize node-fetch
+│         ],
 │         plugins: [
-│           nodeResolve({ browser: true, preferBuiltins: false }),
-│           commonjs(),
+│           nodeResolve({ preferBuiltins: true }), // Use Node.js built-ins
+│           commonjs(), // Handle CommonJS modules like node-fetch
 │           typescript({
 │             tsconfig: "./tsconfig.build.json",
+│             declaration: false, // Keep this
 │           }),
 │           isProd && terser(),
 │         ],
@@ -203,7 +123,7 @@ Project Goals:
 │       {
 │         input: "src/quickbaseClient.ts",
 │         output: {
-│           file: "dist/quickbaseClient.d.ts",
+│           file: "dist/quickbaseClient.d.ts", // Keep as file since dts generates a single file
 │           format: "esm",
 │         },
 │         plugins: [
@@ -220,7 +140,7 @@ Project Goals:
 │           warning.plugin === "typescript" &&
 │           warning.message.includes("TS5096")
 │         ) {
-│           return; // Suppress TS5096 from typescript plugin
+│           return; // Suppress TS5096
 │         }
 │         warn(warning);
 │       },
@@ -228,7 +148,6 @@ Project Goals:
 │     
 ├─ src/
 │ ├─ code-generation/
-│ │ ├─ fix-dist-imports.ts
 │ │ ├─ fix-spec.ts
 │ │ │   Contents:
 │ │ │     #!/usr/bin/env node
@@ -1055,24 +974,28 @@ Project Goals:
 │ │     import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 │ │     import * as apis from "./generated/apis/index.ts";
 │ │     import { simplifyName } from "./utils.ts";
+│ │     import fetch, { RequestInit as NodeFetchRequestInit } from "node-fetch"; // Import node-fetch's RequestInit
 │ │     
 │ │     export interface QuickbaseConfig {
 │ │       realm: string;
 │ │       userToken?: string;
 │ │       tempToken?: string;
 │ │       debug?: boolean;
+│ │       fetchApi?: typeof fetch; // Still typed as node-fetch's fetch
 │ │     }
 │ │     
-│ │     type ApiMethod = (
-│ │       requestParameters: any,
+│ │     type ApiMethod<K extends keyof QuickbaseClient> = (
+│ │       requestParameters: Parameters<QuickbaseClient[K]>[0],
 │ │       initOverrides?: RequestInit
-│ │     ) => Promise<any>;
-│ │     interface MethodInfo {
+│ │     ) => Promise<ReturnType<QuickbaseClient[K]>>;
+│ │     
+│ │     interface MethodInfo<K extends keyof QuickbaseClient> {
 │ │       api: any;
-│ │       method: ApiMethod;
+│ │       method: ApiMethod<K>;
 │ │       paramMap: string[];
 │ │     }
-│ │     type MethodMap = { [key: string]: MethodInfo };
+│ │     
+│ │     type MethodMap = { [K in keyof QuickbaseClient]: MethodInfo<K> };
 │ │     
 │ │     const getParamNames = (fn: (...args: any[]) => any): string[] =>
 │ │       fn
@@ -1093,7 +1016,7 @@ Project Goals:
 │ │       const configuration = new Configuration({
 │ │         basePath: baseUrl,
 │ │         headers,
-│ │         fetchApi: window.fetch.bind(window), // Use browser-native fetch
+│ │         fetchApi: config.fetchApi || (fetch as any),
 │ │       });
 │ │     
 │ │       const apiInstances = Object.fromEntries(
@@ -1108,11 +1031,11 @@ Project Goals:
 │ │       const methodMap = buildMethodMap();
 │ │     
 │ │       function buildMethodMap(): MethodMap {
-│ │         const methodMap: MethodMap = {};
+│ │         const methodMap: Partial<MethodMap> = {};
 │ │         const isValidMethod = (name: string) =>
 │ │           !name.startsWith("_") &&
 │ │           name !== "constructor" &&
-│ │           !["Middleware", "Pre", "Post"].some((s) => name.includes(s));
+│ │           !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
 │ │     
 │ │         for (const [apiName, api] of Object.entries(apiInstances)) {
 │ │           Object.getOwnPropertyNames(Object.getPrototypeOf(api))
@@ -1121,44 +1044,106 @@ Project Goals:
 │ │                 isValidMethod(name) &&
 │ │                 typeof api[name as keyof typeof api] === "function"
 │ │             )
-│ │             .forEach((methodName) => {
-│ │               const friendlyName = simplifyName(methodName);
-│ │               const componenteMethod = api[methodName as keyof typeof api];
-│ │               const boundMethod = componenteMethod.bind(
-│ │                 api
-│ │               ) as unknown as ApiMethod;
-│ │               methodMap[friendlyName] = {
-│ │                 api,
-│ │                 method: boundMethod,
-│ │                 paramMap: getParamNames(componenteMethod),
-│ │               };
+│ │             .forEach((rawMethodName) => {
+│ │               const simplifiedName = simplifyName(
+│ │                 rawMethodName
+│ │               ) as keyof QuickbaseClient;
+│ │               const method = api[rawMethodName as keyof typeof api];
+│ │               const boundMethod = method.bind(api) as unknown;
+│ │               if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+│ │                 methodMap[simplifiedName] = {
+│ │                   api,
+│ │                   method: boundMethod as ApiMethod<typeof simplifiedName>,
+│ │                   paramMap: getParamNames(method),
+│ │                 };
+│ │                 if (config.debug) {
+│ │                   console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
+│ │                 }
+│ │               }
 │ │             });
 │ │         }
-│ │         return methodMap;
+│ │         return methodMap as MethodMap;
 │ │       }
 │ │     
 │ │       const invokeMethod = <K extends keyof QuickbaseClient>(
 │ │         methodName: K,
 │ │         params: Parameters<QuickbaseClient[K]>[0]
-│ │       ): Promise<ReturnType<QuickbaseClient[K]>> => {
-│ │         const methodInfo = methodMap[methodName as string];
-│ │         if (!methodInfo) throw new Error(`Method ${methodName} not found`);
+│ │       ): Promise<any> => {
+│ │         if (methodName === "getApp" && "appId" in params) {
+│ │           // Custom fetch for getApp to bypass generated parsing
+│ │           const url = `${configuration.basePath}/apps/${
+│ │             (params as { appId: string }).appId
+│ │           }`;
+│ │           const fetchApi = config.fetchApi || fetch;
+│ │           const requestOptions: NodeFetchRequestInit = {
+│ │             // Use node-fetch's RequestInit
+│ │             method: "GET",
+│ │             headers: configuration.headers,
+│ │           };
+│ │           const responsePromise = fetchApi(url, requestOptions).then((res) => {
+│ │             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+│ │             return res.json();
+│ │           });
+│ │           if (config.debug) {
+│ │             responsePromise.then((response) => {
+│ │               console.log(`Response from ${methodName}:`, response);
+│ │               console.log(`Request details:`, {
+│ │                 url,
+│ │                 headers: configuration.headers,
+│ │                 method: "GET",
+│ │               });
+│ │             });
+│ │           }
+│ │           return responsePromise;
+│ │         }
+│ │     
+│ │         const methodInfo = methodMap[methodName];
+│ │         if (!methodInfo) {
+│ │           console.error(`Method ${methodName} not found in methodMap`, methodMap);
+│ │           throw new Error(`Method ${methodName} not found`);
+│ │         }
+│ │         if (config.debug) {
+│ │           console.log(`Invoking ${methodName} with params:`, params);
+│ │           console.log(`Calling method with args:`, [params, undefined]);
+│ │         }
 │ │         const args: [any, RequestInit | undefined] =
 │ │           methodInfo.paramMap.length === 1 &&
 │ │           methodInfo.paramMap[0] === "requestParameters"
 │ │             ? [params, undefined]
 │ │             : [params, undefined];
-│ │         return methodInfo.method(...args) as Promise<
-│ │           ReturnType<QuickbaseClient[K]>
-│ │         >;
+│ │         const responsePromise = methodInfo.method(...args);
+│ │         if (config.debug) {
+│ │           responsePromise.then((response) => {
+│ │             console.log(`Response from ${methodName}:`, response);
+│ │             console.log(`Request details:`, {
+│ │               url:
+│ │                 methodName === "getApp" && "appId" in params
+│ │                   ? `${configuration.basePath}/apps/${
+│ │                       (params as { appId: string }).appId
+│ │                     }`
+│ │                   : configuration.basePath,
+│ │               headers: configuration.headers,
+│ │               method: "GET",
+│ │             });
+│ │           });
+│ │         }
+│ │         return responsePromise;
 │ │       };
 │ │     
 │ │       return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
-│ │         get: (_, prop: string) =>
-│ │           prop in methodMap
-│ │             ? (params: any) =>
-│ │                 invokeMethod(prop as keyof QuickbaseClient, params || {})
-│ │             : (console.warn(`Method ${prop} not found in methodMap`), undefined),
+│ │         get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
+│ │           if (prop in methodMap) {
+│ │             const methodName = prop as keyof QuickbaseClient;
+│ │             return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) => {
+│ │               if (config.debug) {
+│ │                 console.log(`Proxy called ${methodName} with:`, params);
+│ │               }
+│ │               return invokeMethod(methodName, params);
+│ │             };
+│ │           }
+│ │           console.warn(`Method ${prop} not found in methodMap`);
+│ │           return undefined;
+│ │         },
 │ │       });
 │ │     }
 │ │     
@@ -1166,30 +1151,81 @@ Project Goals:
 │ │ └─ QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
 │ ├─ test-esm.ts
 │ ├─ test.ts
-│ │   Contents:
-│ │     import { quickbaseClient } from "./quickbaseClient.ts";
-│ │     import dotenv from "dotenv";
-│ │     
-│ │     dotenv.config({ path: ".env.development" });
-│ │     
-│ │     async function runTest() {
-│ │       const client = quickbaseClient({
-│ │         realm: process.env.QB_REALM!,
-│ │         userToken: process.env.QB_USER_TOKEN!,
-│ │         debug: true,
-│ │       });
-│ │     
-│ │       const app = await client.getApp({ appId: process.env.QB_APP_ID! });
-│ │       const fields = await client.getFields({ tableId: process.env.QB_TABLE_ID! });
-│ │       console.log("App:", app);
-│ │       console.log("Fields:", fields);
-│ │     }
-│ │     
-│ │     runTest().catch(console.error);
-│ │     
 │ └─ utils.ts
-├─ test/
-│ └─ client.test.ts
+├─ tests/
+│ ├─ integration.test.ts
+│ └─ quickbaseClient.test.ts
+│     Contents:
+│       import { describe, it, expect, vi, beforeEach } from "vitest";
+│       import { quickbaseClient } from "../src/quickbaseClient.ts";
+│       import dotenv from "dotenv";
+│       
+│       dotenv.config();
+│       
+│       describe("QuickbaseClient", () => {
+│         const mockFetch = vi.fn((url, options) => {
+│           console.log("Mock fetch:", url, options);
+│           return Promise.resolve({
+│             ok: true,
+│             status: 200,
+│             json: () =>
+│               Promise.resolve({
+│                 id: process.env.QB_APP_ID,
+│                 name: "qb-copy",
+│                 created: "2025-02-13T18:22:33Z",
+│                 updated: "2025-03-04T04:25:51Z",
+│                 description: "",
+│                 timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+│                 dateFormat: "MM-DD-YYYY",
+│               }),
+│           } as Response);
+│         });
+│       
+│         const client = quickbaseClient({
+│           realm: process.env.QB_REALM || "default-realm",
+│           userToken: process.env.QB_USER_TOKEN || "default-token",
+│           debug: true,
+│           fetchApi: mockFetch,
+│         });
+│       
+│         beforeEach(() => {
+│           mockFetch.mockClear();
+│         });
+│       
+│         it("initializes without errors", () => {
+│           expect(client).toBeDefined();
+│         });
+│       
+│         it("has getApp method", () => {
+│           expect(typeof client.getApp).toBe("function");
+│         });
+│       
+│         it("calls getApp successfully", async () => {
+│           const appId = process.env.QB_APP_ID;
+│           if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+│           console.log("Test appId:", appId);
+│           const result = await client.getApp({ appId });
+│           expect(result).toEqual({
+│             id: appId,
+│             name: "qb-copy",
+│             created: "2025-02-13T18:22:33Z",
+│             updated: "2025-03-04T04:25:51Z",
+│             description: "",
+│             timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+│             dateFormat: "MM-DD-YYYY",
+│           });
+│           expect(mockFetch).toHaveBeenCalledWith(
+│             `https://api.quickbase.com/v1/apps/${appId}`,
+│             expect.objectContaining({
+│               headers: expect.objectContaining({
+│                 Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+│                 "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+│               }),
+│             })
+│           );
+│         });
+│       });
+│       
 ├─ text.txt
 ├─ tsconfig.build.json
 │   Contents:
@@ -1200,11 +1236,11 @@ Project Goals:
 │         "rootDir": "src",
 │         "module": "NodeNext",
 │         "moduleResolution": "NodeNext",
-│         "declaration": true,
+│         "declaration": false, // Disable individual .d.ts generation
 │         "allowImportingTsExtensions": true,
 │         "noEmit": true
 │       },
-│       "include": ["src/**/*"],
+│       "include": ["src/quickbaseClient.ts"], // Only process the entry point
 │       "exclude": ["node_modules", "dist", "src/generated-old"]
 │     }
 └─ tsconfig.json

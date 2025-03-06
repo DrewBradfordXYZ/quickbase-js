@@ -2,7 +2,7 @@ import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
-import fetch, { RequestInit as NodeFetchRequestInit } from "node-fetch"; // Import node-fetch's RequestInit
+import fetch from "node-fetch"; // No need for RequestInit import since we won't use it directly
 
 export interface QuickbaseConfig {
   realm: string;
@@ -96,35 +96,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const invokeMethod = <K extends keyof QuickbaseClient>(
     methodName: K,
     params: Parameters<QuickbaseClient[K]>[0]
-  ): Promise<any> => {
-    if (methodName === "getApp" && "appId" in params) {
-      // Custom fetch for getApp to bypass generated parsing
-      const url = `${configuration.basePath}/apps/${
-        (params as { appId: string }).appId
-      }`;
-      const fetchApi = config.fetchApi || fetch;
-      const requestOptions: NodeFetchRequestInit = {
-        // Use node-fetch's RequestInit
-        method: "GET",
-        headers: configuration.headers,
-      };
-      const responsePromise = fetchApi(url, requestOptions).then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      });
-      if (config.debug) {
-        responsePromise.then((response) => {
-          console.log(`Response from ${methodName}:`, response);
-          console.log(`Request details:`, {
-            url,
-            headers: configuration.headers,
-            method: "GET",
-          });
-        });
-      }
-      return responsePromise;
-    }
-
+  ): Promise<ReturnType<QuickbaseClient[K]>> => {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
       console.error(`Method ${methodName} not found in methodMap`, methodMap);
@@ -143,16 +115,6 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     if (config.debug) {
       responsePromise.then((response) => {
         console.log(`Response from ${methodName}:`, response);
-        console.log(`Request details:`, {
-          url:
-            methodName === "getApp" && "appId" in params
-              ? `${configuration.basePath}/apps/${
-                  (params as { appId: string }).appId
-                }`
-              : configuration.basePath,
-          headers: configuration.headers,
-          method: "GET",
-        });
       });
     }
     return responsePromise;

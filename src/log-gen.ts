@@ -19,8 +19,9 @@ const importantFiles: string[] = [
   "src/code-generation/fix-spec.ts",
   "src/code-generation/generate-unified-interface.ts",
   "src/code-generation/regenerate-client.ts",
-  "src/test.ts",
   "src/quickbaseClient.ts",
+  "tests/integration.test.ts",
+  "tests/quickbaseClient.test.ts",
 ];
 
 // Project Goals as plain text

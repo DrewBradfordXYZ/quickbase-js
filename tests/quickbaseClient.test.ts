@@ -14,8 +14,8 @@ describe("QuickbaseClient", () => {
         Promise.resolve({
           id: process.env.QB_APP_ID,
           name: "qb-copy",
-          created: "2025-02-13T18:22:33Z",
-          updated: "2025-03-04T04:25:51Z",
+          created: "2025-02-13T18:22:33Z", // Keep as string in mock
+          updated: "2025-03-04T04:25:51Z", // Keep as string in mock
           description: "",
           timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
           dateFormat: "MM-DD-YYYY",
@@ -50,8 +50,8 @@ describe("QuickbaseClient", () => {
     expect(result).toEqual({
       id: appId,
       name: "qb-copy",
-      created: "2025-02-13T18:22:33Z",
-      updated: "2025-03-04T04:25:51Z",
+      created: new Date("2025-02-13T18:22:33Z"), // Expect Date object
+      updated: new Date("2025-03-04T04:25:51Z"), // Expect Date object
       description: "",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       dateFormat: "MM-DD-YYYY",

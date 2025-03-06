@@ -321,7 +321,34 @@ async function fixQuickBaseSpec(): Promise<void> {
     };
     spec.definitions.App = {
       type: "object",
-      properties: { id: { type: "string" }, name: { type: "string" } },
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+        created: { type: "string", format: "date-time" },
+        updated: { type: "string", format: "date-time" },
+        description: { type: "string" },
+        timeZone: { type: "string" },
+        dateFormat: { type: "string" },
+        hasEveryoneOnTheInternet: { type: "boolean" },
+        memoryInfo: {
+          type: "object",
+          properties: {
+            estMemory: { type: "number" },
+            estMemoryInclDependentApps: { type: "number" },
+          },
+        },
+        securityProperties: {
+          type: "object",
+          properties: {
+            allowClone: { type: "boolean" },
+            allowExport: { type: "boolean" },
+            enableAppTokens: { type: "boolean" },
+            hideFromPublic: { type: "boolean" },
+            mustBeRealmApproved: { type: "boolean" },
+            useIPFilter: { type: "boolean" },
+          },
+        },
+      },
       required: ["id", "name"],
     };
     spec.definitions.Record = { type: "object", additionalProperties: true };

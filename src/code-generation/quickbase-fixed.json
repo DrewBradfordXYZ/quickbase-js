@@ -8992,6 +8992,60 @@
         },
         "name": {
           "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "dateFormat": {
+          "type": "string"
+        },
+        "hasEveryoneOnTheInternet": {
+          "type": "boolean"
+        },
+        "memoryInfo": {
+          "type": "object",
+          "properties": {
+            "estMemory": {
+              "type": "number"
+            },
+            "estMemoryInclDependentApps": {
+              "type": "number"
+            }
+          }
+        },
+        "securityProperties": {
+          "type": "object",
+          "properties": {
+            "allowClone": {
+              "type": "boolean"
+            },
+            "allowExport": {
+              "type": "boolean"
+            },
+            "enableAppTokens": {
+              "type": "boolean"
+            },
+            "hideFromPublic": {
+              "type": "boolean"
+            },
+            "mustBeRealmApproved": {
+              "type": "boolean"
+            },
+            "useIPFilter": {
+              "type": "boolean"
+            }
+          }
         }
       },
       "required": [
