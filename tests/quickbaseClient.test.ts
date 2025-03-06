@@ -14,11 +14,24 @@ describe("QuickbaseClient", () => {
         Promise.resolve({
           id: process.env.QB_APP_ID,
           name: "qb-copy",
-          created: "2025-02-13T18:22:33Z", // Keep as string in mock
-          updated: "2025-03-04T04:25:51Z", // Keep as string in mock
+          created: "2025-02-13T18:22:33Z",
+          updated: "2025-03-04T04:25:51Z",
           description: "",
           timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
           dateFormat: "MM-DD-YYYY",
+          hasEveryoneOnTheInternet: false,
+          memoryInfo: {
+            estMemory: 0,
+            estMemoryInclDependentApps: 0,
+          },
+          securityProperties: {
+            allowClone: false,
+            allowExport: true,
+            enableAppTokens: true,
+            hideFromPublic: false,
+            mustBeRealmApproved: false,
+            useIPFilter: false,
+          },
         }),
     } as Response);
   });
@@ -50,11 +63,24 @@ describe("QuickbaseClient", () => {
     expect(result).toEqual({
       id: appId,
       name: "qb-copy",
-      created: new Date("2025-02-13T18:22:33Z"), // Expect Date object
-      updated: new Date("2025-03-04T04:25:51Z"), // Expect Date object
+      created: new Date("2025-02-13T18:22:33Z"),
+      updated: new Date("2025-03-04T04:25:51Z"),
       description: "",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       dateFormat: "MM-DD-YYYY",
+      hasEveryoneOnTheInternet: false,
+      memoryInfo: {
+        estMemory: 0,
+        estMemoryInclDependentApps: 0,
+      },
+      securityProperties: {
+        allowClone: false,
+        allowExport: true,
+        enableAppTokens: true,
+        hideFromPublic: false,
+        mustBeRealmApproved: false,
+        useIPFilter: false,
+      },
     });
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${appId}`,
