@@ -10,16 +10,18 @@ export interface QuickbaseConfig {
   debug?: boolean;
 }
 
-type ApiMethod = (
-  requestParameters: any,
+type ApiMethod<K extends keyof QuickbaseClient> = (
+  requestParameters: Parameters<QuickbaseClient[K]>[0],
   initOverrides?: RequestInit
-) => Promise<any>;
-interface MethodInfo {
+) => Promise<ReturnType<QuickbaseClient[K]>>;
+
+interface MethodInfo<K extends keyof QuickbaseClient> {
   api: any;
-  method: ApiMethod;
+  method: ApiMethod<K>;
   paramMap: string[];
 }
-type MethodMap = { [key: string]: MethodInfo };
+
+type MethodMap = { [K in keyof QuickbaseClient]: MethodInfo<K> };
 
 const getParamNames = (fn: (...args: any[]) => any): string[] =>
   fn
@@ -40,7 +42,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi: window.fetch.bind(window), // Use browser-native fetch
+    fetchApi: window.fetch.bind(window),
   });
 
   const apiInstances = Object.fromEntries(
@@ -55,11 +57,11 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const methodMap = buildMethodMap();
 
   function buildMethodMap(): MethodMap {
-    const methodMap: MethodMap = {};
+    const methodMap: Partial<MethodMap> = {};
     const isValidMethod = (name: string) =>
       !name.startsWith("_") &&
       name !== "constructor" &&
-      !["Middleware", "Pre", "Post"].some((s) => name.includes(s));
+      !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
 
     for (const [apiName, api] of Object.entries(apiInstances)) {
       Object.getOwnPropertyNames(Object.getPrototypeOf(api))
@@ -68,43 +70,60 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
             isValidMethod(name) &&
             typeof api[name as keyof typeof api] === "function"
         )
-        .forEach((methodName) => {
-          const friendlyName = simplifyName(methodName);
-          const componenteMethod = api[methodName as keyof typeof api];
-          const boundMethod = componenteMethod.bind(
-            api
-          ) as unknown as ApiMethod;
-          methodMap[friendlyName] = {
-            api,
-            method: boundMethod,
-            paramMap: getParamNames(componenteMethod),
-          };
+        .forEach((rawMethodName) => {
+          const simplifiedName = simplifyName(
+            rawMethodName
+          ) as keyof QuickbaseClient;
+          const method = api[rawMethodName as keyof typeof api];
+          const boundMethod = method.bind(api) as unknown;
+          if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+            methodMap[simplifiedName] = {
+              api,
+              method: boundMethod as ApiMethod<typeof simplifiedName>,
+              paramMap: getParamNames(method),
+            };
+            if (config.debug) {
+              console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
+            }
+          }
         });
     }
-    return methodMap;
+    return methodMap as MethodMap;
   }
 
   const invokeMethod = <K extends keyof QuickbaseClient>(
     methodName: K,
     params: Parameters<QuickbaseClient[K]>[0]
   ): Promise<ReturnType<QuickbaseClient[K]>> => {
-    const methodInfo = methodMap[methodName as string];
-    if (!methodInfo) throw new Error(`Method ${methodName} not found`);
+    const methodInfo = methodMap[methodName];
+    if (!methodInfo) {
+      console.error(`Method ${methodName} not found in methodMap`, methodMap);
+      throw new Error(`Method ${methodName} not found`);
+    }
+    if (config.debug) {
+      console.log(`Invoking ${methodName} with params:`, params);
+    }
     const args: [any, RequestInit | undefined] =
       methodInfo.paramMap.length === 1 &&
       methodInfo.paramMap[0] === "requestParameters"
         ? [params, undefined]
         : [params, undefined];
-    return methodInfo.method(...args) as Promise<
-      ReturnType<QuickbaseClient[K]>
-    >;
+    return methodInfo.method(...args);
   };
 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
-    get: (_, prop: string) =>
-      prop in methodMap
-        ? (params: any) =>
-            invokeMethod(prop as keyof QuickbaseClient, params || {})
-        : (console.warn(`Method ${prop} not found in methodMap`), undefined),
+    get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
+      if (prop in methodMap) {
+        const methodName = prop as keyof QuickbaseClient;
+        return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) => {
+          if (config.debug) {
+            console.log(`Proxy called ${methodName} with:`, params);
+          }
+          return invokeMethod(methodName, params);
+        };
+      }
+      console.warn(`Method ${prop} not found in methodMap`);
+      return undefined;
+    },
   });
 }

@@ -14,8 +14,6 @@ generated-old/
 
 # Environment variables
 .env
-.env.development
-.env.production
 
 # Temporary files
 *.log
