@@ -9,8 +9,8 @@
     "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
     "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "test": "node --loader ts-node/esm src/test.ts",
-    "build": "tsc -p tsconfig.build.json && npm run aiupdate",
-    "aiupdate": "node --loader ts-node/esm src/logGen.ts"
+    "build": "tsc -p tsconfig.build.json && npm run log-gen",
+    "log-gen": "node --loader ts-node/esm src/logGen.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
