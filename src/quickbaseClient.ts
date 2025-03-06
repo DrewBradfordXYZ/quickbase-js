@@ -2,12 +2,14 @@ import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
+import fetch, { RequestInit as NodeFetchRequestInit } from "node-fetch"; // Import node-fetch's RequestInit
 
 export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
   debug?: boolean;
+  fetchApi?: typeof fetch; // Still typed as node-fetch's fetch
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -42,7 +44,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi: window.fetch.bind(window),
+    fetchApi: config.fetchApi || (fetch as any),
   });
 
   const apiInstances = Object.fromEntries(
@@ -94,7 +96,35 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const invokeMethod = <K extends keyof QuickbaseClient>(
     methodName: K,
     params: Parameters<QuickbaseClient[K]>[0]
-  ): Promise<ReturnType<QuickbaseClient[K]>> => {
+  ): Promise<any> => {
+    if (methodName === "getApp" && "appId" in params) {
+      // Custom fetch for getApp to bypass generated parsing
+      const url = `${configuration.basePath}/apps/${
+        (params as { appId: string }).appId
+      }`;
+      const fetchApi = config.fetchApi || fetch;
+      const requestOptions: NodeFetchRequestInit = {
+        // Use node-fetch's RequestInit
+        method: "GET",
+        headers: configuration.headers,
+      };
+      const responsePromise = fetchApi(url, requestOptions).then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      });
+      if (config.debug) {
+        responsePromise.then((response) => {
+          console.log(`Response from ${methodName}:`, response);
+          console.log(`Request details:`, {
+            url,
+            headers: configuration.headers,
+            method: "GET",
+          });
+        });
+      }
+      return responsePromise;
+    }
+
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
       console.error(`Method ${methodName} not found in methodMap`, methodMap);
@@ -102,13 +132,30 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     }
     if (config.debug) {
       console.log(`Invoking ${methodName} with params:`, params);
+      console.log(`Calling method with args:`, [params, undefined]);
     }
     const args: [any, RequestInit | undefined] =
       methodInfo.paramMap.length === 1 &&
       methodInfo.paramMap[0] === "requestParameters"
         ? [params, undefined]
         : [params, undefined];
-    return methodInfo.method(...args);
+    const responsePromise = methodInfo.method(...args);
+    if (config.debug) {
+      responsePromise.then((response) => {
+        console.log(`Response from ${methodName}:`, response);
+        console.log(`Request details:`, {
+          url:
+            methodName === "getApp" && "appId" in params
+              ? `${configuration.basePath}/apps/${
+                  (params as { appId: string }).appId
+                }`
+              : configuration.basePath,
+          headers: configuration.headers,
+          method: "GET",
+        });
+      });
+    }
+    return responsePromise;
   };
 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {

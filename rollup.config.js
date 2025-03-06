@@ -10,17 +10,31 @@ export default [
   {
     input: "src/quickbaseClient.ts",
     output: {
-      file: "dist/quickbaseClient.js",
+      dir: "dist", // Switch to dir for multiple chunks
       format: "esm",
       sourcemap: true,
       compact: isProd,
+      entryFileNames: "quickbaseClient.js", // Maintain output file name
     },
+    external: [
+      "node:http",
+      "node:https",
+      "node:zlib",
+      "node:stream",
+      "node:buffer",
+      "node:util",
+      "node:url",
+      "node:net",
+      "node:fs",
+      "node:path",
+      "node-fetch", // Externalize node-fetch
+    ],
     plugins: [
-      nodeResolve({ browser: true, preferBuiltins: false }),
-      commonjs(),
+      nodeResolve({ preferBuiltins: true }), // Use Node.js built-ins
+      commonjs(), // Handle CommonJS modules like node-fetch
       typescript({
         tsconfig: "./tsconfig.build.json",
-        declaration: false, // Explicitly disable here too
+        declaration: false, // Keep this
       }),
       isProd && terser(),
     ],
@@ -28,7 +42,7 @@ export default [
   {
     input: "src/quickbaseClient.ts",
     output: {
-      file: "dist/quickbaseClient.d.ts",
+      file: "dist/quickbaseClient.d.ts", // Keep as file since dts generates a single file
       format: "esm",
     },
     plugins: [
