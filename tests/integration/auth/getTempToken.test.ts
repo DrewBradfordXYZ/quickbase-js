@@ -1,7 +1,7 @@
 // tests/integration/auth/getTempToken.test.ts
 import { test, expect } from "@playwright/test";
 import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-import fetch from "node-fetch"; // Ensure node-fetch is installed
+import fetch from "node-fetch";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -153,25 +153,14 @@ test.describe("QuickbaseClient Integration - getTempTokenDBID", () => {
     expect(typeof token).toBe("string");
     expect(token.length).toBeGreaterThan(0);
 
-    // Create a new client using the temporary token with correct header prefix
+    // Create a new client using the temporary token
     const clientWithToken = quickbaseClient({
       realm,
       tempToken: token,
       debug: true,
-      // Override headers to use QB-TEMP-TOKEN
       fetchApi: async (url, init) => {
-        const customInit = {
-          ...init,
-          headers: {
-            ...init?.headers,
-            Authorization: `QB-TEMP-TOKEN ${token}`, // Correct prefix
-            "QB-Realm-Hostname": `${realm}.quickbase.com`,
-            "Content-Type": "application/json",
-          },
-        };
-        console.log(`Fetching ${url} with init:`, customInit);
-
-        const response = await fetch(url, customInit as RequestInit); // Use Node fetch
+        console.log(`Fetching ${url} with init:`, init);
+        const response = await fetch(url, init as RequestInit); // Use Node fetch
         const body = await response.text();
 
         console.log(`Raw response from ${url} with token:`, {

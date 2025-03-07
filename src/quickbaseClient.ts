@@ -40,20 +40,28 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
 export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
-  const token = config.tempToken || config.userToken || "";
+  const { realm, userToken, tempToken, fetchApi, withCredentials, debug } =
+    config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
   // Define headers and remove undefined values manually
-  const headers: HTTPHeaders = {};
-  if (token) headers["Authorization"] = `QB-USER-TOKEN ${token}`;
-  headers["QB-Realm-Hostname"] = `${config.realm}.quickbase.com`;
-  headers["Content-Type"] = "application/json";
+  const headers: HTTPHeaders = {
+    "QB-Realm-Hostname": `${realm}.quickbase.com`,
+    "Content-Type": "application/json",
+  };
+
+  // Set Authorization header based on token type
+  if (tempToken) {
+    headers["Authorization"] = `QB-TEMP-TOKEN ${tempToken}`;
+  } else if (userToken) {
+    headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
+  }
 
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi: config.fetchApi || (fetch as any),
-    credentials: config.withCredentials ? "include" : "omit",
+    fetchApi: fetchApi || (fetch as any),
+    credentials: withCredentials ? "include" : "omit",
   });
 
   const apiInstances = Object.fromEntries(
@@ -93,7 +101,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
               method: boundMethod as ApiMethod<typeof simplifiedName>,
               paramMap: getParamNames(method),
             };
-            if (config.debug) {
+            if (debug) {
               console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
             }
           }
@@ -111,7 +119,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       console.error(`Method ${methodName} not found in methodMap`, methodMap);
       throw new Error(`Method ${methodName} not found`);
     }
-    if (config.debug) {
+    if (debug) {
       console.log(`Invoking ${methodName} with params:`, params);
       console.log(`Calling method with args:`, [params, undefined]);
     }
@@ -123,7 +131,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
 
     try {
       const response = await methodInfo.method(...args);
-      if (config.debug) {
+      if (debug) {
         console.log(`Response from ${methodName}:`, response);
       }
       return response;
@@ -153,7 +161,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
         return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) => {
-          if (config.debug) {
+          if (debug) {
             console.log(`Proxy called ${methodName} with:`, params);
           }
           return invokeMethod(methodName, params);
