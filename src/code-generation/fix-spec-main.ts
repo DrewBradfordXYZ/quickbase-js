@@ -46,7 +46,7 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing missing items in ${pathKey}(${method}).${param.name}`
             );
-            param.schema.items = { type: "string" }; // Default fallback
+            param.schema.items = { type: "string" };
           }
         });
       }
@@ -57,7 +57,7 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing missing items in ${pathKey}(${method}).responses.${status}`
             );
-            response.schema.items = { type: "string" }; // Default fallback
+            response.schema.items = { type: "string" };
           }
         }
       }
@@ -69,6 +69,7 @@ async function fixQuickBaseSpec(): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
     const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
+    const OUTPUT_DIR = path.join(CODEGEN_DIR, "output"); // New output subdir
     console.log("Finding latest QuickBase RESTful API spec...");
     const specFiles = glob.sync(
       path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
@@ -80,7 +81,7 @@ async function fixQuickBaseSpec(): Promise<void> {
       process.exit(1);
     }
     const inputFile = specFiles.sort().pop() as string;
-    const outputFile = path.join(CODEGEN_DIR, "quickbase-fixed.json");
+    const outputFile = path.join(OUTPUT_DIR, "quickbase-fixed.json"); // Updated path
 
     console.log(`Reading ${path.basename(inputFile)} from specs/...`);
     const specContent = await fs.readFile(inputFile, "utf8");
@@ -117,10 +118,10 @@ async function fixQuickBaseSpec(): Promise<void> {
     }
 
     console.log("Applying endpoint fixes...");
-    spec.paths = { ...paths }; // Fully replace paths with custom ones
+    spec.paths = { ...paths };
 
     console.log("Fixing array schemas...");
-    fixArraySchemas(spec); // Fix any remaining arrays
+    fixArraySchemas(spec);
 
     console.log("Applying definitions...");
     spec.definitions = definitions;
@@ -131,6 +132,7 @@ async function fixQuickBaseSpec(): Promise<void> {
     delete spec.components;
 
     console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+    await fs.mkdir(OUTPUT_DIR, { recursive: true }); // Create output dir if it doesn’t exist
     await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
     console.log("Spec fixed successfully!");
   } catch (error) {

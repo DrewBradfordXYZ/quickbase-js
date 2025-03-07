@@ -3,16 +3,15 @@ import { execSync } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
-import fetch from "node-fetch"; // Requires "node-fetch": "^3.3.2" in package.json
+import fetch from "node-fetch";
 import readline from "readline";
 
-// Configuration
-const CURRENT_JAR_VERSION = "7.12.0"; // Your current version as of March 2025
+const CURRENT_JAR_VERSION = "7.12.0";
 const MAVEN_METADATA_URL =
   "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/maven-metadata.xml";
 const CODEGEN_DIR = join(fileURLToPath(import.meta.url), "..");
-const JARS_DIR = join(CODEGEN_DIR, "..", "openapi-jars"); // New folder for .jar files
-const SPEC_INPUT = join(CODEGEN_DIR, "quickbase-fixed.json");
+const JARS_DIR = join(CODEGEN_DIR, "..", "openapi-jars");
+const SPEC_INPUT = join(CODEGEN_DIR, "output", "quickbase-fixed.json"); // Updated path
 const OUTPUT_DIR = join(CODEGEN_DIR, "..", "generated");
 
 async function getLatestVersion(): Promise<string> {
@@ -23,7 +22,7 @@ async function getLatestVersion(): Promise<string> {
   const match = text.match(/<latest>(.*?)<\/latest>/);
   if (!match)
     throw new Error("Couldn’t parse latest version from Maven metadata");
-  return match[1]; // e.g., "7.12.0" or newer
+  return match[1];
 }
 
 async function checkAndPromptForUpdate(messages: string[]): Promise<string> {
@@ -43,7 +42,7 @@ async function checkAndPromptForUpdate(messages: string[]): Promise<string> {
 
   return new Promise((resolve) => {
     const prompt = "Do you want to update to the latest version? (y/n): ";
-    messages.push(prompt); // Log the prompt
+    messages.push(prompt);
     rl.question(prompt, (answer) => {
       rl.close();
       if (answer.toLowerCase() === "y" || answer.toLowerCase() === "yes") {
@@ -61,7 +60,7 @@ async function ensureJarExists(
   version: string,
   messages: string[]
 ): Promise<string> {
-  const jarPath = join(JARS_DIR, `openapi-generator-cli-${version}.jar`); // Updated to new folder
+  const jarPath = join(JARS_DIR, `openapi-generator-cli-${version}.jar`);
   const jarUrl = `https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${version}/openapi-generator-cli-${version}.jar`;
 
   if (!existsSync(jarPath)) {
@@ -76,7 +75,7 @@ async function ensureJarExists(
   } else {
     messages.push(`Using existing ${jarPath}`);
   }
-  return jarPath; // Return the path to the versioned .jar
+  return jarPath;
 }
 
 function regenerateClient(jarPath: string, messages: string[]) {
