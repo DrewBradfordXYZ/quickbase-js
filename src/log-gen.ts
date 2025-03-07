@@ -10,21 +10,15 @@ const __dirname = path.dirname(__filename);
 const rootDir: string = "./";
 const excludeDirs: string[] = ["node_modules", ".git"];
 
+const importantFolders: string[] = ["src/code-generation"];
+
 const importantFiles: string[] = [
-  "logGen.ts",
   "package.json",
   "tsconfig.json",
-  "tsconfig.build.json",
   "rollup.config.js",
-  "src/code-generation/fix-spec-main.ts",
-  "src/code-generation/fix-spec-definitions.ts",
-  "src/code-generation/fix-spec-paths.ts",
-  "src/code-generation/generate-unified-interface.ts",
-  "src/code-generation/regenerate-client.ts",
+  "vitest.config.ts",
   "src/quickbaseClient.ts",
 ];
-
-const importantFolders: string[] = ["src/code-generation", "src"];
 
 const projectGoals: string[] = [
   "Implement a QuickBase API client in TypeScript.",
