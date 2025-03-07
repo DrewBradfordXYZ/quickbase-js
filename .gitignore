@@ -21,7 +21,7 @@ generated-old/
 *.bak
 
 # OpenAPI Generator artifacts
-src/code-generation/openapi-generator-cli*.jar
+src/openapi-jars/openapi-generator-cli*.jar
 openapitools.json
 
 # Java installation tarball

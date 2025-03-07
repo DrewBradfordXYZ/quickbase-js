@@ -11,6 +11,7 @@ const CURRENT_JAR_VERSION = "7.12.0"; // Your current version as of March 2025
 const MAVEN_METADATA_URL =
   "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/maven-metadata.xml";
 const CODEGEN_DIR = join(fileURLToPath(import.meta.url), "..");
+const JARS_DIR = join(CODEGEN_DIR, "..", "openapi-jars"); // New folder for .jar files
 const SPEC_INPUT = join(CODEGEN_DIR, "quickbase-fixed.json");
 const OUTPUT_DIR = join(CODEGEN_DIR, "..", "generated");
 
@@ -60,7 +61,7 @@ async function ensureJarExists(
   version: string,
   messages: string[]
 ): Promise<string> {
-  const jarPath = join(CODEGEN_DIR, `openapi-generator-cli-${version}.jar`);
+  const jarPath = join(JARS_DIR, `openapi-generator-cli-${version}.jar`); // Updated to new folder
   const jarUrl = `https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${version}/openapi-generator-cli-${version}.jar`;
 
   if (!existsSync(jarPath)) {
