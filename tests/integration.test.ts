@@ -14,8 +14,8 @@ describe("QuickbaseClient Integration", () => {
   it(
     "fetches real app data from QuickBase",
     async () => {
-      const appId = process.env.QB_APP_ID;
-      if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+      const getAppId = process.env.QB_APP_ID; // Unique name to avoid conflict
+      if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
       if (!process.env.QB_REALM)
         throw new Error("QB_REALM is not defined in .env");
       if (!process.env.QB_USER_TOKEN)
@@ -24,12 +24,12 @@ describe("QuickbaseClient Integration", () => {
       console.log("Config used:", {
         realm: process.env.QB_REALM,
         userToken: process.env.QB_USER_TOKEN,
-        appId,
+        appId: getAppId,
       });
-      const result = await client.getApp({ appId });
+      const result = await client.getApp({ appId: getAppId });
       console.log("Real API response:", result);
       expect(result).toEqual({
-        id: appId,
+        id: getAppId,
         name: "qb-copy",
         created: new Date("2025-02-13T18:22:33Z"),
         updated: new Date("2025-03-04T04:25:51Z"),
@@ -57,7 +57,7 @@ describe("QuickbaseClient Integration", () => {
   it(
     "fetches real field data from QuickBase",
     async () => {
-      const tableId = "buwai2z3s"; // From your curl
+      const tableId = "buwai2z3s";
       if (!tableId) throw new Error("Table ID is not defined");
       if (!process.env.QB_REALM)
         throw new Error("QB_REALM is not defined in .env");
@@ -171,6 +171,67 @@ describe("QuickbaseClient Integration", () => {
               blankIsZero: true,
               commaStart: 4,
             }),
+          }),
+        ])
+      );
+    },
+    { timeout: 10000 }
+  );
+
+  it(
+    "fetches real table data from QuickBase",
+    async () => {
+      const appId = process.env.QB_APP_ID; // Unique name to avoid conflict
+      if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+      if (!process.env.QB_REALM)
+        throw new Error("QB_REALM is not defined in .env");
+      if (!process.env.QB_USER_TOKEN)
+        throw new Error("QB_USER_TOKEN is not defined in .env");
+
+      console.log("Config used:", {
+        realm: process.env.QB_REALM,
+        userToken: process.env.QB_USER_TOKEN,
+        appId: appId,
+      });
+      const result = await client.getAppTables({ appId: appId });
+      console.log("Real API response:", result);
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            alias: "_DBID_ROOT",
+            created: new Date("2025-02-13T18:22:33Z"),
+            defaultSortFieldId: 2,
+            defaultSortOrder: "DESC",
+            description: "",
+            id: "buwai2zr4",
+            keyFieldId: 3,
+            name: "Root",
+            nextFieldId: 6,
+            nextRecordId: 1,
+            pluralRecordName: "Roots",
+            singleRecordName: "Root",
+            sizeLimit: "500 MB",
+            spaceRemaining: "500 MB",
+            spaceUsed: "0 KB",
+            updated: new Date("2025-02-13T18:22:34Z"),
+          }),
+          expect.objectContaining({
+            alias: "_DBID_ROLES",
+            created: new Date("2025-02-13T18:22:33Z"),
+            defaultSortFieldId: 2,
+            defaultSortOrder: "DESC",
+            description: "",
+            id: "buwai2z3s",
+            keyFieldId: 3,
+            name: "Roles",
+            nextFieldId: 6,
+            nextRecordId: 1,
+            pluralRecordName: "Roles",
+            singleRecordName: "Role",
+            sizeLimit: "500 MB",
+            spaceRemaining: "500 MB",
+            spaceUsed: "0 KB",
+            updated: new Date("2025-02-13T18:22:34Z"),
           }),
         ])
       );

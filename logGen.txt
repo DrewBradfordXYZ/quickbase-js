@@ -44,7 +44,8 @@ Project Goals:
 │         }
 │       },
 │       "scripts": {
-│         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
+│         "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
+│         "fix-spec-old": "node --loader ts-node/esm src/code-generation/fix-spec.ts",
 │         "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
 │         "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
 │         "log-gen": "node --loader ts-node/esm src/log-gen.ts",
@@ -148,12 +149,164 @@ Project Goals:
 │     
 ├─ src/
 │ ├─ code-generation/
-│ │ ├─ fix-spec.ts
+│ │ ├─ fix-spec-definitions.ts
+│ │ │   Contents:
+│ │ │     export const definitions = {
+│ │ │       Field: {
+│ │ │         type: "object",
+│ │ │         properties: {
+│ │ │           id: { type: "integer" },
+│ │ │           label: { type: "string" },
+│ │ │           fieldType: { type: "string" },
+│ │ │           appearsByDefault: { type: "boolean" },
+│ │ │           audited: { type: "boolean" },
+│ │ │           bold: { type: "boolean" },
+│ │ │           doesDataCopy: { type: "boolean" },
+│ │ │           fieldHelp: { type: "string" },
+│ │ │           findEnabled: { type: "boolean" },
+│ │ │           mode: { type: "string" },
+│ │ │           noWrap: { type: "boolean" },
+│ │ │           required: { type: "boolean" },
+│ │ │           unique: { type: "boolean" },
+│ │ │           addToForms: { type: "boolean" },
+│ │ │           permissions: {
+│ │ │             type: "array",
+│ │ │             items: {
+│ │ │               type: "object",
+│ │ │               properties: {
+│ │ │                 permissionType: { type: "string" },
+│ │ │                 role: { type: "string" },
+│ │ │                 roleId: { type: "integer" },
+│ │ │               },
+│ │ │               required: ["permissionType", "role", "roleId"],
+│ │ │             },
+│ │ │           },
+│ │ │           properties: {
+│ │ │             type: "object",
+│ │ │             properties: {
+│ │ │               primaryKey: { type: "boolean" },
+│ │ │               foreignKey: { type: "boolean" },
+│ │ │               formula: { type: "string" },
+│ │ │               defaultValue: { type: "string" },
+│ │ │               carryChoices: { type: "boolean" },
+│ │ │               allowNewChoices: { type: "boolean" },
+│ │ │               sortAsGiven: { type: "boolean" },
+│ │ │               numLines: { type: "integer" },
+│ │ │               maxLength: { type: "integer" },
+│ │ │               appendOnly: { type: "boolean" },
+│ │ │               allowHTML: { type: "boolean" },
+│ │ │               allowMentions: { type: "boolean" },
+│ │ │               numberFormat: { type: "integer" },
+│ │ │               decimalPlaces: { type: "integer" },
+│ │ │               doesAverage: { type: "boolean" },
+│ │ │               doesTotal: { type: "boolean" },
+│ │ │               blankIsZero: { type: "boolean" },
+│ │ │               commaStart: { type: "integer" },
+│ │ │               defaultToday: { type: "boolean" },
+│ │ │               displayDayOfWeek: { type: "boolean" },
+│ │ │               displayMonth: { type: "string" },
+│ │ │               displayRelative: { type: "boolean" },
+│ │ │               displayTime: { type: "boolean" },
+│ │ │               displayTimezone: { type: "boolean" },
+│ │ │               defaultKind: { type: "string" },
+│ │ │               displayUser: { type: "string" },
+│ │ │             },
+│ │ │           },
+│ │ │         },
+│ │ │         required: ["id", "label", "fieldType"],
+│ │ │       },
+│ │ │       Table: {
+│ │ │         type: "object",
+│ │ │         properties: { id: { type: "string" }, name: { type: "string" } },
+│ │ │         required: ["id", "name"],
+│ │ │       },
+│ │ │       App: {
+│ │ │         type: "object",
+│ │ │         properties: {
+│ │ │           id: { type: "string" },
+│ │ │           name: { type: "string" },
+│ │ │           created: { type: "string", format: "date-time" },
+│ │ │           updated: { type: "string", format: "date-time" },
+│ │ │           description: { type: "string" },
+│ │ │           timeZone: { type: "string" },
+│ │ │           dateFormat: { type: "string" },
+│ │ │           hasEveryoneOnTheInternet: { type: "boolean" },
+│ │ │           memoryInfo: {
+│ │ │             type: "object",
+│ │ │             properties: {
+│ │ │               estMemory: { type: "number" },
+│ │ │               estMemoryInclDependentApps: { type: "number" },
+│ │ │             },
+│ │ │           },
+│ │ │           securityProperties: {
+│ │ │             type: "object",
+│ │ │             properties: {
+│ │ │               allowClone: { type: "boolean" },
+│ │ │               allowExport: { type: "boolean" },
+│ │ │               enableAppTokens: { type: "boolean" },
+│ │ │               hideFromPublic: { type: "boolean" },
+│ │ │               mustBeRealmApproved: { type: "boolean" },
+│ │ │               useIPFilter: { type: "boolean" },
+│ │ │             },
+│ │ │           },
+│ │ │         },
+│ │ │         required: ["id", "name"],
+│ │ │       },
+│ │ │       Record: { type: "object", additionalProperties: true },
+│ │ │       CreateField200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { id: { type: "integer" } },
+│ │ │       },
+│ │ │       DeleteFields200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { deleted: { type: "boolean" } },
+│ │ │       },
+│ │ │       Upsert200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { metadata: { type: "object" } },
+│ │ │       },
+│ │ │       CopyAppRequest: {
+│ │ │         type: "object",
+│ │ │         properties: { name: { type: "string" } },
+│ │ │       },
+│ │ │       CopyApp200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { id: { type: "string" } },
+│ │ │       },
+│ │ │       CreateAppRequest: {
+│ │ │         type: "object",
+│ │ │         properties: { name: { type: "string" } },
+│ │ │       },
+│ │ │       CreateApp200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { id: { type: "string" } },
+│ │ │       },
+│ │ │       DeleteAppRequest: {
+│ │ │         type: "object",
+│ │ │         properties: { name: { type: "string" } },
+│ │ │       },
+│ │ │       DeleteApp200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { deleted: { type: "boolean" } },
+│ │ │       },
+│ │ │       UpdateAppRequest: {
+│ │ │         type: "object",
+│ │ │         properties: { name: { type: "string" } },
+│ │ │       },
+│ │ │       UpdateApp200Response: {
+│ │ │         type: "object",
+│ │ │         properties: { id: { type: "string" } },
+│ │ │       },
+│ │ │     };
+│ │ │     
+│ │ ├─ fix-spec-main.ts
 │ │ │   Contents:
 │ │ │     #!/usr/bin/env node
 │ │ │     import { promises as fs } from "fs";
 │ │ │     import path from "path";
 │ │ │     import * as glob from "glob";
+│ │ │     import { paths } from "./fix-spec-paths.ts";
+│ │ │     import { definitions } from "./fix-spec-definitions.ts";
 │ │ │     
 │ │ │     interface Parameter {
 │ │ │       name: string;
@@ -180,7 +333,6 @@ Project Goals:
 │ │ │       components?: any;
 │ │ │     }
 │ │ │     
-│ │ │     // Function to convert hyphenated names to camelCase
 │ │ │     function toCamelCase(str: string): string {
 │ │ │       return str
 │ │ │         .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
@@ -215,7 +367,6 @@ Project Goals:
 │ │ │             if (operation.parameters) {
 │ │ │               operation.parameters = operation.parameters.map(
 │ │ │                 (param: Parameter) => {
-│ │ │                   // Transform hyphenated parameter names to camelCase
 │ │ │                   param.name = toCamelCase(param.name);
 │ │ │                   if ("example" in param) delete param.example;
 │ │ │                   if ("schema" in param && param.in !== "body") delete param.schema;
@@ -234,10 +385,33 @@ Project Goals:
 │ │ │           }
 │ │ │         }
 │ │ │     
-│ │ │         console.log("Ensuring required endpoints...");
-│ │ │         // Fields endpoints
-│ │ │         spec.paths["/fields"] = spec.paths["/fields"] || {};
-│ │ │         spec.paths["/fields"].get = {
+│ │ │         console.log("Applying endpoint fixes...");
+│ │ │         Object.assign(spec.paths, paths);
+│ │ │     
+│ │ │         console.log("Applying definitions...");
+│ │ │         spec.definitions = definitions;
+│ │ │     
+│ │ │         console.log("Removing unexpected top-level attributes...");
+│ │ │         delete spec.operations;
+│ │ │         delete spec.groups;
+│ │ │         delete spec.components;
+│ │ │     
+│ │ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+│ │ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
+│ │ │         console.log("Spec fixed successfully!");
+│ │ │       } catch (error) {
+│ │ │         console.error("Failed to fix spec:", error);
+│ │ │         process.exit(1);
+│ │ │       }
+│ │ │     }
+│ │ │     
+│ │ │     fixQuickBaseSpec();
+│ │ │     
+│ │ ├─ fix-spec-paths.ts
+│ │ │   Contents:
+│ │ │     export const paths = {
+│ │ │       "/fields": {
+│ │ │         get: {
 │ │ │           operationId: "getFields",
 │ │ │           summary: "Get fields for a table",
 │ │ │           tags: ["Fields"],
@@ -256,9 +430,8 @@ Project Goals:
 │ │ │               schema: { type: "array", items: { $ref: "#/definitions/Field" } },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         spec.paths["/fields"].post = {
+│ │ │         },
+│ │ │         post: {
 │ │ │           operationId: "createField",
 │ │ │           summary: "Create a field",
 │ │ │           tags: ["Fields"],
@@ -277,9 +450,8 @@ Project Goals:
 │ │ │               schema: { $ref: "#/definitions/CreateField200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         spec.paths["/fields"].delete = {
+│ │ │         },
+│ │ │         delete: {
 │ │ │           operationId: "deleteFields",
 │ │ │           summary: "Delete fields",
 │ │ │           tags: ["Fields"],
@@ -298,11 +470,10 @@ Project Goals:
 │ │ │               schema: { $ref: "#/definitions/DeleteFields200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         // Tables endpoint
-│ │ │         spec.paths["/tables/{tableId}"] = spec.paths["/tables/{tableId}"] || {};
-│ │ │         spec.paths["/tables/{tableId}"].get = {
+│ │ │         },
+│ │ │       },
+│ │ │       "/tables/{tableId}": {
+│ │ │         get: {
 │ │ │           operationId: "getTable",
 │ │ │           summary: "Get table details",
 │ │ │           tags: ["Tables"],
@@ -316,131 +487,125 @@ Project Goals:
 │ │ │               schema: { $ref: "#/definitions/Table" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         // Apps endpoints (overwriting /apps/{appId} entirely)
-│ │ │         spec.paths["/apps/{appId}"] = {
-│ │ │           get: {
-│ │ │             operationId: "getAppById",
-│ │ │             summary: "Get application details by ID",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               { name: "appId", in: "path", required: true, type: "string" },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { $ref: "#/definitions/App" },
-│ │ │               },
+│ │ │         },
+│ │ │       },
+│ │ │       "/apps/{appId}": {
+│ │ │         get: {
+│ │ │           operationId: "getAppById",
+│ │ │           summary: "Get application details by ID",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/App" },
 │ │ │             },
 │ │ │           },
-│ │ │           post: {
-│ │ │             operationId: "updateApp",
-│ │ │             summary: "Update an app",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               { name: "appId", in: "path", required: true, type: "string" },
-│ │ │               {
-│ │ │                 name: "generated",
-│ │ │                 in: "body",
-│ │ │                 required: true,
-│ │ │                 schema: { $ref: "#/definitions/UpdateAppRequest" },
-│ │ │               },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { $ref: "#/definitions/UpdateApp200Response" },
-│ │ │               },
+│ │ │         },
+│ │ │         post: {
+│ │ │           operationId: "updateApp",
+│ │ │           summary: "Update an app",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { $ref: "#/definitions/UpdateAppRequest" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/UpdateApp200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │           delete: {
-│ │ │             operationId: "deleteApp",
-│ │ │             summary: "Delete an app",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               { name: "appId", in: "path", required: true, type: "string" },
-│ │ │               {
-│ │ │                 name: "generated",
-│ │ │                 in: "body",
-│ │ │                 required: true,
-│ │ │                 schema: { $ref: "#/definitions/DeleteAppRequest" },
-│ │ │               },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { $ref: "#/definitions/DeleteApp200Response" },
-│ │ │               },
+│ │ │         },
+│ │ │         delete: {
+│ │ │           operationId: "deleteApp",
+│ │ │           summary: "Delete an app",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { $ref: "#/definitions/DeleteAppRequest" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/DeleteApp200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         spec.paths["/apps"] = {
-│ │ │           post: {
-│ │ │             operationId: "createApp",
-│ │ │             summary: "Create an app",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               {
-│ │ │                 name: "generated",
-│ │ │                 in: "body",
-│ │ │                 required: true,
-│ │ │                 schema: { $ref: "#/definitions/CreateAppRequest" },
-│ │ │               },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { $ref: "#/definitions/CreateApp200Response" },
-│ │ │               },
+│ │ │         },
+│ │ │       },
+│ │ │       "/apps": {
+│ │ │         post: {
+│ │ │           operationId: "createApp",
+│ │ │           summary: "Create an app",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { $ref: "#/definitions/CreateAppRequest" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/CreateApp200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         spec.paths["/apps/{appId}/copy"] = {
-│ │ │           post: {
-│ │ │             operationId: "copyApp",
-│ │ │             summary: "Copy an app",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               { name: "appId", in: "path", required: true, type: "string" },
-│ │ │               {
-│ │ │                 name: "generated",
-│ │ │                 in: "body",
-│ │ │                 required: true,
-│ │ │                 schema: { $ref: "#/definitions/CopyAppRequest" },
-│ │ │               },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { $ref: "#/definitions/CopyApp200Response" },
-│ │ │               },
+│ │ │         },
+│ │ │       },
+│ │ │       "/apps/{appId}/copy": {
+│ │ │         post: {
+│ │ │           operationId: "copyApp",
+│ │ │           summary: "Copy an app",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │             {
+│ │ │               name: "generated",
+│ │ │               in: "body",
+│ │ │               required: true,
+│ │ │               schema: { $ref: "#/definitions/CopyAppRequest" },
+│ │ │             },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { $ref: "#/definitions/CopyApp200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         spec.paths["/apps/{appId}/events"] = {
-│ │ │           get: {
-│ │ │             operationId: "getAppEvents",
-│ │ │             summary: "Get app events",
-│ │ │             tags: ["Apps"],
-│ │ │             parameters: [
-│ │ │               { name: "appId", in: "path", required: true, type: "string" },
-│ │ │             ],
-│ │ │             responses: {
-│ │ │               200: {
-│ │ │                 description: "Success",
-│ │ │                 schema: { type: "array", items: { type: "object" } },
-│ │ │               },
+│ │ │         },
+│ │ │       },
+│ │ │       "/apps/{appId}/events": {
+│ │ │         get: {
+│ │ │           operationId: "getAppEvents",
+│ │ │           summary: "Get app events",
+│ │ │           tags: ["Apps"],
+│ │ │           parameters: [
+│ │ │             { name: "appId", in: "path", required: true, type: "string" },
+│ │ │           ],
+│ │ │           responses: {
+│ │ │             200: {
+│ │ │               description: "Success",
+│ │ │               schema: { type: "array", items: { type: "object" } },
 │ │ │             },
 │ │ │           },
-│ │ │         };
-│ │ │     
-│ │ │         // Records endpoint
-│ │ │         spec.paths["/records"] = spec.paths["/records"] || {};
-│ │ │         spec.paths["/records"].post = {
+│ │ │         },
+│ │ │       },
+│ │ │       "/records": {
+│ │ │         post: {
 │ │ │           operationId: "upsert",
 │ │ │           summary: "Upsert records",
 │ │ │           tags: ["Records"],
@@ -458,86 +623,11 @@ Project Goals:
 │ │ │               schema: { $ref: "#/definitions/Upsert200Response" },
 │ │ │             },
 │ │ │           },
-│ │ │         };
+│ │ │         },
+│ │ │       },
+│ │ │     };
 │ │ │     
-│ │ │         console.log("Adding definitions...");
-│ │ │         if (!spec.definitions) spec.definitions = {};
-│ │ │         spec.definitions.Field = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "integer" }, label: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.Table = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "string" }, name: { type: "string" } },
-│ │ │           required: ["id", "name"],
-│ │ │         };
-│ │ │         spec.definitions.App = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "string" }, name: { type: "string" } },
-│ │ │           required: ["id", "name"],
-│ │ │         };
-│ │ │         spec.definitions.Record = { type: "object", additionalProperties: true };
-│ │ │         spec.definitions.CreateField200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "integer" } },
-│ │ │         };
-│ │ │         spec.definitions.DeleteFields200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { deleted: { type: "boolean" } },
-│ │ │         };
-│ │ │         spec.definitions.Upsert200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { metadata: { type: "object" } },
-│ │ │         };
-│ │ │         spec.definitions.CopyAppRequest = {
-│ │ │           type: "object",
-│ │ │           properties: { name: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.CopyApp200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.CreateAppRequest = {
-│ │ │           type: "object",
-│ │ │           properties: { name: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.CreateApp200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.DeleteAppRequest = {
-│ │ │           type: "object",
-│ │ │           properties: { name: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.DeleteApp200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { deleted: { type: "boolean" } },
-│ │ │         };
-│ │ │         spec.definitions.UpdateAppRequest = {
-│ │ │           type: "object",
-│ │ │           properties: { name: { type: "string" } },
-│ │ │         };
-│ │ │         spec.definitions.UpdateApp200Response = {
-│ │ │           type: "object",
-│ │ │           properties: { id: { type: "string" } },
-│ │ │         };
-│ │ │     
-│ │ │         console.log("Removing unexpected top-level attributes...");
-│ │ │         delete spec.operations;
-│ │ │         delete spec.groups;
-│ │ │         delete spec.components;
-│ │ │     
-│ │ │         console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
-│ │ │         await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
-│ │ │         console.log("Spec fixed successfully!");
-│ │ │       } catch (error) {
-│ │ │         console.error("Failed to fix spec:", error);
-│ │ │         process.exit(1);
-│ │ │       }
-│ │ │     }
-│ │ │     
-│ │ │     fixQuickBaseSpec();
-│ │ │     
+│ │ ├─ fix-spec.ts.bak
 │ │ ├─ generate-unified-interface.ts
 │ │ │   Contents:
 │ │ │     #!/usr/bin/env node
@@ -812,6 +902,8 @@ Project Goals:
 │ │ │ ├─ AddMembersToGroup200Response.ts
 │ │ │ ├─ AddSubgroupsToGroup200Response.ts
 │ │ │ ├─ App.ts
+│ │ │ ├─ AppMemoryInfo.ts
+│ │ │ ├─ AppSecurityProperties.ts
 │ │ │ ├─ Audit200Response.ts
 │ │ │ ├─ Audit202Response.ts
 │ │ │ ├─ AuditRequest.ts
@@ -831,14 +923,13 @@ Project Goals:
 │ │ │ ├─ DeleteAppRequest.ts
 │ │ │ ├─ DeleteFields200Response.ts
 │ │ │ ├─ DeleteFile200Response.ts
-│ │ │ ├─ DeleteRecords200Response.ts
-│ │ │ ├─ DeleteRecordsRequest.ts
 │ │ │ ├─ DeleteRelationship200Response.ts
-│ │ │ ├─ DeleteTable200Response.ts
 │ │ │ ├─ DenyUsers200Response.ts
 │ │ │ ├─ ExchangeSsoToken200Response.ts
 │ │ │ ├─ ExchangeSsoTokenRequest.ts
 │ │ │ ├─ Field.ts
+│ │ │ ├─ FieldPermissionsInner.ts
+│ │ │ ├─ FieldProperties.ts
 │ │ │ ├─ GenerateDocument200Response.ts
 │ │ │ ├─ GetField200Response.ts
 │ │ │ ├─ GetRelationships200Response.ts
@@ -871,7 +962,6 @@ Project Goals:
 │ │ │ ├─ UpdateAppRequest.ts
 │ │ │ ├─ UpdateFieldRequest.ts
 │ │ │ ├─ UpdateRelationshipRequest.ts
-│ │ │ ├─ UpdateTableRequest.ts
 │ │ │ ├─ Upsert200Response.ts
 │ │ │ └─ index.ts
 │ │ └─ runtime.ts
@@ -901,6 +991,8 @@ Project Goals:
 │ │ │ ├─ AddMembersToGroup200Response.ts
 │ │ │ ├─ AddSubgroupsToGroup200Response.ts
 │ │ │ ├─ App.ts
+│ │ │ ├─ AppMemoryInfo.ts
+│ │ │ ├─ AppSecurityProperties.ts
 │ │ │ ├─ Audit200Response.ts
 │ │ │ ├─ Audit202Response.ts
 │ │ │ ├─ AuditRequest.ts
@@ -974,7 +1066,7 @@ Project Goals:
 │ │     import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
 │ │     import * as apis from "./generated/apis/index.ts";
 │ │     import { simplifyName } from "./utils.ts";
-│ │     import fetch, { RequestInit as NodeFetchRequestInit } from "node-fetch"; // Import node-fetch's RequestInit
+│ │     import fetch from "node-fetch"; // No need for RequestInit import since we won't use it directly
 │ │     
 │ │     export interface QuickbaseConfig {
 │ │       realm: string;
@@ -1068,35 +1160,7 @@ Project Goals:
 │ │       const invokeMethod = <K extends keyof QuickbaseClient>(
 │ │         methodName: K,
 │ │         params: Parameters<QuickbaseClient[K]>[0]
-│ │       ): Promise<any> => {
-│ │         if (methodName === "getApp" && "appId" in params) {
-│ │           // Custom fetch for getApp to bypass generated parsing
-│ │           const url = `${configuration.basePath}/apps/${
-│ │             (params as { appId: string }).appId
-│ │           }`;
-│ │           const fetchApi = config.fetchApi || fetch;
-│ │           const requestOptions: NodeFetchRequestInit = {
-│ │             // Use node-fetch's RequestInit
-│ │             method: "GET",
-│ │             headers: configuration.headers,
-│ │           };
-│ │           const responsePromise = fetchApi(url, requestOptions).then((res) => {
-│ │             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-│ │             return res.json();
-│ │           });
-│ │           if (config.debug) {
-│ │             responsePromise.then((response) => {
-│ │               console.log(`Response from ${methodName}:`, response);
-│ │               console.log(`Request details:`, {
-│ │                 url,
-│ │                 headers: configuration.headers,
-│ │                 method: "GET",
-│ │               });
-│ │             });
-│ │           }
-│ │           return responsePromise;
-│ │         }
-│ │     
+│ │       ): Promise<ReturnType<QuickbaseClient[K]>> => {
 │ │         const methodInfo = methodMap[methodName];
 │ │         if (!methodInfo) {
 │ │           console.error(`Method ${methodName} not found in methodMap`, methodMap);
@@ -1115,16 +1179,6 @@ Project Goals:
 │ │         if (config.debug) {
 │ │           responsePromise.then((response) => {
 │ │             console.log(`Response from ${methodName}:`, response);
-│ │             console.log(`Request details:`, {
-│ │               url:
-│ │                 methodName === "getApp" && "appId" in params
-│ │                   ? `${configuration.basePath}/apps/${
-│ │                       (params as { appId: string }).appId
-│ │                     }`
-│ │                   : configuration.basePath,
-│ │               headers: configuration.headers,
-│ │               method: "GET",
-│ │             });
 │ │           });
 │ │         }
 │ │         return responsePromise;
@@ -1154,6 +1208,188 @@ Project Goals:
 │ └─ utils.ts
 ├─ tests/
 │ ├─ integration.test.ts
+│ │   Contents:
+│ │     import { describe, it, expect } from "vitest";
+│ │     import { quickbaseClient } from "../src/quickbaseClient.ts";
+│ │     import dotenv from "dotenv";
+│ │     
+│ │     dotenv.config();
+│ │     
+│ │     describe("QuickbaseClient Integration", () => {
+│ │       const client = quickbaseClient({
+│ │         realm: process.env.QB_REALM!,
+│ │         userToken: process.env.QB_USER_TOKEN!,
+│ │         debug: true,
+│ │       });
+│ │     
+│ │       it(
+│ │         "fetches real app data from QuickBase",
+│ │         async () => {
+│ │           const appId = process.env.QB_APP_ID;
+│ │           if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+│ │           if (!process.env.QB_REALM)
+│ │             throw new Error("QB_REALM is not defined in .env");
+│ │           if (!process.env.QB_USER_TOKEN)
+│ │             throw new Error("QB_USER_TOKEN is not defined in .env");
+│ │     
+│ │           console.log("Config used:", {
+│ │             realm: process.env.QB_REALM,
+│ │             userToken: process.env.QB_USER_TOKEN,
+│ │             appId,
+│ │           });
+│ │           const result = await client.getApp({ appId });
+│ │           console.log("Real API response:", result);
+│ │           expect(result).toEqual({
+│ │             id: appId,
+│ │             name: "qb-copy",
+│ │             created: new Date("2025-02-13T18:22:33Z"),
+│ │             updated: new Date("2025-03-04T04:25:51Z"),
+│ │             description: "",
+│ │             timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+│ │             dateFormat: "MM-DD-YYYY",
+│ │             hasEveryoneOnTheInternet: false,
+│ │             memoryInfo: {
+│ │               estMemory: 0,
+│ │               estMemoryInclDependentApps: 0,
+│ │             },
+│ │             securityProperties: {
+│ │               allowClone: false,
+│ │               allowExport: true,
+│ │               enableAppTokens: true,
+│ │               hideFromPublic: false,
+│ │               mustBeRealmApproved: false,
+│ │               useIPFilter: false,
+│ │             },
+│ │           });
+│ │         },
+│ │         { timeout: 10000 }
+│ │       );
+│ │     
+│ │       it(
+│ │         "fetches real field data from QuickBase",
+│ │         async () => {
+│ │           const tableId = "buwai2z3s"; // From your curl
+│ │           if (!tableId) throw new Error("Table ID is not defined");
+│ │           if (!process.env.QB_REALM)
+│ │             throw new Error("QB_REALM is not defined in .env");
+│ │           if (!process.env.QB_USER_TOKEN)
+│ │             throw new Error("QB_USER_TOKEN is not defined in .env");
+│ │     
+│ │           console.log("Config used:", {
+│ │             realm: process.env.QB_REALM,
+│ │             userToken: process.env.QB_USER_TOKEN,
+│ │             tableId,
+│ │           });
+│ │           const result = await client.getFields({
+│ │             tableId,
+│ │             includeFieldPerms: true,
+│ │           });
+│ │           console.log("Real API response:", result);
+│ │           expect(result).toEqual(
+│ │             expect.arrayContaining([
+│ │               expect.objectContaining({
+│ │                 id: 1,
+│ │                 label: "Date Created",
+│ │                 fieldType: "timestamp",
+│ │                 appearsByDefault: false,
+│ │                 audited: false,
+│ │                 bold: false,
+│ │                 doesDataCopy: false,
+│ │                 fieldHelp: "",
+│ │                 findEnabled: false,
+│ │                 mode: "",
+│ │                 noWrap: true,
+│ │                 required: false,
+│ │                 unique: false,
+│ │                 addToForms: undefined,
+│ │                 permissions: expect.arrayContaining([
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Viewer",
+│ │                     roleId: 10,
+│ │                   }),
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Participant",
+│ │                     roleId: 11,
+│ │                   }),
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Administrator",
+│ │                     roleId: 12,
+│ │                   }),
+│ │                 ]),
+│ │                 properties: expect.objectContaining({
+│ │                   allowNewChoices: false,
+│ │                   carryChoices: true,
+│ │                   defaultToday: false,
+│ │                   defaultValue: "",
+│ │                   displayDayOfWeek: false,
+│ │                   displayMonth: "number",
+│ │                   displayRelative: false,
+│ │                   displayTime: true,
+│ │                   displayTimezone: false,
+│ │                   foreignKey: false,
+│ │                   formula: "",
+│ │                   primaryKey: false,
+│ │                   sortAsGiven: true,
+│ │                 }),
+│ │               }),
+│ │               expect.objectContaining({
+│ │                 id: 3,
+│ │                 label: "Record ID#",
+│ │                 fieldType: "recordid",
+│ │                 appearsByDefault: false,
+│ │                 audited: false,
+│ │                 bold: false,
+│ │                 doesDataCopy: false,
+│ │                 fieldHelp: "",
+│ │                 findEnabled: false,
+│ │                 mode: "",
+│ │                 noWrap: true,
+│ │                 required: false,
+│ │                 unique: true,
+│ │                 addToForms: undefined,
+│ │                 permissions: expect.arrayContaining([
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Viewer",
+│ │                     roleId: 10,
+│ │                   }),
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Participant",
+│ │                     roleId: 11,
+│ │                   }),
+│ │                   expect.objectContaining({
+│ │                     permissionType: "Modify",
+│ │                     role: "Administrator",
+│ │                     roleId: 12,
+│ │                   }),
+│ │                 ]),
+│ │                 properties: expect.objectContaining({
+│ │                   primaryKey: true,
+│ │                   foreignKey: false,
+│ │                   formula: "",
+│ │                   defaultValue: "",
+│ │                   carryChoices: true,
+│ │                   allowNewChoices: false,
+│ │                   sortAsGiven: true,
+│ │                   numberFormat: 0,
+│ │                   decimalPlaces: 0,
+│ │                   doesAverage: false,
+│ │                   doesTotal: false,
+│ │                   blankIsZero: true,
+│ │                   commaStart: 4,
+│ │                 }),
+│ │               }),
+│ │             ])
+│ │           );
+│ │         },
+│ │         { timeout: 10000 }
+│ │       );
+│ │     });
+│ │     
 │ └─ quickbaseClient.test.ts
 │     Contents:
 │       import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -1163,7 +1399,7 @@ Project Goals:
 │       dotenv.config();
 │       
 │       describe("QuickbaseClient", () => {
-│         const mockFetch = vi.fn((url, options) => {
+│         const mockFetchApp = vi.fn((url: string, options: any) => {
 │           console.log("Mock fetch:", url, options);
 │           return Promise.resolve({
 │             ok: true,
@@ -1177,6 +1413,19 @@ Project Goals:
 │                 description: "",
 │                 timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
 │                 dateFormat: "MM-DD-YYYY",
+│                 hasEveryoneOnTheInternet: false,
+│                 memoryInfo: {
+│                   estMemory: 0,
+│                   estMemoryInclDependentApps: 0,
+│                 },
+│                 securityProperties: {
+│                   allowClone: false,
+│                   allowExport: true,
+│                   enableAppTokens: true,
+│                   hideFromPublic: false,
+│                   mustBeRealmApproved: false,
+│                   useIPFilter: false,
+│                 },
 │               }),
 │           } as Response);
 │         });
@@ -1185,11 +1434,11 @@ Project Goals:
 │           realm: process.env.QB_REALM || "default-realm",
 │           userToken: process.env.QB_USER_TOKEN || "default-token",
 │           debug: true,
-│           fetchApi: mockFetch,
+│           fetchApi: mockFetchApp as any, // Type assertion to bypass strict typing for simplicity
 │         });
 │       
 │         beforeEach(() => {
-│           mockFetch.mockClear();
+│           mockFetchApp.mockClear();
 │         });
 │       
 │         it("initializes without errors", () => {
@@ -1208,14 +1457,144 @@ Project Goals:
 │           expect(result).toEqual({
 │             id: appId,
 │             name: "qb-copy",
-│             created: "2025-02-13T18:22:33Z",
-│             updated: "2025-03-04T04:25:51Z",
+│             created: new Date("2025-02-13T18:22:33Z"),
+│             updated: new Date("2025-03-04T04:25:51Z"),
 │             description: "",
 │             timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
 │             dateFormat: "MM-DD-YYYY",
+│             hasEveryoneOnTheInternet: false,
+│             memoryInfo: {
+│               estMemory: 0,
+│               estMemoryInclDependentApps: 0,
+│             },
+│             securityProperties: {
+│               allowClone: false,
+│               allowExport: true,
+│               enableAppTokens: true,
+│               hideFromPublic: false,
+│               mustBeRealmApproved: false,
+│               useIPFilter: false,
+│             },
 │           });
-│           expect(mockFetch).toHaveBeenCalledWith(
+│           expect(mockFetchApp).toHaveBeenCalledWith(
 │             `https://api.quickbase.com/v1/apps/${appId}`,
+│             expect.objectContaining({
+│               headers: expect.objectContaining({
+│                 Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+│                 "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+│               }),
+│             })
+│           );
+│         });
+│       
+│         it("calls getFields successfully", async () => {
+│           const mockFetchFields = vi.fn((url: string, options: any) => {
+│             console.log("Mock fetch for getFields:", url, options);
+│             return Promise.resolve({
+│               ok: true,
+│               status: 200,
+│               json: () =>
+│                 Promise.resolve([
+│                   {
+│                     id: 1,
+│                     label: "Field1",
+│                     fieldType: "text",
+│                     noWrap: false,
+│                     bold: false,
+│                     required: false,
+│                     appearsByDefault: false,
+│                     findEnabled: false,
+│                     unique: false,
+│                     doesDataCopy: false,
+│                     fieldHelp: "field help",
+│                     audited: false,
+│                     properties: {
+│                       primaryKey: false,
+│                       foreignKey: false,
+│                       numLines: 1,
+│                       maxLength: 0,
+│                       appendOnly: false,
+│                       allowHTML: false,
+│                       allowMentions: false,
+│                       sortAsGiven: false,
+│                       carryChoices: true,
+│                       allowNewChoices: false,
+│                       formula: "",
+│                       defaultValue: "",
+│                     },
+│                     permissions: [
+│                       { permissionType: "View", role: "Viewer", roleId: 10 },
+│                       { permissionType: "None", role: "Participant", roleId: 11 },
+│                       { permissionType: "Modify", role: "Administrator", roleId: 12 },
+│                     ],
+│                   },
+│                 ]),
+│             } as Response);
+│           });
+│       
+│           const clientWithMock = quickbaseClient({
+│             realm: process.env.QB_REALM || "default-realm",
+│             userToken: process.env.QB_USER_TOKEN || "default-token",
+│             debug: true,
+│             fetchApi: mockFetchFields as any, // Type assertion to bypass strict typing
+│           });
+│       
+│           const result = await clientWithMock.getFields({
+│             tableId: "dummyTableId",
+│             includeFieldPerms: true,
+│           });
+│           console.log("getFields response:", result);
+│           expect(result).toEqual(
+│             expect.arrayContaining([
+│               expect.objectContaining({
+│                 id: 1,
+│                 label: "Field1",
+│                 fieldType: "text",
+│                 noWrap: false,
+│                 bold: false,
+│                 required: false,
+│                 appearsByDefault: false,
+│                 findEnabled: false,
+│                 unique: false,
+│                 doesDataCopy: false,
+│                 fieldHelp: "field help",
+│                 audited: false,
+│                 properties: expect.objectContaining({
+│                   primaryKey: false,
+│                   foreignKey: false,
+│                   numLines: 1,
+│                   maxLength: 0,
+│                   appendOnly: false,
+│                   allowHTML: false,
+│                   allowMentions: false,
+│                   sortAsGiven: false,
+│                   carryChoices: true,
+│                   allowNewChoices: false,
+│                   formula: "",
+│                   defaultValue: "",
+│                 }),
+│                 permissions: expect.arrayContaining([
+│                   expect.objectContaining({
+│                     permissionType: "View",
+│                     role: "Viewer",
+│                     roleId: 10,
+│                   }),
+│                   expect.objectContaining({
+│                     permissionType: "None",
+│                     role: "Participant",
+│                     roleId: 11,
+│                   }),
+│                   expect.objectContaining({
+│                     permissionType: "Modify",
+│                     role: "Administrator",
+│                     roleId: 12,
+│                   }),
+│                 ]),
+│               }),
+│             ])
+│           );
+│           expect(mockFetchFields).toHaveBeenCalledWith(
+│             `https://api.quickbase.com/v1/fields?tableId=dummyTableId&includeFieldPerms=true`,
 │             expect.objectContaining({
 │               headers: expect.objectContaining({
 │                 Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,

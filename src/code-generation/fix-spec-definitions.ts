@@ -64,7 +64,24 @@ export const definitions = {
   },
   Table: {
     type: "object",
-    properties: { id: { type: "string" }, name: { type: "string" } },
+    properties: {
+      id: { type: "string" },
+      name: { type: "string" },
+      alias: { type: "string" },
+      created: { type: "string", format: "date-time" },
+      defaultSortFieldId: { type: "integer" },
+      defaultSortOrder: { type: "string" }, // e.g., "DESC", "ASC"
+      description: { type: "string" },
+      keyFieldId: { type: "integer" },
+      nextFieldId: { type: "integer" },
+      nextRecordId: { type: "integer" },
+      pluralRecordName: { type: "string" },
+      singleRecordName: { type: "string" },
+      sizeLimit: { type: "string" }, // e.g., "500 MB"
+      spaceRemaining: { type: "string" }, // e.g., "500 MB"
+      spaceUsed: { type: "string" }, // e.g., "0 KB"
+      updated: { type: "string", format: "date-time" },
+    },
     required: ["id", "name"],
   },
   App: {

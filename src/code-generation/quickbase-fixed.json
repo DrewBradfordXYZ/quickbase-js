@@ -186,368 +186,31 @@
       }
     },
     "/tables": {
-      "post": {
-        "description": "Creates a table in an application.",
-        "summary": "Create a table",
-        "operationId": "createTable",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-              "example": {
-                "name": "My table",
-                "description": "my first table",
-                "singleRecordName": "record",
-                "pluralRecordName": "records"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The name for the table.",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "pluralRecordName": {
-                  "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
-                  "type": "string"
-                },
-                "singleRecordName": {
-                  "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the table. If this value is not passed the default value is blank.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "name": "Example Table",
-                "created": "2020-03-27T18:34:40Z",
-                "updated": "2020-04-03T19:12:40Z",
-                "alias": "_dbid_example_table",
-                "description": "Table as an example.",
-                "id": "bpqe82s0",
-                "nextRecordId": 1,
-                "nextFieldId": 1,
-                "defaultSortFieldId": 2,
-                "defaultSortOrder": "ASC",
-                "keyFieldId": 3,
-                "singleRecordName": "Example Record",
-                "pluralRecordName": "Example Records",
-                "sizeLimit": "150 MB",
-                "spaceUsed": "17 MB",
-                "spaceRemaining": "133 MB"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name of the table.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier (dbid) of the table.",
-                  "type": "string"
-                },
-                "alias": {
-                  "description": "The automatically-created table alias for the table.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the table, as configured by an application administrator.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "nextRecordId": {
-                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "nextFieldId": {
-                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "defaultSortFieldId": {
-                  "description": "The id of the field that is configured for default sorting.",
-                  "type": "integer"
-                },
-                "defaultSortOrder": {
-                  "description": "The configuration of the default sort order on the table.",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ],
-                  "type": "string"
-                },
-                "keyFieldId": {
-                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                  "type": "integer"
-                },
-                "singleRecordName": {
-                  "description": "The builder-configured singular noun of the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The builder-configured plural noun of the table.",
-                  "type": "string"
-                },
-                "sizeLimit": {
-                  "description": "The size limit for the table.",
-                  "type": "string"
-                },
-                "spaceUsed": {
-                  "description": "The amount of space currently being used by the table.",
-                  "type": "string"
-                },
-                "spaceRemaining": {
-                  "description": "The amount of space remaining for use by the table.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
+      "get": {
+        "operationId": "getAppTables",
+        "summary": "Get all tables for an app",
         "tags": [
           "Tables"
-        ]
-      },
-      "get": {
-        "description": "Gets a list of all the tables that exist in a specific application. The properties for each table are the same as what is returned in Get table.",
-        "operationId": "getAppTables",
-        "summary": "Get tables for an app",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
             "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "Success",
-            "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "name": "Example Table #0",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table_#0",
-                  "description": "Table zero as an example.",
-                  "id": "bpqe82s1",
-                  "nextRecordId": 1,
-                  "nextFieldId": 1,
-                  "defaultSortFieldId": 2,
-                  "defaultSortOrder": "ASC",
-                  "keyFieldId": 3,
-                  "singleRecordName": "Example Record",
-                  "pluralRecordName": "Example Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "17 MB",
-                  "spaceRemaining": "133 MB"
-                },
-                {
-                  "name": "Example Table #2",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table_#2",
-                  "description": "Table two as an example.",
-                  "id": "bpqe82z1",
-                  "nextRecordId": 10,
-                  "nextFieldId": 111,
-                  "defaultSortFieldId": 12,
-                  "defaultSortOrder": "DESC",
-                  "keyFieldId": 33,
-                  "singleRecordName": "Another Record",
-                  "pluralRecordName": "More Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "22 MB",
-                  "spaceRemaining": "128 MB"
-                }
-              ],
               "type": "array",
               "items": {
-                "example": {
-                  "name": "Example Table",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table",
-                  "description": "Table as an example.",
-                  "id": "bpqe82s0",
-                  "nextRecordId": 1,
-                  "nextFieldId": 1,
-                  "defaultSortFieldId": 2,
-                  "defaultSortOrder": "ASC",
-                  "keyFieldId": 3,
-                  "singleRecordName": "Example Record",
-                  "pluralRecordName": "Example Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "17 MB",
-                  "spaceRemaining": "133 MB"
-                },
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "name": {
-                    "description": "The name of the table.",
-                    "type": "string"
-                  },
-                  "id": {
-                    "description": "The unique identifier (dbid) of the table.",
-                    "type": "string"
-                  },
-                  "alias": {
-                    "description": "The automatically-created table alias for the table.",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "The description of the table, as configured by an application administrator.",
-                    "type": "string"
-                  },
-                  "created": {
-                    "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                    "type": "string"
-                  },
-                  "updated": {
-                    "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                    "type": "string"
-                  },
-                  "nextRecordId": {
-                    "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                    "type": "integer"
-                  },
-                  "nextFieldId": {
-                    "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                    "type": "integer"
-                  },
-                  "defaultSortFieldId": {
-                    "description": "The id of the field that is configured for default sorting.",
-                    "type": "integer"
-                  },
-                  "defaultSortOrder": {
-                    "description": "The configuration of the default sort order on the table.",
-                    "enum": [
-                      "ASC",
-                      "DESC"
-                    ],
-                    "type": "string"
-                  },
-                  "keyFieldId": {
-                    "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                    "type": "integer"
-                  },
-                  "singleRecordName": {
-                    "description": "The builder-configured singular noun of the table.",
-                    "type": "string"
-                  },
-                  "pluralRecordName": {
-                    "description": "The builder-configured plural noun of the table.",
-                    "type": "string"
-                  },
-                  "sizeLimit": {
-                    "description": "The size limit for the table.",
-                    "type": "string"
-                  },
-                  "spaceUsed": {
-                    "description": "The amount of space currently being used by the table.",
-                    "type": "string"
-                  },
-                  "spaceRemaining": {
-                    "description": "The amount of space remaining for use by the table.",
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/definitions/Table"
               }
             }
           }
-        },
-        "tags": [
-          "Tables"
-        ]
+        }
       }
     },
     "/tables/{tableId}": {
@@ -605,27 +268,6 @@
             "description": "The unique identifier (dbid) of the child table.",
             "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
@@ -839,27 +481,6 @@
             "description": "The unique identifier (dbid) of the table. This will be the child table.",
             "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           },
           {
@@ -1117,27 +738,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -1361,27 +961,6 @@
             "required": true,
             "in": "path",
             "type": "number"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1428,27 +1007,6 @@
             "description": "The unique identifier of the table.",
             "required": true,
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
@@ -1644,27 +1202,6 @@
             "description": "The identifier of the report, unique to the table.",
             "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           }
         ],
@@ -1870,27 +1407,6 @@
             "description": "The identifier of the report, unique to the table.",
             "required": true,
             "in": "path",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
             "type": "string"
           },
           {
@@ -2150,27 +1666,6 @@
             "required": true,
             "in": "path",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -2656,27 +2151,6 @@
             "required": true,
             "in": "path",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           },
           {
             "x-amf-mediaType": "application/json",
@@ -3576,27 +3050,6 @@
             "required": false,
             "in": "query",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -3995,27 +3448,6 @@
             "required": true,
             "in": "path",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -4402,27 +3834,6 @@
         ],
         "parameters": [
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -4520,27 +3931,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
           {
             "x-amf-mediaType": "application/json",
             "in": "body",
@@ -4809,20 +4199,6 @@
             "type": "string"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "qBAppToken",
             "description": "Your Quickbase app token",
             "required": false,
@@ -4866,20 +4242,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
           {
             "x-amf-mediaType": "application/json",
             "in": "body",
@@ -4983,27 +4345,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
           {
             "x-amf-mediaType": "application/json",
             "in": "body",
@@ -5118,27 +4459,6 @@
         ],
         "parameters": [
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -5250,29 +4570,7 @@
         "produces": [
           "application/json"
         ],
-        "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -5308,29 +4606,7 @@
         "produces": [
           "application/json"
         ],
-        "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -5394,27 +4670,6 @@
             "required": true,
             "in": "path",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -5469,27 +4724,6 @@
             "required": true,
             "in": "path",
             "type": "integer"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -5573,27 +4807,6 @@
             "required": false,
             "in": "query",
             "type": "number"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           },
           {
             "x-amf-mediaType": "application/json",
@@ -5793,27 +5006,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -5912,27 +5104,6 @@
             "type": "boolean"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -6022,27 +5193,6 @@
             "required": false,
             "in": "query",
             "type": "number"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           },
           {
             "x-amf-mediaType": "application/json",
@@ -6136,27 +5286,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -6245,27 +5374,6 @@
             "required": true,
             "in": "path",
             "type": "number"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           },
           {
             "x-amf-mediaType": "application/json",
@@ -6360,27 +5468,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -6469,27 +5556,6 @@
             "required": true,
             "in": "path",
             "type": "number"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           },
           {
             "x-amf-mediaType": "application/json",
@@ -6584,27 +5650,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -6692,27 +5737,6 @@
             "type": "number"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
@@ -6794,27 +5818,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
           {
             "x-amf-mediaType": "application/json",
             "in": "body",
@@ -7061,27 +6064,6 @@
             "in": "query",
             "type": "string",
             "format": "date"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -7172,26 +6154,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "description": "Your Quickbase domain, for example demo.quickbase.com.",
-            "in": "header",
-            "name": "qBRealmHostname",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
-            "in": "header",
-            "name": "userAgent",
-            "type": "string"
-          },
-          {
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "in": "header",
-            "name": "authorization",
-            "required": true,
-            "type": "string"
-          },
           {
             "description": "The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen.",
             "in": "query",
@@ -7535,27 +6497,6 @@
             "required": false,
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -7644,27 +6585,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -7745,27 +6665,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -7857,30 +6756,9 @@
             "type": "boolean"
           },
           {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "qBLVersion",
             "description": "The QBL version to be used for the export. If not specified the default would be used.",
             "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
             "in": "header",
             "type": "string"
           }
@@ -7978,27 +6856,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -8108,27 +6965,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -8229,27 +7065,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -8369,27 +7184,6 @@
             "required": false,
             "in": "header",
             "type": "boolean"
-          },
-          {
-            "name": "qBRealmHostname",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": true,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": true,
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -8512,27 +7306,6 @@
             "description": "File name for the downloaded file",
             "required": true,
             "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "qBRealmHostname",
-            "in": "header",
-            "description": "Your Quickbase domain, for example demo.quickbase.com",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "userAgent",
-            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
-            "required": false,
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
-            "required": false,
             "type": "string"
           },
           {
@@ -8782,6 +7555,50 @@
         },
         "name": {
           "type": "string"
+        },
+        "alias": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "defaultSortFieldId": {
+          "type": "integer"
+        },
+        "defaultSortOrder": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "keyFieldId": {
+          "type": "integer"
+        },
+        "nextFieldId": {
+          "type": "integer"
+        },
+        "nextRecordId": {
+          "type": "integer"
+        },
+        "pluralRecordName": {
+          "type": "string"
+        },
+        "singleRecordName": {
+          "type": "string"
+        },
+        "sizeLimit": {
+          "type": "string"
+        },
+        "spaceRemaining": {
+          "type": "string"
+        },
+        "spaceUsed": {
+          "type": "string"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "required": [

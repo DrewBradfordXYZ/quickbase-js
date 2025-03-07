@@ -62,8 +62,14 @@ async function fixQuickBaseSpec(): Promise<void> {
       for (const method in spec.paths[pathKey]) {
         const operation = spec.paths[pathKey][method];
         if (operation.parameters) {
-          operation.parameters = operation.parameters.map(
-            (param: Parameter) => {
+          operation.parameters = operation.parameters
+            .filter(
+              (param) =>
+                !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+                  param.name
+                )
+            ) // Filter out unwanted headers
+            .map((param: Parameter) => {
               param.name = toCamelCase(param.name);
               if ("example" in param) delete param.example;
               if ("schema" in param && param.in !== "body") delete param.schema;
@@ -76,12 +82,10 @@ async function fixQuickBaseSpec(): Promise<void> {
                 param.schema!.items = { $ref: "#/definitions/Record" };
               }
               return param;
-            }
-          );
+            });
         }
       }
     }
-
     console.log("Applying endpoint fixes...");
     Object.assign(spec.paths, paths);
 

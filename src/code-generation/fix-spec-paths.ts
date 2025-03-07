@@ -61,6 +61,22 @@ export const paths = {
       },
     },
   },
+  "/tables": {
+    get: {
+      operationId: "getAppTables",
+      summary: "Get all tables for an app",
+      tags: ["Tables"],
+      parameters: [
+        { name: "appId", in: "query", required: true, type: "string" },
+      ],
+      responses: {
+        200: {
+          description: "Success",
+          schema: { type: "array", items: { $ref: "#/definitions/Table" } },
+        },
+      },
+    },
+  },
   "/tables/{tableId}": {
     get: {
       operationId: "getTable",

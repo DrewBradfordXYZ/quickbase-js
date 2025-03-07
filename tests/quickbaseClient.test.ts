@@ -40,7 +40,7 @@ describe("QuickbaseClient", () => {
     realm: process.env.QB_REALM || "default-realm",
     userToken: process.env.QB_USER_TOKEN || "default-token",
     debug: true,
-    fetchApi: mockFetchApp as any, // Type assertion to bypass strict typing for simplicity
+    fetchApi: mockFetchApp as any,
   });
 
   beforeEach(() => {
@@ -56,12 +56,12 @@ describe("QuickbaseClient", () => {
   });
 
   it("calls getApp successfully", async () => {
-    const appId = process.env.QB_APP_ID;
-    if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-    console.log("Test appId:", appId);
-    const result = await client.getApp({ appId });
+    const getAppId = process.env.QB_APP_ID; // Unique name to avoid conflict
+    if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
+    console.log("Test appId:", getAppId);
+    const result = await client.getApp({ appId: getAppId });
     expect(result).toEqual({
-      id: appId,
+      id: getAppId,
       name: "qb-copy",
       created: new Date("2025-02-13T18:22:33Z"),
       updated: new Date("2025-03-04T04:25:51Z"),
@@ -83,7 +83,7 @@ describe("QuickbaseClient", () => {
       },
     });
     expect(mockFetchApp).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/apps/${appId}`,
+      `https://api.quickbase.com/v1/apps/${getAppId}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
@@ -142,7 +142,7 @@ describe("QuickbaseClient", () => {
       realm: process.env.QB_REALM || "default-realm",
       userToken: process.env.QB_USER_TOKEN || "default-token",
       debug: true,
-      fetchApi: mockFetchFields as any, // Type assertion to bypass strict typing
+      fetchApi: mockFetchFields as any,
     });
 
     const result = await clientWithMock.getFields({
@@ -201,6 +201,80 @@ describe("QuickbaseClient", () => {
     );
     expect(mockFetchFields).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields?tableId=dummyTableId&includeFieldPerms=true`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+          "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+        }),
+      })
+    );
+  });
+
+  it("calls getAppTables successfully", async () => {
+    const mockFetchTables = vi.fn((url: string, options: any) => {
+      console.log("Mock fetch for getAppTables:", url, options);
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve([
+            {
+              alias: "_DBID_ROOT",
+              created: "2025-02-13T18:22:33Z",
+              defaultSortFieldId: 2,
+              defaultSortOrder: "DESC",
+              description: "",
+              id: "buwai2zr4",
+              keyFieldId: 3,
+              name: "Root",
+              nextFieldId: 6,
+              nextRecordId: 1,
+              pluralRecordName: "Roots",
+              singleRecordName: "Root",
+              sizeLimit: "500 MB",
+              spaceRemaining: "500 MB",
+              spaceUsed: "0 KB",
+              updated: "2025-02-13T18:22:34Z",
+            },
+          ]),
+      } as Response);
+    });
+
+    const clientWithMock = quickbaseClient({
+      realm: process.env.QB_REALM || "default-realm",
+      userToken: process.env.QB_USER_TOKEN || "default-token",
+      debug: true,
+      fetchApi: mockFetchTables as any,
+    });
+
+    const tablesAppId = process.env.QB_APP_ID; // Unique name to avoid conflict
+    if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
+    const result = await clientWithMock.getAppTables({ appId: tablesAppId });
+    console.log("getAppTables response:", result);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          alias: "_DBID_ROOT",
+          created: new Date("2025-02-13T18:22:33Z"),
+          defaultSortFieldId: 2,
+          defaultSortOrder: "DESC",
+          description: "",
+          id: "buwai2zr4",
+          keyFieldId: 3,
+          name: "Root",
+          nextFieldId: 6,
+          nextRecordId: 1,
+          pluralRecordName: "Roots",
+          singleRecordName: "Root",
+          sizeLimit: "500 MB",
+          spaceRemaining: "500 MB",
+          spaceUsed: "0 KB",
+          updated: new Date("2025-02-13T18:22:34Z"),
+        }),
+      ])
+    );
+    expect(mockFetchTables).toHaveBeenCalledWith(
+      `https://api.quickbase.com/v1/tables?appId=${tablesAppId}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,

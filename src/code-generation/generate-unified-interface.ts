@@ -30,7 +30,7 @@ function generateInterface() {
   for (const [path, methodsObj] of Object.entries(
     paths as OpenAPIV3.PathsObject
   )) {
-    if (!methodsObj) continue; // Guard against undefined PathItemObject
+    if (!methodsObj) continue;
 
     for (const [method, operation] of Object.entries(
       methodsObj as OpenAPIV3.PathItemObject
@@ -48,20 +48,17 @@ function generateInterface() {
         })
         .map((p) => {
           const param = p as OpenAPIV3.ParameterObject;
-          const type = param.schema
-            ? mapRefToType(param.schema, modelImports)
-            : "any";
+          const type =
+            param.type ||
+            (param.schema ? mapRefToType(param.schema, modelImports) : "any");
           return `${param.name}${param.required ? "" : "?"}: ${type}`;
         })
         .join("; ");
       const response = op.responses?.["200"] as
         | OpenAPIV3.ResponseObject
         | undefined;
-      const returnType = response?.content?.["application/json"]?.schema
-        ? mapRefToType(
-            response.content["application/json"].schema,
-            modelImports
-          )
+      const returnType = response?.schema
+        ? mapRefToType(response.schema, modelImports)
         : "void";
       methods.push(
         `  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
@@ -70,7 +67,7 @@ function generateInterface() {
   }
 
   const importLines = Array.from(modelImports)
-    .map((m) => `import { ${m} } from "../generated/models/${m}.ts";`) // Add .ts extension
+    .map((m) => `import { ${m} } from "../generated/models/${m}.ts";`)
     .join("\n");
   const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importLines}\n\nexport interface QuickbaseClient {\n${methods.join(
     "\n"
