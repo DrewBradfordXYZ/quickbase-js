@@ -48,9 +48,11 @@ function generateInterface() {
         })
         .map((p) => {
           const param = p as OpenAPIV3.ParameterObject;
-          const type =
-            param.type ||
-            (param.schema ? mapRefToType(param.schema, modelImports) : "any");
+          const type = param.type
+            ? mapOpenApiTypeToTs(param.type) // Map OpenAPI type to TS
+            : param.schema
+            ? mapRefToType(param.schema, modelImports)
+            : "any";
           return `${param.name}${param.required ? "" : "?"}: ${type}`;
         })
         .join("; ");
@@ -80,6 +82,20 @@ function generateInterface() {
   console.log(`Generated ${OUTPUT_FILE}`);
 }
 
+function mapOpenApiTypeToTs(openApiType: string): string {
+  switch (openApiType.toLowerCase()) {
+    case "integer":
+    case "int":
+      return "number";
+    case "string":
+      return "string";
+    case "boolean":
+      return "boolean";
+    default:
+      return "any";
+  }
+}
+
 function mapRefToType(
   schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
   modelImports: Set<string>
@@ -93,11 +109,11 @@ function mapRefToType(
     const itemType =
       "$ref" in schema.items
         ? schema.items.$ref.split("/").pop()!
-        : schema.items.type || "any";
+        : mapOpenApiTypeToTs(schema.items.type || "any");
     if ("$ref" in schema.items) modelImports.add(itemType);
     return `${itemType}[]`;
   }
-  return schema.type || "any";
+  return mapOpenApiTypeToTs(schema.type || "any");
 }
 
 try {

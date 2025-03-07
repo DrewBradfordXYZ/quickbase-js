@@ -10,11 +10,11 @@ export default [
   {
     input: "src/quickbaseClient.ts",
     output: {
-      dir: "dist", // Switch to dir for multiple chunks
+      dir: "dist",
       format: "esm",
       sourcemap: true,
       compact: isProd,
-      entryFileNames: "quickbaseClient.js", // Maintain output file name
+      entryFileNames: "quickbaseClient.js",
     },
     external: [
       "node:http",
@@ -27,14 +27,14 @@ export default [
       "node:net",
       "node:fs",
       "node:path",
-      "node-fetch", // Externalize node-fetch
+      "node-fetch",
     ],
     plugins: [
-      nodeResolve({ preferBuiltins: true }), // Use Node.js built-ins
-      commonjs(), // Handle CommonJS modules like node-fetch
+      nodeResolve({ preferBuiltins: true }),
+      commonjs(),
       typescript({
-        tsconfig: "./tsconfig.build.json",
-        declaration: false, // Keep this
+        tsconfig: "./tsconfig.json", // Updated to single tsconfig
+        declaration: false, // Rollup handles this separately
       }),
       isProd && terser(),
     ],
@@ -42,12 +42,12 @@ export default [
   {
     input: "src/quickbaseClient.ts",
     output: {
-      file: "dist/quickbaseClient.d.ts", // Keep as file since dts generates a single file
+      file: "dist/quickbaseClient.d.ts",
       format: "esm",
     },
     plugins: [
       dts({
-        tsconfig: "./tsconfig.build.json",
+        tsconfig: "./tsconfig.json", // Updated to single tsconfig
       }),
     ],
   },
@@ -59,7 +59,7 @@ export default [
       warning.plugin === "typescript" &&
       warning.message.includes("TS5096")
     ) {
-      return; // Suppress TS5096
+      return;
     }
     warn(warning);
   },

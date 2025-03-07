@@ -9,7 +9,11 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": false, // Changed to false for Rollup to emit
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true, // Rollup needs this for .d.ts files
+    "sourceMap": true // Matches Rollup’s sourcemap option
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/generated-old"],
