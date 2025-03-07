@@ -1,3 +1,6 @@
+import { describe, it, expect, beforeEach } from "vitest";
+import { createClient, mockFetch } from "../../setup.ts";
+
 describe("QuickbaseClient - getApp (Unit)", () => {
   const client = createClient(mockFetch);
 

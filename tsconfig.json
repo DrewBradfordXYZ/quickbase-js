@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext", // Changed from NodeNext to match bundler
+    "moduleResolution": "bundler",
     "strict": true,
     "lib": ["ESNext", "DOM"],
     "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
-    "noEmit": false, // Changed to false for Rollup to emit
+    "noEmit": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true, // Rollup needs this for .d.ts files
-    "sourceMap": true // Matches Rollup’s sourcemap option
+    "rootDir": ".", // Includes src/ and tests/
+    "declaration": true,
+    "sourceMap": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "src/generated-old"],
   "ts-node": {
     "esm": true,
