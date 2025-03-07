@@ -1,11 +1,37 @@
 export const paths = {
+  "/apps/{appId}": {
+    get: {
+      operationId: "getApp",
+      summary: "Get an app by ID",
+      tags: ["Apps"],
+      parameters: [
+        {
+          name: "appId",
+          in: "path",
+          required: true,
+          type: "string",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success",
+          schema: { $ref: "#/definitions/App" },
+        },
+      },
+    },
+  },
   "/fields": {
     get: {
       operationId: "getFields",
-      summary: "Get fields for a table",
+      summary: "Get all fields for a table",
       tags: ["Fields"],
       parameters: [
-        { name: "tableId", in: "query", required: true, type: "string" },
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+        },
         {
           name: "includeFieldPerms",
           in: "query",
@@ -16,47 +42,10 @@ export const paths = {
       responses: {
         200: {
           description: "Success",
-          schema: { type: "array", items: { $ref: "#/definitions/Field" } },
-        },
-      },
-    },
-    post: {
-      operationId: "createField",
-      summary: "Create a field",
-      tags: ["Fields"],
-      parameters: [
-        { name: "tableId", in: "query", required: true, type: "string" },
-        {
-          name: "generated",
-          in: "body",
-          required: true,
-          schema: { type: "object" },
-        },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/CreateField200Response" },
-        },
-      },
-    },
-    delete: {
-      operationId: "deleteFields",
-      summary: "Delete fields",
-      tags: ["Fields"],
-      parameters: [
-        { name: "tableId", in: "query", required: true, type: "string" },
-        {
-          name: "generated",
-          in: "body",
-          required: true,
-          schema: { type: "object" },
-        },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/DeleteFields200Response" },
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Field" },
+          },
         },
       },
     },
@@ -67,151 +56,27 @@ export const paths = {
       summary: "Get all tables for an app",
       tags: ["Tables"],
       parameters: [
-        { name: "appId", in: "query", required: true, type: "string" },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { type: "array", items: { $ref: "#/definitions/Table" } },
-        },
-      },
-    },
-  },
-  "/tables/{tableId}": {
-    get: {
-      operationId: "getTable",
-      summary: "Get table details",
-      tags: ["Tables"],
-      parameters: [
-        { name: "appId", in: "query", required: true, type: "string" },
-        { name: "tableId", in: "path", required: true, type: "string" },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/Table" },
-        },
-      },
-    },
-  },
-  "/apps/{appId}": {
-    get: {
-      operationId: "getAppById",
-      summary: "Get application details by ID",
-      tags: ["Apps"],
-      parameters: [
-        { name: "appId", in: "path", required: true, type: "string" },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/App" },
-        },
-      },
-    },
-    post: {
-      operationId: "updateApp",
-      summary: "Update an app",
-      tags: ["Apps"],
-      parameters: [
-        { name: "appId", in: "path", required: true, type: "string" },
         {
-          name: "generated",
-          in: "body",
+          name: "appId",
+          in: "query",
           required: true,
-          schema: { $ref: "#/definitions/UpdateAppRequest" },
+          type: "string",
         },
       ],
       responses: {
         200: {
           description: "Success",
-          schema: { $ref: "#/definitions/UpdateApp200Response" },
-        },
-      },
-    },
-    delete: {
-      operationId: "deleteApp",
-      summary: "Delete an app",
-      tags: ["Apps"],
-      parameters: [
-        { name: "appId", in: "path", required: true, type: "string" },
-        {
-          name: "generated",
-          in: "body",
-          required: true,
-          schema: { $ref: "#/definitions/DeleteAppRequest" },
-        },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/DeleteApp200Response" },
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Table" },
+          },
         },
       },
     },
   },
-  "/apps": {
+  "/records/query": {
     post: {
-      operationId: "createApp",
-      summary: "Create an app",
-      tags: ["Apps"],
-      parameters: [
-        {
-          name: "generated",
-          in: "body",
-          required: true,
-          schema: { $ref: "#/definitions/CreateAppRequest" },
-        },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/CreateApp200Response" },
-        },
-      },
-    },
-  },
-  "/apps/{appId}/copy": {
-    post: {
-      operationId: "copyApp",
-      summary: "Copy an app",
-      tags: ["Apps"],
-      parameters: [
-        { name: "appId", in: "path", required: true, type: "string" },
-        {
-          name: "generated",
-          in: "body",
-          required: true,
-          schema: { $ref: "#/definitions/CopyAppRequest" },
-        },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { $ref: "#/definitions/CopyApp200Response" },
-        },
-      },
-    },
-  },
-  "/apps/{appId}/events": {
-    get: {
-      operationId: "getAppEvents",
-      summary: "Get app events",
-      tags: ["Apps"],
-      parameters: [
-        { name: "appId", in: "path", required: true, type: "string" },
-      ],
-      responses: {
-        200: {
-          description: "Success",
-          schema: { type: "array", items: { type: "object" } },
-        },
-      },
-    },
-  },
-  "/records": {
-    post: {
-      operationId: "upsert",
+      operationId: "upsertRecords", // Changed to avoid clash
       summary: "Upsert records",
       tags: ["Records"],
       parameters: [
@@ -219,13 +84,57 @@ export const paths = {
           name: "generated",
           in: "body",
           required: true,
-          schema: { type: "object" },
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Record" },
+          },
         },
       ],
       responses: {
         200: {
           description: "Success",
-          schema: { $ref: "#/definitions/Upsert200Response" },
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Upsert200Response" },
+          },
+        },
+        207: {
+          // Added for completeness
+          description: "Multi-Status (partial success)",
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Upsert200Response" },
+          },
+        },
+      },
+    },
+  },
+  "/reports/{reportId}/run": {
+    post: {
+      operationId: "runReport",
+      summary: "Run a report",
+      tags: ["Reports"],
+      parameters: [
+        {
+          name: "reportId",
+          in: "path",
+          required: true,
+          type: "string",
+        },
+        {
+          name: "generated",
+          in: "body",
+          required: true,
+          schema: { type: "object" }, // Placeholder
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success",
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/ReportRunResponse" },
+          },
         },
       },
     },

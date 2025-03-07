@@ -36,6 +36,35 @@ function toCamelCase(str: string): string {
     .replace(/^./, (str) => str.toLowerCase());
 }
 
+function fixArraySchemas(spec: Spec) {
+  for (const pathKey in spec.paths) {
+    for (const method in spec.paths[pathKey]) {
+      const operation = spec.paths[pathKey][method];
+      if (operation.parameters) {
+        operation.parameters.forEach((param: Parameter) => {
+          if (param.schema?.type === "array" && !param.schema.items) {
+            console.log(
+              `Fixing missing items in ${pathKey}(${method}).${param.name}`
+            );
+            param.schema.items = { type: "string" }; // Default fallback
+          }
+        });
+      }
+      if (operation.responses) {
+        for (const status in operation.responses) {
+          const response = operation.responses[status];
+          if (response.schema?.type === "array" && !response.schema.items) {
+            console.log(
+              `Fixing missing items in ${pathKey}(${method}).responses.${status}`
+            );
+            response.schema.items = { type: "string" }; // Default fallback
+          }
+        }
+      }
+    }
+  }
+}
+
 async function fixQuickBaseSpec(): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
@@ -68,7 +97,7 @@ async function fixQuickBaseSpec(): Promise<void> {
                 !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
                   param.name
                 )
-            ) // Filter out unwanted headers
+            )
             .map((param: Parameter) => {
               param.name = toCamelCase(param.name);
               if ("example" in param) delete param.example;
@@ -86,8 +115,12 @@ async function fixQuickBaseSpec(): Promise<void> {
         }
       }
     }
+
     console.log("Applying endpoint fixes...");
-    Object.assign(spec.paths, paths);
+    spec.paths = { ...paths }; // Fully replace paths with custom ones
+
+    console.log("Fixing array schemas...");
+    fixArraySchemas(spec); // Fix any remaining arrays
 
     console.log("Applying definitions...");
     spec.definitions = definitions;

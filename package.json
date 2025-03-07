@@ -21,7 +21,8 @@
     "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
     "test": "vitest run tests/unit/**/*.test.ts",
     "test:integration": "vitest run tests/integration/**/*.test.ts",
-    "test:all": "vitest run tests/**/*.test.ts"
+    "test:all": "vitest run tests/**/*.test.ts",
+    "install:openapi": "curl -o openapi-generator-cli.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar"
   },
   "dependencies": {
     "typescript": "^5.8.2"

@@ -1,89 +1,4 @@
 export const definitions = {
-  Field: {
-    type: "object",
-    properties: {
-      id: { type: "integer" },
-      label: { type: "string" },
-      fieldType: { type: "string" },
-      appearsByDefault: { type: "boolean" },
-      audited: { type: "boolean" },
-      bold: { type: "boolean" },
-      doesDataCopy: { type: "boolean" },
-      fieldHelp: { type: "string" },
-      findEnabled: { type: "boolean" },
-      mode: { type: "string" },
-      noWrap: { type: "boolean" },
-      required: { type: "boolean" },
-      unique: { type: "boolean" },
-      addToForms: { type: "boolean" },
-      permissions: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            permissionType: { type: "string" },
-            role: { type: "string" },
-            roleId: { type: "integer" },
-          },
-          required: ["permissionType", "role", "roleId"],
-        },
-      },
-      properties: {
-        type: "object",
-        properties: {
-          primaryKey: { type: "boolean" },
-          foreignKey: { type: "boolean" },
-          formula: { type: "string" },
-          defaultValue: { type: "string" },
-          carryChoices: { type: "boolean" },
-          allowNewChoices: { type: "boolean" },
-          sortAsGiven: { type: "boolean" },
-          numLines: { type: "integer" },
-          maxLength: { type: "integer" },
-          appendOnly: { type: "boolean" },
-          allowHTML: { type: "boolean" },
-          allowMentions: { type: "boolean" },
-          numberFormat: { type: "integer" },
-          decimalPlaces: { type: "integer" },
-          doesAverage: { type: "boolean" },
-          doesTotal: { type: "boolean" },
-          blankIsZero: { type: "boolean" },
-          commaStart: { type: "integer" },
-          defaultToday: { type: "boolean" },
-          displayDayOfWeek: { type: "boolean" },
-          displayMonth: { type: "string" },
-          displayRelative: { type: "boolean" },
-          displayTime: { type: "boolean" },
-          displayTimezone: { type: "boolean" },
-          defaultKind: { type: "string" },
-          displayUser: { type: "string" },
-        },
-      },
-    },
-    required: ["id", "label", "fieldType"],
-  },
-  Table: {
-    type: "object",
-    properties: {
-      id: { type: "string" },
-      name: { type: "string" },
-      alias: { type: "string" },
-      created: { type: "string", format: "date-time" },
-      defaultSortFieldId: { type: "integer" },
-      defaultSortOrder: { type: "string" }, // e.g., "DESC", "ASC"
-      description: { type: "string" },
-      keyFieldId: { type: "integer" },
-      nextFieldId: { type: "integer" },
-      nextRecordId: { type: "integer" },
-      pluralRecordName: { type: "string" },
-      singleRecordName: { type: "string" },
-      sizeLimit: { type: "string" }, // e.g., "500 MB"
-      spaceRemaining: { type: "string" }, // e.g., "500 MB"
-      spaceUsed: { type: "string" }, // e.g., "0 KB"
-      updated: { type: "string", format: "date-time" },
-    },
-    required: ["id", "name"],
-  },
   App: {
     type: "object",
     properties: {
@@ -116,49 +31,99 @@ export const definitions = {
     },
     required: ["id", "name"],
   },
-  Record: { type: "object", additionalProperties: true },
-  CreateField200Response: {
+  Field: {
     type: "object",
-    properties: { id: { type: "integer" } },
+    properties: {
+      id: { type: "number" },
+      label: { type: "string" },
+      fieldType: { type: "string" },
+      noWrap: { type: "boolean" },
+      bold: { type: "boolean" },
+      required: { type: "boolean" },
+      appearsByDefault: { type: "boolean" },
+      findEnabled: { type: "boolean" },
+      unique: { type: "boolean" },
+      doesDataCopy: { type: "boolean" },
+      fieldHelp: { type: "string" },
+      audited: { type: "boolean" },
+      properties: {
+        type: "object",
+        properties: {
+          primaryKey: { type: "boolean" },
+          foreignKey: { type: "boolean" },
+          numLines: { type: "number" },
+          maxLength: { type: "number" },
+          appendOnly: { type: "boolean" },
+          allowHTML: { type: "boolean" },
+          allowMentions: { type: "boolean" },
+          sortAsGiven: { type: "boolean" },
+          carryChoices: { type: "boolean" },
+          allowNewChoices: { type: "boolean" },
+          formula: { type: "string" },
+          defaultValue: { type: "string" },
+        },
+      },
+      permissions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            permissionType: { type: "string" },
+            role: { type: "string" },
+            roleId: { type: "number" },
+          },
+        },
+      },
+    },
+    required: ["id", "label", "fieldType"],
   },
-  DeleteFields200Response: {
+  Table: {
     type: "object",
-    properties: { deleted: { type: "boolean" } },
+    properties: {
+      id: { type: "string" },
+      name: { type: "string" },
+      alias: { type: "string" },
+      created: { type: "string", format: "date-time" },
+      defaultSortFieldId: { type: "number" },
+      defaultSortOrder: { type: "string" },
+      description: { type: "string" },
+      keyFieldId: { type: "number" },
+      nextFieldId: { type: "number" },
+      nextRecordId: { type: "number" },
+      pluralRecordName: { type: "string" },
+      singleRecordName: { type: "string" },
+      sizeLimit: { type: "string" },
+      spaceRemaining: { type: "string" },
+      spaceUsed: { type: "string" },
+      updated: { type: "string", format: "date-time" },
+    },
+    required: ["id", "name"],
+  },
+  Record: {
+    type: "object",
+    properties: {
+      id: { type: "number" },
+      fields: {
+        type: "object",
+        additionalProperties: { type: "string" },
+      },
+    },
+    required: ["id"],
   },
   Upsert200Response: {
     type: "object",
-    properties: { metadata: { type: "object" } },
+    properties: {
+      id: { type: "number" },
+      status: { type: "string" },
+    },
+    required: ["id"],
   },
-  CopyAppRequest: {
+  ReportRunResponse: {
     type: "object",
-    properties: { name: { type: "string" } },
-  },
-  CopyApp200Response: {
-    type: "object",
-    properties: { id: { type: "string" } },
-  },
-  CreateAppRequest: {
-    type: "object",
-    properties: { name: { type: "string" } },
-  },
-  CreateApp200Response: {
-    type: "object",
-    properties: { id: { type: "string" } },
-  },
-  DeleteAppRequest: {
-    type: "object",
-    properties: { name: { type: "string" } },
-  },
-  DeleteApp200Response: {
-    type: "object",
-    properties: { deleted: { type: "boolean" } },
-  },
-  UpdateAppRequest: {
-    type: "object",
-    properties: { name: { type: "string" } },
-  },
-  UpdateApp200Response: {
-    type: "object",
-    properties: { id: { type: "string" } },
+    properties: {
+      id: { type: "string" },
+      data: { type: "object" }, // Placeholder
+    },
+    required: ["id"],
   },
 };
