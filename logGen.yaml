@@ -305,6 +305,13 @@ tree:
                     },
                     required: ["id"],
                   },
+                  GetTempTokenDBID200Response: {
+                    type: "object",
+                    properties: {
+                      temporaryAuthorization: { type: "string" },
+                    },
+                    required: ["temporaryAuthorization"],
+                  },
                 };
             - name: fix-spec-main.ts
               type: file
@@ -534,7 +541,7 @@ tree:
                   },
                   "/records/query": {
                     post: {
-                      operationId: "upsertRecords", // Changed to avoid clash
+                      operationId: "upsertRecords",
                       summary: "Upsert records",
                       tags: ["Records"],
                       parameters: [
@@ -557,7 +564,6 @@ tree:
                           },
                         },
                         207: {
-                          // Added for completeness
                           description: "Multi-Status (partial success)",
                           schema: {
                             type: "array",
@@ -583,7 +589,7 @@ tree:
                           name: "generated",
                           in: "body",
                           required: true,
-                          schema: { type: "object" }, // Placeholder
+                          schema: { type: "object" },
                         },
                       ],
                       responses: {
@@ -593,6 +599,27 @@ tree:
                             type: "array",
                             items: { $ref: "#/definitions/ReportRunResponse" },
                           },
+                        },
+                      },
+                    },
+                  },
+                  "/auth/temporary/{dbid}": {
+                    get: {
+                      operationId: "getTempTokenDBID",
+                      summary: "Get a temporary authorization token for a specific dbid",
+                      tags: ["Auth"],
+                      parameters: [
+                        {
+                          name: "dbid",
+                          in: "path",
+                          required: true,
+                          type: "string",
+                        },
+                      ],
+                      responses: {
+                        200: {
+                          description: "Success",
+                          schema: { $ref: "#/definitions/GetTempTokenDBID200Response" },
                         },
                       },
                     },
@@ -778,6 +805,31 @@ tree:
                                   "items": {
                                     "$ref": "#/definitions/ReportRunResponse"
                                   }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "/auth/temporary/{dbid}": {
+                          "get": {
+                            "operationId": "getTempTokenDBID",
+                            "summary": "Get a temporary authorization token for a specific dbid",
+                            "tags": [
+                              "Auth"
+                            ],
+                            "parameters": [
+                              {
+                                "name": "dbid",
+                                "in": "path",
+                                "required": true,
+                                "type": "string"
+                              }
+                            ],
+                            "responses": {
+                              "200": {
+                                "description": "Success",
+                                "schema": {
+                                  "$ref": "#/definitions/GetTempTokenDBID200Response"
                                 }
                               }
                             }
@@ -1060,6 +1112,17 @@ tree:
                           },
                           "required": [
                             "id"
+                          ]
+                        },
+                        "GetTempTokenDBID200Response": {
+                          "type": "object",
+                          "properties": {
+                            "temporaryAuthorization": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "temporaryAuthorization"
                           ]
                         }
                       }
@@ -1450,17 +1513,21 @@ tree:
           type: file
           contents: |
             import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
-            import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
+            import {
+              Configuration,
+              HTTPHeaders,
+              ResponseError,
+            } from "./generated/runtime.ts"; // Added ResponseError
             import * as apis from "./generated/apis/index.ts";
             import { simplifyName } from "./utils.ts";
-            import fetch from "node-fetch"; // No need for RequestInit import since we won't use it directly
+            import fetch from "node-fetch";
 
             export interface QuickbaseConfig {
               realm: string;
               userToken?: string;
               tempToken?: string;
               debug?: boolean;
-              fetchApi?: typeof fetch; // Still typed as node-fetch's fetch
+              fetchApi?: typeof fetch;
             }
 
             type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -1544,7 +1611,7 @@ tree:
                 return methodMap as MethodMap;
               }
 
-              const invokeMethod = <K extends keyof QuickbaseClient>(
+              const invokeMethod = async <K extends keyof QuickbaseClient>(
                 methodName: K,
                 params: Parameters<QuickbaseClient[K]>[0]
               ): Promise<ReturnType<QuickbaseClient[K]>> => {
@@ -1562,13 +1629,28 @@ tree:
                   methodInfo.paramMap[0] === "requestParameters"
                     ? [params, undefined]
                     : [params, undefined];
-                const responsePromise = methodInfo.method(...args);
-                if (config.debug) {
-                  responsePromise.then((response) => {
+
+                try {
+                  const response = await methodInfo.method(...args);
+                  if (config.debug) {
                     console.log(`Response from ${methodName}:`, response);
-                  });
+                  }
+                  return response;
+                } catch (error) {
+                  if (error instanceof ResponseError) {
+                    let errorMessage = error.message;
+                    try {
+                      const errorBody = await error.response.json();
+                      errorMessage = errorBody.message || errorMessage;
+                    } catch (e) {
+                      // If JSON parsing fails, keep the original message
+                    }
+                    throw new Error(
+                      `API Error: ${errorMessage} (Status: ${error.response.status})`
+                    );
+                  }
+                  throw error; // Rethrow other errors unchanged
                 }
-                return responsePromise;
               };
 
               return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
@@ -1654,7 +1736,52 @@ tree:
                     });
             - name: auth
               type: directory
-              children: []
+              children:
+                - name: getTempToken.test.ts
+                  type: file
+                  contents: |
+                    import { describe, it, expect } from "vitest";
+                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+
+                    describe("QuickbaseClient Integration - getTempTokenDBID", () => {
+                      const config = {
+                        realm: process.env.QB_REALM || "",
+                        userToken: process.env.QB_USER_TOKEN || "",
+                        debug: true,
+                      };
+
+                      const client = quickbaseClient(config);
+
+                      it(
+                        "fetches a temporary token from QuickBase using user token",
+                        async () => {
+                          const dbid = process.env.QB_APP_ID || ""; // Use app ID instead of table ID
+                          if (!config.realm) throw new Error("QB_REALM is not defined in .env");
+                          if (!config.userToken)
+                            throw new Error("QB_USER_TOKEN is not defined in .env");
+                          if (!dbid) throw new Error("QB_APP_ID is not defined in .env");
+
+                          console.log("Config used:", {
+                            realm: config.realm,
+                            userToken: config.userToken.slice(0, 10) + "...",
+                            dbid,
+                          });
+
+                          try {
+                            const result = await client.getTempTokenDBID({ dbid });
+                            console.log("Real API response:", result);
+
+                            expect(result).toEqual({
+                              temporaryAuthorization: expect.stringMatching(/^b[0-9a-z_]+$/),
+                            });
+                          } catch (error) {
+                            console.error("API error:", error);
+                            throw error;
+                          }
+                        },
+                        { timeout: 10000 }
+                      );
+                    });
             - name: fields
               type: directory
               children:
@@ -1693,17 +1820,24 @@ tree:
                                 id: 1,
                                 label: "Date Created",
                                 fieldType: "timestamp",
-                                appearsByDefault: false,
-                                audited: false,
+                                noWrap: true,
                                 bold: false,
+                                required: false,
+                                appearsByDefault: false,
+                                findEnabled: false,
+                                unique: false,
                                 doesDataCopy: false,
                                 fieldHelp: "",
-                                findEnabled: false,
-                                mode: "",
-                                noWrap: true,
-                                required: false,
-                                unique: false,
-                                addToForms: undefined,
+                                audited: false,
+                                properties: expect.objectContaining({
+                                  primaryKey: false,
+                                  foreignKey: false,
+                                  sortAsGiven: true,
+                                  carryChoices: true,
+                                  allowNewChoices: false,
+                                  formula: "",
+                                  defaultValue: "",
+                                }),
                                 permissions: expect.arrayContaining([
                                   expect.objectContaining({
                                     permissionType: "Modify",
@@ -1721,37 +1855,69 @@ tree:
                                     roleId: 12,
                                   }),
                                 ]),
+                              }),
+                              expect.objectContaining({
+                                id: 2,
+                                label: "Date Modified",
+                                fieldType: "timestamp",
+                                noWrap: true,
+                                bold: false,
+                                required: false,
+                                appearsByDefault: false,
+                                findEnabled: false,
+                                unique: false,
+                                doesDataCopy: false,
+                                fieldHelp: "",
+                                audited: false,
                                 properties: expect.objectContaining({
-                                  allowNewChoices: false,
-                                  carryChoices: true,
-                                  defaultToday: false,
-                                  defaultValue: "",
-                                  displayDayOfWeek: false,
-                                  displayMonth: "number",
-                                  displayRelative: false,
-                                  displayTime: true,
-                                  displayTimezone: false,
-                                  foreignKey: false,
-                                  formula: "",
                                   primaryKey: false,
+                                  foreignKey: false,
                                   sortAsGiven: true,
+                                  carryChoices: true,
+                                  allowNewChoices: false,
+                                  formula: "",
+                                  defaultValue: "",
                                 }),
+                                permissions: expect.arrayContaining([
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Viewer",
+                                    roleId: 10,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Participant",
+                                    roleId: 11,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Administrator",
+                                    roleId: 12,
+                                  }),
+                                ]),
                               }),
                               expect.objectContaining({
                                 id: 3,
                                 label: "Record ID#",
                                 fieldType: "recordid",
-                                appearsByDefault: false,
-                                audited: false,
+                                noWrap: true,
                                 bold: false,
+                                required: false,
+                                appearsByDefault: false,
+                                findEnabled: false,
+                                unique: true,
                                 doesDataCopy: false,
                                 fieldHelp: "",
-                                findEnabled: false,
-                                mode: "",
-                                noWrap: true,
-                                required: false,
-                                unique: true,
-                                addToForms: undefined,
+                                audited: false,
+                                properties: expect.objectContaining({
+                                  primaryKey: true,
+                                  foreignKey: false,
+                                  sortAsGiven: true,
+                                  carryChoices: true,
+                                  allowNewChoices: false,
+                                  formula: "",
+                                  defaultValue: "",
+                                }),
                                 permissions: expect.arrayContaining([
                                   expect.objectContaining({
                                     permissionType: "Modify",
@@ -1769,21 +1935,86 @@ tree:
                                     roleId: 12,
                                   }),
                                 ]),
+                              }),
+                              expect.objectContaining({
+                                id: 4,
+                                label: "Record Owner",
+                                fieldType: "user",
+                                noWrap: true,
+                                bold: false,
+                                required: false,
+                                appearsByDefault: false,
+                                findEnabled: true,
+                                unique: false,
+                                doesDataCopy: false,
+                                fieldHelp: "",
+                                audited: false,
                                 properties: expect.objectContaining({
-                                  primaryKey: true,
+                                  primaryKey: false,
                                   foreignKey: false,
+                                  sortAsGiven: true,
+                                  carryChoices: true,
+                                  allowNewChoices: true,
                                   formula: "",
                                   defaultValue: "",
-                                  carryChoices: true,
-                                  allowNewChoices: false,
-                                  sortAsGiven: true,
-                                  numberFormat: 0,
-                                  decimalPlaces: 0,
-                                  doesAverage: false,
-                                  doesTotal: false,
-                                  blankIsZero: true,
-                                  commaStart: 4,
                                 }),
+                                permissions: expect.arrayContaining([
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Viewer",
+                                    roleId: 10,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Participant",
+                                    roleId: 11,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Administrator",
+                                    roleId: 12,
+                                  }),
+                                ]),
+                              }),
+                              expect.objectContaining({
+                                id: 5,
+                                label: "Last Modified By",
+                                fieldType: "user",
+                                noWrap: true,
+                                bold: false,
+                                required: false,
+                                appearsByDefault: false,
+                                findEnabled: true,
+                                unique: false,
+                                doesDataCopy: false,
+                                fieldHelp: "",
+                                audited: false,
+                                properties: expect.objectContaining({
+                                  primaryKey: false,
+                                  foreignKey: false,
+                                  sortAsGiven: true,
+                                  carryChoices: true,
+                                  allowNewChoices: true,
+                                  formula: "",
+                                  defaultValue: "",
+                                }),
+                                permissions: expect.arrayContaining([
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Viewer",
+                                    roleId: 10,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Participant",
+                                    roleId: 11,
+                                  }),
+                                  expect.objectContaining({
+                                    permissionType: "Modify",
+                                    role: "Administrator",
+                                    roleId: 12,
+                                  }),
+                                ]),
                               }),
                             ])
                           );
@@ -1981,7 +2212,72 @@ tree:
                     });
             - name: auth
               type: directory
-              children: []
+              children:
+                - name: getTempToken.test.ts
+                  type: file
+                  contents: |
+                    import { describe, it, expect, beforeEach } from "vitest";
+                    import { createClient, mockFetch } from "../../setup.ts";
+
+                    describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
+                      const client = createClient(mockFetch);
+
+                      beforeEach(() => {
+                        mockFetch.mockClear();
+                      });
+
+                      it("initializes without errors", () => {
+                        expect(client).toBeDefined();
+                      });
+
+                      it("has getTempTokenDBID method", () => {
+                        expect(typeof client.getTempTokenDBID).toBe("function");
+                      });
+
+                      it("calls getTempTokenDBID successfully", async () => {
+                        const mockDbid = "mockDbid123";
+                        const mockToken = "b123xyz_temp_token";
+
+                        mockFetch.mockResolvedValue({
+                          ok: true,
+                          status: 200,
+                          json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
+                        } as Response);
+
+                        const result = await client.getTempTokenDBID({ dbid: mockDbid });
+                        expect(result).toEqual({ temporaryAuthorization: mockToken });
+                        expect(mockFetch).toHaveBeenCalledWith(
+                          `https://api.quickbase.com/v1/auth/temporary/${mockDbid}`,
+                          expect.objectContaining({
+                            method: "GET",
+                            headers: expect.objectContaining({
+                              Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+                              "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+                              "Content-Type": "application/json",
+                            }),
+                          })
+                        );
+                      });
+
+                      it("handles API error", async () => {
+                        const mockDbid = "mockDbid123";
+                        const errorResponse = {
+                          ok: false,
+                          status: 401,
+                          json: () => Promise.resolve({ message: "Unauthorized" }),
+                        } as Response;
+
+                        mockFetch.mockResolvedValue(errorResponse);
+
+                        await expect(client.getTempTokenDBID({ dbid: mockDbid })).rejects.toSatisfy(
+                          (error: Error) => {
+                            expect(error).toBeInstanceOf(Error);
+                            expect(error.message).toBe("API Error: Unauthorized (Status: 401)");
+                            return true;
+                          }
+                        );
+                      });
+                    });
             - name: fields
               type: directory
               children:

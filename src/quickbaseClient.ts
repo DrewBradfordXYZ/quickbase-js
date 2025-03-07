@@ -1,9 +1,10 @@
+// src/quickbaseClient.ts
 import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 import {
   Configuration,
   HTTPHeaders,
   ResponseError,
-} from "./generated/runtime.ts"; // Added ResponseError
+} from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
 import fetch from "node-fetch";
@@ -14,6 +15,7 @@ export interface QuickbaseConfig {
   tempToken?: string;
   debug?: boolean;
   fetchApi?: typeof fetch;
+  withCredentials?: boolean;
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -40,15 +42,18 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
 export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const token = config.tempToken || config.userToken || "";
   const baseUrl = `https://api.quickbase.com/v1`;
-  const headers: HTTPHeaders = {
-    Authorization: `QB-USER-TOKEN ${token}`,
-    "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
-    "Content-Type": "application/json",
-  };
+
+  // Define headers and remove undefined values manually
+  const headers: HTTPHeaders = {};
+  if (token) headers["Authorization"] = `QB-USER-TOKEN ${token}`;
+  headers["QB-Realm-Hostname"] = `${config.realm}.quickbase.com`;
+  headers["Content-Type"] = "application/json";
+
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
     fetchApi: config.fetchApi || (fetch as any),
+    credentials: config.withCredentials ? "include" : "omit",
   });
 
   const apiInstances = Object.fromEntries(
@@ -127,15 +132,19 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         let errorMessage = error.message;
         try {
           const errorBody = await error.response.json();
+          console.log(`Error response body for ${methodName}:`, errorBody);
           errorMessage = errorBody.message || errorMessage;
         } catch (e) {
-          // If JSON parsing fails, keep the original message
+          console.log(
+            `Failed to parse error response for ${methodName}:`,
+            error.message
+          );
         }
         throw new Error(
           `API Error: ${errorMessage} (Status: ${error.response.status})`
         );
       }
-      throw error; // Rethrow other errors unchanged
+      throw error;
     }
   };
 
