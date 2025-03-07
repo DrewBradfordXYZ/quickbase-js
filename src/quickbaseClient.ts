@@ -1,15 +1,19 @@
 import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
-import { Configuration, HTTPHeaders } from "./generated/runtime.ts";
+import {
+  Configuration,
+  HTTPHeaders,
+  ResponseError,
+} from "./generated/runtime.ts"; // Added ResponseError
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
-import fetch from "node-fetch"; // No need for RequestInit import since we won't use it directly
+import fetch from "node-fetch";
 
 export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
   debug?: boolean;
-  fetchApi?: typeof fetch; // Still typed as node-fetch's fetch
+  fetchApi?: typeof fetch;
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -93,7 +97,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     return methodMap as MethodMap;
   }
 
-  const invokeMethod = <K extends keyof QuickbaseClient>(
+  const invokeMethod = async <K extends keyof QuickbaseClient>(
     methodName: K,
     params: Parameters<QuickbaseClient[K]>[0]
   ): Promise<ReturnType<QuickbaseClient[K]>> => {
@@ -111,13 +115,28 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       methodInfo.paramMap[0] === "requestParameters"
         ? [params, undefined]
         : [params, undefined];
-    const responsePromise = methodInfo.method(...args);
-    if (config.debug) {
-      responsePromise.then((response) => {
+
+    try {
+      const response = await methodInfo.method(...args);
+      if (config.debug) {
         console.log(`Response from ${methodName}:`, response);
-      });
+      }
+      return response;
+    } catch (error) {
+      if (error instanceof ResponseError) {
+        let errorMessage = error.message;
+        try {
+          const errorBody = await error.response.json();
+          errorMessage = errorBody.message || errorMessage;
+        } catch (e) {
+          // If JSON parsing fails, keep the original message
+        }
+        throw new Error(
+          `API Error: ${errorMessage} (Status: ${error.response.status})`
+        );
+      }
+      throw error; // Rethrow other errors unchanged
     }
-    return responsePromise;
   };
 
   return new Proxy<QuickbaseClient>({} as QuickbaseClient, {

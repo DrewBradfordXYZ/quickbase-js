@@ -126,4 +126,11 @@ export const definitions = {
     },
     required: ["id"],
   },
+  GetTempTokenDBID200Response: {
+    type: "object",
+    properties: {
+      temporaryAuthorization: { type: "string" },
+    },
+    required: ["temporaryAuthorization"],
+  },
 };

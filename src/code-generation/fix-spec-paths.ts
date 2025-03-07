@@ -76,7 +76,7 @@ export const paths = {
   },
   "/records/query": {
     post: {
-      operationId: "upsertRecords", // Changed to avoid clash
+      operationId: "upsertRecords",
       summary: "Upsert records",
       tags: ["Records"],
       parameters: [
@@ -99,7 +99,6 @@ export const paths = {
           },
         },
         207: {
-          // Added for completeness
           description: "Multi-Status (partial success)",
           schema: {
             type: "array",
@@ -125,7 +124,7 @@ export const paths = {
           name: "generated",
           in: "body",
           required: true,
-          schema: { type: "object" }, // Placeholder
+          schema: { type: "object" },
         },
       ],
       responses: {
@@ -135,6 +134,27 @@ export const paths = {
             type: "array",
             items: { $ref: "#/definitions/ReportRunResponse" },
           },
+        },
+      },
+    },
+  },
+  "/auth/temporary/{dbid}": {
+    get: {
+      operationId: "getTempTokenDBID",
+      summary: "Get a temporary authorization token for a specific dbid",
+      tags: ["Auth"],
+      parameters: [
+        {
+          name: "dbid",
+          in: "path",
+          required: true,
+          type: "string",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success",
+          schema: { $ref: "#/definitions/GetTempTokenDBID200Response" },
         },
       },
     },
