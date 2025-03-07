@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
-import { existsSync, unlinkSync } from "fs";
+import { existsSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import fetch from "node-fetch"; // Requires "node-fetch": "^3.3.2" in package.json
@@ -10,19 +10,9 @@ import readline from "readline";
 const CURRENT_JAR_VERSION = "7.12.0"; // Your current version as of March 2025
 const MAVEN_METADATA_URL =
   "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/maven-metadata.xml";
-const JAR_PATH = join(
-  join(fileURLToPath(import.meta.url), ".."),
-  "openapi-generator-cli.jar"
-);
-const SPEC_INPUT = join(
-  join(fileURLToPath(import.meta.url), ".."),
-  "quickbase-fixed.json"
-);
-const OUTPUT_DIR = join(
-  join(fileURLToPath(import.meta.url), ".."),
-  "..",
-  "generated"
-);
+const CODEGEN_DIR = join(fileURLToPath(import.meta.url), "..");
+const SPEC_INPUT = join(CODEGEN_DIR, "quickbase-fixed.json");
+const OUTPUT_DIR = join(CODEGEN_DIR, "..", "generated");
 
 async function getLatestVersion(): Promise<string> {
   const response = await fetch(MAVEN_METADATA_URL);
@@ -56,7 +46,7 @@ async function checkAndPromptForUpdate(messages: string[]): Promise<string> {
     rl.question(prompt, (answer) => {
       rl.close();
       if (answer.toLowerCase() === "y" || answer.toLowerCase() === "yes") {
-        messages.push(`Updating to version ${latestVersion}...`);
+        messages.push(`Switching to version ${latestVersion}...`);
         resolve(latestVersion);
       } else {
         messages.push(`Sticking with version ${CURRENT_JAR_VERSION}.`);
@@ -66,37 +56,31 @@ async function checkAndPromptForUpdate(messages: string[]): Promise<string> {
   });
 }
 
-async function ensureJarExists(version: string, messages: string[]) {
+async function ensureJarExists(
+  version: string,
+  messages: string[]
+): Promise<string> {
+  const jarPath = join(CODEGEN_DIR, `openapi-generator-cli-${version}.jar`);
   const jarUrl = `https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${version}/openapi-generator-cli-${version}.jar`;
-  if (!existsSync(JAR_PATH)) {
+
+  if (!existsSync(jarPath)) {
     messages.push(`Downloading OpenAPI Generator CLI v${version}...`);
     try {
-      execSync(`curl -L -o ${JAR_PATH} ${jarUrl}`, { stdio: "inherit" });
-      messages.push(`Downloaded ${JAR_PATH}`);
-    } catch (error) {
-      messages.push("Failed to download JAR.");
-      throw error;
-    }
-  } else if (version !== CURRENT_JAR_VERSION) {
-    // If updating to a new version, remove the old .jar first
-    messages.push(`Removing existing JAR to update to v${version}...`);
-    unlinkSync(JAR_PATH);
-    messages.push(`Downloading OpenAPI Generator CLI v${version}...`);
-    try {
-      execSync(`curl -L -o ${JAR_PATH} ${jarUrl}`, { stdio: "inherit" });
-      messages.push(`Downloaded ${JAR_PATH}`);
+      execSync(`curl -L -o ${jarPath} ${jarUrl}`, { stdio: "inherit" });
+      messages.push(`Downloaded ${jarPath}`);
     } catch (error) {
       messages.push("Failed to download JAR.");
       throw error;
     }
   } else {
-    messages.push(`Using existing ${JAR_PATH}`);
+    messages.push(`Using existing ${jarPath}`);
   }
+  return jarPath; // Return the path to the versioned .jar
 }
 
-function regenerateClient(messages: string[]) {
+function regenerateClient(jarPath: string, messages: string[]) {
   messages.push("Regenerating client from spec...");
-  const command = `java -jar ${JAR_PATH} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR}`;
+  const command = `java -jar ${jarPath} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR}`;
   try {
     execSync(command, { stdio: "inherit" });
     messages.push("Client regeneration complete.");
@@ -110,8 +94,8 @@ async function main() {
   const messages: string[] = [];
   try {
     const versionToUse = await checkAndPromptForUpdate(messages);
-    await ensureJarExists(versionToUse, messages);
-    regenerateClient(messages);
+    const jarPath = await ensureJarExists(versionToUse, messages);
+    regenerateClient(jarPath, messages);
   } catch (error) {
     console.error("Error occurred during process:", error);
   } finally {
