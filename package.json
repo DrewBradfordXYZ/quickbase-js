@@ -19,9 +19,9 @@
     "log-gen": "node --loader ts-node/esm src/log-gen.ts",
     "build": "rollup -c",
     "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
-    "test": "vitest run --environment jsdom tests/quickbaseClient.test.ts",
-    "test:integration": "vitest run --environment jsdom tests/integration.test.ts",
-    "test:all": "vitest run --environment jsdom tests/quickbaseClient.test.ts tests/integration.test.ts"
+    "test": "vitest run tests/unit/**/*.test.ts",
+    "test:integration": "vitest run tests/integration/**/*.test.ts",
+    "test:all": "vitest run tests/**/*.test.ts"
   },
   "dependencies": {
     "typescript": "^5.8.2"
