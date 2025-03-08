@@ -43,6 +43,8 @@ tree:
           type: file
     - name: logGen.yaml
       type: file
+    - name: login-page.png
+      type: file
     - name: openapitools.json
       type: file
     - name: package-lock.json
@@ -73,6 +75,7 @@ tree:
             "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
             "test": "vitest run tests/unit/**/*.test.ts",
             "test:integration": "vitest run tests/integration/**/*.test.ts",
+            "test:integration:browser": "playwright test",
             "test:all": "vitest run tests/**/*.test.ts",
             "install:openapi": "curl -o openapi-generator-cli.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar"
           },
@@ -80,6 +83,7 @@ tree:
             "typescript": "^5.8.2"
           },
           "devDependencies": {
+            "@playwright/test": "^1.51.0",
             "@rollup/plugin-commonjs": "^28.0.3",
             "@rollup/plugin-node-resolve": "^16.0.0",
             "@rollup/plugin-terser": "^0.4.4",
@@ -99,6 +103,8 @@ tree:
             "vitest": "^1.6.0"
           }
         }
+    - name: playwrite.config.ts
+      type: file
     - name: rollup.config.js
       type: file
       contents: |
@@ -176,455 +182,10 @@ tree:
           children:
             - name: fix-spec-definitions.ts
               type: file
-              contents: |
-                export const definitions = {
-                  App: {
-                    type: "object",
-                    properties: {
-                      id: { type: "string" },
-                      name: { type: "string" },
-                      created: { type: "string", format: "date-time" },
-                      updated: { type: "string", format: "date-time" },
-                      description: { type: "string" },
-                      timeZone: { type: "string" },
-                      dateFormat: { type: "string" },
-                      hasEveryoneOnTheInternet: { type: "boolean" },
-                      memoryInfo: {
-                        type: "object",
-                        properties: {
-                          estMemory: { type: "number" },
-                          estMemoryInclDependentApps: { type: "number" },
-                        },
-                      },
-                      securityProperties: {
-                        type: "object",
-                        properties: {
-                          allowClone: { type: "boolean" },
-                          allowExport: { type: "boolean" },
-                          enableAppTokens: { type: "boolean" },
-                          hideFromPublic: { type: "boolean" },
-                          mustBeRealmApproved: { type: "boolean" },
-                          useIPFilter: { type: "boolean" },
-                        },
-                      },
-                    },
-                    required: ["id", "name"],
-                  },
-                  Field: {
-                    type: "object",
-                    properties: {
-                      id: { type: "number" },
-                      label: { type: "string" },
-                      fieldType: { type: "string" },
-                      noWrap: { type: "boolean" },
-                      bold: { type: "boolean" },
-                      required: { type: "boolean" },
-                      appearsByDefault: { type: "boolean" },
-                      findEnabled: { type: "boolean" },
-                      unique: { type: "boolean" },
-                      doesDataCopy: { type: "boolean" },
-                      fieldHelp: { type: "string" },
-                      audited: { type: "boolean" },
-                      properties: {
-                        type: "object",
-                        properties: {
-                          primaryKey: { type: "boolean" },
-                          foreignKey: { type: "boolean" },
-                          numLines: { type: "number" },
-                          maxLength: { type: "number" },
-                          appendOnly: { type: "boolean" },
-                          allowHTML: { type: "boolean" },
-                          allowMentions: { type: "boolean" },
-                          sortAsGiven: { type: "boolean" },
-                          carryChoices: { type: "boolean" },
-                          allowNewChoices: { type: "boolean" },
-                          formula: { type: "string" },
-                          defaultValue: { type: "string" },
-                        },
-                      },
-                      permissions: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            permissionType: { type: "string" },
-                            role: { type: "string" },
-                            roleId: { type: "number" },
-                          },
-                        },
-                      },
-                    },
-                    required: ["id", "label", "fieldType"],
-                  },
-                  Table: {
-                    type: "object",
-                    properties: {
-                      id: { type: "string" },
-                      name: { type: "string" },
-                      alias: { type: "string" },
-                      created: { type: "string", format: "date-time" },
-                      defaultSortFieldId: { type: "number" },
-                      defaultSortOrder: { type: "string" },
-                      description: { type: "string" },
-                      keyFieldId: { type: "number" },
-                      nextFieldId: { type: "number" },
-                      nextRecordId: { type: "number" },
-                      pluralRecordName: { type: "string" },
-                      singleRecordName: { type: "string" },
-                      sizeLimit: { type: "string" },
-                      spaceRemaining: { type: "string" },
-                      spaceUsed: { type: "string" },
-                      updated: { type: "string", format: "date-time" },
-                    },
-                    required: ["id", "name"],
-                  },
-                  Record: {
-                    type: "object",
-                    properties: {
-                      id: { type: "number" },
-                      fields: {
-                        type: "object",
-                        additionalProperties: { type: "string" },
-                      },
-                    },
-                    required: ["id"],
-                  },
-                  Upsert200Response: {
-                    type: "object",
-                    properties: {
-                      id: { type: "number" },
-                      status: { type: "string" },
-                    },
-                    required: ["id"],
-                  },
-                  ReportRunResponse: {
-                    type: "object",
-                    properties: {
-                      id: { type: "string" },
-                      data: { type: "object" }, // Placeholder
-                    },
-                    required: ["id"],
-                  },
-                  GetTempTokenDBID200Response: {
-                    type: "object",
-                    properties: {
-                      temporaryAuthorization: { type: "string" },
-                    },
-                    required: ["temporaryAuthorization"],
-                  },
-                };
             - name: fix-spec-main.ts
               type: file
-              contents: |
-                #!/usr/bin/env node
-                import { promises as fs } from "fs";
-                import path from "path";
-                import * as glob from "glob";
-                import { paths } from "./fix-spec-paths.ts";
-                import { definitions } from "./fix-spec-definitions.ts";
-
-                interface Parameter {
-                  name: string;
-                  in: string;
-                  required?: boolean;
-                  type?: string;
-                  schema?: { type?: string; items?: any; $ref?: string };
-                  example?: any;
-                }
-
-                interface Operation {
-                  parameters?: Parameter[];
-                  responses?: Record<string, { description: string; schema?: any }>;
-                  operationId?: string;
-                  summary?: string;
-                  tags?: string[];
-                }
-
-                interface Spec {
-                  paths: Record<string, Record<string, Operation>>;
-                  definitions?: Record<string, any>;
-                  operations?: any;
-                  groups?: any;
-                  components?: any;
-                }
-
-                function toCamelCase(str: string): string {
-                  return str
-                    .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
-                    .replace(/^./, (str) => str.toLowerCase());
-                }
-
-                function fixArraySchemas(spec: Spec) {
-                  for (const pathKey in spec.paths) {
-                    for (const method in spec.paths[pathKey]) {
-                      const operation = spec.paths[pathKey][method];
-                      if (operation.parameters) {
-                        operation.parameters.forEach((param: Parameter) => {
-                          if (param.schema?.type === "array" && !param.schema.items) {
-                            console.log(
-                              `Fixing missing items in ${pathKey}(${method}).${param.name}`
-                            );
-                            param.schema.items = { type: "string" };
-                          }
-                        });
-                      }
-                      if (operation.responses) {
-                        for (const status in operation.responses) {
-                          const response = operation.responses[status];
-                          if (response.schema?.type === "array" && !response.schema.items) {
-                            console.log(
-                              `Fixing missing items in ${pathKey}(${method}).responses.${status}`
-                            );
-                            response.schema.items = { type: "string" };
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-
-                async function fixQuickBaseSpec(): Promise<void> {
-                  try {
-                    const CODEGEN_DIR = path.dirname(new URL(import.meta.url).pathname);
-                    const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
-                    const OUTPUT_DIR = path.join(CODEGEN_DIR, "output"); // New output subdir
-                    console.log("Finding latest QuickBase RESTful API spec...");
-                    const specFiles = glob.sync(
-                      path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
-                    );
-                    if (specFiles.length === 0) {
-                      console.error(
-                        "No QuickBase_RESTful_*.json files found in specs/ folder."
-                      );
-                      process.exit(1);
-                    }
-                    const inputFile = specFiles.sort().pop() as string;
-                    const outputFile = path.join(OUTPUT_DIR, "quickbase-fixed.json"); // Updated path
-
-                    console.log(`Reading ${path.basename(inputFile)} from specs/...`);
-                    const specContent = await fs.readFile(inputFile, "utf8");
-                    const spec: Spec = JSON.parse(specContent);
-
-                    console.log("Fixing parameters...");
-                    for (const pathKey in spec.paths) {
-                      for (const method in spec.paths[pathKey]) {
-                        const operation = spec.paths[pathKey][method];
-                        if (operation.parameters) {
-                          operation.parameters = operation.parameters
-                            .filter(
-                              (param) =>
-                                !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
-                                  param.name
-                                )
-                            )
-                            .map((param: Parameter) => {
-                              param.name = toCamelCase(param.name);
-                              if ("example" in param) delete param.example;
-                              if ("schema" in param && param.in !== "body") delete param.schema;
-                              if (!param.type && param.in !== "body") param.type = "string";
-                              if (
-                                param.name === "generated" &&
-                                param.schema?.type === "array" &&
-                                !param.schema.items
-                              ) {
-                                param.schema!.items = { $ref: "#/definitions/Record" };
-                              }
-                              return param;
-                            });
-                        }
-                      }
-                    }
-
-                    console.log("Applying endpoint fixes...");
-                    spec.paths = { ...paths };
-
-                    console.log("Fixing array schemas...");
-                    fixArraySchemas(spec);
-
-                    console.log("Applying definitions...");
-                    spec.definitions = definitions;
-
-                    console.log("Removing unexpected top-level attributes...");
-                    delete spec.operations;
-                    delete spec.groups;
-                    delete spec.components;
-
-                    console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
-                    await fs.mkdir(OUTPUT_DIR, { recursive: true }); // Create output dir if it doesn’t exist
-                    await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
-                    console.log("Spec fixed successfully!");
-                  } catch (error) {
-                    console.error("Failed to fix spec:", error);
-                    process.exit(1);
-                  }
-                }
-
-                fixQuickBaseSpec();
             - name: fix-spec-paths.ts
               type: file
-              contents: |
-                export const paths = {
-                  "/apps/{appId}": {
-                    get: {
-                      operationId: "getApp",
-                      summary: "Get an app by ID",
-                      tags: ["Apps"],
-                      parameters: [
-                        {
-                          name: "appId",
-                          in: "path",
-                          required: true,
-                          type: "string",
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: { $ref: "#/definitions/App" },
-                        },
-                      },
-                    },
-                  },
-                  "/fields": {
-                    get: {
-                      operationId: "getFields",
-                      summary: "Get all fields for a table",
-                      tags: ["Fields"],
-                      parameters: [
-                        {
-                          name: "tableId",
-                          in: "query",
-                          required: true,
-                          type: "string",
-                        },
-                        {
-                          name: "includeFieldPerms",
-                          in: "query",
-                          required: false,
-                          type: "boolean",
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/Field" },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  "/tables": {
-                    get: {
-                      operationId: "getAppTables",
-                      summary: "Get all tables for an app",
-                      tags: ["Tables"],
-                      parameters: [
-                        {
-                          name: "appId",
-                          in: "query",
-                          required: true,
-                          type: "string",
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/Table" },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  "/records/query": {
-                    post: {
-                      operationId: "upsertRecords",
-                      summary: "Upsert records",
-                      tags: ["Records"],
-                      parameters: [
-                        {
-                          name: "generated",
-                          in: "body",
-                          required: true,
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/Record" },
-                          },
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/Upsert200Response" },
-                          },
-                        },
-                        207: {
-                          description: "Multi-Status (partial success)",
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/Upsert200Response" },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  "/reports/{reportId}/run": {
-                    post: {
-                      operationId: "runReport",
-                      summary: "Run a report",
-                      tags: ["Reports"],
-                      parameters: [
-                        {
-                          name: "reportId",
-                          in: "path",
-                          required: true,
-                          type: "string",
-                        },
-                        {
-                          name: "generated",
-                          in: "body",
-                          required: true,
-                          schema: { type: "object" },
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: {
-                            type: "array",
-                            items: { $ref: "#/definitions/ReportRunResponse" },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  "/auth/temporary/{dbid}": {
-                    get: {
-                      operationId: "getTempTokenDBID",
-                      summary: "Get a temporary authorization token for a specific dbid",
-                      tags: ["Auth"],
-                      parameters: [
-                        {
-                          name: "dbid",
-                          in: "path",
-                          required: true,
-                          type: "string",
-                        },
-                      ],
-                      responses: {
-                        200: {
-                          description: "Success",
-                          schema: { $ref: "#/definitions/GetTempTokenDBID200Response" },
-                        },
-                      },
-                    },
-                  },
-                };
             - name: generate-unified-interface.ts
               type: file
             - name: output
@@ -632,501 +193,6 @@ tree:
               children:
                 - name: quickbase-fixed.json
                   type: file
-                  contents: |-
-                    {
-                      "swagger": "2.0",
-                      "info": {
-                        "title": "Quick Base API",
-                        "version": "1.0.0"
-                      },
-                      "host": "api.quickbase.com/v1",
-                      "basePath": "/",
-                      "schemes": [
-                        "https"
-                      ],
-                      "paths": {
-                        "/apps/{appId}": {
-                          "get": {
-                            "operationId": "getApp",
-                            "summary": "Get an app by ID",
-                            "tags": [
-                              "Apps"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "appId",
-                                "in": "path",
-                                "required": true,
-                                "type": "string"
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "$ref": "#/definitions/App"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "/fields": {
-                          "get": {
-                            "operationId": "getFields",
-                            "summary": "Get all fields for a table",
-                            "tags": [
-                              "Fields"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "tableId",
-                                "in": "query",
-                                "required": true,
-                                "type": "string"
-                              },
-                              {
-                                "name": "includeFieldPerms",
-                                "in": "query",
-                                "required": false,
-                                "type": "boolean"
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/Field"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "/tables": {
-                          "get": {
-                            "operationId": "getAppTables",
-                            "summary": "Get all tables for an app",
-                            "tags": [
-                              "Tables"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "appId",
-                                "in": "query",
-                                "required": true,
-                                "type": "string"
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/Table"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "/records/query": {
-                          "post": {
-                            "operationId": "upsertRecords",
-                            "summary": "Upsert records",
-                            "tags": [
-                              "Records"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "generated",
-                                "in": "body",
-                                "required": true,
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/Record"
-                                  }
-                                }
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/Upsert200Response"
-                                  }
-                                }
-                              },
-                              "207": {
-                                "description": "Multi-Status (partial success)",
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/Upsert200Response"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "/reports/{reportId}/run": {
-                          "post": {
-                            "operationId": "runReport",
-                            "summary": "Run a report",
-                            "tags": [
-                              "Reports"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "reportId",
-                                "in": "path",
-                                "required": true,
-                                "type": "string"
-                              },
-                              {
-                                "name": "generated",
-                                "in": "body",
-                                "required": true,
-                                "schema": {
-                                  "type": "object"
-                                }
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "type": "array",
-                                  "items": {
-                                    "$ref": "#/definitions/ReportRunResponse"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "/auth/temporary/{dbid}": {
-                          "get": {
-                            "operationId": "getTempTokenDBID",
-                            "summary": "Get a temporary authorization token for a specific dbid",
-                            "tags": [
-                              "Auth"
-                            ],
-                            "parameters": [
-                              {
-                                "name": "dbid",
-                                "in": "path",
-                                "required": true,
-                                "type": "string"
-                              }
-                            ],
-                            "responses": {
-                              "200": {
-                                "description": "Success",
-                                "schema": {
-                                  "$ref": "#/definitions/GetTempTokenDBID200Response"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "definitions": {
-                        "App": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "created": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "updated": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "description": {
-                              "type": "string"
-                            },
-                            "timeZone": {
-                              "type": "string"
-                            },
-                            "dateFormat": {
-                              "type": "string"
-                            },
-                            "hasEveryoneOnTheInternet": {
-                              "type": "boolean"
-                            },
-                            "memoryInfo": {
-                              "type": "object",
-                              "properties": {
-                                "estMemory": {
-                                  "type": "number"
-                                },
-                                "estMemoryInclDependentApps": {
-                                  "type": "number"
-                                }
-                              }
-                            },
-                            "securityProperties": {
-                              "type": "object",
-                              "properties": {
-                                "allowClone": {
-                                  "type": "boolean"
-                                },
-                                "allowExport": {
-                                  "type": "boolean"
-                                },
-                                "enableAppTokens": {
-                                  "type": "boolean"
-                                },
-                                "hideFromPublic": {
-                                  "type": "boolean"
-                                },
-                                "mustBeRealmApproved": {
-                                  "type": "boolean"
-                                },
-                                "useIPFilter": {
-                                  "type": "boolean"
-                                }
-                              }
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "name"
-                          ]
-                        },
-                        "Field": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "number"
-                            },
-                            "label": {
-                              "type": "string"
-                            },
-                            "fieldType": {
-                              "type": "string"
-                            },
-                            "noWrap": {
-                              "type": "boolean"
-                            },
-                            "bold": {
-                              "type": "boolean"
-                            },
-                            "required": {
-                              "type": "boolean"
-                            },
-                            "appearsByDefault": {
-                              "type": "boolean"
-                            },
-                            "findEnabled": {
-                              "type": "boolean"
-                            },
-                            "unique": {
-                              "type": "boolean"
-                            },
-                            "doesDataCopy": {
-                              "type": "boolean"
-                            },
-                            "fieldHelp": {
-                              "type": "string"
-                            },
-                            "audited": {
-                              "type": "boolean"
-                            },
-                            "properties": {
-                              "type": "object",
-                              "properties": {
-                                "primaryKey": {
-                                  "type": "boolean"
-                                },
-                                "foreignKey": {
-                                  "type": "boolean"
-                                },
-                                "numLines": {
-                                  "type": "number"
-                                },
-                                "maxLength": {
-                                  "type": "number"
-                                },
-                                "appendOnly": {
-                                  "type": "boolean"
-                                },
-                                "allowHTML": {
-                                  "type": "boolean"
-                                },
-                                "allowMentions": {
-                                  "type": "boolean"
-                                },
-                                "sortAsGiven": {
-                                  "type": "boolean"
-                                },
-                                "carryChoices": {
-                                  "type": "boolean"
-                                },
-                                "allowNewChoices": {
-                                  "type": "boolean"
-                                },
-                                "formula": {
-                                  "type": "string"
-                                },
-                                "defaultValue": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "permissions": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "permissionType": {
-                                    "type": "string"
-                                  },
-                                  "role": {
-                                    "type": "string"
-                                  },
-                                  "roleId": {
-                                    "type": "number"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "label",
-                            "fieldType"
-                          ]
-                        },
-                        "Table": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "alias": {
-                              "type": "string"
-                            },
-                            "created": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "defaultSortFieldId": {
-                              "type": "number"
-                            },
-                            "defaultSortOrder": {
-                              "type": "string"
-                            },
-                            "description": {
-                              "type": "string"
-                            },
-                            "keyFieldId": {
-                              "type": "number"
-                            },
-                            "nextFieldId": {
-                              "type": "number"
-                            },
-                            "nextRecordId": {
-                              "type": "number"
-                            },
-                            "pluralRecordName": {
-                              "type": "string"
-                            },
-                            "singleRecordName": {
-                              "type": "string"
-                            },
-                            "sizeLimit": {
-                              "type": "string"
-                            },
-                            "spaceRemaining": {
-                              "type": "string"
-                            },
-                            "spaceUsed": {
-                              "type": "string"
-                            },
-                            "updated": {
-                              "type": "string",
-                              "format": "date-time"
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "name"
-                          ]
-                        },
-                        "Record": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "number"
-                            },
-                            "fields": {
-                              "type": "object",
-                              "additionalProperties": {
-                                "type": "string"
-                              }
-                            }
-                          },
-                          "required": [
-                            "id"
-                          ]
-                        },
-                        "Upsert200Response": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "number"
-                            },
-                            "status": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "id"
-                          ]
-                        },
-                        "ReportRunResponse": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string"
-                            },
-                            "data": {
-                              "type": "object"
-                            }
-                          },
-                          "required": [
-                            "id"
-                          ]
-                        },
-                        "GetTempTokenDBID200Response": {
-                          "type": "object",
-                          "properties": {
-                            "temporaryAuthorization": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "temporaryAuthorization"
-                          ]
-                        }
-                      }
-                    }
             - name: regenerate-client.ts
               type: file
         - name: generated
@@ -1512,22 +578,24 @@ tree:
         - name: quickbaseClient.ts
           type: file
           contents: |
+            // src/quickbaseClient.ts
             import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
             import {
               Configuration,
               HTTPHeaders,
               ResponseError,
-            } from "./generated/runtime.ts"; // Added ResponseError
+            } from "./generated/runtime.ts";
             import * as apis from "./generated/apis/index.ts";
             import { simplifyName } from "./utils.ts";
-            import fetch from "node-fetch";
+            import { tokenCache } from "./tokenCache.ts";
 
             export interface QuickbaseConfig {
               realm: string;
               userToken?: string;
               tempToken?: string;
+              useTempTokens?: boolean;
               debug?: boolean;
-              fetchApi?: typeof fetch;
+              fetchApi?: typeof fetch; // Optional in browser, required in Node.js if no window.fetch
             }
 
             type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -1552,18 +620,42 @@ tree:
                 .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
             export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
-              const token = config.tempToken || config.userToken || "";
+              const {
+                realm,
+                userToken,
+                tempToken: initialTempToken,
+                useTempTokens,
+                fetchApi,
+                debug,
+              } = config;
               const baseUrl = `https://api.quickbase.com/v1`;
+
               const headers: HTTPHeaders = {
-                Authorization: `QB-USER-TOKEN ${token}`,
-                "QB-Realm-Hostname": `${config.realm}.quickbase.com`,
+                "QB-Realm-Hostname": `${realm}.quickbase.com`,
                 "Content-Type": "application/json",
               };
+
+              if (initialTempToken) {
+                headers["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
+              } else if (userToken) {
+                headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
+              }
+
+              // Default to window.fetch in browser, require fetchApi in Node.js if no default
+              const defaultFetch =
+                typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
               const configuration = new Configuration({
                 basePath: baseUrl,
                 headers,
-                fetchApi: config.fetchApi || (fetch as any),
+                fetchApi: fetchApi || defaultFetch,
+                credentials: "omit", // Tokens handle auth
               });
+
+              if (!configuration.fetchApi && typeof window === "undefined") {
+                throw new Error(
+                  "fetchApi must be provided in non-browser environments (e.g., Node.js)"
+                );
+              }
 
               const apiInstances = Object.fromEntries(
                 Object.entries(apis)
@@ -1602,7 +694,7 @@ tree:
                           method: boundMethod as ApiMethod<typeof simplifiedName>,
                           paramMap: getParamNames(method),
                         };
-                        if (config.debug) {
+                        if (debug) {
                           console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
                         }
                       }
@@ -1620,7 +712,48 @@ tree:
                   console.error(`Method ${methodName} not found in methodMap`, methodMap);
                   throw new Error(`Method ${methodName} not found`);
                 }
-                if (config.debug) {
+
+                // Auto-fetch temp token if useTempTokens is true and no token is set
+                let token = initialTempToken || userToken;
+                if (useTempTokens && !token) {
+                  const dbid =
+                    (params as any).appId ||
+                    (params as any).tableId ||
+                    (params as any).dbid;
+                  if (!dbid) {
+                    throw new Error(
+                      `No dbid found in params for ${methodName} to fetch temp token`
+                    );
+                  }
+                  const cachedToken = tokenCache.get(dbid);
+                  if (cachedToken) {
+                    token = cachedToken;
+                    if (debug) {
+                      console.log(`Reusing cached token for dbid: ${dbid}`, token);
+                    }
+                  } else {
+                    if (typeof window === "undefined" && !fetchApi) {
+                      throw new Error(
+                        "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
+                      );
+                    }
+                    const tokenClient = quickbaseClient({
+                      realm,
+                      fetchApi: fetchApi || defaultFetch,
+                      debug,
+                      withCredentials: true, // For temp token fetch
+                    });
+                    const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
+                    token = tokenResult.temporaryAuthorization;
+                    tokenCache.set(dbid, token);
+                    if (debug) {
+                      console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
+                    }
+                  }
+                  configuration.headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+                }
+
+                if (debug) {
                   console.log(`Invoking ${methodName} with params:`, params);
                   console.log(`Calling method with args:`, [params, undefined]);
                 }
@@ -1632,7 +765,7 @@ tree:
 
                 try {
                   const response = await methodInfo.method(...args);
-                  if (config.debug) {
+                  if (debug) {
                     console.log(`Response from ${methodName}:`, response);
                   }
                   return response;
@@ -1641,15 +774,19 @@ tree:
                     let errorMessage = error.message;
                     try {
                       const errorBody = await error.response.json();
+                      console.log(`Error response body for ${methodName}:`, errorBody);
                       errorMessage = errorBody.message || errorMessage;
                     } catch (e) {
-                      // If JSON parsing fails, keep the original message
+                      console.log(
+                        `Failed to parse error response for ${methodName}:`,
+                        error.message
+                      );
                     }
                     throw new Error(
                       `API Error: ${errorMessage} (Status: ${error.response.status})`
                     );
                   }
-                  throw error; // Rethrow other errors unchanged
+                  throw error;
                 }
               };
 
@@ -1658,7 +795,7 @@ tree:
                   if (prop in methodMap) {
                     const methodName = prop as keyof QuickbaseClient;
                     return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) => {
-                      if (config.debug) {
+                      if (debug) {
                         console.log(`Proxy called ${methodName} with:`, params);
                       }
                       return invokeMethod(methodName, params);
@@ -1674,7 +811,58 @@ tree:
           children:
             - name: QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json
               type: file
+        - name: tokenCache.ts
+          type: file
+          contents: |
+            // src/tokenCache.ts
+            interface TokenEntry {
+              token: string;
+              dbid: string;
+              expiresAt: number; // Unix timestamp in milliseconds
+            }
+
+            export class TokenCache {
+              private tokens: Map<string, TokenEntry>;
+
+              constructor() {
+                this.tokens = new Map();
+              }
+
+              // Add or update a token for a dbid
+              set(dbid: string, token: string, lifespanSeconds: number = 300): void {
+                const expiresAt = Date.now() + (lifespanSeconds - 10) * 1000; // 10-second buffer
+                this.tokens.set(dbid, { token, dbid, expiresAt });
+              }
+
+              // Get a valid token for a dbid, or undefined if expired/missing
+              get(dbid: string): string | undefined {
+                const entry = this.tokens.get(dbid);
+                if (entry && Date.now() < entry.expiresAt) {
+                  return entry.token;
+                }
+                this.tokens.delete(dbid); // Clean up expired token
+                return undefined;
+              }
+
+              // Check if a valid token exists for a dbid
+              hasValidToken(dbid: string): boolean {
+                return !!this.get(dbid);
+              }
+
+              // Clear the cache (for testing or reset)
+              clear(): void {
+                this.tokens.clear();
+              }
+            }
+
+            // Singleton instance (optional, adjust based on your needs)
+            export const tokenCache = new TokenCache();
         - name: utils.ts
+          type: file
+    - name: test-results
+      type: directory
+      children:
+        - name: .last-run.json
           type: file
     - name: tests
       type: directory
@@ -1737,50 +925,786 @@ tree:
             - name: auth
               type: directory
               children:
+                - name: cacheSwitching.test.ts
+                  type: file
+                  contents: |
+                    // tests/integration/auth/cacheSwitching.test.ts
+                    import { test, expect } from "@playwright/test";
+                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+                    import { tokenCache } from "../../../src/tokenCache.ts";
+                    import fetch from "node-fetch";
+                    import dotenv from "dotenv";
+
+                    dotenv.config();
+
+                    const loginToQuickbase = async (
+                      page: import("@playwright/test").Page,
+                      quickbaseUrl: string,
+                      username: string,
+                      password: string
+                    ): Promise<boolean> => {
+                      console.log("Logging in to QuickBase");
+                      let loginSuccess = false;
+                      const maxLoginAttempts = 3;
+                      let loginAttempt = 0;
+
+                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                        try {
+                          loginAttempt++;
+                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
+                          });
+
+                          const loginError = await page.$(".login-error");
+                          if (loginError) {
+                            throw new Error("Login failed. Please check your credentials.");
+                          }
+
+                          console.log("Signed In to QuickBase.");
+                          loginSuccess = true;
+                        } catch (error) {
+                          console.error(
+                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                          );
+                          if (loginAttempt >= maxLoginAttempts) {
+                            console.error("Max login attempts reached. Exiting.");
+                            await page.context().browser()!.close();
+                            return false;
+                          }
+                          await new Promise((resolve) => setTimeout(resolve, 5000));
+                        }
+                      }
+                      return loginSuccess;
+                    };
+
+                    test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
+                      test("caches and switches tokens for different DBIDs", async ({ page }) => {
+                        const realm = process.env.QB_REALM;
+                        const appId = process.env.QB_APP_ID;
+                        const tableId = process.env.QB_TABLE_ID;
+                        const username = process.env.QB_USERNAME;
+                        const password = process.env.QB_PASSWORD;
+
+                        if (!realm) throw new Error("QB_REALM is not defined in .env");
+                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                        if (!tableId) throw new Error("QB_TABLE_ID is not defined in .env");
+                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                        // Login to QuickBase
+                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                        const loginSuccess = await loginToQuickbase(
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password
+                        );
+                        if (!loginSuccess) {
+                          throw new Error("Failed to log in to QuickBase after max attempts.");
+                        }
+
+                        // Navigate to the app page to ensure session context
+                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                          waitUntil: "networkidle",
+                          timeout: 60000,
+                        });
+
+                        const currentUrl = page.url();
+                        console.log("Post-login URL after app navigation:", currentUrl);
+
+                        // Token client for fetching temp tokens
+                        const tokenClient = quickbaseClient({
+                          realm,
+                          useTempTokens: true,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            const response = await page.evaluate(
+                              async ([fetchUrl, fetchInit]) => {
+                                const res = await fetch(fetchUrl, {
+                                  ...fetchInit,
+                                  credentials: "include",
+                                });
+                                const body = await res.text();
+                                return {
+                                  ok: res.ok,
+                                  status: res.status,
+                                  statusText: res.statusText,
+                                  headers: Object.fromEntries(res.headers.entries()),
+                                  body,
+                                };
+                              },
+                              [url, init] as [string, RequestInit]
+                            );
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body: response.body,
+                            });
+
+                            const fetchResponse = new Response(response.body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: response.headers,
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!response.body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(response.body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // Main client with node-fetch for API calls
+                        const client = quickbaseClient({
+                          realm,
+                          useTempTokens: true,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            console.log(`Fetching ${url} with init:`, init);
+                            const response = await fetch(url, init as RequestInit);
+                            const body = await response.text();
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body,
+                            });
+
+                            const fetchResponse = new Response(body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: Object.fromEntries(response.headers.entries()),
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // 1. First getApp call
+                        const appResult1 = await client.getApp({ appId });
+                        console.log("First getApp response:", appResult1);
+                        expect(appResult1).toHaveProperty("id", appId);
+                        expect(appResult1).toHaveProperty("name");
+
+                        // Capture the first token from cache
+                        const firstAppToken = tokenCache.get(appId);
+                        console.log("First app token from cache:", firstAppToken);
+
+                        // 2. getFields call
+                        const fieldsResult = await client.getFields({ tableId });
+                        console.log("getFields response:", fieldsResult);
+                        expect(fieldsResult).toBeInstanceOf(Array);
+                        expect(fieldsResult.length).toBeGreaterThan(0);
+
+                        // Check table token is different
+                        const tableToken = tokenCache.get(tableId);
+                        console.log("Table token from cache:", tableToken);
+                        expect(tableToken).not.toBe(firstAppToken);
+
+                        // 3. Second getApp call
+                        const appResult2 = await client.getApp({ appId });
+                        console.log("Second getApp response:", appResult2);
+                        expect(appResult2).toHaveProperty("id", appId);
+                        expect(appResult2).toHaveProperty("name");
+
+                        // Check token reuse
+                        const secondAppToken = tokenCache.get(appId);
+                        console.log("Second app token from cache:", secondAppToken);
+                        expect(secondAppToken).toBe(firstAppToken);
+                      });
+                    });
+                - name: getAppWithUserToken.test.ts
+                  type: file
+                  contents: |
+                    // tests/integration/auth/getAppWithUserToken.test.ts
+                    import { test, expect } from "@playwright/test";
+                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+                    import dotenv from "dotenv";
+
+                    dotenv.config();
+
+                    const loginToQuickbase = async (
+                      page: import("@playwright/test").Page,
+                      quickbaseUrl: string,
+                      username: string,
+                      password: string
+                    ): Promise<boolean> => {
+                      console.log("Logging in to QuickBase");
+                      let loginSuccess = false;
+                      const maxLoginAttempts = 3;
+                      let loginAttempt = 0;
+
+                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                        try {
+                          loginAttempt++;
+                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
+                          });
+
+                          const loginError = await page.$(".login-error");
+                          if (loginError) {
+                            throw new Error("Login failed. Please check your credentials.");
+                          }
+
+                          console.log("Signed In to QuickBase.");
+                          loginSuccess = true;
+                        } catch (error) {
+                          console.error(
+                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                          );
+                          if (loginAttempt >= maxLoginAttempts) {
+                            console.error("Max login attempts reached. Exiting.");
+                            await page.context().browser()!.close();
+                            return false;
+                          }
+                          await new Promise((resolve) => setTimeout(resolve, 5000));
+                        }
+                      }
+                      return loginSuccess;
+                    };
+
+                    test.describe("QuickbaseClient Integration - getApp with User Token", () => {
+                      test("uses user token for getApp in browser", async ({ page }) => {
+                        const realm = process.env.QB_REALM;
+                        const appId = process.env.QB_APP_ID;
+                        const username = process.env.QB_USERNAME;
+                        const password = process.env.QB_PASSWORD;
+                        const userToken = process.env.QB_USER_TOKEN;
+
+                        if (!realm) throw new Error("QB_REALM is not defined in .env");
+                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+                        if (!userToken) throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                        // Login to Quickbase (optional, to mimic code page context)
+                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                        const loginSuccess = await loginToQuickbase(
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password
+                        );
+                        if (!loginSuccess) {
+                          throw new Error("Failed to log in to QuickBase after max attempts.");
+                        }
+
+                        // Navigate to the app page to ensure session context (optional)
+                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                          waitUntil: "networkidle",
+                          timeout: 60000,
+                        });
+
+                        const currentUrl = page.url();
+                        console.log("Post-login URL after app navigation:", currentUrl);
+
+                        // Create Quickbase client with user token
+                        const client = quickbaseClient({
+                          realm,
+                          userToken, // Use user token instead of temp tokens
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            console.log(`Fetching ${url} with init:`, init);
+                            const response = await page.evaluate(
+                              async ([fetchUrl, fetchInit]) => {
+                                const res = await fetch(fetchUrl, {
+                                  ...fetchInit,
+                                  credentials: "omit", // No cookies needed with user token
+                                });
+                                const body = await res.text();
+                                return {
+                                  ok: res.ok,
+                                  status: res.status,
+                                  statusText: res.statusText,
+                                  headers: Object.fromEntries(res.headers.entries()),
+                                  body,
+                                };
+                              },
+                              [url, init] as [string, RequestInit]
+                            );
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body: response.body,
+                            });
+
+                            const fetchResponse = new Response(response.body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: response.headers,
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!response.body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(response.body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // Call getApp directly
+                        const appResult = await client.getApp({ appId });
+                        console.log("App response using user token:", appResult);
+
+                        // Validate the app response
+                        expect(appResult).toHaveProperty("id", appId);
+                        expect(appResult).toHaveProperty("name");
+                      });
+                    });
                 - name: getTempToken.test.ts
                   type: file
                   contents: |
-                    import { describe, it, expect } from "vitest";
+                    // tests/integration/auth/getTempToken.test.ts
+                    import { test, expect } from "@playwright/test";
                     import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+                    import fetch from "node-fetch";
+                    import dotenv from "dotenv";
 
-                    describe("QuickbaseClient Integration - getTempTokenDBID", () => {
-                      const config = {
-                        realm: process.env.QB_REALM || "",
-                        userToken: process.env.QB_USER_TOKEN || "",
-                        debug: true,
-                      };
+                    dotenv.config();
 
-                      const client = quickbaseClient(config);
+                    const loginToQuickbase = async (
+                      page: import("@playwright/test").Page,
+                      quickbaseUrl: string,
+                      username: string,
+                      password: string
+                    ): Promise<boolean> => {
+                      console.log("Logging in to QuickBase");
+                      let loginSuccess = false;
+                      const maxLoginAttempts = 3;
+                      let loginAttempt = 0;
 
-                      it(
-                        "fetches a temporary token from QuickBase using user token",
-                        async () => {
-                          const dbid = process.env.QB_APP_ID || ""; // Use app ID instead of table ID
-                          if (!config.realm) throw new Error("QB_REALM is not defined in .env");
-                          if (!config.userToken)
-                            throw new Error("QB_USER_TOKEN is not defined in .env");
-                          if (!dbid) throw new Error("QB_APP_ID is not defined in .env");
+                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                        try {
+                          loginAttempt++;
+                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
 
-                          console.log("Config used:", {
-                            realm: config.realm,
-                            userToken: config.userToken.slice(0, 10) + "...",
-                            dbid,
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
                           });
 
-                          try {
-                            const result = await client.getTempTokenDBID({ dbid });
-                            console.log("Real API response:", result);
-
-                            expect(result).toEqual({
-                              temporaryAuthorization: expect.stringMatching(/^b[0-9a-z_]+$/),
-                            });
-                          } catch (error) {
-                            console.error("API error:", error);
-                            throw error;
+                          const loginError = await page.$(".login-error");
+                          if (loginError) {
+                            throw new Error("Login failed. Please check your credentials.");
                           }
-                        },
-                        { timeout: 10000 }
-                      );
+
+                          console.log("Signed In to QuickBase.");
+                          loginSuccess = true;
+                        } catch (error) {
+                          console.error(
+                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                          );
+                          if (loginAttempt >= maxLoginAttempts) {
+                            console.error("Max login attempts reached. Exiting.");
+                            await page.context().browser()!.close();
+                            return false;
+                          }
+                          await new Promise((resolve) => setTimeout(resolve, 5000));
+                        }
+                      }
+                      return loginSuccess;
+                    };
+
+                    test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
+                      test("uses temp tokens automatically for getApp in browser", async ({
+                        page,
+                      }) => {
+                        const realm = process.env.QB_REALM;
+                        const appId = process.env.QB_APP_ID;
+                        const username = process.env.QB_USERNAME;
+                        const password = process.env.QB_PASSWORD;
+
+                        if (!realm) throw new Error("QB_REALM is not defined in .env");
+                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                        // Login to QuickBase
+                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                        const loginSuccess = await loginToQuickbase(
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password
+                        );
+                        if (!loginSuccess) {
+                          throw new Error("Failed to log in to QuickBase after max attempts.");
+                        }
+
+                        // Navigate to the app page to ensure session context
+                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                          waitUntil: "networkidle",
+                          timeout: 60000,
+                        });
+
+                        const currentUrl = page.url();
+                        console.log("Post-login URL after app navigation:", currentUrl);
+
+                        // Create Quickbase client for token fetch
+                        const tokenClient = quickbaseClient({
+                          realm,
+                          useTempTokens: true,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            const response = await page.evaluate(
+                              async ([fetchUrl, fetchInit]) => {
+                                const res = await fetch(fetchUrl, {
+                                  ...fetchInit,
+                                  credentials: "include",
+                                });
+                                const body = await res.text();
+                                return {
+                                  ok: res.ok,
+                                  status: res.status,
+                                  statusText: res.statusText,
+                                  headers: Object.fromEntries(res.headers.entries()),
+                                  body,
+                                };
+                              },
+                              [url, init] as [string, RequestInit]
+                            );
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body: response.body,
+                            });
+
+                            const fetchResponse = new Response(response.body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: response.headers,
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!response.body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(response.body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // Fetch token manually
+                        const tokenResult = await tokenClient.getTempTokenDBID({ dbid: appId });
+                        const token = tokenResult.temporaryAuthorization;
+
+                        // Create main client with fetched token
+                        const client = quickbaseClient({
+                          realm,
+                          tempToken: token,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            console.log(`Fetching ${url} with init:`, init);
+                            const response = await fetch(url, init as RequestInit); // Use node-fetch for test
+                            const body = await response.text();
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body,
+                            });
+
+                            const fetchResponse = new Response(body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: Object.fromEntries(response.headers.entries()),
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // Call getApp directly
+                        const appResult = await client.getApp({ appId });
+                        console.log("App response using auto-fetched temp token:", appResult);
+
+                        // Validate the app response
+                        expect(appResult).toHaveProperty("id", appId);
+                        expect(appResult).toHaveProperty("name");
+                      });
+                    });
+                - name: tokenRenewal.test.ts
+                  type: file
+                  contents: |
+                    // tests/integration/auth/tokenRenewal.test.ts
+                    import { test, expect } from "@playwright/test";
+                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+                    import { tokenCache } from "../../../src/tokenCache.ts";
+                    import fetch from "node-fetch";
+                    import dotenv from "dotenv";
+
+                    dotenv.config();
+
+                    const loginToQuickbase = async (
+                      page: import("@playwright/test").Page,
+                      quickbaseUrl: string,
+                      username: string,
+                      password: string
+                    ): Promise<boolean> => {
+                      console.log("Logging in to QuickBase");
+                      let loginSuccess = false;
+                      const maxLoginAttempts = 3;
+                      let loginAttempt = 0;
+
+                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                        try {
+                          loginAttempt++;
+                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
+                          });
+
+                          const loginError = await page.$(".login-error");
+                          if (loginError) {
+                            throw new Error("Login failed. Please check your credentials.");
+                          }
+
+                          console.log("Signed In to QuickBase.");
+                          loginSuccess = true;
+                        } catch (error) {
+                          console.error(
+                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                          );
+                          if (loginAttempt >= maxLoginAttempts) {
+                            console.error("Max login attempts reached. Exiting.");
+                            await page.context().browser()!.close();
+                            return false;
+                          }
+                          await new Promise((resolve) => setTimeout(resolve, 5000));
+                        }
+                      }
+                      return loginSuccess;
+                    };
+
+                    test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
+                      test("renews temp token after 5 minutes", async ({ page }) => {
+                        test.setTimeout(330000);
+
+                        const realm = process.env.QB_REALM;
+                        const appId = process.env.QB_APP_ID;
+                        const username = process.env.QB_USERNAME;
+                        const password = process.env.QB_PASSWORD;
+
+                        if (!realm) throw new Error("QB_REALM is not defined in .env");
+                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                        // Login to QuickBase
+                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                        const loginSuccess = await loginToQuickbase(
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password
+                        );
+                        if (!loginSuccess) {
+                          throw new Error("Failed to log in to QuickBase after max attempts.");
+                        }
+
+                        // Navigate to the app page to ensure session context
+                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                          waitUntil: "networkidle",
+                          timeout: 60000,
+                        });
+
+                        const currentUrl = page.url();
+                        console.log("Post-login URL after app navigation:", currentUrl);
+
+                        // Token client for fetching temp tokens
+                        const tokenClient = quickbaseClient({
+                          realm,
+                          useTempTokens: true,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            const response = await page.evaluate(
+                              async ([fetchUrl, fetchInit]) => {
+                                const res = await fetch(fetchUrl, {
+                                  ...fetchInit,
+                                  credentials: "include",
+                                });
+                                const body = await res.text();
+                                return {
+                                  ok: res.ok,
+                                  status: res.status,
+                                  statusText: res.statusText,
+                                  headers: Object.fromEntries(res.headers.entries()),
+                                  body,
+                                };
+                              },
+                              [url, init] as [string, RequestInit]
+                            );
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body: response.body,
+                            });
+
+                            const fetchResponse = new Response(response.body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: response.headers,
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!response.body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(response.body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // Main client with node-fetch for API calls
+                        const client = quickbaseClient({
+                          realm,
+                          useTempTokens: true,
+                          debug: true,
+                          fetchApi: async (url, init) => {
+                            console.log(`Fetching ${url} with init:`, init);
+                            const response = await fetch(url, init as RequestInit);
+                            const body = await response.text();
+
+                            console.log(`Raw response from ${url}:`, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              body,
+                            });
+
+                            const fetchResponse = new Response(body || null, {
+                              status: response.status,
+                              statusText: response.statusText,
+                              headers: Object.fromEntries(response.headers.entries()),
+                            });
+
+                            fetchResponse.json = async () => {
+                              if (!body) {
+                                throw new Error("Empty response body from API");
+                              }
+                              try {
+                                return JSON.parse(body);
+                              } catch (e) {
+                                throw new SyntaxError(`Invalid JSON response: ${body}`);
+                              }
+                            };
+
+                            return fetchResponse;
+                          },
+                        });
+
+                        // 1. First getApp call
+                        const appResult1 = await client.getApp({ appId });
+                        console.log("First getApp response:", appResult1);
+                        expect(appResult1).toHaveProperty("id", appId);
+                        expect(appResult1).toHaveProperty("name");
+
+                        // Capture initial token
+                        const initialToken = tokenCache.get(appId);
+                        console.log("Initial token from cache:", initialToken);
+
+                        // Wait 5 minutes
+                        console.log("Waiting 5 minutes to test token expiration...");
+                        await new Promise((resolve) => setTimeout(resolve, 300000));
+
+                        // Refresh page to maintain session
+                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                          waitUntil: "networkidle",
+                          timeout: 60000,
+                        });
+                        console.log("Refreshed page after 5 minutes, URL:", page.url());
+
+                        // 2. Second getApp call (auto-renews)
+                        const appResult2 = await client.getApp({ appId });
+                        console.log("Second getApp response:", appResult2);
+                        expect(appResult2).toHaveProperty("id", appId);
+                        expect(appResult2).toHaveProperty("name");
+
+                        // Check token renewal
+                        const renewedToken = tokenCache.get(appId);
+                        console.log("Renewed token from cache:", renewedToken);
+                        expect(renewedToken).not.toBe(initialToken);
+                      });
                     });
             - name: fields
               type: directory

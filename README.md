@@ -11,10 +11,6 @@ npm run test
 npm run test:integration
 ```
 
-`useTempTokens: true` is browser-only (QuickBase code pages).
-
-`userToken` works in both browser and Node.js with `fetchApi`.
-
 ## In QuickBase Code Pages (Browser Environment)
 
 ### useTempTokens: true:
@@ -49,9 +45,7 @@ Requirement: Must provide fetchApi explicitly (no default in Node.js).
 
 Behavior: Fails with a clear error unless a browser-like fetchApi is provided:
 
-```
 "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
-```
 
 How It Works: Temp tokens need a browser session with cookies, which Node.js can’t provide natively. A custom fetchApi (e.g., via Puppeteer) could work but is impractical for typical Node.js use.
 

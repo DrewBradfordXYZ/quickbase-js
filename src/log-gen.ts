@@ -19,10 +19,11 @@ const importantFiles: string[] = [
   "vitest.config.ts",
   "generated-unified/QuickbaseClient.ts",
   "src/quickbaseClient.ts",
-  "src/code-generation/fix-spec-main.ts",
-  "src/code-generation/fix-spec-paths.ts",
-  "src/code-generation/fix-spec-definitions.ts",
-  "src/code-generation/output/quickbase-fixed.json",
+  "src/tokenCache.ts",
+  // "src/code-generation/fix-spec-main.ts",
+  // "src/code-generation/fix-spec-paths.ts",
+  // "src/code-generation/fix-spec-definitions.ts",
+  // "src/code-generation/output/quickbase-fixed.json",
 ];
 
 const projectGoals: string[] = [

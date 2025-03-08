@@ -159,9 +159,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         }
         const tokenClient = quickbaseClient({
           realm,
-          fetchApi: fetchApi || defaultFetch,
+          fetchApi, // Use the original fetchApi to preserve session context
           debug,
-          withCredentials: true, // For temp token fetch
+          useTempTokens: false, // Prevent infinite recursion
         });
         const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
         token = tokenResult.temporaryAuthorization;
