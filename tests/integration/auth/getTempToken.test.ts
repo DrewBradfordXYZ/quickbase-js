@@ -140,7 +140,7 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       },
     });
 
-    // Fetch token manually to simulate code page flow
+    // Fetch token manually
     const tokenResult = await tokenClient.getTempTokenDBID({ dbid: appId });
     const token = tokenResult.temporaryAuthorization;
 
@@ -151,7 +151,7 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       debug: true,
       fetchApi: async (url, init) => {
         console.log(`Fetching ${url} with init:`, init);
-        const response = await fetch(url, init as RequestInit); // Use node-fetch for simplicity
+        const response = await fetch(url, init as RequestInit); // Use node-fetch for test
         const body = await response.text();
 
         console.log(`Raw response from ${url}:`, {

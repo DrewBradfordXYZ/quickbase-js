@@ -11,18 +11,48 @@ npm run test
 npm run test:integration
 ```
 
-Node.js Compatibility Revisited
-Your Question
-If someone asks, "Can I use Node.js with this project?"
+`useTempTokens: true` is browser-only (QuickBase code pages).
 
-Answer Based on Change
-Change Recap: Removed node-fetch default, uses window.fetch if available, or requires a provided fetchApi. All calls stay in the fetchApi context (browser assumed for useTempTokens: true).
+`userToken` works in both browser and Node.js with `fetchApi`.
 
-Implications:
-With useTempTokens: true: No, you can’t use Node.js directly. The temporary token fetch requires a browser session with cookies, which Node.js can’t provide natively. You’d need a browser (or Playwright) to fetch the token first, then pass it as tempToken to a Node.js client, but that’s not the auto-fetching intent.
+## In QuickBase Code Pages (Browser Environment)
 
-With userToken: Yes, it works in Node.js. If you provide a userToken and a fetchApi (e.g., node-fetch), all calls use QB-USER-TOKEN and don’t need a browser session.
+### useTempTokens: true:
 
-Without Tokens: No, unless a browser-like fetchApi is provided, as the default now assumes window.fetch.
+Token Fetch: Auto-fetches temporary tokens using the provided fetchApi (or window.fetch by default) with cookies (withCredentials: true in the internal tokenClient).
 
-Definitive Answer: "You can use this library in Node.js with permanent user tokens (userToken) and a fetch implementation like node-fetch. However, for temporary tokens (useTempTokens: true), it’s designed for browser environments like QuickBase code pages, as the token fetch requires a logged-in browser session. Node.js alone can’t fetch temp tokens without external browser support."
+Subsequent Calls (e.g., getApp): Uses the same fetchApi (or window.fetch) with the QB-TEMP-TOKEN {TOKEN} header. No additional config needed beyond realm and useTempTokens.
+
+How It Works: Leverages the browser’s session cookies for the initial token fetch, then uses the token for all API calls. In a real code page, window.fetch handles both steps seamlessly.
+
+Test Output: The test uses page.evaluate for token fetch and node-fetch for getApp to bypass Playwright’s browser fetch issue, but in a code page, it’s all window.fetch.
+
+### userToken:
+
+All Calls: Uses the provided fetchApi (or window.fetch by default) with the QB-USER-TOKEN {TOKEN} header. No session cookies needed (credentials: "omit").
+
+How It Works: The user token authenticates directly, independent of the browser session, making it straightforward and reliable.
+
+Test Output: Confirms this with page.evaluate sending QB-USER-TOKEN.
+
+## In Node.js (Non-Browser Environment)
+
+### userToken:
+
+All Calls: Works with a provided fetchApi (e.g., fetchApi: node-fetch). Sets QB-USER-TOKEN {TOKEN} header.
+
+How It Works: Fully functional as long as fetchApi is supplied (e.g., node-fetch), since user tokens don’t require a browser session.
+
+Requirement: Must provide fetchApi explicitly (no default in Node.js).
+
+### useTempTokens: true:
+
+Behavior: Fails with a clear error unless a browser-like fetchApi is provided:
+
+```
+"Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
+```
+
+How It Works: Temp tokens need a browser session with cookies, which Node.js can’t provide natively. A custom fetchApi (e.g., via Puppeteer) could work but is impractical for typical Node.js use.
+
+Practicality: Effectively unusable in Node.js without external browser support, aligning with QuickBase’s temp token requirement.

@@ -15,7 +15,7 @@ export interface QuickbaseConfig {
   tempToken?: string;
   useTempTokens?: boolean;
   debug?: boolean;
-  fetchApi?: typeof fetch; // Browser fetch required for QuickBase code pages
+  fetchApi?: typeof fetch; // Optional in browser, required in Node.js if no window.fetch
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -61,14 +61,21 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
   }
 
+  // Default to window.fetch in browser, require fetchApi in Node.js if no default
+  const defaultFetch =
+    typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi:
-      fetchApi ||
-      (typeof window !== "undefined" ? window.fetch.bind(window) : undefined),
-    credentials: "omit", // No cookies for main calls
+    fetchApi: fetchApi || defaultFetch,
+    credentials: "omit", // Tokens handle auth
   });
+
+  if (!configuration.fetchApi && typeof window === "undefined") {
+    throw new Error(
+      "fetchApi must be provided in non-browser environments (e.g., Node.js)"
+    );
+  }
 
   const apiInstances = Object.fromEntries(
     Object.entries(apis)
@@ -145,16 +152,16 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
           console.log(`Reusing cached token for dbid: ${dbid}`, token);
         }
       } else {
-        if (!fetchApi && typeof window === "undefined") {
+        if (typeof window === "undefined" && !fetchApi) {
           throw new Error(
-            "fetchApi must be provided for temp token fetch in non-browser context"
+            "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
           );
         }
         const tokenClient = quickbaseClient({
           realm,
-          fetchApi,
+          fetchApi: fetchApi || defaultFetch,
           debug,
-          withCredentials: true, // Needed for token fetch only
+          withCredentials: true, // For temp token fetch
         });
         const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
         token = tokenResult.temporaryAuthorization;
