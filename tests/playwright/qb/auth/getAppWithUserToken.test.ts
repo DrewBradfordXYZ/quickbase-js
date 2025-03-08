@@ -1,6 +1,6 @@
 // tests/integration/auth/getAppWithUserToken.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createClient } from "../../setup.ts";
+import { createClient } from "../../../setup.ts";
 
 describe("QuickbaseClient Integration - getApp", () => {
   const client = createClient();

@@ -2,6 +2,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
+  fullyParallel: true, // Run tests in parallel
+  workers: process.env.CI ? 1 : "50%", // Use 50% of CPU cores for local testing
   testDir: "./tests/integration", // Point to your integration tests
   timeout: 30000, // 30 seconds per test
   retries: 2, // Retry flaky tests

@@ -1,7 +1,7 @@
 // tests/integration/auth/tokenRenewal.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-import { tokenCache } from "../../../src/tokenCache.ts";
+import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { tokenCache } from "../../../../src/tokenCache.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 

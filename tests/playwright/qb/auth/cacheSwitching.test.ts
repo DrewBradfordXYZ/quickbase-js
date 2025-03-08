@@ -1,6 +1,7 @@
-// tests/integration/auth/getTempToken.test.ts
+// tests/integration/auth/cacheSwitching.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../src/quickbaseClient.ts";
+import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { tokenCache } from "../../../../src/tokenCache.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -54,21 +55,22 @@ const loginToQuickbase = async (
   return loginSuccess;
 };
 
-test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
-  test("uses temp tokens automatically for getApp in browser", async ({
+test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
+  test("caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence", async ({
     page,
   }) => {
     const realm = process.env.QB_REALM;
     const appId = process.env.QB_APP_ID;
+    const tableId = process.env.QB_TABLE_ID;
     const username = process.env.QB_USERNAME;
     const password = process.env.QB_PASSWORD;
 
     if (!realm) throw new Error("QB_REALM is not defined in .env");
     if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+    if (!tableId) throw new Error("QB_TABLE_ID is not defined in .env");
     if (!username) throw new Error("QB_USERNAME is not defined in .env");
     if (!password) throw new Error("QB_PASSWORD is not defined in .env");
 
-    // Login to QuickBase
     const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
     const loginSuccess = await loginToQuickbase(
       page,
@@ -80,14 +82,12 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       throw new Error("Failed to log in to QuickBase after max attempts.");
     }
 
-    // Navigate to the app page to ensure session context
     await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
       waitUntil: "networkidle",
       timeout: 60000,
     });
     console.log("Post-login URL after app navigation:", page.url());
 
-    // Define browser fetch function
     const browserFetch = async (url: string, init?: RequestInit) => {
       const response = await page.evaluate(
         async ([fetchUrl, fetchInit]) => {
@@ -131,17 +131,16 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       return fetchResponse;
     };
 
-    // Single client with conditional fetch
     const client = quickbaseClient({
       realm,
       useTempTokens: true,
       debug: true,
       fetchApi: async (url, init) => {
         if (url.includes("/auth/temporary/")) {
-          return browserFetch(url, init); // Use browser context for temp token
+          return browserFetch(url, init);
         }
         console.log(`Fetching ${url} with init:`, init);
-        const response = await fetch(url, init as RequestInit); // Node-fetch for API calls
+        const response = await fetch(url, init as RequestInit);
         const body = await response.text();
 
         console.log(`Raw response from ${url}:`, {
@@ -169,12 +168,32 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       },
     });
 
-    // Call getApp directly, letting the library handle temp token logic
-    const appResult = await client.getApp({ appId });
-    console.log("App response using auto-fetched temp token:", appResult);
+    tokenCache.clear();
 
-    // Validate the app response
-    expect(appResult).toHaveProperty("id", appId);
-    expect(appResult).toHaveProperty("name");
+    const appResult1 = await client.getApp({ appId });
+    console.log("First getApp response:", appResult1);
+    expect(appResult1).toHaveProperty("id", appId);
+    expect(appResult1).toHaveProperty("name");
+
+    const firstAppToken = tokenCache.get(appId);
+    console.log("First app token from cache:", firstAppToken);
+
+    const fieldsResult = await client.getFields({ tableId });
+    console.log("getFields response:", fieldsResult);
+    expect(fieldsResult).toBeInstanceOf(Array);
+    expect(fieldsResult.length).toBeGreaterThan(0);
+
+    const tableToken = tokenCache.get(tableId);
+    console.log("Table token from cache:", tableToken);
+    expect(tableToken).not.toBe(firstAppToken);
+
+    const appResult2 = await client.getApp({ appId });
+    console.log("Second getApp response:", appResult2);
+    expect(appResult2).toHaveProperty("id", appId);
+    expect(appResult2).toHaveProperty("name");
+
+    const secondAppToken = tokenCache.get(appId);
+    console.log("Second app token from cache:", secondAppToken);
+    expect(secondAppToken).toBe(firstAppToken);
   });
 });
