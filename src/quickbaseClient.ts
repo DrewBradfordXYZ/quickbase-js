@@ -15,7 +15,13 @@ export interface QuickbaseConfig {
   tempToken?: string;
   useTempTokens?: boolean;
   debug?: boolean;
-  fetchApi?: typeof fetch; // Optional in browser, required in Node.js if no window.fetch
+  fetchApi?: typeof fetch;
+}
+
+interface TempTokenParams {
+  appId?: string;
+  tableId?: string;
+  dbid?: string;
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -61,14 +67,13 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
   }
 
-  // Default to window.fetch in browser, require fetchApi in Node.js if no default
   const defaultFetch =
     typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
-    headers,
+    headers: { ...headers }, // Ensure headers is always defined
     fetchApi: fetchApi || defaultFetch,
-    credentials: "omit", // Tokens handle auth
+    credentials: "omit",
   });
 
   if (!configuration.fetchApi && typeof window === "undefined") {
@@ -125,7 +130,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
 
   const invokeMethod = async <K extends keyof QuickbaseClient>(
     methodName: K,
-    params: Parameters<QuickbaseClient[K]>[0]
+    params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>
   ): Promise<ReturnType<QuickbaseClient[K]>> => {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
@@ -133,13 +138,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
-    // Auto-fetch temp token if useTempTokens is true and no token is set
     let token = initialTempToken || userToken;
     if (useTempTokens && !token) {
-      const dbid =
-        (params as any).appId ||
-        (params as any).tableId ||
-        (params as any).dbid;
+      const dbid = params.appId || params.tableId || params.dbid;
       if (!dbid) {
         throw new Error(
           `No dbid found in params for ${methodName} to fetch temp token`
@@ -159,9 +160,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         }
         const tokenClient = quickbaseClient({
           realm,
-          fetchApi, // Use the original fetchApi to preserve session context
+          fetchApi,
           debug,
-          useTempTokens: false, // Prevent infinite recursion
+          useTempTokens: false,
         });
         const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
         token = tokenResult.temporaryAuthorization;
@@ -169,8 +170,8 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         if (debug) {
           console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
         }
+        configuration.headers!["Authorization"] = `QB-TEMP-TOKEN ${token}`; // Fixed TS18048
       }
-      configuration.headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
     }
 
     if (debug) {

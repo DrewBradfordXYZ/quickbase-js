@@ -25,7 +25,7 @@
     "test:qb:apps": "vitest run tests/vitest/qb/apps/**/*.test.ts",
     "test:qb:fields": "vitest run tests/vitest/qb/fields/**/*.test.ts",
     "test:qb:tables": "vitest run tests/vitest/qb/tables/**/*.test.ts",
-    "test:qb:browser:all": "playwright test tests/playwright/qb", 
+    "test:qb:browser:all": "playwright test tests/playwright/qb",
     "test:qb:auth": "playwright test tests/playwright/qb/auth",
     "test:qb:auth:temptoken": "playwright test tests/playwright/qb/auth/getTempToken.test.ts",
     "test:qb:auth:renewal": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts",
@@ -42,6 +42,7 @@
     "typescript": "^5.8.2"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.17.0",
     "@playwright/test": "^1.51.0",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.0",

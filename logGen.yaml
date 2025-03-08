@@ -1,5 +1,5 @@
 project: quickbase-js
-date: 3/7/2025
+date: 3/8/2025
 root: /home/drew/Projects/quickbase-js
 goals:
   - Implement a QuickBase API client in TypeScript.
@@ -28,11 +28,16 @@ tree:
     - name: dist
       type: directory
       children:
-        - name: quickbaseClient.d.ts
-          type: file
+        - name: code-generation
+          type: directory
+          children:
+            - name: generate-unified-interface.js
+              type: file
         - name: quickbaseClient.js
           type: file
         - name: quickbaseClient.js.map
+          type: file
+        - name: utils.js
           type: file
     - name: examples
       type: directory
@@ -41,7 +46,7 @@ tree:
           type: file
         - name: vanillajs.html
           type: file
-    - name: logGen.yaml
+    - name: logGen_saved.yaml
       type: file
     - name: login-page.png
       type: file
@@ -73,11 +78,24 @@ tree:
             "log-gen": "node --loader ts-node/esm src/log-gen.ts",
             "build": "rollup -c",
             "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
+            "install:openapi": "curl -o openapi-generator-cli.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar",
             "test": "vitest run tests/unit/**/*.test.ts",
+            "test:qb": "vitest run tests/vitest/qb/**/*.test.ts",
+            "test:qb:apps": "vitest run tests/vitest/qb/apps/**/*.test.ts",
+            "test:qb:fields": "vitest run tests/vitest/qb/fields/**/*.test.ts",
+            "test:qb:tables": "vitest run tests/vitest/qb/tables/**/*.test.ts",
+            "test:qb:browser:all": "playwright test tests/playwright/qb", 
+            "test:qb:auth": "playwright test tests/playwright/qb/auth",
+            "test:qb:auth:temptoken": "playwright test tests/playwright/qb/auth/getTempToken.test.ts",
+            "test:qb:auth:renewal": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts",
+            "test:qb:auth:cache": "playwright test tests/playwright/qb/auth/cacheSwitching.test.ts",
+            "test:qb:auth:debug": "playwright test tests/playwright/qb/auth --headed --debug",
+            "test:qb:auth:temp:debug": "playwright test tests/playwright/qb/auth/getTempToken.test.ts --headed --debug",
+            "test:qb:auth:renewal:debug": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts --headed --debug",
+            "test:qb:auth:cache:debug": "playwright test tests/playwright/qb/auth/cacheSwitching.test.ts --headed --debug",
+            "test:qb:parallel": "playwright test tests/playwright/qb --workers 50%",
             "test:integration": "vitest run tests/integration/**/*.test.ts",
-            "test:integration:browser": "playwright test",
-            "test:all": "vitest run tests/**/*.test.ts",
-            "install:openapi": "curl -o openapi-generator-cli.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar"
+            "test:all": "vitest run tests/**/*.test.ts"
           },
           "dependencies": {
             "typescript": "^5.8.2"
@@ -273,21 +291,17 @@ tree:
                   type: file
                 - name: CreateAppRequest.ts
                   type: file
-                - name: CreateField200Response.ts
-                  type: file
                 - name: CreateRelationship200Response.ts
                   type: file
                 - name: CreateRelationshipRequest.ts
                   type: file
                 - name: DeactivateUserToken200Response.ts
                   type: file
-                - name: DeleteApp200Response.ts
-                  type: file
-                - name: DeleteAppRequest.ts
-                  type: file
-                - name: DeleteFields200Response.ts
-                  type: file
                 - name: DeleteFile200Response.ts
+                  type: file
+                - name: DeleteRecords200Response.ts
+                  type: file
+                - name: DeleteRecordsRequest.ts
                   type: file
                 - name: DeleteRelationship200Response.ts
                   type: file
@@ -353,12 +367,6 @@ tree:
                   type: file
                 - name: RunFormulaRequest.ts
                   type: file
-                - name: RunQuery200Response.ts
-                  type: file
-                - name: RunQueryRequest.ts
-                  type: file
-                - name: RunReport200Response.ts
-                  type: file
                 - name: Table.ts
                   type: file
                 - name: TransferUserToken200Response.ts
@@ -367,10 +375,6 @@ tree:
                   type: file
                 - name: UndenyUsers200Response.ts
                   type: file
-                - name: UpdateApp200Response.ts
-                  type: file
-                - name: UpdateAppRequest.ts
-                  type: file
                 - name: UpdateFieldRequest.ts
                   type: file
                 - name: UpdateRelationshipRequest.ts
@@ -378,6 +382,12 @@ tree:
                 - name: UpdateTableRequest.ts
                   type: file
                 - name: Upsert200Response.ts
+                  type: file
+                - name: Upsert207Response.ts
+                  type: file
+                - name: Upsert400Response.ts
+                  type: file
+                - name: UpsertRequest.ts
                   type: file
                 - name: index.ts
                   type: file
@@ -739,9 +749,9 @@ tree:
                     }
                     const tokenClient = quickbaseClient({
                       realm,
-                      fetchApi: fetchApi || defaultFetch,
+                      fetchApi, // Use the original fetchApi to preserve session context
                       debug,
-                      withCredentials: true, // For temp token fetch
+                      useTempTokens: false, // Prevent infinite recursion
                     });
                     const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
                     token = tokenResult.temporaryAuthorization;
@@ -867,1165 +877,756 @@ tree:
     - name: tests
       type: directory
       children:
-        - name: integration
+        - name: playwright
           type: directory
           children:
-            - name: apps
+            - name: qb
               type: directory
               children:
-                - name: getApp.test.ts
-                  type: file
-                  contents: |
-                    import { describe, it, expect } from "vitest";
-                    import { createClient } from "../../setup.ts";
+                - name: auth
+                  type: directory
+                  children:
+                    - name: cacheSwitching.test.ts
+                      type: file
+                      contents: |
+                        // tests/integration/auth/cacheSwitching.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+                        import { tokenCache } from "../../../../src/tokenCache.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
 
-                    describe("QuickbaseClient Integration - getApp", () => {
-                      const client = createClient();
+                        dotenv.config();
 
-                      it(
-                        "fetches real app data from QuickBase",
-                        async () => {
-                          const getAppId = process.env.QB_APP_ID;
-                          if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
-                          if (!process.env.QB_REALM)
-                            throw new Error("QB_REALM is not defined in .env");
-                          if (!process.env.QB_USER_TOKEN)
-                            throw new Error("QB_USER_TOKEN is not defined in .env");
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
 
-                          console.log("Config used:", {
-                            realm: process.env.QB_REALM,
-                            userToken: process.env.QB_USER_TOKEN,
-                            appId: getAppId,
-                          });
-                          const result = await client.getApp({ appId: getAppId });
-                          console.log("Real API response:", result);
-                          expect(result).toEqual({
-                            id: getAppId,
-                            name: "qb-copy",
-                            created: new Date("2025-02-13T18:22:33Z"),
-                            updated: new Date("2025-03-04T04:25:51Z"),
-                            description: "",
-                            timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
-                            dateFormat: "MM-DD-YYYY",
-                            hasEveryoneOnTheInternet: false,
-                            memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
-                            securityProperties: {
-                              allowClone: false,
-                              allowExport: true,
-                              enableAppTokens: true,
-                              hideFromPublic: false,
-                              mustBeRealmApproved: false,
-                              useIPFilter: false,
-                            },
-                          });
-                        },
-                        { timeout: 10000 }
-                      );
-                    });
-            - name: auth
-              type: directory
-              children:
-                - name: cacheSwitching.test.ts
-                  type: file
-                  contents: |
-                    // tests/integration/auth/cacheSwitching.test.ts
-                    import { test, expect } from "@playwright/test";
-                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-                    import { tokenCache } from "../../../src/tokenCache.ts";
-                    import fetch from "node-fetch";
-                    import dotenv from "dotenv";
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
 
-                    dotenv.config();
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
 
-                    const loginToQuickbase = async (
-                      page: import("@playwright/test").Page,
-                      quickbaseUrl: string,
-                      username: string,
-                      password: string
-                    ): Promise<boolean> => {
-                      console.log("Logging in to QuickBase");
-                      let loginSuccess = false;
-                      const maxLoginAttempts = 3;
-                      let loginAttempt = 0;
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
 
-                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
-                        try {
-                          loginAttempt++;
-                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
-
-                          await page.goto(quickbaseUrl, { timeout: 60000 });
-                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
-                          await page.fill("input[name='loginid']", username);
-                          await page.fill("input[name='password']", password);
-                          await page.click("#signin");
-                          await page.waitForURL(`https://*.quickbase.com/**`, {
-                            waitUntil: "networkidle",
-                            timeout: 60000,
-                          });
-
-                          const loginError = await page.$(".login-error");
-                          if (loginError) {
-                            throw new Error("Login failed. Please check your credentials.");
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
                           }
+                          return loginSuccess;
+                        };
 
-                          console.log("Signed In to QuickBase.");
-                          loginSuccess = true;
-                        } catch (error) {
-                          console.error(
-                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
-                          );
-                          if (loginAttempt >= maxLoginAttempts) {
-                            console.error("Max login attempts reached. Exiting.");
-                            await page.context().browser()!.close();
-                            return false;
-                          }
-                          await new Promise((resolve) => setTimeout(resolve, 5000));
-                        }
-                      }
-                      return loginSuccess;
-                    };
+                        test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
+                          test("caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const tableId = process.env.QB_TABLE_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
 
-                    test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
-                      test("caches and switches tokens for different DBIDs", async ({ page }) => {
-                        const realm = process.env.QB_REALM;
-                        const appId = process.env.QB_APP_ID;
-                        const tableId = process.env.QB_TABLE_ID;
-                        const username = process.env.QB_USERNAME;
-                        const password = process.env.QB_PASSWORD;
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!tableId) throw new Error("QB_TABLE_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
 
-                        if (!realm) throw new Error("QB_REALM is not defined in .env");
-                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-                        if (!tableId) throw new Error("QB_TABLE_ID is not defined in .env");
-                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
-                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
-
-                        // Login to QuickBase
-                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
-                        const loginSuccess = await loginToQuickbase(
-                          page,
-                          quickbaseUrl,
-                          username,
-                          password
-                        );
-                        if (!loginSuccess) {
-                          throw new Error("Failed to log in to QuickBase after max attempts.");
-                        }
-
-                        // Navigate to the app page to ensure session context
-                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                          waitUntil: "networkidle",
-                          timeout: 60000,
-                        });
-
-                        const currentUrl = page.url();
-                        console.log("Post-login URL after app navigation:", currentUrl);
-
-                        // Token client for fetching temp tokens
-                        const tokenClient = quickbaseClient({
-                          realm,
-                          useTempTokens: true,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            const response = await page.evaluate(
-                              async ([fetchUrl, fetchInit]) => {
-                                const res = await fetch(fetchUrl, {
-                                  ...fetchInit,
-                                  credentials: "include",
-                                });
-                                const body = await res.text();
-                                return {
-                                  ok: res.ok,
-                                  status: res.status,
-                                  statusText: res.statusText,
-                                  headers: Object.fromEntries(res.headers.entries()),
-                                  body,
-                                };
-                              },
-                              [url, init] as [string, RequestInit]
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
                             );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
 
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body: response.body,
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
                             });
+                            console.log("Post-login URL after app navigation:", page.url());
 
-                            const fetchResponse = new Response(response.body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: response.headers,
-                            });
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
 
-                            fetchResponse.json = async () => {
-                              if (!response.body) {
-                                throw new Error("Empty response body from API");
-                              }
-                              try {
-                                return JSON.parse(response.body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
-                              }
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              fetchResponse.json = async () => {
+                                if (!response.body) throw new Error("Empty response body from API");
+                                try {
+                                  return JSON.parse(response.body);
+                                } catch (e) {
+                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                }
+                              };
+
+                              return fetchResponse;
                             };
 
-                            return fetchResponse;
-                          },
-                        });
+                            const client = quickbaseClient({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init);
+                                }
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit);
+                                const body = await response.text();
 
-                        // Main client with node-fetch for API calls
-                        const client = quickbaseClient({
-                          realm,
-                          useTempTokens: true,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            console.log(`Fetching ${url} with init:`, init);
-                            const response = await fetch(url, init as RequestInit);
-                            const body = await response.text();
-
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body,
-                            });
-
-                            const fetchResponse = new Response(body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: Object.fromEntries(response.headers.entries()),
-                            });
-
-                            fetchResponse.json = async () => {
-                              if (!body) {
-                                throw new Error("Empty response body from API");
-                              }
-                              try {
-                                return JSON.parse(body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${body}`);
-                              }
-                            };
-
-                            return fetchResponse;
-                          },
-                        });
-
-                        // 1. First getApp call
-                        const appResult1 = await client.getApp({ appId });
-                        console.log("First getApp response:", appResult1);
-                        expect(appResult1).toHaveProperty("id", appId);
-                        expect(appResult1).toHaveProperty("name");
-
-                        // Capture the first token from cache
-                        const firstAppToken = tokenCache.get(appId);
-                        console.log("First app token from cache:", firstAppToken);
-
-                        // 2. getFields call
-                        const fieldsResult = await client.getFields({ tableId });
-                        console.log("getFields response:", fieldsResult);
-                        expect(fieldsResult).toBeInstanceOf(Array);
-                        expect(fieldsResult.length).toBeGreaterThan(0);
-
-                        // Check table token is different
-                        const tableToken = tokenCache.get(tableId);
-                        console.log("Table token from cache:", tableToken);
-                        expect(tableToken).not.toBe(firstAppToken);
-
-                        // 3. Second getApp call
-                        const appResult2 = await client.getApp({ appId });
-                        console.log("Second getApp response:", appResult2);
-                        expect(appResult2).toHaveProperty("id", appId);
-                        expect(appResult2).toHaveProperty("name");
-
-                        // Check token reuse
-                        const secondAppToken = tokenCache.get(appId);
-                        console.log("Second app token from cache:", secondAppToken);
-                        expect(secondAppToken).toBe(firstAppToken);
-                      });
-                    });
-                - name: getAppWithUserToken.test.ts
-                  type: file
-                  contents: |
-                    // tests/integration/auth/getAppWithUserToken.test.ts
-                    import { test, expect } from "@playwright/test";
-                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-                    import dotenv from "dotenv";
-
-                    dotenv.config();
-
-                    const loginToQuickbase = async (
-                      page: import("@playwright/test").Page,
-                      quickbaseUrl: string,
-                      username: string,
-                      password: string
-                    ): Promise<boolean> => {
-                      console.log("Logging in to QuickBase");
-                      let loginSuccess = false;
-                      const maxLoginAttempts = 3;
-                      let loginAttempt = 0;
-
-                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
-                        try {
-                          loginAttempt++;
-                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
-
-                          await page.goto(quickbaseUrl, { timeout: 60000 });
-                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
-                          await page.fill("input[name='loginid']", username);
-                          await page.fill("input[name='password']", password);
-                          await page.click("#signin");
-                          await page.waitForURL(`https://*.quickbase.com/**`, {
-                            waitUntil: "networkidle",
-                            timeout: 60000,
-                          });
-
-                          const loginError = await page.$(".login-error");
-                          if (loginError) {
-                            throw new Error("Login failed. Please check your credentials.");
-                          }
-
-                          console.log("Signed In to QuickBase.");
-                          loginSuccess = true;
-                        } catch (error) {
-                          console.error(
-                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
-                          );
-                          if (loginAttempt >= maxLoginAttempts) {
-                            console.error("Max login attempts reached. Exiting.");
-                            await page.context().browser()!.close();
-                            return false;
-                          }
-                          await new Promise((resolve) => setTimeout(resolve, 5000));
-                        }
-                      }
-                      return loginSuccess;
-                    };
-
-                    test.describe("QuickbaseClient Integration - getApp with User Token", () => {
-                      test("uses user token for getApp in browser", async ({ page }) => {
-                        const realm = process.env.QB_REALM;
-                        const appId = process.env.QB_APP_ID;
-                        const username = process.env.QB_USERNAME;
-                        const password = process.env.QB_PASSWORD;
-                        const userToken = process.env.QB_USER_TOKEN;
-
-                        if (!realm) throw new Error("QB_REALM is not defined in .env");
-                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
-                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
-                        if (!userToken) throw new Error("QB_USER_TOKEN is not defined in .env");
-
-                        // Login to Quickbase (optional, to mimic code page context)
-                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
-                        const loginSuccess = await loginToQuickbase(
-                          page,
-                          quickbaseUrl,
-                          username,
-                          password
-                        );
-                        if (!loginSuccess) {
-                          throw new Error("Failed to log in to QuickBase after max attempts.");
-                        }
-
-                        // Navigate to the app page to ensure session context (optional)
-                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                          waitUntil: "networkidle",
-                          timeout: 60000,
-                        });
-
-                        const currentUrl = page.url();
-                        console.log("Post-login URL after app navigation:", currentUrl);
-
-                        // Create Quickbase client with user token
-                        const client = quickbaseClient({
-                          realm,
-                          userToken, // Use user token instead of temp tokens
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            console.log(`Fetching ${url} with init:`, init);
-                            const response = await page.evaluate(
-                              async ([fetchUrl, fetchInit]) => {
-                                const res = await fetch(fetchUrl, {
-                                  ...fetchInit,
-                                  credentials: "omit", // No cookies needed with user token
-                                });
-                                const body = await res.text();
-                                return {
-                                  ok: res.ok,
-                                  status: res.status,
-                                  statusText: res.statusText,
-                                  headers: Object.fromEntries(res.headers.entries()),
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
                                   body,
-                                };
-                              },
-                              [url, init] as [string, RequestInit]
-                            );
-
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body: response.body,
-                            });
-
-                            const fetchResponse = new Response(response.body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: response.headers,
-                            });
-
-                            fetchResponse.json = async () => {
-                              if (!response.body) {
-                                throw new Error("Empty response body from API");
-                              }
-                              try {
-                                return JSON.parse(response.body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
-                              }
-                            };
-
-                            return fetchResponse;
-                          },
-                        });
-
-                        // Call getApp directly
-                        const appResult = await client.getApp({ appId });
-                        console.log("App response using user token:", appResult);
-
-                        // Validate the app response
-                        expect(appResult).toHaveProperty("id", appId);
-                        expect(appResult).toHaveProperty("name");
-                      });
-                    });
-                - name: getTempToken.test.ts
-                  type: file
-                  contents: |
-                    // tests/integration/auth/getTempToken.test.ts
-                    import { test, expect } from "@playwright/test";
-                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-                    import fetch from "node-fetch";
-                    import dotenv from "dotenv";
-
-                    dotenv.config();
-
-                    const loginToQuickbase = async (
-                      page: import("@playwright/test").Page,
-                      quickbaseUrl: string,
-                      username: string,
-                      password: string
-                    ): Promise<boolean> => {
-                      console.log("Logging in to QuickBase");
-                      let loginSuccess = false;
-                      const maxLoginAttempts = 3;
-                      let loginAttempt = 0;
-
-                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
-                        try {
-                          loginAttempt++;
-                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
-
-                          await page.goto(quickbaseUrl, { timeout: 60000 });
-                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
-                          await page.fill("input[name='loginid']", username);
-                          await page.fill("input[name='password']", password);
-                          await page.click("#signin");
-                          await page.waitForURL(`https://*.quickbase.com/**`, {
-                            waitUntil: "networkidle",
-                            timeout: 60000,
-                          });
-
-                          const loginError = await page.$(".login-error");
-                          if (loginError) {
-                            throw new Error("Login failed. Please check your credentials.");
-                          }
-
-                          console.log("Signed In to QuickBase.");
-                          loginSuccess = true;
-                        } catch (error) {
-                          console.error(
-                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
-                          );
-                          if (loginAttempt >= maxLoginAttempts) {
-                            console.error("Max login attempts reached. Exiting.");
-                            await page.context().browser()!.close();
-                            return false;
-                          }
-                          await new Promise((resolve) => setTimeout(resolve, 5000));
-                        }
-                      }
-                      return loginSuccess;
-                    };
-
-                    test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
-                      test("uses temp tokens automatically for getApp in browser", async ({
-                        page,
-                      }) => {
-                        const realm = process.env.QB_REALM;
-                        const appId = process.env.QB_APP_ID;
-                        const username = process.env.QB_USERNAME;
-                        const password = process.env.QB_PASSWORD;
-
-                        if (!realm) throw new Error("QB_REALM is not defined in .env");
-                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
-                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
-
-                        // Login to QuickBase
-                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
-                        const loginSuccess = await loginToQuickbase(
-                          page,
-                          quickbaseUrl,
-                          username,
-                          password
-                        );
-                        if (!loginSuccess) {
-                          throw new Error("Failed to log in to QuickBase after max attempts.");
-                        }
-
-                        // Navigate to the app page to ensure session context
-                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                          waitUntil: "networkidle",
-                          timeout: 60000,
-                        });
-
-                        const currentUrl = page.url();
-                        console.log("Post-login URL after app navigation:", currentUrl);
-
-                        // Create Quickbase client for token fetch
-                        const tokenClient = quickbaseClient({
-                          realm,
-                          useTempTokens: true,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            const response = await page.evaluate(
-                              async ([fetchUrl, fetchInit]) => {
-                                const res = await fetch(fetchUrl, {
-                                  ...fetchInit,
-                                  credentials: "include",
                                 });
-                                const body = await res.text();
-                                return {
-                                  ok: res.ok,
-                                  status: res.status,
-                                  statusText: res.statusText,
-                                  headers: Object.fromEntries(res.headers.entries()),
-                                  body,
-                                };
-                              },
-                              [url, init] as [string, RequestInit]
-                            );
 
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body: response.body,
-                            });
-
-                            const fetchResponse = new Response(response.body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: response.headers,
-                            });
-
-                            fetchResponse.json = async () => {
-                              if (!response.body) {
-                                throw new Error("Empty response body from API");
-                              }
-                              try {
-                                return JSON.parse(response.body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
-                              }
-                            };
-
-                            return fetchResponse;
-                          },
-                        });
-
-                        // Fetch token manually
-                        const tokenResult = await tokenClient.getTempTokenDBID({ dbid: appId });
-                        const token = tokenResult.temporaryAuthorization;
-
-                        // Create main client with fetched token
-                        const client = quickbaseClient({
-                          realm,
-                          tempToken: token,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            console.log(`Fetching ${url} with init:`, init);
-                            const response = await fetch(url, init as RequestInit); // Use node-fetch for test
-                            const body = await response.text();
-
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body,
-                            });
-
-                            const fetchResponse = new Response(body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: Object.fromEntries(response.headers.entries()),
-                            });
-
-                            fetchResponse.json = async () => {
-                              if (!body) {
-                                throw new Error("Empty response body from API");
-                              }
-                              try {
-                                return JSON.parse(body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${body}`);
-                              }
-                            };
-
-                            return fetchResponse;
-                          },
-                        });
-
-                        // Call getApp directly
-                        const appResult = await client.getApp({ appId });
-                        console.log("App response using auto-fetched temp token:", appResult);
-
-                        // Validate the app response
-                        expect(appResult).toHaveProperty("id", appId);
-                        expect(appResult).toHaveProperty("name");
-                      });
-                    });
-                - name: tokenRenewal.test.ts
-                  type: file
-                  contents: |
-                    // tests/integration/auth/tokenRenewal.test.ts
-                    import { test, expect } from "@playwright/test";
-                    import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-                    import { tokenCache } from "../../../src/tokenCache.ts";
-                    import fetch from "node-fetch";
-                    import dotenv from "dotenv";
-
-                    dotenv.config();
-
-                    const loginToQuickbase = async (
-                      page: import("@playwright/test").Page,
-                      quickbaseUrl: string,
-                      username: string,
-                      password: string
-                    ): Promise<boolean> => {
-                      console.log("Logging in to QuickBase");
-                      let loginSuccess = false;
-                      const maxLoginAttempts = 3;
-                      let loginAttempt = 0;
-
-                      while (!loginSuccess && loginAttempt < maxLoginAttempts) {
-                        try {
-                          loginAttempt++;
-                          if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
-
-                          await page.goto(quickbaseUrl, { timeout: 60000 });
-                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
-                          await page.fill("input[name='loginid']", username);
-                          await page.fill("input[name='password']", password);
-                          await page.click("#signin");
-                          await page.waitForURL(`https://*.quickbase.com/**`, {
-                            waitUntil: "networkidle",
-                            timeout: 60000,
-                          });
-
-                          const loginError = await page.$(".login-error");
-                          if (loginError) {
-                            throw new Error("Login failed. Please check your credentials.");
-                          }
-
-                          console.log("Signed In to QuickBase.");
-                          loginSuccess = true;
-                        } catch (error) {
-                          console.error(
-                            `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
-                          );
-                          if (loginAttempt >= maxLoginAttempts) {
-                            console.error("Max login attempts reached. Exiting.");
-                            await page.context().browser()!.close();
-                            return false;
-                          }
-                          await new Promise((resolve) => setTimeout(resolve, 5000));
-                        }
-                      }
-                      return loginSuccess;
-                    };
-
-                    test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
-                      test("renews temp token after 5 minutes", async ({ page }) => {
-                        test.setTimeout(330000);
-
-                        const realm = process.env.QB_REALM;
-                        const appId = process.env.QB_APP_ID;
-                        const username = process.env.QB_USERNAME;
-                        const password = process.env.QB_PASSWORD;
-
-                        if (!realm) throw new Error("QB_REALM is not defined in .env");
-                        if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-                        if (!username) throw new Error("QB_USERNAME is not defined in .env");
-                        if (!password) throw new Error("QB_PASSWORD is not defined in .env");
-
-                        // Login to QuickBase
-                        const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
-                        const loginSuccess = await loginToQuickbase(
-                          page,
-                          quickbaseUrl,
-                          username,
-                          password
-                        );
-                        if (!loginSuccess) {
-                          throw new Error("Failed to log in to QuickBase after max attempts.");
-                        }
-
-                        // Navigate to the app page to ensure session context
-                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                          waitUntil: "networkidle",
-                          timeout: 60000,
-                        });
-
-                        const currentUrl = page.url();
-                        console.log("Post-login URL after app navigation:", currentUrl);
-
-                        // Token client for fetching temp tokens
-                        const tokenClient = quickbaseClient({
-                          realm,
-                          useTempTokens: true,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            const response = await page.evaluate(
-                              async ([fetchUrl, fetchInit]) => {
-                                const res = await fetch(fetchUrl, {
-                                  ...fetchInit,
-                                  credentials: "include",
+                                const fetchResponse = new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
                                 });
-                                const body = await res.text();
-                                return {
-                                  ok: res.ok,
-                                  status: res.status,
-                                  statusText: res.statusText,
-                                  headers: Object.fromEntries(res.headers.entries()),
-                                  body,
+
+                                fetchResponse.json = async () => {
+                                  if (!body) throw new Error("Empty response body from API");
+                                  try {
+                                    return JSON.parse(body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
+                                  }
                                 };
+
+                                return fetchResponse;
                               },
-                              [url, init] as [string, RequestInit]
+                            });
+
+                            tokenCache.clear();
+
+                            const appResult1 = await client.getApp({ appId });
+                            console.log("First getApp response:", appResult1);
+                            expect(appResult1).toHaveProperty("id", appId);
+                            expect(appResult1).toHaveProperty("name");
+
+                            const firstAppToken = tokenCache.get(appId);
+                            console.log("First app token from cache:", firstAppToken);
+
+                            const fieldsResult = await client.getFields({ tableId });
+                            console.log("getFields response:", fieldsResult);
+                            expect(fieldsResult).toBeInstanceOf(Array);
+                            expect(fieldsResult.length).toBeGreaterThan(0);
+
+                            const tableToken = tokenCache.get(tableId);
+                            console.log("Table token from cache:", tableToken);
+                            expect(tableToken).not.toBe(firstAppToken);
+
+                            const appResult2 = await client.getApp({ appId });
+                            console.log("Second getApp response:", appResult2);
+                            expect(appResult2).toHaveProperty("id", appId);
+                            expect(appResult2).toHaveProperty("name");
+
+                            const secondAppToken = tokenCache.get(appId);
+                            console.log("Second app token from cache:", secondAppToken);
+                            expect(secondAppToken).toBe(firstAppToken);
+                          });
+                        });
+                    - name: getAppWithUserToken.test.ts
+                      type: file
+                      contents: |
+                        // tests/integration/auth/getAppWithUserToken.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - getApp with User Token", () => {
+                          test("uses user token for getApp in browser", async ({ page }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+                            const userToken = process.env.QB_USER_TOKEN;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+                            if (!userToken) throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                            // Login to Quickbase (optional, to mimic code page context)
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
                             );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
 
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body: response.body,
+                            // Navigate to the app page to ensure session context (optional)
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
                             });
 
-                            const fetchResponse = new Response(response.body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: response.headers,
+                            const currentUrl = page.url();
+                            console.log("Post-login URL after app navigation:", currentUrl);
+
+                            // Create Quickbase client with user token
+                            const client = quickbaseClient({
+                              realm,
+                              userToken, // Use user token instead of temp tokens
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await page.evaluate(
+                                  async ([fetchUrl, fetchInit]) => {
+                                    const res = await fetch(fetchUrl, {
+                                      ...fetchInit,
+                                      credentials: "omit", // No cookies needed with user token
+                                    });
+                                    const body = await res.text();
+                                    return {
+                                      ok: res.ok,
+                                      status: res.status,
+                                      statusText: res.statusText,
+                                      headers: Object.fromEntries(res.headers.entries()),
+                                      body,
+                                    };
+                                  },
+                                  [url, init] as [string, RequestInit]
+                                );
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body: response.body,
+                                });
+
+                                const fetchResponse = new Response(response.body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: response.headers,
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!response.body) {
+                                    throw new Error("Empty response body from API");
+                                  }
+                                  try {
+                                    return JSON.parse(response.body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
                             });
 
-                            fetchResponse.json = async () => {
-                              if (!response.body) {
-                                throw new Error("Empty response body from API");
+                            // Call getApp directly
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response using user token:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+                          });
+                        });
+                    - name: getTempToken.test.ts
+                      type: file
+                      contents: |
+                        // tests/integration/auth/getTempToken.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
                               }
-                              try {
-                                return JSON.parse(response.body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
                               }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
+                          test("uses temp tokens automatically for getApp in browser", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            // Login to QuickBase
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            // Navigate to the app page to ensure session context
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            // Define browser fetch function
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              fetchResponse.json = async () => {
+                                if (!response.body) throw new Error("Empty response body from API");
+                                try {
+                                  return JSON.parse(response.body);
+                                } catch (e) {
+                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                }
+                              };
+
+                              return fetchResponse;
                             };
 
-                            return fetchResponse;
-                          },
+                            // Single client with conditional fetch
+                            const client = quickbaseClient({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init); // Use browser context for temp token
+                                }
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit); // Node-fetch for API calls
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                const fetchResponse = new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!body) throw new Error("Empty response body from API");
+                                  try {
+                                    return JSON.parse(body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
+                            });
+
+                            // Call getApp directly, letting the library handle temp token logic
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response using auto-fetched temp token:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+                          });
                         });
+                    - name: tokenRenewal.test.ts
+                      type: file
+                      contents: |
+                        // tests/integration/auth/tokenRenewal.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+                        import { tokenCache } from "../../../../src/tokenCache.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
 
-                        // Main client with node-fetch for API calls
-                        const client = quickbaseClient({
-                          realm,
-                          useTempTokens: true,
-                          debug: true,
-                          fetchApi: async (url, init) => {
-                            console.log(`Fetching ${url} with init:`, init);
-                            const response = await fetch(url, init as RequestInit);
-                            const body = await response.text();
+                        dotenv.config();
 
-                            console.log(`Raw response from ${url}:`, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              body,
-                            });
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
 
-                            const fetchResponse = new Response(body || null, {
-                              status: response.status,
-                              statusText: response.statusText,
-                              headers: Object.fromEntries(response.headers.entries()),
-                            });
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
 
-                            fetchResponse.json = async () => {
-                              if (!body) {
-                                throw new Error("Empty response body from API");
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
                               }
-                              try {
-                                return JSON.parse(body);
-                              } catch (e) {
-                                throw new SyntaxError(`Invalid JSON response: ${body}`);
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
                               }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
+                          test("renews temp token after 5 minutes with getApp → wait → getApp sequence", async ({
+                            page,
+                          }) => {
+                            test.setTimeout(330000);
+
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              fetchResponse.json = async () => {
+                                if (!response.body) throw new Error("Empty response body from API");
+                                try {
+                                  return JSON.parse(response.body);
+                                } catch (e) {
+                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                }
+                              };
+
+                              return fetchResponse;
                             };
 
-                            return fetchResponse;
-                          },
+                            const client = quickbaseClient({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init);
+                                }
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit);
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                const fetchResponse = new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!body) throw new Error("Empty response body from API");
+                                  try {
+                                    return JSON.parse(body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
+                            });
+
+                            tokenCache.clear();
+
+                            const appResult1 = await client.getApp({ appId });
+                            console.log("First getApp response:", appResult1);
+                            expect(appResult1).toHaveProperty("id", appId);
+                            expect(appResult1).toHaveProperty("name");
+
+                            const initialToken = tokenCache.get(appId);
+                            console.log("Initial token from cache:", initialToken);
+
+                            console.log("Waiting 5 minutes to test token expiration...");
+                            await new Promise((resolve) => setTimeout(resolve, 300000));
+
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Refreshed page after 5 minutes, URL:", page.url());
+
+                            const appResult2 = await client.getApp({ appId });
+                            console.log("Second getApp response:", appResult2);
+                            expect(appResult2).toHaveProperty("id", appId);
+                            expect(appResult2).toHaveProperty("name");
+
+                            const renewedToken = tokenCache.get(appId);
+                            console.log("Renewed token from cache:", renewedToken);
+                            expect(renewedToken).not.toBe(initialToken);
+                          });
                         });
-
-                        // 1. First getApp call
-                        const appResult1 = await client.getApp({ appId });
-                        console.log("First getApp response:", appResult1);
-                        expect(appResult1).toHaveProperty("id", appId);
-                        expect(appResult1).toHaveProperty("name");
-
-                        // Capture initial token
-                        const initialToken = tokenCache.get(appId);
-                        console.log("Initial token from cache:", initialToken);
-
-                        // Wait 5 minutes
-                        console.log("Waiting 5 minutes to test token expiration...");
-                        await new Promise((resolve) => setTimeout(resolve, 300000));
-
-                        // Refresh page to maintain session
-                        await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                          waitUntil: "networkidle",
-                          timeout: 60000,
-                        });
-                        console.log("Refreshed page after 5 minutes, URL:", page.url());
-
-                        // 2. Second getApp call (auto-renews)
-                        const appResult2 = await client.getApp({ appId });
-                        console.log("Second getApp response:", appResult2);
-                        expect(appResult2).toHaveProperty("id", appId);
-                        expect(appResult2).toHaveProperty("name");
-
-                        // Check token renewal
-                        const renewedToken = tokenCache.get(appId);
-                        console.log("Renewed token from cache:", renewedToken);
-                        expect(renewedToken).not.toBe(initialToken);
-                      });
-                    });
-            - name: fields
-              type: directory
-              children:
-                - name: getFields.test.ts
-                  type: file
-                  contents: |
-                    import { describe, it, expect } from "vitest";
-                    import { createClient } from "../../setup.ts";
-
-                    describe("QuickbaseClient Integration - getFields", () => {
-                      const client = createClient();
-
-                      it(
-                        "fetches real field data from QuickBase",
-                        async () => {
-                          const tableId = "buwai2z3s";
-                          if (!tableId) throw new Error("Table ID is not defined");
-                          if (!process.env.QB_REALM)
-                            throw new Error("QB_REALM is not defined in .env");
-                          if (!process.env.QB_USER_TOKEN)
-                            throw new Error("QB_USER_TOKEN is not defined in .env");
-
-                          console.log("Config used:", {
-                            realm: process.env.QB_REALM,
-                            userToken: process.env.QB_USER_TOKEN,
-                            tableId,
-                          });
-                          const result = await client.getFields({
-                            tableId,
-                            includeFieldPerms: true,
-                          });
-                          console.log("Real API response:", result);
-                          expect(result).toEqual(
-                            expect.arrayContaining([
-                              expect.objectContaining({
-                                id: 1,
-                                label: "Date Created",
-                                fieldType: "timestamp",
-                                noWrap: true,
-                                bold: false,
-                                required: false,
-                                appearsByDefault: false,
-                                findEnabled: false,
-                                unique: false,
-                                doesDataCopy: false,
-                                fieldHelp: "",
-                                audited: false,
-                                properties: expect.objectContaining({
-                                  primaryKey: false,
-                                  foreignKey: false,
-                                  sortAsGiven: true,
-                                  carryChoices: true,
-                                  allowNewChoices: false,
-                                  formula: "",
-                                  defaultValue: "",
-                                }),
-                                permissions: expect.arrayContaining([
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Viewer",
-                                    roleId: 10,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Participant",
-                                    roleId: 11,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Administrator",
-                                    roleId: 12,
-                                  }),
-                                ]),
-                              }),
-                              expect.objectContaining({
-                                id: 2,
-                                label: "Date Modified",
-                                fieldType: "timestamp",
-                                noWrap: true,
-                                bold: false,
-                                required: false,
-                                appearsByDefault: false,
-                                findEnabled: false,
-                                unique: false,
-                                doesDataCopy: false,
-                                fieldHelp: "",
-                                audited: false,
-                                properties: expect.objectContaining({
-                                  primaryKey: false,
-                                  foreignKey: false,
-                                  sortAsGiven: true,
-                                  carryChoices: true,
-                                  allowNewChoices: false,
-                                  formula: "",
-                                  defaultValue: "",
-                                }),
-                                permissions: expect.arrayContaining([
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Viewer",
-                                    roleId: 10,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Participant",
-                                    roleId: 11,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Administrator",
-                                    roleId: 12,
-                                  }),
-                                ]),
-                              }),
-                              expect.objectContaining({
-                                id: 3,
-                                label: "Record ID#",
-                                fieldType: "recordid",
-                                noWrap: true,
-                                bold: false,
-                                required: false,
-                                appearsByDefault: false,
-                                findEnabled: false,
-                                unique: true,
-                                doesDataCopy: false,
-                                fieldHelp: "",
-                                audited: false,
-                                properties: expect.objectContaining({
-                                  primaryKey: true,
-                                  foreignKey: false,
-                                  sortAsGiven: true,
-                                  carryChoices: true,
-                                  allowNewChoices: false,
-                                  formula: "",
-                                  defaultValue: "",
-                                }),
-                                permissions: expect.arrayContaining([
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Viewer",
-                                    roleId: 10,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Participant",
-                                    roleId: 11,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Administrator",
-                                    roleId: 12,
-                                  }),
-                                ]),
-                              }),
-                              expect.objectContaining({
-                                id: 4,
-                                label: "Record Owner",
-                                fieldType: "user",
-                                noWrap: true,
-                                bold: false,
-                                required: false,
-                                appearsByDefault: false,
-                                findEnabled: true,
-                                unique: false,
-                                doesDataCopy: false,
-                                fieldHelp: "",
-                                audited: false,
-                                properties: expect.objectContaining({
-                                  primaryKey: false,
-                                  foreignKey: false,
-                                  sortAsGiven: true,
-                                  carryChoices: true,
-                                  allowNewChoices: true,
-                                  formula: "",
-                                  defaultValue: "",
-                                }),
-                                permissions: expect.arrayContaining([
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Viewer",
-                                    roleId: 10,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Participant",
-                                    roleId: 11,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Administrator",
-                                    roleId: 12,
-                                  }),
-                                ]),
-                              }),
-                              expect.objectContaining({
-                                id: 5,
-                                label: "Last Modified By",
-                                fieldType: "user",
-                                noWrap: true,
-                                bold: false,
-                                required: false,
-                                appearsByDefault: false,
-                                findEnabled: true,
-                                unique: false,
-                                doesDataCopy: false,
-                                fieldHelp: "",
-                                audited: false,
-                                properties: expect.objectContaining({
-                                  primaryKey: false,
-                                  foreignKey: false,
-                                  sortAsGiven: true,
-                                  carryChoices: true,
-                                  allowNewChoices: true,
-                                  formula: "",
-                                  defaultValue: "",
-                                }),
-                                permissions: expect.arrayContaining([
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Viewer",
-                                    roleId: 10,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Participant",
-                                    roleId: 11,
-                                  }),
-                                  expect.objectContaining({
-                                    permissionType: "Modify",
-                                    role: "Administrator",
-                                    roleId: 12,
-                                  }),
-                                ]),
-                              }),
-                            ])
-                          );
-                        },
-                        { timeout: 10000 }
-                      );
-                    });
-            - name: index.ts
-              type: file
-              contents: |
-                // Optional: Only add if you need to export tests
-                export * from "./apps/getApp.test.ts";
-                export * from "./fields/getFields.test.ts";
-                export * from "./tables/getAppTables.test.ts";
-            - name: tables
-              type: directory
-              children:
-                - name: getAppTables.test.ts
-                  type: file
-                  contents: |
-                    import { describe, it, expect } from "vitest";
-                    import { createClient } from "../../setup.ts";
-
-                    describe("QuickbaseClient Integration - getAppTables", () => {
-                      const client = createClient();
-
-                      it(
-                        "fetches real table data from QuickBase",
-                        async () => {
-                          const tablesAppId = process.env.QB_APP_ID;
-                          if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
-                          if (!process.env.QB_REALM)
-                            throw new Error("QB_REALM is not defined in .env");
-                          if (!process.env.QB_USER_TOKEN)
-                            throw new Error("QB_USER_TOKEN is not defined in .env");
-
-                          console.log("Config used:", {
-                            realm: process.env.QB_REALM,
-                            userToken: process.env.QB_USER_TOKEN,
-                            appId: tablesAppId,
-                          });
-                          const result = await client.getAppTables({ appId: tablesAppId });
-                          console.log("Real API response:", result);
-                          expect(result).toEqual(
-                            expect.arrayContaining([
-                              expect.objectContaining({
-                                alias: "_DBID_ROOT",
-                                created: new Date("2025-02-13T18:22:33Z"),
-                                defaultSortFieldId: 2,
-                                defaultSortOrder: "DESC",
-                                description: "",
-                                id: "buwai2zr4",
-                                keyFieldId: 3,
-                                name: "Root",
-                                nextFieldId: 6,
-                                nextRecordId: 1,
-                                pluralRecordName: "Roots",
-                                singleRecordName: "Root",
-                                sizeLimit: "500 MB",
-                                spaceRemaining: "500 MB",
-                                spaceUsed: "0 KB",
-                                updated: new Date("2025-02-13T18:22:34Z"),
-                              }),
-                              expect.objectContaining({
-                                alias: "_DBID_ROLES",
-                                created: new Date("2025-02-13T18:22:33Z"),
-                                defaultSortFieldId: 2,
-                                defaultSortOrder: "DESC",
-                                description: "",
-                                id: "buwai2z3s",
-                                keyFieldId: 3,
-                                name: "Roles",
-                                nextFieldId: 6,
-                                nextRecordId: 1,
-                                pluralRecordName: "Roles",
-                                singleRecordName: "Role",
-                                sizeLimit: "500 MB",
-                                spaceRemaining: "500 MB",
-                                spaceUsed: "0 KB",
-                                updated: new Date("2025-02-13T18:22:34Z"),
-                              }),
-                            ])
-                          );
-                        },
-                        { timeout: 10000 }
-                      );
-                    });
         - name: setup.ts
           type: file
           contents: |
@@ -2044,45 +1645,46 @@ tree:
               });
 
             export const mockFetch = vi.fn();
-        - name: unit
+        - name: vitest
           type: directory
           children:
-            - name: apps
+            - name: qb
               type: directory
               children:
-                - name: getApp.test.ts
-                  type: file
-                  contents: |
-                    import { describe, it, expect, beforeEach } from "vitest";
-                    import { createClient, mockFetch } from "../../setup.ts";
+                - name: apps
+                  type: directory
+                  children:
+                    - name: getApp.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient } from "../../../setup.ts";
 
-                    describe("QuickbaseClient - getApp (Unit)", () => {
-                      const client = createClient(mockFetch);
+                        describe("QuickbaseClient Integration - getApp", () => {
+                          const client = createClient();
 
-                      beforeEach(() => {
-                        mockFetch.mockClear();
-                      });
+                          it(
+                            "fetches real app data from QuickBase",
+                            async () => {
+                              const getAppId = process.env.QB_APP_ID;
+                              if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
+                              if (!process.env.QB_REALM)
+                                throw new Error("QB_REALM is not defined in .env");
+                              if (!process.env.QB_USER_TOKEN)
+                                throw new Error("QB_USER_TOKEN is not defined in .env");
 
-                      it("initializes without errors", () => {
-                        expect(client).toBeDefined();
-                      });
-
-                      it("has getApp method", () => {
-                        expect(typeof client.getApp).toBe("function");
-                      });
-
-                      it("calls getApp successfully", async () => {
-                        mockFetch.mockImplementation((url: string, options: any) => {
-                          console.log("Mock fetch:", url, options);
-                          return Promise.resolve({
-                            ok: true,
-                            status: 200,
-                            json: () =>
-                              Promise.resolve({
-                                id: process.env.QB_APP_ID,
+                              console.log("Config used:", {
+                                realm: process.env.QB_REALM,
+                                userToken: process.env.QB_USER_TOKEN,
+                                appId: getAppId,
+                              });
+                              const result = await client.getApp({ appId: getAppId });
+                              console.log("Real API response:", result);
+                              expect(result).toEqual({
+                                id: getAppId,
                                 name: "qb-copy",
-                                created: "2025-02-13T18:22:33Z",
-                                updated: "2025-03-04T04:25:51Z",
+                                created: new Date("2025-02-13T18:22:33Z"),
+                                updated: new Date("2025-03-04T04:25:51Z"),
                                 description: "",
                                 timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                                 dateFormat: "MM-DD-YYYY",
@@ -2096,131 +1698,553 @@ tree:
                                   mustBeRealmApproved: false,
                                   useIPFilter: false,
                                 },
-                              }),
-                          } as Response);
+                              });
+                            },
+                            { timeout: 10000 }
+                          );
                         });
+                - name: fields
+                  type: directory
+                  children:
+                    - name: getFields.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient } from "../../../setup.ts";
 
-                        const getAppId = process.env.QB_APP_ID;
-                        if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
-                        console.log("Test appId:", getAppId);
-                        const result = await client.getApp({ appId: getAppId });
-                        expect(result).toEqual({
-                          id: getAppId,
-                          name: "qb-copy",
-                          created: new Date("2025-02-13T18:22:33Z"),
-                          updated: new Date("2025-03-04T04:25:51Z"),
-                          description: "",
-                          timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
-                          dateFormat: "MM-DD-YYYY",
-                          hasEveryoneOnTheInternet: false,
-                          memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
-                          securityProperties: {
-                            allowClone: false,
-                            allowExport: true,
-                            enableAppTokens: true,
-                            hideFromPublic: false,
-                            mustBeRealmApproved: false,
-                            useIPFilter: false,
-                          },
+                        describe("QuickbaseClient Integration - getFields", () => {
+                          const client = createClient();
+
+                          it(
+                            "fetches real field data from QuickBase",
+                            async () => {
+                              const tableId = "buwai2z3s";
+                              if (!tableId) throw new Error("Table ID is not defined");
+                              if (!process.env.QB_REALM)
+                                throw new Error("QB_REALM is not defined in .env");
+                              if (!process.env.QB_USER_TOKEN)
+                                throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                              console.log("Config used:", {
+                                realm: process.env.QB_REALM,
+                                userToken: process.env.QB_USER_TOKEN,
+                                tableId,
+                              });
+                              const result = await client.getFields({
+                                tableId,
+                                includeFieldPerms: true,
+                              });
+                              console.log("Real API response:", result);
+                              expect(result).toEqual(
+                                expect.arrayContaining([
+                                  expect.objectContaining({
+                                    id: 1,
+                                    label: "Date Created",
+                                    fieldType: "timestamp",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 2,
+                                    label: "Date Modified",
+                                    fieldType: "timestamp",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 3,
+                                    label: "Record ID#",
+                                    fieldType: "recordid",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: true,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: true,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 4,
+                                    label: "Record Owner",
+                                    fieldType: "user",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: true,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: true,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 5,
+                                    label: "Last Modified By",
+                                    fieldType: "user",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: true,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: true,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                ])
+                              );
+                            },
+                            { timeout: 10000 }
+                          );
                         });
-                        expect(mockFetch).toHaveBeenCalledWith(
-                          `https://api.quickbase.com/v1/apps/${getAppId}`,
-                          expect.objectContaining({
-                            headers: expect.objectContaining({
-                              Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-                              "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
-                            }),
-                          })
-                        );
-                      });
-                    });
-            - name: auth
-              type: directory
-              children:
-                - name: getTempToken.test.ts
+                - name: index.ts
                   type: file
                   contents: |
-                    import { describe, it, expect, beforeEach } from "vitest";
-                    import { createClient, mockFetch } from "../../setup.ts";
+                    // Optional: Only add if you need to export tests
+                    export * from "./apps/getApp.test.ts";
+                    export * from "./fields/getFields.test.ts";
+                    export * from "./tables/getAppTables.test.ts";
+                - name: tables
+                  type: directory
+                  children:
+                    - name: getAppTables.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient } from "../../../setup.ts";
 
-                    describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
-                      const client = createClient(mockFetch);
+                        describe("QuickbaseClient Integration - getAppTables", () => {
+                          const client = createClient();
 
-                      beforeEach(() => {
-                        mockFetch.mockClear();
-                      });
+                          it(
+                            "fetches real table data from QuickBase",
+                            async () => {
+                              const tablesAppId = process.env.QB_APP_ID;
+                              if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
+                              if (!process.env.QB_REALM)
+                                throw new Error("QB_REALM is not defined in .env");
+                              if (!process.env.QB_USER_TOKEN)
+                                throw new Error("QB_USER_TOKEN is not defined in .env");
 
-                      it("initializes without errors", () => {
-                        expect(client).toBeDefined();
-                      });
-
-                      it("has getTempTokenDBID method", () => {
-                        expect(typeof client.getTempTokenDBID).toBe("function");
-                      });
-
-                      it("calls getTempTokenDBID successfully", async () => {
-                        const mockDbid = "mockDbid123";
-                        const mockToken = "b123xyz_temp_token";
-
-                        mockFetch.mockResolvedValue({
-                          ok: true,
-                          status: 200,
-                          json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-                        } as Response);
-
-                        const result = await client.getTempTokenDBID({ dbid: mockDbid });
-                        expect(result).toEqual({ temporaryAuthorization: mockToken });
-                        expect(mockFetch).toHaveBeenCalledWith(
-                          `https://api.quickbase.com/v1/auth/temporary/${mockDbid}`,
-                          expect.objectContaining({
-                            method: "GET",
-                            headers: expect.objectContaining({
-                              Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-                              "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
-                              "Content-Type": "application/json",
-                            }),
-                          })
-                        );
-                      });
-
-                      it("handles API error", async () => {
-                        const mockDbid = "mockDbid123";
-                        const errorResponse = {
-                          ok: false,
-                          status: 401,
-                          json: () => Promise.resolve({ message: "Unauthorized" }),
-                        } as Response;
-
-                        mockFetch.mockResolvedValue(errorResponse);
-
-                        await expect(client.getTempTokenDBID({ dbid: mockDbid })).rejects.toSatisfy(
-                          (error: Error) => {
-                            expect(error).toBeInstanceOf(Error);
-                            expect(error.message).toBe("API Error: Unauthorized (Status: 401)");
-                            return true;
-                          }
-                        );
-                      });
-                    });
-            - name: fields
+                              console.log("Config used:", {
+                                realm: process.env.QB_REALM,
+                                userToken: process.env.QB_USER_TOKEN,
+                                appId: tablesAppId,
+                              });
+                              const result = await client.getAppTables({ appId: tablesAppId });
+                              console.log("Real API response:", result);
+                              expect(result).toEqual(
+                                expect.arrayContaining([
+                                  expect.objectContaining({
+                                    alias: "_DBID_ROOT",
+                                    created: new Date("2025-02-13T18:22:33Z"),
+                                    defaultSortFieldId: 2,
+                                    defaultSortOrder: "DESC",
+                                    description: "",
+                                    id: "buwai2zr4",
+                                    keyFieldId: 3,
+                                    name: "Root",
+                                    nextFieldId: 6,
+                                    nextRecordId: 1,
+                                    pluralRecordName: "Roots",
+                                    singleRecordName: "Root",
+                                    sizeLimit: "500 MB",
+                                    spaceRemaining: "500 MB",
+                                    spaceUsed: "0 KB",
+                                    updated: new Date("2025-02-13T18:22:34Z"),
+                                  }),
+                                  expect.objectContaining({
+                                    alias: "_DBID_ROLES",
+                                    created: new Date("2025-02-13T18:22:33Z"),
+                                    defaultSortFieldId: 2,
+                                    defaultSortOrder: "DESC",
+                                    description: "",
+                                    id: "buwai2z3s",
+                                    keyFieldId: 3,
+                                    name: "Roles",
+                                    nextFieldId: 6,
+                                    nextRecordId: 1,
+                                    pluralRecordName: "Roles",
+                                    singleRecordName: "Role",
+                                    sizeLimit: "500 MB",
+                                    spaceRemaining: "500 MB",
+                                    spaceUsed: "0 KB",
+                                    updated: new Date("2025-02-13T18:22:34Z"),
+                                  }),
+                                ])
+                              );
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
+            - name: unit
               type: directory
               children:
-                - name: getFields.test.ts
-                  type: file
-                  contents: |
-                    import { describe, it, expect } from "vitest";
-                    import { createClient, mockFetch } from "../../setup.ts";
+                - name: apps
+                  type: directory
+                  children:
+                    - name: getApp.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect, beforeEach } from "vitest";
+                        import { createClient, mockFetch } from "../../setup.ts";
 
-                    describe("QuickbaseClient - getFields (Unit)", () => {
-                      it("calls getFields successfully", async () => {
-                        mockFetch.mockImplementation((url: string, options: any) => {
-                          console.log("Mock fetch for getFields:", url, options);
-                          return Promise.resolve({
-                            ok: true,
-                            status: 200,
-                            json: () =>
-                              Promise.resolve([
-                                {
+                        describe("QuickbaseClient - getApp (Unit)", () => {
+                          const client = createClient(mockFetch);
+
+                          beforeEach(() => {
+                            mockFetch.mockClear();
+                          });
+
+                          it("initializes without errors", () => {
+                            expect(client).toBeDefined();
+                          });
+
+                          it("has getApp method", () => {
+                            expect(typeof client.getApp).toBe("function");
+                          });
+
+                          it("calls getApp successfully", async () => {
+                            mockFetch.mockImplementation((url: string, options: any) => {
+                              console.log("Mock fetch:", url, options);
+                              return Promise.resolve({
+                                ok: true,
+                                status: 200,
+                                json: () =>
+                                  Promise.resolve({
+                                    id: process.env.QB_APP_ID,
+                                    name: "qb-copy",
+                                    created: "2025-02-13T18:22:33Z",
+                                    updated: "2025-03-04T04:25:51Z",
+                                    description: "",
+                                    timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                                    dateFormat: "MM-DD-YYYY",
+                                    hasEveryoneOnTheInternet: false,
+                                    memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+                                    securityProperties: {
+                                      allowClone: false,
+                                      allowExport: true,
+                                      enableAppTokens: true,
+                                      hideFromPublic: false,
+                                      mustBeRealmApproved: false,
+                                      useIPFilter: false,
+                                    },
+                                  }),
+                              } as Response);
+                            });
+
+                            const getAppId = process.env.QB_APP_ID;
+                            if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
+                            console.log("Test appId:", getAppId);
+                            const result = await client.getApp({ appId: getAppId });
+                            expect(result).toEqual({
+                              id: getAppId,
+                              name: "qb-copy",
+                              created: new Date("2025-02-13T18:22:33Z"),
+                              updated: new Date("2025-03-04T04:25:51Z"),
+                              description: "",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              dateFormat: "MM-DD-YYYY",
+                              hasEveryoneOnTheInternet: false,
+                              memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+                              securityProperties: {
+                                allowClone: false,
+                                allowExport: true,
+                                enableAppTokens: true,
+                                hideFromPublic: false,
+                                mustBeRealmApproved: false,
+                                useIPFilter: false,
+                              },
+                            });
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/apps/${getAppId}`,
+                              expect.objectContaining({
+                                headers: expect.objectContaining({
+                                  Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+                                  "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+                                }),
+                              })
+                            );
+                          });
+                        });
+                - name: auth
+                  type: directory
+                  children:
+                    - name: getTempToken.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect, beforeEach } from "vitest";
+                        import { createClient, mockFetch } from "../../setup.ts";
+
+                        describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
+                          const client = createClient(mockFetch);
+
+                          beforeEach(() => {
+                            mockFetch.mockClear();
+                          });
+
+                          it("initializes without errors", () => {
+                            expect(client).toBeDefined();
+                          });
+
+                          it("has getTempTokenDBID method", () => {
+                            expect(typeof client.getTempTokenDBID).toBe("function");
+                          });
+
+                          it("calls getTempTokenDBID successfully", async () => {
+                            const mockDbid = "mockDbid123";
+                            const mockToken = "b123xyz_temp_token";
+
+                            mockFetch.mockResolvedValue({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
+                            } as Response);
+
+                            const result = await client.getTempTokenDBID({ dbid: mockDbid });
+                            expect(result).toEqual({ temporaryAuthorization: mockToken });
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/auth/temporary/${mockDbid}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+                                  "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("handles API error", async () => {
+                            const mockDbid = "mockDbid123";
+                            const errorResponse = {
+                              ok: false,
+                              status: 401,
+                              json: () => Promise.resolve({ message: "Unauthorized" }),
+                            } as Response;
+
+                            mockFetch.mockResolvedValue(errorResponse);
+
+                            await expect(client.getTempTokenDBID({ dbid: mockDbid })).rejects.toSatisfy(
+                              (error: Error) => {
+                                expect(error).toBeInstanceOf(Error);
+                                expect(error.message).toBe("API Error: Unauthorized (Status: 401)");
+                                return true;
+                              }
+                            );
+                          });
+                        });
+                - name: fields
+                  type: directory
+                  children:
+                    - name: getFields.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, mockFetch } from "../../setup.ts";
+
+                        describe("QuickbaseClient - getFields (Unit)", () => {
+                          it("calls getFields successfully", async () => {
+                            mockFetch.mockImplementation((url: string, options: any) => {
+                              console.log("Mock fetch for getFields:", url, options);
+                              return Promise.resolve({
+                                ok: true,
+                                status: 200,
+                                json: () =>
+                                  Promise.resolve([
+                                    {
+                                      id: 1,
+                                      label: "Field1",
+                                      fieldType: "text",
+                                      noWrap: false,
+                                      bold: false,
+                                      required: false,
+                                      appearsByDefault: false,
+                                      findEnabled: false,
+                                      unique: false,
+                                      doesDataCopy: false,
+                                      fieldHelp: "field help",
+                                      audited: false,
+                                      properties: {
+                                        primaryKey: false,
+                                        foreignKey: false,
+                                        numLines: 1,
+                                        maxLength: 0,
+                                        appendOnly: false,
+                                        allowHTML: false,
+                                        allowMentions: false,
+                                        sortAsGiven: false,
+                                        carryChoices: true,
+                                        allowNewChoices: false,
+                                        formula: "",
+                                        defaultValue: "",
+                                      },
+                                      permissions: [
+                                        { permissionType: "View", role: "Viewer", roleId: 10 },
+                                        { permissionType: "None", role: "Participant", roleId: 11 },
+                                        { permissionType: "Modify", role: "Administrator", roleId: 12 },
+                                      ],
+                                    },
+                                  ]),
+                              } as Response);
+                            });
+
+                            const client = createClient(mockFetch);
+                            const result = await client.getFields({
+                              tableId: "dummyTableId",
+                              includeFieldPerms: true,
+                            });
+                            console.log("getFields response:", result);
+                            expect(result).toEqual(
+                              expect.arrayContaining([
+                                expect.objectContaining({
                                   id: 1,
                                   label: "Field1",
                                   fieldType: "text",
@@ -2233,7 +2257,7 @@ tree:
                                   doesDataCopy: false,
                                   fieldHelp: "field help",
                                   audited: false,
-                                  properties: {
+                                  properties: expect.objectContaining({
                                     primaryKey: false,
                                     foreignKey: false,
                                     numLines: 1,
@@ -2246,111 +2270,95 @@ tree:
                                     allowNewChoices: false,
                                     formula: "",
                                     defaultValue: "",
-                                  },
-                                  permissions: [
-                                    { permissionType: "View", role: "Viewer", roleId: 10 },
-                                    { permissionType: "None", role: "Participant", roleId: 11 },
-                                    { permissionType: "Modify", role: "Administrator", roleId: 12 },
-                                  ],
-                                },
-                              ]),
-                          } as Response);
+                                  }),
+                                  permissions: expect.arrayContaining([
+                                    expect.objectContaining({
+                                      permissionType: "View",
+                                      role: "Viewer",
+                                      roleId: 10,
+                                    }),
+                                    expect.objectContaining({
+                                      permissionType: "None",
+                                      role: "Participant",
+                                      roleId: 11,
+                                    }),
+                                    expect.objectContaining({
+                                      permissionType: "Modify",
+                                      role: "Administrator",
+                                      roleId: 12,
+                                    }),
+                                  ]),
+                                }),
+                              ])
+                            );
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields?tableId=dummyTableId&includeFieldPerms=true`,
+                              expect.objectContaining({
+                                headers: expect.objectContaining({
+                                  Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+                                  "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+                                }),
+                              })
+                            );
+                          });
                         });
-
-                        const client = createClient(mockFetch);
-                        const result = await client.getFields({
-                          tableId: "dummyTableId",
-                          includeFieldPerms: true,
-                        });
-                        console.log("getFields response:", result);
-                        expect(result).toEqual(
-                          expect.arrayContaining([
-                            expect.objectContaining({
-                              id: 1,
-                              label: "Field1",
-                              fieldType: "text",
-                              noWrap: false,
-                              bold: false,
-                              required: false,
-                              appearsByDefault: false,
-                              findEnabled: false,
-                              unique: false,
-                              doesDataCopy: false,
-                              fieldHelp: "field help",
-                              audited: false,
-                              properties: expect.objectContaining({
-                                primaryKey: false,
-                                foreignKey: false,
-                                numLines: 1,
-                                maxLength: 0,
-                                appendOnly: false,
-                                allowHTML: false,
-                                allowMentions: false,
-                                sortAsGiven: false,
-                                carryChoices: true,
-                                allowNewChoices: false,
-                                formula: "",
-                                defaultValue: "",
-                              }),
-                              permissions: expect.arrayContaining([
-                                expect.objectContaining({
-                                  permissionType: "View",
-                                  role: "Viewer",
-                                  roleId: 10,
-                                }),
-                                expect.objectContaining({
-                                  permissionType: "None",
-                                  role: "Participant",
-                                  roleId: 11,
-                                }),
-                                expect.objectContaining({
-                                  permissionType: "Modify",
-                                  role: "Administrator",
-                                  roleId: 12,
-                                }),
-                              ]),
-                            }),
-                          ])
-                        );
-                        expect(mockFetch).toHaveBeenCalledWith(
-                          `https://api.quickbase.com/v1/fields?tableId=dummyTableId&includeFieldPerms=true`,
-                          expect.objectContaining({
-                            headers: expect.objectContaining({
-                              Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-                              "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
-                            }),
-                          })
-                        );
-                      });
-                    });
-            - name: index.ts
-              type: file
-              contents: |
-                // tests/unit/index.ts
-                export * from "./apps/getApp.test.ts";
-                export * from "./fields/getFields.test.ts";
-                export * from "./tables/getAppTables.test.ts";
-            - name: tables
-              type: directory
-              children:
-                - name: getAppTables.test.ts
+                - name: index.ts
                   type: file
                   contents: |
-                    import { describe, it, expect } from "vitest";
-                    import { createClient, mockFetch } from "../../setup.ts";
+                    // tests/unit/index.ts
+                    export * from "./apps/getApp.test.ts";
+                    export * from "./fields/getFields.test.ts";
+                    export * from "./tables/getAppTables.test.ts";
+                - name: tables
+                  type: directory
+                  children:
+                    - name: getAppTables.test.ts
+                      type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, mockFetch } from "../../setup.ts";
 
-                    describe("QuickbaseClient - getAppTables (Unit)", () => {
-                      it("calls getAppTables successfully", async () => {
-                        mockFetch.mockImplementation((url: string, options: any) => {
-                          console.log("Mock fetch for getAppTables:", url, options);
-                          return Promise.resolve({
-                            ok: true,
-                            status: 200,
-                            json: () =>
-                              Promise.resolve([
-                                {
+                        describe("QuickbaseClient - getAppTables (Unit)", () => {
+                          it("calls getAppTables successfully", async () => {
+                            mockFetch.mockImplementation((url: string, options: any) => {
+                              console.log("Mock fetch for getAppTables:", url, options);
+                              return Promise.resolve({
+                                ok: true,
+                                status: 200,
+                                json: () =>
+                                  Promise.resolve([
+                                    {
+                                      alias: "_DBID_ROOT",
+                                      created: "2025-02-13T18:22:33Z",
+                                      defaultSortFieldId: 2,
+                                      defaultSortOrder: "DESC",
+                                      description: "",
+                                      id: "buwai2zr4",
+                                      keyFieldId: 3,
+                                      name: "Root",
+                                      nextFieldId: 6,
+                                      nextRecordId: 1,
+                                      pluralRecordName: "Roots",
+                                      singleRecordName: "Root",
+                                      sizeLimit: "500 MB",
+                                      spaceRemaining: "500 MB",
+                                      spaceUsed: "0 KB",
+                                      updated: "2025-02-13T18:22:34Z",
+                                    },
+                                  ]),
+                              } as Response);
+                            });
+
+                            const client = createClient(mockFetch);
+                            const tablesAppId = process.env.QB_APP_ID;
+                            if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
+                            const result = await client.getAppTables({ appId: tablesAppId });
+                            console.log("getAppTables response:", result);
+                            expect(result).toEqual(
+                              expect.arrayContaining([
+                                expect.objectContaining({
                                   alias: "_DBID_ROOT",
-                                  created: "2025-02-13T18:22:33Z",
+                                  created: new Date("2025-02-13T18:22:33Z"),
                                   defaultSortFieldId: 2,
                                   defaultSortOrder: "DESC",
                                   description: "",
@@ -2364,50 +2372,21 @@ tree:
                                   sizeLimit: "500 MB",
                                   spaceRemaining: "500 MB",
                                   spaceUsed: "0 KB",
-                                  updated: "2025-02-13T18:22:34Z",
-                                },
-                              ]),
-                          } as Response);
+                                  updated: new Date("2025-02-13T18:22:34Z"),
+                                }),
+                              ])
+                            );
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/tables?appId=${tablesAppId}`,
+                              expect.objectContaining({
+                                headers: expect.objectContaining({
+                                  Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
+                                  "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+                                }),
+                              })
+                            );
+                          });
                         });
-
-                        const client = createClient(mockFetch);
-                        const tablesAppId = process.env.QB_APP_ID;
-                        if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
-                        const result = await client.getAppTables({ appId: tablesAppId });
-                        console.log("getAppTables response:", result);
-                        expect(result).toEqual(
-                          expect.arrayContaining([
-                            expect.objectContaining({
-                              alias: "_DBID_ROOT",
-                              created: new Date("2025-02-13T18:22:33Z"),
-                              defaultSortFieldId: 2,
-                              defaultSortOrder: "DESC",
-                              description: "",
-                              id: "buwai2zr4",
-                              keyFieldId: 3,
-                              name: "Root",
-                              nextFieldId: 6,
-                              nextRecordId: 1,
-                              pluralRecordName: "Roots",
-                              singleRecordName: "Root",
-                              sizeLimit: "500 MB",
-                              spaceRemaining: "500 MB",
-                              spaceUsed: "0 KB",
-                              updated: new Date("2025-02-13T18:22:34Z"),
-                            }),
-                          ])
-                        );
-                        expect(mockFetch).toHaveBeenCalledWith(
-                          `https://api.quickbase.com/v1/tables?appId=${tablesAppId}`,
-                          expect.objectContaining({
-                            headers: expect.objectContaining({
-                              Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-                              "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
-                            }),
-                          })
-                        );
-                      });
-                    });
     - name: text.txt
       type: file
     - name: tsconfig.json

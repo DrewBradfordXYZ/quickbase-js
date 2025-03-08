@@ -1,12 +1,12 @@
-#!/usr/bin/env node
+// src/code-generation/generate-unified-interface.ts
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { simplifyName } from "../utils.ts";
-import { OpenAPIV3 } from "openapi-types";
+import { OpenAPIV2 } from "openapi-types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SPEC_FILE = join(__dirname, "quickbase-fixed.json");
+const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 
@@ -21,35 +21,35 @@ function generateInterface() {
   console.log("Generating unified QuickbaseClient interface...");
   const spec = JSON.parse(
     readFileSync(SPEC_FILE, "utf8")
-  ) as OpenAPIV3.Document;
+  ) as OpenAPIV2.Document;
   const { paths } = spec;
 
   const modelImports = new Set<string>();
   const methods: string[] = [];
 
   for (const [path, methodsObj] of Object.entries(
-    paths as OpenAPIV3.PathsObject
+    paths as OpenAPIV2.PathsObject
   )) {
     if (!methodsObj) continue;
 
     for (const [method, operation] of Object.entries(
-      methodsObj as OpenAPIV3.PathItemObject
+      methodsObj as OpenAPIV2.PathItemObject
     )) {
-      const op = operation as OpenAPIV3.OperationObject | undefined;
+      const op = operation as OpenAPIV2.OperationObject | undefined;
       if (!op || !op.operationId) continue;
 
-      const opId = simplifyName(op.operationId);
+      const opId = op.operationId; // Use operationId directly, no simplification
       const params = (op.parameters || [])
         .filter((p) => {
-          const param = p as OpenAPIV3.ParameterObject;
+          const param = p as OpenAPIV2.ParameterObject;
           return !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
             param.name
           );
         })
         .map((p) => {
-          const param = p as OpenAPIV3.ParameterObject;
+          const param = p as OpenAPIV2.ParameterObject;
           const type = param.type
-            ? mapOpenApiTypeToTs(param.type) // Map OpenAPI type to TS
+            ? mapOpenApiTypeToTs(param.type)
             : param.schema
             ? mapRefToType(param.schema, modelImports)
             : "any";
@@ -57,7 +57,7 @@ function generateInterface() {
         })
         .join("; ");
       const response = op.responses?.["200"] as
-        | OpenAPIV3.ResponseObject
+        | OpenAPIV2.ResponseObject
         | undefined;
       const returnType = response?.schema
         ? mapRefToType(response.schema, modelImports)
@@ -97,7 +97,7 @@ function mapOpenApiTypeToTs(openApiType: string): string {
 }
 
 function mapRefToType(
-  schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+  schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject,
   modelImports: Set<string>
 ): string {
   if ("$ref" in schema) {
