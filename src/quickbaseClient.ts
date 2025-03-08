@@ -7,15 +7,15 @@ import {
 } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
-import fetch from "node-fetch";
+import { tokenCache } from "./tokenCache.ts";
 
 export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
+  useTempTokens?: boolean;
   debug?: boolean;
-  fetchApi?: typeof fetch;
-  withCredentials?: boolean;
+  fetchApi?: typeof fetch; // Browser fetch required for QuickBase code pages
 }
 
 type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -40,19 +40,23 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
 export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
-  const { realm, userToken, tempToken, fetchApi, withCredentials, debug } =
-    config;
+  const {
+    realm,
+    userToken,
+    tempToken: initialTempToken,
+    useTempTokens,
+    fetchApi,
+    debug,
+  } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
-  // Define headers and remove undefined values manually
   const headers: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
     "Content-Type": "application/json",
   };
 
-  // Set Authorization header based on token type
-  if (tempToken) {
-    headers["Authorization"] = `QB-TEMP-TOKEN ${tempToken}`;
+  if (initialTempToken) {
+    headers["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
   } else if (userToken) {
     headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
   }
@@ -60,8 +64,10 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const configuration = new Configuration({
     basePath: baseUrl,
     headers,
-    fetchApi: fetchApi || (fetch as any),
-    credentials: withCredentials ? "include" : "omit",
+    fetchApi:
+      fetchApi ||
+      (typeof window !== "undefined" ? window.fetch.bind(window) : undefined),
+    credentials: "omit", // No cookies for main calls
   });
 
   const apiInstances = Object.fromEntries(
@@ -119,6 +125,47 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       console.error(`Method ${methodName} not found in methodMap`, methodMap);
       throw new Error(`Method ${methodName} not found`);
     }
+
+    // Auto-fetch temp token if useTempTokens is true and no token is set
+    let token = initialTempToken || userToken;
+    if (useTempTokens && !token) {
+      const dbid =
+        (params as any).appId ||
+        (params as any).tableId ||
+        (params as any).dbid;
+      if (!dbid) {
+        throw new Error(
+          `No dbid found in params for ${methodName} to fetch temp token`
+        );
+      }
+      const cachedToken = tokenCache.get(dbid);
+      if (cachedToken) {
+        token = cachedToken;
+        if (debug) {
+          console.log(`Reusing cached token for dbid: ${dbid}`, token);
+        }
+      } else {
+        if (!fetchApi && typeof window === "undefined") {
+          throw new Error(
+            "fetchApi must be provided for temp token fetch in non-browser context"
+          );
+        }
+        const tokenClient = quickbaseClient({
+          realm,
+          fetchApi,
+          debug,
+          withCredentials: true, // Needed for token fetch only
+        });
+        const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
+        token = tokenResult.temporaryAuthorization;
+        tokenCache.set(dbid, token);
+        if (debug) {
+          console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
+        }
+      }
+      configuration.headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+    }
+
     if (debug) {
       console.log(`Invoking ${methodName} with params:`, params);
       console.log(`Calling method with args:`, [params, undefined]);

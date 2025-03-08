@@ -1,7 +1,6 @@
-// tests/integration/auth/getTempToken.test.ts
+// tests/integration/auth/getAppWithUserToken.test.ts
 import { test, expect } from "@playwright/test";
 import { quickbaseClient } from "../../../src/quickbaseClient.ts";
-import fetch from "node-fetch";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -54,21 +53,21 @@ const loginToQuickbase = async (
   return loginSuccess;
 };
 
-test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
-  test("uses temp tokens automatically for getApp in browser", async ({
-    page,
-  }) => {
+test.describe("QuickbaseClient Integration - getApp with User Token", () => {
+  test("uses user token for getApp in browser", async ({ page }) => {
     const realm = process.env.QB_REALM;
     const appId = process.env.QB_APP_ID;
     const username = process.env.QB_USERNAME;
     const password = process.env.QB_PASSWORD;
+    const userToken = process.env.QB_USER_TOKEN;
 
     if (!realm) throw new Error("QB_REALM is not defined in .env");
     if (!appId) throw new Error("QB_APP_ID is not defined in .env");
     if (!username) throw new Error("QB_USERNAME is not defined in .env");
     if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+    if (!userToken) throw new Error("QB_USER_TOKEN is not defined in .env");
 
-    // Login to QuickBase
+    // Login to Quickbase (optional, to mimic code page context)
     const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
     const loginSuccess = await loginToQuickbase(
       page,
@@ -80,7 +79,7 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       throw new Error("Failed to log in to QuickBase after max attempts.");
     }
 
-    // Navigate to the app page to ensure session context
+    // Navigate to the app page to ensure session context (optional)
     await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
       waitUntil: "networkidle",
       timeout: 60000,
@@ -89,17 +88,18 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
     const currentUrl = page.url();
     console.log("Post-login URL after app navigation:", currentUrl);
 
-    // Create Quickbase client for token fetch
-    const tokenClient = quickbaseClient({
+    // Create Quickbase client with user token
+    const client = quickbaseClient({
       realm,
-      useTempTokens: true,
+      userToken, // Use user token instead of temp tokens
       debug: true,
       fetchApi: async (url, init) => {
+        console.log(`Fetching ${url} with init:`, init);
         const response = await page.evaluate(
           async ([fetchUrl, fetchInit]) => {
             const res = await fetch(fetchUrl, {
               ...fetchInit,
-              credentials: "include",
+              credentials: "omit", // No cookies needed with user token
             });
             const body = await res.text();
             return {
@@ -140,50 +140,9 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
       },
     });
 
-    // Fetch token manually to simulate code page flow
-    const tokenResult = await tokenClient.getTempTokenDBID({ dbid: appId });
-    const token = tokenResult.temporaryAuthorization;
-
-    // Create main client with fetched token
-    const client = quickbaseClient({
-      realm,
-      tempToken: token,
-      debug: true,
-      fetchApi: async (url, init) => {
-        console.log(`Fetching ${url} with init:`, init);
-        const response = await fetch(url, init as RequestInit); // Use node-fetch for simplicity
-        const body = await response.text();
-
-        console.log(`Raw response from ${url}:`, {
-          status: response.status,
-          statusText: response.statusText,
-          body,
-        });
-
-        const fetchResponse = new Response(body || null, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-        });
-
-        fetchResponse.json = async () => {
-          if (!body) {
-            throw new Error("Empty response body from API");
-          }
-          try {
-            return JSON.parse(body);
-          } catch (e) {
-            throw new SyntaxError(`Invalid JSON response: ${body}`);
-          }
-        };
-
-        return fetchResponse;
-      },
-    });
-
     // Call getApp directly
     const appResult = await client.getApp({ appId });
-    console.log("App response using auto-fetched temp token:", appResult);
+    console.log("App response using user token:", appResult);
 
     // Validate the app response
     expect(appResult).toHaveProperty("id", appId);
