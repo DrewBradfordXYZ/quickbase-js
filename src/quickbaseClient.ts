@@ -7,7 +7,7 @@ import {
 } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
-import { tokenCache } from "./tokenCache.ts";
+import { TokenCache } from "./tokenCache.ts";
 
 export interface QuickbaseConfig {
   realm: string;
@@ -56,6 +56,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
+  // Instance-specific token cache
+  const tokenCache = new TokenCache();
+
   const headers: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
     "Content-Type": "application/json",
@@ -71,7 +74,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
-    headers: { ...headers }, // Base headers without Authorization for temp tokens
+    headers: { ...headers },
     fetchApi: fetchApi || defaultFetch,
     credentials: "omit",
   });
@@ -128,9 +131,32 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     return methodMap as MethodMap;
   }
 
+  const fetchTempToken = async (dbid: string): Promise<string> => {
+    const tokenClient = quickbaseClient({
+      realm,
+      fetchApi,
+      debug,
+      useTempTokens: false,
+    });
+    const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
+    const token = tokenResult.temporaryAuthorization;
+    tokenCache.set(dbid, token);
+    if (debug) {
+      console.log(
+        `Fetched and cached new token for dbid: ${dbid}`,
+        token,
+        `Expires at: ${new Date(
+          Date.now() + (4 * 60 + 50) * 1000
+        ).toISOString()}`
+      );
+    }
+    return token;
+  };
+
   const invokeMethod = async <K extends keyof QuickbaseClient>(
     methodName: K,
-    params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>
+    params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>,
+    retryCount: number = 0
   ): Promise<ReturnType<QuickbaseClient[K]>> => {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
@@ -148,6 +174,9 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
           `No dbid found in params for ${methodName} to fetch temp token`
         );
       }
+      if (debug) {
+        console.log(`Cache state before fetch for ${dbid}:`, tokenCache.dump());
+      }
       const cachedToken = tokenCache.get(dbid);
       if (cachedToken) {
         token = cachedToken;
@@ -160,20 +189,8 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
             "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
           );
         }
-        const tokenClient = quickbaseClient({
-          realm,
-          fetchApi,
-          debug,
-          useTempTokens: false,
-        });
-        const tokenResult = await tokenClient.getTempTokenDBID({ dbid });
-        token = tokenResult.temporaryAuthorization;
-        tokenCache.set(dbid, token);
-        if (debug) {
-          console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
-        }
+        token = await fetchTempToken(dbid);
       }
-      // Set token per request, not globally
       initOverrides.headers = {
         ...headers,
         Authorization: `QB-TEMP-TOKEN ${token}`,
@@ -197,6 +214,31 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       }
       return response;
     } catch (error) {
+      if (
+        error instanceof ResponseError &&
+        error.response.status === 401 &&
+        retryCount < 1
+      ) {
+        if (debug) {
+          console.log(
+            `Authorization error for ${methodName}, refreshing token:`,
+            error.message
+          );
+        }
+        const dbid = params.appId || params.tableId || params.dbid;
+        if (!dbid) {
+          throw new Error(`No dbid to refresh token after authorization error`);
+        }
+        token = await fetchTempToken(dbid);
+        initOverrides.headers = {
+          ...headers,
+          Authorization: `QB-TEMP-TOKEN ${token}`,
+        };
+        if (debug) {
+          console.log(`Retrying ${methodName} with new token`);
+        }
+        return invokeMethod(methodName, params, retryCount + 1); // Retry once
+      }
       if (error instanceof ResponseError) {
         let errorMessage = error.message;
         try {

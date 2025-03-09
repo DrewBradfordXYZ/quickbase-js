@@ -1,0 +1,2050 @@
+{
+  "config": {
+    "configFile": "/home/drew/Projects/quickbase-js/playwright.config.ts",
+    "rootDir": "/home/drew/Projects/quickbase-js/tests/playwright",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/drew/Projects/quickbase-js/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/drew/Projects/quickbase-js/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.51.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "qb/auth/cacheSwitching.test.ts",
+      "file": "qb/auth/cacheSwitching.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - Cache Switching with Temp Tokens",
+          "file": "qb/auth/cacheSwitching.test.ts",
+          "line": 61,
+          "column": 6,
+          "specs": [
+            {
+              "title": "caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13033,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Starting cacheSwitching test\n"
+                        },
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Navigating to login page\n"
+                        },
+                        {
+                          "text": "Waiting for loginid selector\n"
+                        },
+                        {
+                          "text": "Clicking signin\n"
+                        },
+                        {
+                          "text": "Waiting for navigation\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: []\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24=\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24= Expires at: 2025-03-09T15:07:07.992Z\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "First getApp response: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Proxy called getFields with: { tableId: \u001b[32m'buwai2zws'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zws: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m,\n      expiresAt: \u001b[33m1741532827992\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zws'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zws'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zws'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zws: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg==\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg=='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zws VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg== Expires at: 2025-03-09T15:07:09.131Z\n"
+                        },
+                        {
+                          "text": "Invoking getFields with params: { tableId: \u001b[32m'buwai2zws'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { tableId: \u001b[32m'buwai2zws'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg=='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/fields?tableId=buwai2zws with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg=='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/fields?tableId=buwai2zws: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'[{\"appearsByDefault\":true,\"audited\":false,\"bold\":false,\"doesDataCopy\":true,\"fieldHelp\":\"\",\"fieldType\":\"text\",\"findEnabled\":true,\"id\":6,\"label\":\"Test\",\"mode\":\"\",\"noWrap\":false,\"properties\":{\"allowHTML\":false,\"allowMentions\":false,\"allowNewChoices\":false,\"appendOnly\":false,\"carryChoices\":true,\"defaultValue\":\"\",\"foreignKey\":false,\"formula\":\"\",\"maxLength\":0,\"numLines\":1,\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"timestamp\",\"findEnabled\":false,\"id\":1,\"label\":\"Date Created\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"carryChoices\":true,\"defaultToday\":false,\"defaultValue\":\"\",\"displayDayOfWeek\":false,\"displayMonth\":\"number\",\"displayRelative\":false,\"displayTime\":true,\"displayTimezone\":false,\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"timestamp\",\"findEnabled\":false,\"id\":2,\"label\":\"Date Modified\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"carryChoices\":true,\"defaultToday\":false,\"defaultValue\":\"\",\"displayDayOfWeek\":false,\"displayMonth\":\"number\",\"displayRelative\":false,\"displayTime\":true,\"displayTimezone\":false,\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"recordid\",\"findEnabled\":false,\"id\":3,\"label\":\"Record ID#\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"blankIsZero\":true,\"carryChoices\":true,\"commaStart\":4,\"decimalPlaces\":0,\"defaultValue\":\"\",\"doesAverage\":false,\"doesTotal\":false,\"foreignKey\":false,\"formula\":\"\",\"numberFormat\":0,\"primaryKey\":true,\"sortAsGiven\":true},\"required\":false,\"unique\":true},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"user\",\"findEnabled\":true,\"id\":4,\"label\":\"Record Owner\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":true,\"carryChoices\":true,\"defaultKind\":\"none\",\"defaultValue\":\"\",\"displayUser\":\"fullnamelf\",\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"user\",\"findEnabled\":true,\"id\":5,\"label\":\"Last Modified By\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":true,\"carryChoices\":true,\"defaultKind\":\"none\",\"defaultValue\":\"\",\"displayUser\":\"fullnamelf\",\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false}]'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getFields: [\n  {\n    id: \u001b[33m6\u001b[39m,\n    label: \u001b[32m'Test'\u001b[39m,\n    fieldType: \u001b[32m'text'\u001b[39m,\n    noWrap: \u001b[33mfalse\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mtrue\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mtrue\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[33m1\u001b[39m,\n      maxLength: \u001b[33m0\u001b[39m,\n      appendOnly: \u001b[33mfalse\u001b[39m,\n      allowHTML: \u001b[33mfalse\u001b[39m,\n      allowMentions: \u001b[33mfalse\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m1\u001b[39m,\n    label: \u001b[32m'Date Created'\u001b[39m,\n    fieldType: \u001b[32m'timestamp'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m2\u001b[39m,\n    label: \u001b[32m'Date Modified'\u001b[39m,\n    fieldType: \u001b[32m'timestamp'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m3\u001b[39m,\n    label: \u001b[32m'Record ID#'\u001b[39m,\n    fieldType: \u001b[32m'recordid'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mtrue\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mtrue\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m4\u001b[39m,\n    label: \u001b[32m'Record Owner'\u001b[39m,\n    fieldType: \u001b[32m'user'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mtrue\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m5\u001b[39m,\n    label: \u001b[32m'Last Modified By'\u001b[39m,\n    fieldType: \u001b[32m'user'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mtrue\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "getFields response: [\n  {\n    id: \u001b[33m6\u001b[39m,\n    label: \u001b[32m'Test'\u001b[39m,\n    fieldType: \u001b[32m'text'\u001b[39m,\n    noWrap: \u001b[33mfalse\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mtrue\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mtrue\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[33m1\u001b[39m,\n      maxLength: \u001b[33m0\u001b[39m,\n      appendOnly: \u001b[33mfalse\u001b[39m,\n      allowHTML: \u001b[33mfalse\u001b[39m,\n      allowMentions: \u001b[33mfalse\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m1\u001b[39m,\n    label: \u001b[32m'Date Created'\u001b[39m,\n    fieldType: \u001b[32m'timestamp'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m2\u001b[39m,\n    label: \u001b[32m'Date Modified'\u001b[39m,\n    fieldType: \u001b[32m'timestamp'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m3\u001b[39m,\n    label: \u001b[32m'Record ID#'\u001b[39m,\n    fieldType: \u001b[32m'recordid'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mfalse\u001b[39m,\n    unique: \u001b[33mtrue\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mtrue\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mfalse\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m4\u001b[39m,\n    label: \u001b[32m'Record Owner'\u001b[39m,\n    fieldType: \u001b[32m'user'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mtrue\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  },\n  {\n    id: \u001b[33m5\u001b[39m,\n    label: \u001b[32m'Last Modified By'\u001b[39m,\n    fieldType: \u001b[32m'user'\u001b[39m,\n    noWrap: \u001b[33mtrue\u001b[39m,\n    bold: \u001b[33mfalse\u001b[39m,\n    required: \u001b[33mfalse\u001b[39m,\n    appearsByDefault: \u001b[33mfalse\u001b[39m,\n    findEnabled: \u001b[33mtrue\u001b[39m,\n    unique: \u001b[33mfalse\u001b[39m,\n    doesDataCopy: \u001b[33mfalse\u001b[39m,\n    fieldHelp: \u001b[32m''\u001b[39m,\n    audited: \u001b[33mfalse\u001b[39m,\n    properties: {\n      primaryKey: \u001b[33mfalse\u001b[39m,\n      foreignKey: \u001b[33mfalse\u001b[39m,\n      numLines: \u001b[90mundefined\u001b[39m,\n      maxLength: \u001b[90mundefined\u001b[39m,\n      appendOnly: \u001b[90mundefined\u001b[39m,\n      allowHTML: \u001b[90mundefined\u001b[39m,\n      allowMentions: \u001b[90mundefined\u001b[39m,\n      sortAsGiven: \u001b[33mtrue\u001b[39m,\n      carryChoices: \u001b[33mtrue\u001b[39m,\n      allowNewChoices: \u001b[33mtrue\u001b[39m,\n      formula: \u001b[32m''\u001b[39m,\n      defaultValue: \u001b[32m''\u001b[39m\n    },\n    permissions: \u001b[90mundefined\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m,\n      expiresAt: \u001b[33m1741532827992\u001b[39m\n    }\n  ],\n  [\n    \u001b[32m'buwai2zws'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg3emVyZTVfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYno1OTMyNmJiYXN1NWRjaHVxOXhpYjJxempnemRtOHBzYXBiNzdldXQ5YzlwYmZ5bmM2Z2k4aTlfaXlrbXdkcg=='\u001b[39m,\n      expiresAt: \u001b[33m1741532829131\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24=\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVxYWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfajZ6ZHc4Y3c1YWdkNWJwajQ3YXJkNm16OHV1YmY5djhzc2Q5MmVjbmlidzV4bnVkdnFreXByX2l5a213Y24='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Second getApp response: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-09T15:02:06.909Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d9cb2cca5cb03c0bcd89-8f1f64d2351d17551df9",
+              "file": "qb/auth/cacheSwitching.test.ts",
+              "line": 64,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "qb/auth/getAppWithUserToken.test.ts",
+      "file": "qb/auth/getAppWithUserToken.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - getApp with User Token",
+          "file": "qb/auth/getAppWithUserToken.test.ts",
+          "line": 56,
+          "column": 6,
+          "specs": [
+            {
+              "title": "uses user token for getApp in browser",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 13101,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { appId: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "App response using user token: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-09T15:02:06.982Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "95cc4dd43cb1eb804aca-bbbed45ba12381f1d296",
+              "file": "qb/auth/getAppWithUserToken.test.ts",
+              "line": 57,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "qb/auth/getTempToken.test.ts",
+      "file": "qb/auth/getTempToken.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - getApp with Temp Tokens",
+          "file": "qb/auth/getTempToken.test.ts",
+          "line": 57,
+          "column": 6,
+          "specs": [
+            {
+              "title": "uses temp tokens automatically for getApp in browser",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 10816,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: []\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg3emVwdXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdnNpYzdxZDdiNWZmYWQ1YjlxZ2FkZmY3bnpkYzI5ZGVjaGRzd2Z0eWZjcGhmbmQ1ZDZxYXhzYl9peWttd2Nj\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg3emVwdXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdnNpYzdxZDdiNWZmYWQ1YjlxZ2FkZmY3bnpkYzI5ZGVjaGRzd2Z0eWZjcGhmbmQ1ZDZxYXhzYl9peWttd2Nj'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg3emVwdXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdnNpYzdxZDdiNWZmYWQ1YjlxZ2FkZmY3bnpkYzI5ZGVjaGRzd2Z0eWZjcGhmbmQ1ZDZxYXhzYl9peWttd2Nj Expires at: 2025-03-09T15:07:07.553Z\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVwdXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdnNpYzdxZDdiNWZmYWQ1YjlxZ2FkZmY3bnpkYzI5ZGVjaGRzd2Z0eWZjcGhmbmQ1ZDZxYXhzYl9peWttd2Nj'\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emVwdXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdnNpYzdxZDdiNWZmYWQ1YjlxZ2FkZmY3bnpkYzI5ZGVjaGRzd2Z0eWZjcGhmbmQ1ZDZxYXhzYl9peWttd2Nj'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "App response using auto-fetched temp token: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-09T15:02:07.093Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a701d3a6657df231384c-1f340fa9d9997340cef2",
+              "file": "qb/auth/getTempToken.test.ts",
+              "line": 58,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "qb/auth/tokenRenewal.test.ts",
+      "file": "qb/auth/tokenRenewal.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - Temp Token Renewal",
+          "file": "qb/auth/tokenRenewal.test.ts",
+          "line": 30,
+          "column": 6,
+          "specs": [
+            {
+              "title": "renews temp token after 5 minutes with getApp → wait → getApp sequence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 317745,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Navigated to app URL: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Checking session state before getApp...\n"
+                        },
+                        {
+                          "text": "Session cookie present: \u001b[33mtrue\u001b[39m Cookies: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742137335\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'4caaf526-94a0-40ae-ba0b-a9eaef52aead'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744124536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742137329\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'804015c2-a9ca-4598-be53-73b6e27fddd5'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744124529\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750172535.349825\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742137327\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'df74c468-d8c7-4c3f-a161-80ddf3767b8e'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744124528\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741532527274'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776092527.281472\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741532527274'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'actDbK9QMA2pAmlOisrCzTmGLrua9pXtKlRQqVXgVoI-1741532528-1.2.1.1-x56uLz1ThPV1cd6tyj3RcdG45VWNPbFlMhWUZ8BbrV9sBFWDHL2YMPOt1qsA.vktzrCw3.0mQexBtO1XSOJ8KmoMFInDIN3WHEd4HUe9Jl3kXp.OrM46.Gmm7syRFByIWwJSRTT7G5Ub0tou6A8dA6BUb9cAnriwWuoqyLC94d_nqIczlp3Xlxwa3JWgdBqXUTvZjarRT1r3ICvXhHkkED0wHcmS4K4G25HmoJmQq8R88WlGNJcUq8V5BvpM3u5qUizteu82Z_WQMovSRh94PIutMdV2mv.UgVvo8vujJMRzbp84kkMD7Yx6hptzToVxF6H7LOOlIfg1QToiaVfiR8b5J9n1NejRrGuJnqqQ.Zls1IZ_dKbZzPwTrWVNRt8U4VACtZh1r2ZelfmKbWuD0xEHU7PkhyZDnPgJQJjhGjo'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773068528.427527\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_bux9abmrb_b9f3pk_q4jd_a_-b_drk4zebc4u68ezcb5y6u9b49wcr9dk4hd74dcab8std2pstndbdkkhnz_iykmv7d'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_bux9abmrb_b9f3pk_q4jd_a_-b_drk4zebc4u68ezcb5y6u9b49wcr9dk4hd74dcab8std2pstndbdkkhnz_iykmv7d'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744124528.646739\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741546928\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776092528.705531\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_CpXsVSQPFqI'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172531\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741536136\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_lastStepAdvanced.3719929843'\u001b[39m,\n    value: \u001b[32m'%5B%7B%22tabId%22%3A%22ISaqBJvX7tJapc9s%22%2C%22guideId%22%3A%22IVthd3ywe-KeAjfWu8DLGO1ym58%22%2C%22guideStepId%22%3A%22NLy5E8v8VkVnoiE5zr0AUuNbmh0%22%2C%22time%22%3A1741532532264%2C%22state%22%3A%22active%22%2C%22seenReason%22%3A%22auto%22%2C%22visitorId%22%3A%2266250154%3Aquickbase.com%22%7D%5D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741532542\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'e7fd2bd8-1b3c-95e3-a1f9-71e4625527fb'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiM2EwMGVkMjJmMDQ5N2Q1NGNjYjhlMDZkOGNlMDFiYjQiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.SFjzWc2Ygptf9PuZjzZ7uLbBJa3tDsZG7wTo-KqAYRE%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741536136\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'2283411137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "Cookies after delay: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742137335\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'4caaf526-94a0-40ae-ba0b-a9eaef52aead'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744124536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742137329\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'804015c2-a9ca-4598-be53-73b6e27fddd5'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744124529\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750172535.349825\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742137327\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'df74c468-d8c7-4c3f-a161-80ddf3767b8e'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744124528\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741532527274'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776092527.281472\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741532527274'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'actDbK9QMA2pAmlOisrCzTmGLrua9pXtKlRQqVXgVoI-1741532528-1.2.1.1-x56uLz1ThPV1cd6tyj3RcdG45VWNPbFlMhWUZ8BbrV9sBFWDHL2YMPOt1qsA.vktzrCw3.0mQexBtO1XSOJ8KmoMFInDIN3WHEd4HUe9Jl3kXp.OrM46.Gmm7syRFByIWwJSRTT7G5Ub0tou6A8dA6BUb9cAnriwWuoqyLC94d_nqIczlp3Xlxwa3JWgdBqXUTvZjarRT1r3ICvXhHkkED0wHcmS4K4G25HmoJmQq8R88WlGNJcUq8V5BvpM3u5qUizteu82Z_WQMovSRh94PIutMdV2mv.UgVvo8vujJMRzbp84kkMD7Yx6hptzToVxF6H7LOOlIfg1QToiaVfiR8b5J9n1NejRrGuJnqqQ.Zls1IZ_dKbZzPwTrWVNRt8U4VACtZh1r2ZelfmKbWuD0xEHU7PkhyZDnPgJQJjhGjo'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773068528.427527\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_bux9abmrb_b9f3pk_q4jd_a_-b_drk4zebc4u68ezcb5y6u9b49wcr9dk4hd74dcab8std2pstndbdkkhnz_iykmv7d'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_bux9abmrb_b9f3pk_q4jd_a_-b_drk4zebc4u68ezcb5y6u9b49wcr9dk4hd74dcab8std2pstndbdkkhnz_iykmv7d'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744124528.646739\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741546928\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776092528.705531\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_CpXsVSQPFqI'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172531\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741536136\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'e7fd2bd8-1b3c-95e3-a1f9-71e4625527fb'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiM2EwMGVkMjJmMDQ5N2Q1NGNjYjhlMDZkOGNlMDFiYjQiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.SFjzWc2Ygptf9PuZjzZ7uLbBJa3tDsZG7wTo-KqAYRE%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741536136\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'2283411137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750172536\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: []\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXg3emV1NWpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGI2eGZiOWN1eThiaWQ0eDRhcDZjZGl0YjRoZmkyY3o5YzNic3NuM2NkZzUydmVkN3ZkYml3X2l5a213aDc=\"}\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg3emV1NWpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGI2eGZiOWN1eThiaWQ0eDRhcDZjZGl0YjRoZmkyY3o5YzNic3NuM2NkZzUydmVkN3ZkYml3X2l5a213aDc='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg3emV1NWpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGI2eGZiOWN1eThiaWQ0eDRhcDZjZGl0YjRoZmkyY3o5YzNic3NuM2NkZzUydmVkN3ZkYml3X2l5a213aDc= Expires at: 2025-03-09T15:07:12.991Z\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3emV1NWpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGI2eGZiOWN1eThiaWQ0eDRhcDZjZGl0YjRoZmkyY3o5YzNic3NuM2NkZzUydmVkN3ZkYml3X2l5a213aDc='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Response from: https://api.quickbase.com/v1/apps/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "First getApp response: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Waiting 5 minutes to test token expiration...\n"
+                        },
+                        {
+                          "text": "Refreshed page after 5 minutes, URL: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg3emV1NWpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGI2eGZiOWN1eThiaWQ0eDRhcDZjZGl0YjRoZmkyY3o5YzNic3NuM2NkZzUydmVkN3ZkYml3X2l5a213aDc='\u001b[39m,\n      expiresAt: \u001b[33m1741532832991\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXg3enAza2tfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnJmcGdramQ0czlmN21kaHM5YzhnZDN2Y3E0Y201OG1idGJ4aG5kZ20zeXpxOXRkcWlwbno3X2l5a20zcDM=\"}\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg3enAza2tfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnJmcGdramQ0czlmN21kaHM5YzhnZDN2Y3E0Y201OG1idGJ4aG5kZ20zeXpxOXRkcWlwbno3X2l5a20zcDM='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg3enAza2tfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnJmcGdramQ0czlmN21kaHM5YzhnZDN2Y3E0Y201OG1idGJ4aG5kZ20zeXpxOXRkcWlwbno3X2l5a20zcDM= Expires at: 2025-03-09T15:12:14.473Z\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg3enAza2tfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnJmcGdramQ0czlmN21kaHM5YzhnZDN2Y3E0Y201OG1idGJ4aG5kZ20zeXpxOXRkcWlwbno3X2l5a20zcDM='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "Response from: https://api.quickbase.com/v1/apps/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Second getApp response: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-09T15:02:06.989Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2f702af7105aeb9bbf4a-9e94cc6aefa950e625cc",
+              "file": "qb/auth/tokenRenewal.test.ts",
+              "line": 31,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-03-09T15:02:06.260Z",
+    "duration": 318588.789,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

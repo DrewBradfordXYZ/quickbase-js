@@ -20,9 +20,11 @@ const importantFiles: string[] = [
   "generated-unified/QuickbaseClient.ts",
   "src/quickbaseClient.ts",
   "src/tokenCache.ts",
+  "test-results.json",
   // "src/code-generation/fix-spec-main.ts",
   // "src/code-generation/fix-spec-paths.ts",
   // "src/code-generation/fix-spec-definitions.ts",
+  // "src/code-generation/regenerate-client.ts",
   // "src/code-generation/output/quickbase-fixed.json",
 ];
 
