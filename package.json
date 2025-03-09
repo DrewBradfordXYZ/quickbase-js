@@ -29,7 +29,7 @@
     "test::pw:qb:auth:temptoken": "playwright test tests/playwright/qb/auth/getTempToken.test.ts",
     "test:pw:qb:auth:renewal": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts",
     "test:pw:qb:auth:cache": "playwright test tests/playwright/qb/auth/cacheSwitching.test.ts",
-    "test:pw:qb:auth:invalidation": "playwright test tests/playwright/qb/auth/tokenInvalidation.test.ts",
+    "test:pw:qb:auth:temp401": "playwright test tests/playwright/qb/auth/fetchTempToken401.test.ts",
     "test:pw:qb:auth:prefetch": "playwright test tests/playwright/qb/auth/tokenPrefetch.test.ts",
     "test:pw:qb:auth:debug": "playwright test tests/playwright/qb/auth --headed --debug",
     "test:pw:qb:auth:temp:debug": "playwright test tests/playwright/qb/auth/getTempToken.test.ts --headed --debug",
