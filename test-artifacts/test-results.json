@@ -86,7 +86,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 21444,
+                      "duration": 9615,
                       "errors": [],
                       "stdout": [
                         {
@@ -261,7 +261,10 @@
                           "text": "Mapped undenyUsers to undenyUsers\n"
                         },
                         {
-                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                          "text": "Pre-fetching initial token...\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
                           "text": "Cache state before fetch for buwai2zpe: []\n"
@@ -444,22 +447,34 @@
                           "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI=\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Captured initial token: VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\n"
+                          "text": "Captured initial token: VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI=\n"
                         },
                         {
-                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo='\u001b[39m\n}\n"
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI='\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo= Expires at: 2025-03-09T18:15:28.670Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI= Expires at: 2025-03-09T18:54:37.897Z\n"
+                        },
+                        {
+                          "text": "Initial token pre-fetched and cached: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI='\u001b[39m,\n      expiresAt: \u001b[33m1741546477897\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI=\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
                           "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 2\n"
@@ -651,31 +666,31 @@
                           "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA==\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Captured retry token: VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                          "text": "Captured retry token: VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA==\n"
                         },
                         {
-                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n}\n"
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA=='\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1 Expires at: 2025-03-09T18:15:29.055Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA== Expires at: 2025-03-09T18:54:38.197Z\n"
                         },
                         {
                           "text": "Retrying getApp with new token\n"
                         },
                         {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m,\n      expiresAt: \u001b[33m1741544129055\u001b[39m\n    }\n  ]\n]\n"
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA=='\u001b[39m,\n      expiresAt: \u001b[33m1741546478197\u001b[39m\n    }\n  ]\n]\n"
                         },
                         {
-                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA==\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA=='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
                           "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 4\n"
@@ -684,7 +699,7 @@
                           "text": "getApp call count: 2\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA=='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
@@ -699,15 +714,15 @@
                           "text": "Final callCount: 4, Final getAppCallCount: 2\n"
                         },
                         {
-                          "text": "Initial token: VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\n"
+                          "text": "Initial token: VEtU.OV9idXg4ZWU5eDZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDNqdGs5N2h2ejY0OG1lZ2d0bmNwOXBpMmdja3c1OWl0YzJ1Y3hqdWJ4cHI4dG1jamIyaHV5X2l5a3Q0ZTI=\n"
                         },
                         {
-                          "text": "Retry token: VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                          "text": "Retry token: VEtU.OV9idXg4ZWZhamhfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG1kZWF2N2JyZmppajJjaDRhcmR2Y3p4a2lxNWJicnRnZnBkamVhNmt0ZHczczY5cmQ2eHU5dTNfaXlrdDRmZA==\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T18:10:18.226Z",
+                      "startTime": "2025-03-09T18:49:38.980Z",
                       "attachments": []
                     }
                   ],
@@ -726,8 +741,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-03-09T18:10:17.641Z",
-    "duration": 22112.628999999997,
+    "startTime": "2025-03-09T18:49:38.235Z",
+    "duration": 10449.371,
     "expected": 1,
     "skipped": 0,
     "unexpected": 0,

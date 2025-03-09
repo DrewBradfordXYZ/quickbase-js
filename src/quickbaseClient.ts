@@ -56,7 +56,6 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
-  // Instance-specific token cache
   const tokenCache = new TokenCache();
 
   const headers: HTTPHeaders = {
@@ -190,6 +189,12 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
           );
         }
         token = await fetchTempToken(dbid);
+        // Early return for getTempTokenDBID to avoid redundant fetch
+        if (methodName === "getTempTokenDBID") {
+          return { temporaryAuthorization: token } as ReturnType<
+            QuickbaseClient[K]
+          >;
+        }
       }
       initOverrides.headers = {
         ...headers,
