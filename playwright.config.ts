@@ -8,13 +8,18 @@ const config = defineConfig({
   testDir: "./tests/playwright",
   timeout: 600000, // 10 minutes
   retries: 2,
-  reporter: [["list"], ["json", { outputFile: "test-results.json" }]],
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "test-artifacts/test-results.json" }],
+  ],
   use: {
     baseURL: "https://api.quickbase.com",
     headless: true,
     viewport: { width: 1280, height: 720 },
     actionTimeout: 10000,
+    screenshot: "off",
   },
+  outputDir: "test-artifacts",
   projects: [
     {
       name: "chromium",

@@ -1,0 +1,736 @@
+{
+  "config": {
+    "configFile": "/home/drew/Projects/quickbase-js/playwright.config.ts",
+    "rootDir": "/home/drew/Projects/quickbase-js/tests/playwright",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-artifacts/test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/drew/Projects/quickbase-js/test-artifacts",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/drew/Projects/quickbase-js/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.51.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "qb/auth/tokenInvalidation.test.ts",
+      "file": "qb/auth/tokenInvalidation.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - Token Invalidation with Cached Token",
+          "file": "qb/auth/tokenInvalidation.test.ts",
+          "line": 57,
+          "column": 6,
+          "specs": [
+            {
+              "title": "retries with new token when cached token is unexpectedly invalidated",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21444,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: []\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
+                        },
+                        {
+                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Captured initial token: VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo='\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo= Expires at: 2025-03-09T18:15:28.670Z\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 2\n"
+                        },
+                        {
+                          "text": "getApp call count: 1\n"
+                        },
+                        {
+                          "text": "Simulating 401 Unauthorized for first getApp call\n"
+                        },
+                        {
+                          "text": "Authorization error for getApp, refreshing token: Response returned an error code\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
+                        },
+                        {
+                          "text": "Mapped deleteRecords to deleteRecords\n"
+                        },
+                        {
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
+                        },
+                        {
+                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Captured retry token: VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                        },
+                        {
+                          "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1 Expires at: 2025-03-09T18:15:29.055Z\n"
+                        },
+                        {
+                          "text": "Retrying getApp with new token\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m,\n      expiresAt: \u001b[33m1741544129055\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 4\n"
+                        },
+                        {
+                          "text": "getApp call count: 2\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "App response after token invalidation and retry: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Final callCount: 4, Final getAppCallCount: 2\n"
+                        },
+                        {
+                          "text": "Initial token: VEtU.OV9idXg4YjdqeWdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfdjhhNWtmY3Z4N2p5eWYyZG5uOWM0NXBmNmpjeWNoZnFpYzN4cGVidWJrc2U4bTZjenM3cWNwX2l5a3MzNXo=\n"
+                        },
+                        {
+                          "text": "Retry token: VEtU.OV9idXg4YjdrZHdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGNlYWtyOWNldDN2emRiY3d5amZ5c2drZDNhYjlyM2kzY2Vhc3lmcHN0YjR4ajVpdXF4a19peWtzMzU1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-09T18:10:18.226Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "272bfe78816e02eef771-9766bb63f911c5e5cc21",
+              "file": "qb/auth/tokenInvalidation.test.ts",
+              "line": 58,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-03-09T18:10:17.641Z",
+    "duration": 22112.628999999997,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

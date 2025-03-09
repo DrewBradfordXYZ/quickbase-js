@@ -50,10 +50,6 @@ tree:
           type: file
     - name: logGen.yaml
       type: file
-    - name: logGen_saved.yaml
-      type: file
-    - name: login-page.png
-      type: file
     - name: openapitools.json
       type: file
     - name: package-lock.json
@@ -95,7 +91,7 @@ tree:
             "test:qb:auth:cache": "playwright test tests/playwright/qb/auth/cacheSwitching.test.ts",
             "test:qb:auth:debug": "playwright test tests/playwright/qb/auth --headed --debug",
             "test:qb:auth:temp:debug": "playwright test tests/playwright/qb/auth/getTempToken.test.ts --headed --debug",
-            "test:qb:auth:renewal:debug": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts --headed --debug",
+            "test:qb:auth:renewal:debug": "playwright test tests/playwright/qb/auth/tokenRenewal.test.ts --headed --debug --config=playwright.config.ts",
             "test:qb:auth:cache:debug": "playwright test tests/playwright/qb/auth/cacheSwitching.test.ts --headed --debug",
             "test:qb:parallel": "playwright test tests/playwright/qb --workers 50%",
             "test:integration": "vitest run tests/integration/**/*.test.ts",
@@ -876,6 +872,11 @@ tree:
             }
         - name: utils.ts
           type: file
+    - name: test-artifacts
+      type: directory
+      children:
+        - name: test-results.json
+          type: file
     - name: test-results
       type: directory
       children:
@@ -883,984 +884,6 @@ tree:
           type: file
     - name: test-results.json
       type: file
-      contents: |-
-        {
-          "config": {
-            "configFile": "/home/drew/Projects/quickbase-js/playwright.config.ts",
-            "rootDir": "/home/drew/Projects/quickbase-js/tests/playwright",
-            "forbidOnly": false,
-            "fullyParallel": true,
-            "globalSetup": null,
-            "globalTeardown": null,
-            "globalTimeout": 0,
-            "grep": {},
-            "grepInvert": null,
-            "maxFailures": 0,
-            "metadata": {
-              "actualWorkers": 1
-            },
-            "preserveOutput": "always",
-            "reporter": [
-              [
-                "list",
-                null
-              ],
-              [
-                "json",
-                {
-                  "outputFile": "test-results.json"
-                }
-              ]
-            ],
-            "reportSlowTests": {
-              "max": 5,
-              "threshold": 300000
-            },
-            "quiet": false,
-            "projects": [
-              {
-                "outputDir": "/home/drew/Projects/quickbase-js/test-results",
-                "repeatEach": 1,
-                "retries": 2,
-                "metadata": {
-                  "actualWorkers": 1
-                },
-                "id": "chromium",
-                "name": "chromium",
-                "testDir": "/home/drew/Projects/quickbase-js/tests/playwright",
-                "testIgnore": [],
-                "testMatch": [
-                  "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-                ],
-                "timeout": 310000
-              }
-            ],
-            "shard": null,
-            "updateSnapshots": "missing",
-            "updateSourceMethod": "patch",
-            "version": "1.51.0",
-            "workers": 1,
-            "webServer": null
-          },
-          "suites": [
-            {
-              "title": "qb/auth/cacheSwitching.test.ts",
-              "file": "qb/auth/cacheSwitching.test.ts",
-              "column": 0,
-              "line": 0,
-              "specs": [],
-              "suites": [
-                {
-                  "title": "QuickbaseClient Integration - Cache Switching with Temp Tokens",
-                  "file": "qb/auth/cacheSwitching.test.ts",
-                  "line": 61,
-                  "column": 6,
-                  "specs": [
-                    {
-                      "title": "caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence",
-                      "ok": false,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 310000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
-                          "projectId": "chromium",
-                          "projectName": "chromium",
-                          "results": [
-                            {
-                              "workerIndex": 0,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310051,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for cacheSwitching\n"
-                                },
-                                {
-                                  "text": "Context created for cacheSwitching\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2025-03-09T05:58:24.680Z",
-                              "attachments": []
-                            },
-                            {
-                              "workerIndex": 1,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310104,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for cacheSwitching\n"
-                                },
-                                {
-                                  "text": "Context created for cacheSwitching\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 1,
-                              "startTime": "2025-03-09T06:03:35.259Z",
-                              "attachments": []
-                            },
-                            {
-                              "workerIndex": 2,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310105,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for cacheSwitching\n"
-                                },
-                                {
-                                  "text": "Context created for cacheSwitching\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 2,
-                              "startTime": "2025-03-09T06:08:45.877Z",
-                              "attachments": []
-                            }
-                          ],
-                          "status": "unexpected"
-                        }
-                      ],
-                      "id": "d9cb2cca5cb03c0bcd89-8f1f64d2351d17551df9",
-                      "file": "qb/auth/cacheSwitching.test.ts",
-                      "line": 71,
-                      "column": 3
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "title": "qb/auth/getAppWithUserToken.test.ts",
-              "file": "qb/auth/getAppWithUserToken.test.ts",
-              "column": 0,
-              "line": 0,
-              "specs": [],
-              "suites": [
-                {
-                  "title": "QuickbaseClient Integration - getApp with User Token",
-                  "file": "qb/auth/getAppWithUserToken.test.ts",
-                  "line": 56,
-                  "column": 6,
-                  "specs": [
-                    {
-                      "title": "uses user token for getApp in browser",
-                      "ok": true,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 310000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
-                          "projectId": "chromium",
-                          "projectName": "chromium",
-                          "results": [
-                            {
-                              "workerIndex": 3,
-                              "parallelIndex": 0,
-                              "status": "passed",
-                              "duration": 10944,
-                              "errors": [],
-                              "stdout": [
-                                {
-                                  "text": "Logging in to QuickBase\n"
-                                },
-                                {
-                                  "text": "Signed In to QuickBase.\n"
-                                },
-                                {
-                                  "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
-                                },
-                                {
-                                  "text": "Mapped copyApp to copyApp\n"
-                                },
-                                {
-                                  "text": "Mapped createApp to createApp\n"
-                                },
-                                {
-                                  "text": "Mapped getApp to getApp\n"
-                                },
-                                {
-                                  "text": "Mapped getAppEvents to getAppEvents\n"
-                                },
-                                {
-                                  "text": "Mapped audit to audit\n"
-                                },
-                                {
-                                  "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
-                                },
-                                {
-                                  "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
-                                },
-                                {
-                                  "text": "Mapped generateDocument to generateDocument\n"
-                                },
-                                {
-                                  "text": "Mapped getField to getField\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldUsage to getFieldUsage\n"
-                                },
-                                {
-                                  "text": "Mapped getFields to getFields\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldsUsage to getFieldsUsage\n"
-                                },
-                                {
-                                  "text": "Mapped updateField to updateField\n"
-                                },
-                                {
-                                  "text": "Mapped deleteFile to deleteFile\n"
-                                },
-                                {
-                                  "text": "Mapped downloadFile to downloadFile\n"
-                                },
-                                {
-                                  "text": "Mapped runFormula to runFormula\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRecords to deleteRecords\n"
-                                },
-                                {
-                                  "text": "Mapped upsert to upsert\n"
-                                },
-                                {
-                                  "text": "Mapped upsertRecords to upsertRecords\n"
-                                },
-                                {
-                                  "text": "Mapped getReport to getReport\n"
-                                },
-                                {
-                                  "text": "Mapped getTableReports to getTableReports\n"
-                                },
-                                {
-                                  "text": "Mapped runReport to runReport\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolution to changesetSolution\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createSolution to createSolution\n"
-                                },
-                                {
-                                  "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolution to exportSolution\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolution to updateSolution\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createRelationship to createRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRelationship to deleteRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteTable to deleteTable\n"
-                                },
-                                {
-                                  "text": "Mapped getAppTables to getAppTables\n"
-                                },
-                                {
-                                  "text": "Mapped getRelationships to getRelationships\n"
-                                },
-                                {
-                                  "text": "Mapped getTable to getTable\n"
-                                },
-                                {
-                                  "text": "Mapped updateRelationship to updateRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped updateTable to updateTable\n"
-                                },
-                                {
-                                  "text": "Mapped cloneUserToken to cloneUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deactivateUserToken to deactivateUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deleteUserToken to deleteUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped transferUserToken to transferUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped addManagersToGroup to addManagersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addMembersToGroup to addMembersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsers to denyUsers\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
-                                },
-                                {
-                                  "text": "Mapped getUsers to getUsers\n"
-                                },
-                                {
-                                  "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped undenyUsers to undenyUsers\n"
-                                },
-                                {
-                                  "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Calling method with args: [ { appId: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
-                                },
-                                {
-                                  "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                                },
-                                {
-                                  "text": "App response using user token: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2025-03-09T06:13:56.499Z",
-                              "attachments": []
-                            }
-                          ],
-                          "status": "expected"
-                        }
-                      ],
-                      "id": "95cc4dd43cb1eb804aca-bbbed45ba12381f1d296",
-                      "file": "qb/auth/getAppWithUserToken.test.ts",
-                      "line": 57,
-                      "column": 3
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "title": "qb/auth/getTempToken.test.ts",
-              "file": "qb/auth/getTempToken.test.ts",
-              "column": 0,
-              "line": 0,
-              "specs": [],
-              "suites": [
-                {
-                  "title": "QuickbaseClient Integration - getApp with Temp Tokens",
-                  "file": "qb/auth/getTempToken.test.ts",
-                  "line": 57,
-                  "column": 6,
-                  "specs": [
-                    {
-                      "title": "uses temp tokens automatically for getApp in browser",
-                      "ok": true,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 310000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
-                          "projectId": "chromium",
-                          "projectName": "chromium",
-                          "results": [
-                            {
-                              "workerIndex": 3,
-                              "parallelIndex": 0,
-                              "status": "passed",
-                              "duration": 9291,
-                              "errors": [],
-                              "stdout": [
-                                {
-                                  "text": "Logging in to QuickBase\n"
-                                },
-                                {
-                                  "text": "Signed In to QuickBase.\n"
-                                },
-                                {
-                                  "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
-                                },
-                                {
-                                  "text": "Mapped copyApp to copyApp\n"
-                                },
-                                {
-                                  "text": "Mapped createApp to createApp\n"
-                                },
-                                {
-                                  "text": "Mapped getApp to getApp\n"
-                                },
-                                {
-                                  "text": "Mapped getAppEvents to getAppEvents\n"
-                                },
-                                {
-                                  "text": "Mapped audit to audit\n"
-                                },
-                                {
-                                  "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
-                                },
-                                {
-                                  "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
-                                },
-                                {
-                                  "text": "Mapped generateDocument to generateDocument\n"
-                                },
-                                {
-                                  "text": "Mapped getField to getField\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldUsage to getFieldUsage\n"
-                                },
-                                {
-                                  "text": "Mapped getFields to getFields\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldsUsage to getFieldsUsage\n"
-                                },
-                                {
-                                  "text": "Mapped updateField to updateField\n"
-                                },
-                                {
-                                  "text": "Mapped deleteFile to deleteFile\n"
-                                },
-                                {
-                                  "text": "Mapped downloadFile to downloadFile\n"
-                                },
-                                {
-                                  "text": "Mapped runFormula to runFormula\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRecords to deleteRecords\n"
-                                },
-                                {
-                                  "text": "Mapped upsert to upsert\n"
-                                },
-                                {
-                                  "text": "Mapped upsertRecords to upsertRecords\n"
-                                },
-                                {
-                                  "text": "Mapped getReport to getReport\n"
-                                },
-                                {
-                                  "text": "Mapped getTableReports to getTableReports\n"
-                                },
-                                {
-                                  "text": "Mapped runReport to runReport\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolution to changesetSolution\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createSolution to createSolution\n"
-                                },
-                                {
-                                  "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolution to exportSolution\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolution to updateSolution\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createRelationship to createRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRelationship to deleteRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteTable to deleteTable\n"
-                                },
-                                {
-                                  "text": "Mapped getAppTables to getAppTables\n"
-                                },
-                                {
-                                  "text": "Mapped getRelationships to getRelationships\n"
-                                },
-                                {
-                                  "text": "Mapped getTable to getTable\n"
-                                },
-                                {
-                                  "text": "Mapped updateRelationship to updateRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped updateTable to updateTable\n"
-                                },
-                                {
-                                  "text": "Mapped cloneUserToken to cloneUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deactivateUserToken to deactivateUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deleteUserToken to deleteUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped transferUserToken to transferUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped addManagersToGroup to addManagersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addMembersToGroup to addMembersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsers to denyUsers\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
-                                },
-                                {
-                                  "text": "Mapped getUsers to getUsers\n"
-                                },
-                                {
-                                  "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped undenyUsers to undenyUsers\n"
-                                },
-                                {
-                                  "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Cache state before fetch for buwai2zpe: []\n"
-                                },
-                                {
-                                  "text": "Mapped copyApp to copyApp\n"
-                                },
-                                {
-                                  "text": "Mapped createApp to createApp\n"
-                                },
-                                {
-                                  "text": "Mapped getApp to getApp\n"
-                                },
-                                {
-                                  "text": "Mapped getAppEvents to getAppEvents\n"
-                                },
-                                {
-                                  "text": "Mapped audit to audit\n"
-                                },
-                                {
-                                  "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
-                                },
-                                {
-                                  "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
-                                },
-                                {
-                                  "text": "Mapped generateDocument to generateDocument\n"
-                                },
-                                {
-                                  "text": "Mapped getField to getField\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldUsage to getFieldUsage\n"
-                                },
-                                {
-                                  "text": "Mapped getFields to getFields\n"
-                                },
-                                {
-                                  "text": "Mapped getFieldsUsage to getFieldsUsage\n"
-                                },
-                                {
-                                  "text": "Mapped updateField to updateField\n"
-                                },
-                                {
-                                  "text": "Mapped deleteFile to deleteFile\n"
-                                },
-                                {
-                                  "text": "Mapped downloadFile to downloadFile\n"
-                                },
-                                {
-                                  "text": "Mapped runFormula to runFormula\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
-                                },
-                                {
-                                  "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRecords to deleteRecords\n"
-                                },
-                                {
-                                  "text": "Mapped upsert to upsert\n"
-                                },
-                                {
-                                  "text": "Mapped upsertRecords to upsertRecords\n"
-                                },
-                                {
-                                  "text": "Mapped getReport to getReport\n"
-                                },
-                                {
-                                  "text": "Mapped getTableReports to getTableReports\n"
-                                },
-                                {
-                                  "text": "Mapped runReport to runReport\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolution to changesetSolution\n"
-                                },
-                                {
-                                  "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createSolution to createSolution\n"
-                                },
-                                {
-                                  "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolution to exportSolution\n"
-                                },
-                                {
-                                  "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolution to updateSolution\n"
-                                },
-                                {
-                                  "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
-                                },
-                                {
-                                  "text": "Mapped createRelationship to createRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteRelationship to deleteRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped deleteTable to deleteTable\n"
-                                },
-                                {
-                                  "text": "Mapped getAppTables to getAppTables\n"
-                                },
-                                {
-                                  "text": "Mapped getRelationships to getRelationships\n"
-                                },
-                                {
-                                  "text": "Mapped getTable to getTable\n"
-                                },
-                                {
-                                  "text": "Mapped updateRelationship to updateRelationship\n"
-                                },
-                                {
-                                  "text": "Mapped updateTable to updateTable\n"
-                                },
-                                {
-                                  "text": "Mapped cloneUserToken to cloneUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deactivateUserToken to deactivateUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped deleteUserToken to deleteUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped transferUserToken to transferUserToken\n"
-                                },
-                                {
-                                  "text": "Mapped addManagersToGroup to addManagersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addMembersToGroup to addMembersToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsers to denyUsers\n"
-                                },
-                                {
-                                  "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
-                                },
-                                {
-                                  "text": "Mapped getUsers to getUsers\n"
-                                },
-                                {
-                                  "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
-                                },
-                                {
-                                  "text": "Mapped undenyUsers to undenyUsers\n"
-                                },
-                                {
-                                  "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Invoking getTempTokenDBID with params: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Calling method with args: [ { dbid: \u001b[32m'buwai2zpe'\u001b[39m }, {} ]\n"
-                                },
-                                {
-                                  "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg2Mjd1NXZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnY2Ym54eGJ6d2VpeTliYm1kd24ybXh5cTV6Y2U1a2p1N2QzN2VwNDQyaTI0bTNjY2R1eDQyX2l5anpuNGE=\"}'\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Response from getTempTokenDBID: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg2Mjd1NXZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnY2Ym54eGJ6d2VpeTliYm1kd24ybXh5cTV6Y2U1a2p1N2QzN2VwNDQyaTI0bTNjY2R1eDQyX2l5anpuNGE='\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg2Mjd1NXZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnY2Ym54eGJ6d2VpeTliYm1kd24ybXh5cTV6Y2U1a2p1N2QzN2VwNDQyaTI0bTNjY2R1eDQyX2l5anpuNGE= Expires at: 2025-03-09T06:19:06.374Z\n"
-                                },
-                                {
-                                  "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                                },
-                                {
-                                  "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg2Mjd1NXZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnY2Ym54eGJ6d2VpeTliYm1kd24ybXh5cTV6Y2U1a2p1N2QzN2VwNDQyaTI0bTNjY2R1eDQyX2l5anpuNGE='\u001b[39m\n    }\n  }\n]\n"
-                                },
-                                {
-                                  "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg2Mjd1NXZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYnY2Ym54eGJ6d2VpeTliYm1kd24ybXh5cTV6Y2U1a2p1N2QzN2VwNDQyaTI0bTNjY2R1eDQyX2l5anpuNGE='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'omit'\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
-                                },
-                                {
-                                  "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                                },
-                                {
-                                  "text": "App response using auto-fetched temp token: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2025-03-09T06:14:07.516Z",
-                              "attachments": []
-                            }
-                          ],
-                          "status": "expected"
-                        }
-                      ],
-                      "id": "a701d3a6657df231384c-1f340fa9d9997340cef2",
-                      "file": "qb/auth/getTempToken.test.ts",
-                      "line": 58,
-                      "column": 3
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "title": "qb/auth/tokenRenewal.test.ts",
-              "file": "qb/auth/tokenRenewal.test.ts",
-              "column": 0,
-              "line": 0,
-              "specs": [],
-              "suites": [
-                {
-                  "title": "QuickbaseClient Integration - Temp Token Renewal",
-                  "file": "qb/auth/tokenRenewal.test.ts",
-                  "line": 61,
-                  "column": 6,
-                  "specs": [
-                    {
-                      "title": "renews temp token after 5 minutes with getApp → wait → getApp sequence",
-                      "ok": false,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 310000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
-                          "projectId": "chromium",
-                          "projectName": "chromium",
-                          "results": [
-                            {
-                              "workerIndex": 3,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310102,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for tokenRenewal\n"
-                                },
-                                {
-                                  "text": "Context created for tokenRenewal\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2025-03-09T06:14:16.819Z",
-                              "attachments": []
-                            },
-                            {
-                              "workerIndex": 4,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310102,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for tokenRenewal\n"
-                                },
-                                {
-                                  "text": "Context created for tokenRenewal\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 1,
-                              "startTime": "2025-03-09T06:19:27.399Z",
-                              "attachments": []
-                            },
-                            {
-                              "workerIndex": 5,
-                              "parallelIndex": 0,
-                              "status": "timedOut",
-                              "duration": 310102,
-                              "error": {
-                                "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m",
-                                "stack": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                              },
-                              "errors": [
-                                {
-                                  "message": "\u001b[31mTest timeout of 310000ms exceeded while setting up \"context\".\u001b[39m"
-                                }
-                              ],
-                              "stdout": [
-                                {
-                                  "text": "Starting context creation for tokenRenewal\n"
-                                },
-                                {
-                                  "text": "Context created for tokenRenewal\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 2,
-                              "startTime": "2025-03-09T06:24:38.065Z",
-                              "attachments": []
-                            }
-                          ],
-                          "status": "unexpected"
-                        }
-                      ],
-                      "id": "2f702af7105aeb9bbf4a-9e94cc6aefa950e625cc",
-                      "file": "qb/auth/tokenRenewal.test.ts",
-                      "line": 71,
-                      "column": 3
-                    }
-                  ]
-                }
-              ]
-            }
-          ],
-          "errors": [],
-          "stats": {
-            "startTime": "2025-03-09T05:58:24.076Z",
-            "duration": 1884166.324,
-            "expected": 2,
-            "skipped": 0,
-            "unexpected": 2,
-            "flaky": 0
-          }
-        }
     - name: tests
       type: directory
       children:
@@ -2408,176 +1431,97 @@ tree:
                         // tests/playwright/qb/auth/tokenRenewal.test.ts
                         import { test, expect } from "@playwright/test";
                         import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
-                        import fetch from "node-fetch";
                         import dotenv from "dotenv";
 
                         dotenv.config();
 
                         const loginToQuickbase = async (
-                          page: import("@playwright/test").Page,
-                          quickbaseUrl: string,
-                          username: string,
-                          password: string
-                        ): Promise<boolean> => {
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password,
+                          appUrl
+                        ) => {
                           console.log("Logging in to QuickBase");
-                          let loginSuccess = false;
-                          const maxLoginAttempts = 3;
-                          let loginAttempt = 0;
-
-                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
-                            try {
-                              loginAttempt++;
-                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
-
-                              console.log("Navigating to login page");
-                              await page.goto(quickbaseUrl, { timeout: 30000 });
-                              console.log("Waiting for loginid selector");
-                              await page.waitForSelector("input[name='loginid']", { timeout: 30000 });
-                              await page.fill("input[name='loginid']", username);
-                              await page.fill("input[name='password']", password);
-                              console.log("Clicking signin");
-                              await page.click("#signin");
-                              console.log("Waiting for navigation");
-                              await page.waitForURL(`https://*.quickbase.com/**`, {
-                                waitUntil: "networkidle",
-                                timeout: 30000,
-                              });
-
-                              const loginError = await page.$(".login-error");
-                              if (loginError) {
-                                throw new Error("Login failed. Please check your credentials.");
-                              }
-
-                              console.log("Signed In to QuickBase.");
-                              loginSuccess = true;
-                            } catch (error) {
-                              console.error(
-                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
-                              );
-                              if (loginAttempt >= maxLoginAttempts) {
-                                console.error("Max login attempts reached. Exiting.");
-                                await page.context().browser()!.close();
-                                return false;
-                              }
-                              await new Promise((resolve) => setTimeout(resolve, 5000));
-                            }
-                          }
-                          return loginSuccess;
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
+                          });
+                          console.log("Signed In to QuickBase.");
+                          await page.goto(appUrl, { waitUntil: "networkidle", timeout: 60000 });
+                          console.log("Navigated to app URL:", page.url());
                         };
 
                         test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
-                          // Removed test.use({ context: ... })
-
                           test("renews temp token after 5 minutes with getApp → wait → getApp sequence", async ({
                             page,
                           }) => {
-                            console.log("Starting tokenRenewal test");
-                            const realm = process.env.QB_REALM;
-                            const appId = process.env.QB_APP_ID;
-                            const username = process.env.QB_USERNAME;
-                            const password = process.env.QB_PASSWORD;
-
-                            if (!realm) throw new Error("QB_REALM is not defined in .env");
-                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
-                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
-
+                            const realm = process.env.QB_REALM!;
+                            const appId = process.env.QB_APP_ID!;
+                            const username = process.env.QB_USERNAME!;
+                            const password = process.env.QB_PASSWORD!;
                             const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
-                            const loginSuccess = await loginToQuickbase(
-                              page,
-                              quickbaseUrl,
-                              username,
-                              password
-                            );
-                            if (!loginSuccess) {
-                              throw new Error("Failed to log in to QuickBase after max attempts.");
-                            }
+                            const appUrl = `https://${realm}.quickbase.com/db/${appId}`;
 
-                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
-                              waitUntil: "networkidle",
-                              timeout: 30000,
-                            });
-                            console.log("Post-login URL after app navigation:", page.url());
+                            await loginToQuickbase(page, quickbaseUrl, username, password, appUrl);
 
-                            const browserFetch = async (url: string, init?: RequestInit) => {
-                              const response = await page.evaluate(
-                                async ([fetchUrl, fetchInit]) => {
-                                  const res = await fetch(fetchUrl, {
-                                    ...fetchInit,
-                                    credentials: "include",
-                                  });
-                                  const body = await res.text();
-                                  return {
-                                    ok: res.ok,
-                                    status: res.status,
-                                    statusText: res.statusText,
-                                    headers: Object.fromEntries(res.headers.entries()),
-                                    body,
-                                  };
+                            const browserFetch = async (
+                              url: string,
+                              init: RequestInit
+                            ): Promise<Response> => {
+                              const response = await page.request.fetch(url, {
+                                method: init.method || "GET",
+                                headers: {
+                                  ...init.headers,
+                                  Referer: `https://${realm}.quickbase.com/db/${appId}`,
+                                  Origin: `https://${realm}.quickbase.com`,
                                 },
-                                [url, init] as [string, RequestInit]
+                                data: init.body,
+                                credentials: "include",
+                              });
+                              const body = await response.text();
+                              console.log(
+                                "Response from:",
+                                url,
+                                "status:",
+                                response.status(),
+                                "body:",
+                                body
                               );
-
-                              console.log(`Raw response from ${url}:`, {
-                                status: response.status,
-                                statusText: response.statusText,
-                                body: response.body,
+                              return new Response(body, {
+                                status: response.status(),
+                                statusText: response.statusText(),
+                                headers: response.headers(),
                               });
-
-                              const fetchResponse = new Response(response.body || null, {
-                                status: response.status,
-                                statusText: response.statusText,
-                                headers: response.headers,
-                              });
-
-                              fetchResponse.json = async () => {
-                                if (!response.body) throw new Error("Empty response body from API");
-                                try {
-                                  return JSON.parse(response.body);
-                                } catch (e) {
-                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
-                                }
-                              };
-
-                              return fetchResponse;
                             };
 
                             const client = quickbaseClient({
                               realm,
                               useTempTokens: true,
                               debug: true,
-                              fetchApi: async (url, init) => {
-                                if (url.includes("/auth/temporary/")) {
-                                  return browserFetch(url, init);
-                                }
-                                console.log(`Fetching ${url} with init:`, init);
-                                const response = await fetch(url, init as RequestInit);
-                                const body = await response.text();
-
-                                console.log(`Raw response from ${url}:`, {
-                                  status: response.status,
-                                  statusText: response.statusText,
-                                  body,
-                                });
-
-                                const fetchResponse = new Response(body || null, {
-                                  status: response.status,
-                                  statusText: response.statusText,
-                                  headers: Object.fromEntries(response.headers.entries()),
-                                });
-
-                                fetchResponse.json = async () => {
-                                  if (!body) throw new Error("Empty response body from API");
-                                  try {
-                                    return JSON.parse(body);
-                                  } catch (e) {
-                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
-                                  }
-                                };
-
-                                return fetchResponse;
-                              },
+                              fetchApi: browserFetch,
                             });
+
+                            console.log("Checking session state before getApp...");
+                            const cookies = await page.context().cookies();
+                            const sessionCookie = cookies.find(
+                              (c) => c.name === "TICKET" || c.name.startsWith("TICKET_")
+                            );
+                            console.log(
+                              "Session cookie present:",
+                              !!sessionCookie,
+                              "Cookies:",
+                              cookies
+                            );
+                            if (!sessionCookie) throw new Error("TICKET session cookie not found");
+
+                            await page.waitForTimeout(5000); // Debug delay
+                            console.log("Cookies after delay:", await page.context().cookies());
 
                             const appResult1 = await client.getApp({ appId });
                             console.log("First getApp response:", appResult1);
@@ -2586,7 +1530,7 @@ tree:
                             console.log("Waiting 5 minutes to test token expiration...");
                             await new Promise((resolve) => setTimeout(resolve, 5 * 60 * 1000));
 
-                            await page.reload({ waitUntil: "networkidle", timeout: 30000 });
+                            await page.reload({ waitUntil: "load", timeout: 60000 });
                             console.log("Refreshed page after 5 minutes, URL:", page.url());
 
                             const appResult2 = await client.getApp({ appId });
