@@ -13,7 +13,11 @@
     "outDir": "dist",
     "rootDir": ".", // Includes src/ and tests/
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".", // Added to set the root for path resolution
+    "paths": {
+      "@/*": ["./*"] // Maps '@/*' to root directory
+    }
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "src/generated-old"],

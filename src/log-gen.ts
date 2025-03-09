@@ -31,12 +31,18 @@ const projectGoals: string[] = [
   "Implement a QuickBase API client in TypeScript.",
   "Generate client methods from the QuickBase RESTful API spec.",
   "Provide a simple and intuitive interface for interacting with QuickBase.",
-  "This library should not have to manually update the client methods when the QuickBase API changes.",
-  "Generate ergonomic client methods from the QuickBase RESTful-API spec that do not require manual updates.",
   "Support both Node.js and browser environments.",
-  "The intent is to use this in JS frameworks like React, Vue, and Angular.",
+  "Use case: JS frameworks like React, Vue, and Angular hosted in QuickBase code pages.",
+  "Node.js is supported using User Tokens",
   "Use OpenAPI to generate the TypeScript types and methods.",
   "Use the latest ES6+ features and TypeScript features.",
+  "#",
+  "No manual updating methods when the QuickBase API changes.",
+  "The proxy magic dynamically maps generated methods.",
+  "No manual endpoint definitions—endpoints come from the generated apis (e.g., AppsApi.getApp).",
+  "#",
+  "Per-Instance Store: tokenCache is defined per quickbaseClient call, so each instance has its own isolated TokenCache.",
+  "No Singleton: No shared state—tokens are fetched and cached within the current instance.",
 ];
 
 interface TreeNode {

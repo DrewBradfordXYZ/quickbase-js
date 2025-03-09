@@ -1,4 +1,3 @@
-// src/tokenCache.ts
 interface CachedToken {
   token: string;
   expiresAt: number; // Timestamp in milliseconds
@@ -23,6 +22,16 @@ export class TokenCache {
     return undefined; // Expired or not found
   }
 
+  // New method to get full entry
+  getEntry(dbid: string): CachedToken | undefined {
+    const entry = this.cache.get(dbid);
+    const now = Date.now();
+    if (entry && entry.expiresAt > now) {
+      return entry;
+    }
+    return undefined; // Expired or not found
+  }
+
   set(dbid: string, token: string): void {
     const now = Date.now();
     this.cache.set(dbid, {
@@ -33,5 +42,10 @@ export class TokenCache {
 
   dump(): [string, CachedToken][] {
     return Array.from(this.cache.entries());
+  }
+
+  // New method to clear the cache
+  clear(): void {
+    this.cache.clear();
   }
 }

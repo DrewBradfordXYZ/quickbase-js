@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createClient, mockFetch } from "../../setup.ts";
+import { createClient, mockFetch } from "@/tests/setup.ts";
 
 describe("QuickbaseClient - getFields (Unit)", () => {
   it("calls getFields successfully", async () => {
