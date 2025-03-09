@@ -71,7 +71,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
-    headers: { ...headers }, // Ensure headers is always defined
+    headers: { ...headers }, // Base headers without Authorization for temp tokens
     fetchApi: fetchApi || defaultFetch,
     credentials: "omit",
   });
@@ -139,6 +139,8 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     }
 
     let token = initialTempToken || userToken;
+    let initOverrides: RequestInit = {};
+
     if (useTempTokens && !token) {
       const dbid = params.appId || params.tableId || params.dbid;
       if (!dbid) {
@@ -170,19 +172,23 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         if (debug) {
           console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
         }
-        configuration.headers!["Authorization"] = `QB-TEMP-TOKEN ${token}`; // Fixed TS18048
       }
+      // Set token per request, not globally
+      initOverrides.headers = {
+        ...headers,
+        Authorization: `QB-TEMP-TOKEN ${token}`,
+      };
     }
 
     if (debug) {
       console.log(`Invoking ${methodName} with params:`, params);
-      console.log(`Calling method with args:`, [params, undefined]);
+      console.log(`Calling method with args:`, [params, initOverrides]);
     }
     const args: [any, RequestInit | undefined] =
       methodInfo.paramMap.length === 1 &&
       methodInfo.paramMap[0] === "requestParameters"
-        ? [params, undefined]
-        : [params, undefined];
+        ? [params, initOverrides]
+        : [params, initOverrides];
 
     try {
       const response = await methodInfo.method(...args);

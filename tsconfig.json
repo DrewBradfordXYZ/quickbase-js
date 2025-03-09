@@ -5,7 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "lib": ["ESNext", "DOM"],
-    "types": ["node"],
+    "types": ["node", "playwright/test"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
