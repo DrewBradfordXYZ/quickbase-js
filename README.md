@@ -50,3 +50,31 @@ Behavior: Fails with a clear error unless a browser-like fetchApi is provided:
 How It Works: Temp tokens need a browser session with cookies, which Node.js can’t provide natively. A custom fetchApi (e.g., via Puppeteer) could work but is impractical for typical Node.js use.
 
 Practicality: Effectively unusable in Node.js without external browser support, aligning with QuickBase’s temp token requirement.
+
+## getTempTokenDBID
+
+Temporary Token Handling with getTempTokenDBID
+The QuickBase API provides the getTempTokenDBID method to fetch temporary tokens (QB-TEMP-TOKEN) for browser-based authentication, typically using session credentials (e.g., cookies). These tokens are short-lived (~5 minutes) and intended for secure, client-side API calls. In the generated OpenAPI client, getTempTokenDBID makes a straightforward GET request to /v1/auth/temporary/{dbid} and returns { temporaryAuthorization: string }. However, this raw implementation lacks caching and doesn’t optimize repeated calls, which can lead to unnecessary API requests.
+In quickbaseClient.ts, we enhance getTempTokenDBID when useTempTokens: true is enabled, wrapping it with intelligent token management:
+Caching: We introduce a TokenCache to store temporary tokens by dbid. Before fetching a new token, the client checks the cache. If a valid token exists, it’s returned immediately, avoiding redundant API calls.
+
+Custom Fetch Logic: Instead of relying solely on the generated method, we use a custom fetchTempToken function to fetch tokens. This ensures consistency with browser-based session authentication (credentials: "include") and allows us to cache the result.
+
+Early Returns: For getTempTokenDBID, we bypass the generated method’s execution by returning the cached or freshly fetched token directly. This prevents unnecessary calls to the underlying API when the token is already available or just retrieved.
+
+Why This Matters
+Efficiency: Caching reduces API requests, crucial for performance in browser environments where temp tokens are fetched frequently but don’t change within their lifespan.
+
+Seamless Integration: The wrapper supports both QB-USER-TOKEN (server-side) and QB-TEMP-TOKEN (client-side) workflows, controlled by the useTempTokens config. This makes the client versatile for different use cases.
+
+Testability: The enhancement fixes issues in unit tests (e.g., getTempToken.test.ts) by ensuring predictable behavior—fetching once and reusing cached tokens—avoiding unexpected errors from redundant calls.
+
+How It Works
+When you call client.getTempTokenDBID({ dbid: "someDbid" }) with useTempTokens: true:
+Cache Check: Looks for an existing token in tokenCache for the given dbid.
+
+Fetch if Needed: If no cached token exists, fetchTempToken requests a new one from /v1/auth/temporary/{dbid} and caches it.
+
+Return Early: Returns { temporaryAuthorization: token } immediately, skipping the generated method’s execution.
+
+For other methods (e.g., getFields), the fetched temp token is applied to the Authorization header, ensuring authenticated API calls without re-fetching.
