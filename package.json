@@ -20,7 +20,7 @@
     "build": "rollup -c",
     "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
     "test": "vitest run tests/vitest/**/**/*.test.ts",
-    "test:qb:browser:all": "playwright test tests/playwright/qb --config playwright.config.ts",
+    "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
     "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
     "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/**/*.test.ts",
     "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/**/*.test.ts",

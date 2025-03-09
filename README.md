@@ -78,3 +78,25 @@ Fetch if Needed: If no cached token exists, fetchTempToken requests a new one fr
 Return Early: Returns { temporaryAuthorization: token } immediately, skipping the generated method’s execution.
 
 For other methods (e.g., getFields), the fetched temp token is applied to the Authorization header, ensuring authenticated API calls without re-fetching.
+
+## 401 Unauthorized Error Behavior
+
+The quickbase-js library manages 401 Unauthorized errors from the QuickBase API when using temporary tokens (useTempTokens: true). Normally, it keeps tokens fresh via a time-managed cache intending to never have a 401 Unauthorized error, but there is added safety measures incase a 401 happens to occur.
+
+If a 401 happens, the library tries once more with a fresh temporary token.
+
+It gets the new token using fetchTempToken and retries the call.
+
+If the retry fails with another 401, it stops and throws an error like API Error: Unauthorized (Status: 401).
+
+Fetching a New Token:
+If fetchTempToken itself gets a 401 (e.g., no valid login session), it doesn’t retry.
+
+It throws an error right away: API Error: Unauthorized (Status: 401).
+
+Why It’s Like This
+One Retry: Retries once to fix expired tokens, but stops to avoid endless tries.
+
+Fast Fail: No retry on fetchTempToken 401s means you know quickly if login is broken.
+
+No Loops: Built to never get stuck retrying forever.
