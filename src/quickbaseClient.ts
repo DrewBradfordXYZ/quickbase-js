@@ -45,6 +45,18 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .map((p) => p.trim().split("=")[0].trim())
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
+// New utility function to extract dbid
+const extractDbid = (
+  params: Partial<TempTokenParams>,
+  errorMessage: string
+): string => {
+  const dbid = params.appId || params.tableId || params.dbid;
+  if (!dbid) {
+    throw new Error(errorMessage);
+  }
+  return dbid;
+};
+
 export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
@@ -186,10 +198,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
 
     // Early return for getTempTokenDBID if cached token exists
     if (methodName === "getTempTokenDBID" && useTempTokens) {
-      const dbid = params.appId || params.tableId || params.dbid;
-      if (!dbid) {
-        throw new Error("No dbid provided for getTempTokenDBID");
-      }
+      const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
       const cachedToken = tokenCache.get(dbid);
       if (cachedToken) {
         return { temporaryAuthorization: cachedToken } as ReturnType<
@@ -199,12 +208,10 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     }
 
     if (useTempTokens && !token) {
-      const dbid = params.appId || params.tableId || params.dbid;
-      if (!dbid) {
-        throw new Error(
-          `No dbid found in params for ${methodName} to fetch temp token`
-        );
-      }
+      const dbid = extractDbid(
+        params,
+        `No dbid found in params for ${methodName} to fetch temp token`
+      );
       if (debug)
         console.log(`Cache state before fetch for ${dbid}:`, tokenCache.dump());
       const cachedToken = tokenCache.get(dbid);
@@ -255,10 +262,10 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
             `Authorization error for ${methodName}, refreshing token:`,
             error.message
           );
-        const dbid = params.appId || params.tableId || params.dbid;
-        if (!dbid) {
-          throw new Error(`No dbid to refresh token after authorization error`);
-        }
+        const dbid = extractDbid(
+          params,
+          `No dbid to refresh token after authorization error`
+        );
         token = await fetchTempToken(dbid);
         initOverrides.headers = {
           ...headers,
