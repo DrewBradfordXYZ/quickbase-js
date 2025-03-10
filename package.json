@@ -16,7 +16,9 @@
     }
   },
   "scripts": {
-    "release": "standard-release release",
+    "release": "standard-version",
+    "release:beta": "standard-version --prerelease beta",
+    "release:alpha": "standard-version --prerelease alpha",
     "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
     "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
@@ -51,8 +53,6 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "^12.0.1",
     "@types/node": "^22.13.10",
     "dotenv": "^16.4.7",
     "glob": "^11.0.1",
@@ -63,7 +63,7 @@
     "rimraf": "^5.0.10",
     "rollup": "^4.35.0",
     "rollup-plugin-dts": "^6.1.1",
-    "standard-release": "^0.2.0",
+    "standard-version": "^9.5.0",
     "ts-morph": "^25.0.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
