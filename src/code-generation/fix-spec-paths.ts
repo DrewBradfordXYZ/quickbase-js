@@ -1,5 +1,26 @@
 // src/code-generation/fix-spec-paths.ts
 export const paths = {
+  "/apps": {
+    post: {
+      operationId: "createApp",
+      summary: "Create a new application",
+      tags: ["Apps"],
+      parameters: [
+        {
+          name: "request",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/CreateAppRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - application created",
+          schema: { $ref: "#/definitions/CreateApp200Response" },
+        },
+      },
+    },
+  },
   "/apps/{appId}": {
     get: {
       operationId: "getApp",
@@ -75,10 +96,35 @@ export const paths = {
       },
     },
   },
+  "/records": {
+    post: {
+      operationId: "upsert",
+      summary: "Upsert records in a table",
+      tags: ["Records"],
+      parameters: [
+        {
+          name: "request",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/UpsertRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - all records processed successfully",
+          schema: { $ref: "#/definitions/Upsert200Response" },
+        },
+        207: {
+          description: "Multi-Status - partial success with some errors",
+          schema: { $ref: "#/definitions/Upsert207Response" },
+        },
+      },
+    },
+  },
   "/records/query": {
     post: {
       operationId: "upsertRecords",
-      summary: "Upsert records",
+      summary: "Upsert records (alternative endpoint)",
       tags: ["Records"],
       parameters: [
         {
@@ -103,7 +149,7 @@ export const paths = {
           description: "Multi-Status (partial success)",
           schema: {
             type: "array",
-            items: { $ref: "#/definitions/Upsert207Response" }, // Corrected from Upsert200Response
+            items: { $ref: "#/definitions/Upsert207Response" },
           },
         },
       },

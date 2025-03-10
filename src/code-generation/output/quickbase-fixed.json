@@ -12,297 +12,29 @@
   "paths": {
     "/apps": {
       "post": {
-        "description": "Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.",
-        "summary": "Create an app",
         "operationId": "createApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Create a new application",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
-            "x-amf-mediaType": "application/json",
+            "name": "request",
             "in": "body",
-            "name": "generated",
+            "required": true,
             "schema": {
-              "description": "The example below shows all the properties that can be set with this request. Additional properties that you can see, with the corresponding GET request, cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
-              "example": {
-                "value": {
-                  "name": "My App",
-                  "description": "My first app",
-                  "assignToken": true,
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "variables": [
-                    {
-                      "name": "Variable1",
-                      "value": "Value1"
-                    }
-                  ]
-                }
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "assignToken": {
-                  "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
-                  "example": false,
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "name",
-                      "value"
-                    ],
-                    "properties": {
-                      "name": {
-                        "description": "The name for the variable.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "The value for the variable.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Application security properties.",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    },
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    }
-                  }
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/CreateAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Success - application created",
             "schema": {
-              "x-amf-examples": {
-                "Simple Application": {
-                  "created": "2020-03-27T18:34:12Z",
-                  "dateFormat": "MM-DD-YYYY",
-                  "description": "My testing app",
-                  "hasEveryoneOnTheInternet": true,
-                  "id": "bpqe82s1",
-                  "memoryInfo": {
-                    "estMemory": 1,
-                    "estMemoryInclDependentApps": 2
-                  },
-                  "name": "Testing App",
-                  "securityProperties": {
-                    "allowClone": false,
-                    "allowExport": false,
-                    "enableAppTokens": false,
-                    "hideFromPublic": false,
-                    "mustBeRealmApproved": true,
-                    "useIPFilter": true
-                  },
-                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                  "updated": "2020-04-03T19:12:20Z",
-                  "dataClassification": "Confidential"
-                },
-                "Application with defined variables": {
-                  "description": "This examples shows the response of an application that contains one or more variables.",
-                  "value": {
-                    "created": "2020-03-27T18:34:12Z",
-                    "dateFormat": "MM-DD-YYYY",
-                    "description": "My testing app",
-                    "hasEveryoneOnTheInternet": true,
-                    "id": "bpqe82s1",
-                    "memoryInfo": {
-                      "estMemory": 1,
-                      "estMemoryInclDependentApps": 2
-                    },
-                    "name": "Testing App",
-                    "securityProperties": {
-                      "allowClone": false,
-                      "allowExport": false,
-                      "enableAppTokens": false,
-                      "hideFromPublic": false,
-                      "mustBeRealmApproved": true,
-                      "useIPFilter": true
-                    },
-                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                    "variables": [
-                      {
-                        "name": "Project End Date",
-                        "value": "7-16-2025"
-                      },
-                      {
-                        "name": "Project Manager Email",
-                        "value": "p.diaz@company.com"
-                      }
-                    ],
-                    "updated": "2020-04-03T19:12:20Z"
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app. If this property is left out, the app description will be blank.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "memoryInfo": {
-                  "type": "object",
-                  "description": "Application memory info",
-                  "additionalProperties": false,
-                  "properties": {
-                    "estMemory": {
-                      "type": "number",
-                      "description": "The estimated memory of this application in gigabytes"
-                    },
-                    "estMemoryInclDependentApps": {
-                      "type": "number",
-                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
-                    }
-                  }
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                },
-                "securityProperties": {
-                  "description": "Security properties of the application",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "allowClone": {
-                      "description": "Allow users who are not administrators to copy",
-                      "type": "boolean"
-                    },
-                    "allowExport": {
-                      "description": "Allow users who are not administrators to export data",
-                      "type": "boolean"
-                    },
-                    "hideFromPublic": {
-                      "description": "Hide from public application searches",
-                      "type": "boolean"
-                    },
-                    "enableAppTokens": {
-                      "description": "Require Application Tokens",
-                      "type": "boolean"
-                    },
-                    "useIPFilter": {
-                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
-                      "type": "boolean"
-                    },
-                    "mustBeRealmApproved": {
-                      "description": "Only \"approved\" users may access this application",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/CreateApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/apps/{appId}": {
@@ -4485,441 +4217,41 @@
     },
     "/records": {
       "post": {
-        "description": "Insert and/or update record(s) in a table. In this single API call, inserts and updates can be submitted. Update can use the key field on the table, or any other supported unique field. Refer to the [Field types page](../fieldInfo) for more information about how each field type should be formatted. This operation allows for incremental processing of successful records, even when some of the records fail.  \n**Note:** This endpoint supports a maximum payload size of 40MB.",
-        "summary": "Insert/Update record(s)",
         "operationId": "upsert",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Upsert records in a table",
+        "tags": [
+          "Records"
         ],
         "parameters": [
           {
-            "x-amf-mediaType": "application/json",
+            "name": "request",
             "in": "body",
-            "name": "generated",
+            "required": true,
             "schema": {
-              "x-amf-examples": {
-                "Insert record": {
-                  "value": {
-                    "to": "bck7gp3q2",
-                    "data": [
-                      {
-                        "6": {
-                          "value": "This is my text"
-                        },
-                        "7": {
-                          "value": 10
-                        },
-                        "8": {
-                          "value": "2019-12-18T08:00:00Z"
-                        },
-                        "9": {
-                          "value": [
-                            "a",
-                            "b"
-                          ]
-                        },
-                        "10": {
-                          "value": true
-                        },
-                        "11": {
-                          "value": "user@quickbase.com"
-                        },
-                        "12": {
-                          "value": "www.quickbase.com"
-                        },
-                        "13": {
-                          "value": [
-                            {
-                              "id": "123456.ab1s"
-                            },
-                            {
-                              "id": "254789.mkgp"
-                            },
-                            {
-                              "id": "789654.vc2s"
-                            }
-                          ]
-                        }
-                      }
-                    ],
-                    "fieldsToReturn": [
-                      6,
-                      7,
-                      8,
-                      9,
-                      10,
-                      11,
-                      12,
-                      13
-                    ]
-                  }
-                },
-                "Update existing record": {
-                  "description": "For updating an existing record, add a mapping of the table key field ID (defaults to '3') to the record ID, in the data array. In the following example, we update the first record.",
-                  "value": {
-                    "to": "bck7gp3q2",
-                    "data": [
-                      {
-                        "3": {
-                          "value": 1
-                        },
-                        "6": {
-                          "value": "This is my new text"
-                        },
-                        "7": {
-                          "value": 20
-                        },
-                        "9": {
-                          "value": [
-                            "c",
-                            "d"
-                          ]
-                        },
-                        "10": {
-                          "value": false
-                        },
-                        "11": {
-                          "value": "newuser@quickbase.com"
-                        }
-                      }
-                    ],
-                    "fieldsToReturn": [
-                      6,
-                      7,
-                      9,
-                      10,
-                      11
-                    ]
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "to"
-              ],
-              "properties": {
-                "to": {
-                  "description": "The table identifier.",
-                  "example": "bck7gp3q2",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "data": {
-                  "description": "Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Record"
-                  }
-                },
-                "mergeFieldId": {
-                  "description": "The merge field id.",
-                  "example": 7,
-                  "type": "integer"
-                },
-                "fieldsToReturn": {
-                  "description": "Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested.",
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              }
+              "$ref": "#/definitions/UpsertRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
+            "description": "Success - all records processed successfully",
             "schema": {
-              "description": "A successful response that includes details on the records added, updated or unchanged. In the example below, the table previously had ten records with IDs from 1 through 10. The user posts an upsert that updates the value of record 1 and adds two new records, all successfully.",
-              "example": {
-                "value": {
-                  "data": [
-                    {
-                      "3": {
-                        "value": 1
-                      },
-                      "6": {
-                        "value": "Updating this record"
-                      },
-                      "7": {
-                        "value": 10
-                      },
-                      "8": {
-                        "value": "2019-12-18T08:00:00.000Z"
-                      }
-                    },
-                    {
-                      "3": {
-                        "value": 11
-                      },
-                      "6": {
-                        "value": "This is my text"
-                      },
-                      "7": {
-                        "value": 15
-                      },
-                      "8": {
-                        "value": "2019-12-19T08:00:00.000Z"
-                      }
-                    },
-                    {
-                      "3": {
-                        "value": 12
-                      },
-                      "6": {
-                        "value": "This is my other text"
-                      },
-                      "7": {
-                        "value": 20
-                      },
-                      "8": {
-                        "value": "2019-12-20T08:00:00.000Z"
-                      }
-                    }
-                  ],
-                  "metadata": {
-                    "createdRecordIds": [
-                      11,
-                      12
-                    ],
-                    "totalNumberOfRecordsProcessed": 3,
-                    "unchangedRecordIds": [],
-                    "updatedRecordIds": [
-                      1
-                    ]
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "metadata": {
-                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "createdRecordIds": {
-                      "description": "Array containing the created record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "lineErrors": {
-                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
-                      "type": "object",
-                      "additionalProperties": true
-                    },
-                    "unchangedRecordIds": {
-                      "description": "Array containing the unchanged record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "updatedRecordIds": {
-                      "description": "Array containing the updated record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "totalNumberOfRecordsProcessed": {
-                      "description": "Number of records processed. Includes successful and failed record updates.",
-                      "type": "integer"
-                    }
-                  }
-                },
-                "data": {
-                  "description": "The data that is expected to be returned.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Upsert200Response"
-                  }
-                }
-              }
+              "$ref": "#/definitions/Upsert200Response"
             }
           },
           "207": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
+            "description": "Multi-Status - partial success with some errors",
             "schema": {
-              "description": "Receiving this status code indicates that some (or all) of the individual records being handled had problems and were not processed successfully. The response will be reported under the 'lineErrors' element and indicate the total number of records processed and the errors that occurred with each record. The record IDs of records created, updated, and referenced but unchanged, will be returned in the 'createdRecordIds', 'updatedRecordIds', and 'unchangedRecordIds' elements respectively.  \nIn the example below, a user tries to add three records to a table that previously had ten records with IDs from 1 through 10. The first and third records of the request are valid and create the 11th and 12th records in the table; the second record has a problem that prevents it from being processed.",
-              "example": {
-                "value": {
-                  "data": [],
-                  "metadata": {
-                    "createdRecordIds": [
-                      11,
-                      12
-                    ],
-                    "lineErrors": {
-                      "2": [
-                        "Incompatible value for field with ID \"6\"."
-                      ]
-                    },
-                    "totalNumberOfRecordsProcessed": 3,
-                    "unchangedRecordIds": [],
-                    "updatedRecordIds": []
-                  }
-                }
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "metadata": {
-                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "createdRecordIds": {
-                      "description": "Array containing the created record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "lineErrors": {
-                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
-                      "type": "object",
-                      "additionalProperties": true
-                    },
-                    "unchangedRecordIds": {
-                      "description": "Array containing the unchanged record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "updatedRecordIds": {
-                      "description": "Array containing the updated record ids.",
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    },
-                    "totalNumberOfRecordsProcessed": {
-                      "description": "Number of records processed. Includes successful and failed record updates.",
-                      "type": "integer"
-                    }
-                  }
-                },
-                "data": {
-                  "description": "The data that is expected to be returned.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/Upsert200Response"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "description": "There was problem in the format of the request. This prevented the entire request from processing any records. The error response will be in the [standard format](../errors).",
-              "example": {
-                "message": "Bad request",
-                "description": "Data object cannot be empty."
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "message": {
-                  "description": "The type of error found.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the occurence of the error.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Upsert207Response"
             }
           }
-        },
-        "tags": [
-          "Records"
-        ]
-      },
-      "delete": {
-        "description": "Deletes record(s) in a table based on a query. Alternatively, all records in the table can be deleted.",
-        "summary": "Delete record(s)",
-        "operationId": "deleteRecords",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "example": {
-                "from": "bck7gp3q2",
-                "where": "{6.EX.'hello'}"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "from",
-                "where"
-              ],
-              "properties": {
-                "from": {
-                  "description": "The unique identifier of the table.",
-                  "example": "bck7gp3q2",
-                  "type": "string",
-                  "minLength": 1
-                },
-                "where": {
-                  "description": "The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.",
-                  "example": "{6.EX.'hello'}",
-                  "type": "string",
-                  "minLength": 1
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful delete records response.",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "numberDeleted": 1
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "numberDeleted": {
-                  "description": "The number of records deleted.",
-                  "example": 1,
-                  "type": "integer"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Records"
-        ]
+        }
       }
     },
     "/records/query": {
       "post": {
         "operationId": "upsertRecords",
-        "summary": "Upsert records",
+        "summary": "Upsert records (alternative endpoint)",
         "tags": [
           "Records"
         ],
@@ -8145,6 +7477,10 @@
   "definitions": {
     "App": {
       "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
       "properties": {
         "id": {
           "type": "string"
@@ -8173,38 +7509,157 @@
           "type": "boolean"
         },
         "memoryInfo": {
-          "type": "object",
-          "properties": {
-            "estMemory": {
-              "type": "number"
-            },
-            "estMemoryInclDependentApps": {
-              "type": "number"
-            }
-          }
+          "$ref": "#/definitions/AppMemoryInfo"
         },
         "securityProperties": {
-          "type": "object",
-          "properties": {
-            "allowClone": {
-              "type": "boolean"
+          "$ref": "#/definitions/AppSecurityProperties"
+        }
+      }
+    },
+    "AppMemoryInfo": {
+      "type": "object",
+      "properties": {
+        "estMemory": {
+          "type": "number"
+        },
+        "estMemoryInclDependentApps": {
+          "type": "number"
+        }
+      }
+    },
+    "AppSecurityProperties": {
+      "type": "object",
+      "properties": {
+        "allowClone": {
+          "type": "boolean"
+        },
+        "allowExport": {
+          "type": "boolean"
+        },
+        "enableAppTokens": {
+          "type": "boolean"
+        },
+        "hideFromPublic": {
+          "type": "boolean"
+        },
+        "mustBeRealmApproved": {
+          "type": "boolean"
+        },
+        "useIPFilter": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CreateAppRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The app name. Multiple apps with the same name are allowed in the same realm."
+        },
+        "assignToken": {
+          "type": "boolean",
+          "description": "Set to true to assign the app to the user token used to create it. Default is false."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the app. Defaults to blank if omitted."
+        },
+        "securityProperties": {
+          "$ref": "#/definitions/AppSecurityProperties",
+          "description": "Application security properties."
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
             },
-            "allowExport": {
-              "type": "boolean"
+            "required": [
+              "name",
+              "value"
+            ]
+          },
+          "description": "App variables (max 10, optional). See About Application Variables."
+        }
+      }
+    },
+    "CreateApp200Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for this application."
+        },
+        "name": {
+          "type": "string",
+          "description": "The app name."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the app."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was created (ISO 8601, UTC)."
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was last updated (ISO 8601, UTC)."
+        },
+        "dateFormat": {
+          "type": "string",
+          "description": "The format used for displaying dates in the app (e.g., MM-DD-YYYY)."
+        },
+        "timeZone": {
+          "type": "string",
+          "description": "The time zone used for displaying time values (e.g., (UTC-08:00) Pacific Time)."
+        },
+        "memoryInfo": {
+          "$ref": "#/definitions/AppMemoryInfo",
+          "description": "Application memory information."
+        },
+        "hasEveryoneOnTheInternet": {
+          "type": "boolean",
+          "description": "Indicates if the app includes Everyone On The Internet access."
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
             },
-            "enableAppTokens": {
-              "type": "boolean"
-            },
-            "hideFromPublic": {
-              "type": "boolean"
-            },
-            "mustBeRealmApproved": {
-              "type": "boolean"
-            },
-            "useIPFilter": {
-              "type": "boolean"
-            }
-          }
+            "required": [
+              "name",
+              "value"
+            ]
+          },
+          "description": "The app variables."
+        },
+        "dataClassification": {
+          "type": "string",
+          "description": "The Data Classification label assigned to the app (optional, may be 'None')."
+        },
+        "securityProperties": {
+          "$ref": "#/definitions/AppSecurityProperties",
+          "description": "Security properties of the application."
         }
       },
       "required": [
@@ -8214,9 +7669,14 @@
     },
     "Field": {
       "type": "object",
+      "required": [
+        "id",
+        "label",
+        "fieldType"
+      ],
       "properties": {
         "id": {
-          "type": "number"
+          "type": "integer"
         },
         "label": {
           "type": "string"
@@ -8252,72 +7712,77 @@
           "type": "boolean"
         },
         "properties": {
-          "type": "object",
-          "properties": {
-            "primaryKey": {
-              "type": "boolean"
-            },
-            "foreignKey": {
-              "type": "boolean"
-            },
-            "numLines": {
-              "type": "number"
-            },
-            "maxLength": {
-              "type": "number"
-            },
-            "appendOnly": {
-              "type": "boolean"
-            },
-            "allowHTML": {
-              "type": "boolean"
-            },
-            "allowMentions": {
-              "type": "boolean"
-            },
-            "sortAsGiven": {
-              "type": "boolean"
-            },
-            "carryChoices": {
-              "type": "boolean"
-            },
-            "allowNewChoices": {
-              "type": "boolean"
-            },
-            "formula": {
-              "type": "string"
-            },
-            "defaultValue": {
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/FieldProperties"
         },
         "permissions": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "permissionType": {
-                "type": "string"
-              },
-              "role": {
-                "type": "string"
-              },
-              "roleId": {
-                "type": "number"
-              }
-            }
+            "$ref": "#/definitions/FieldPermissionsInner"
           }
         }
-      },
-      "required": [
-        "id",
-        "label",
-        "fieldType"
-      ]
+      }
+    },
+    "FieldProperties": {
+      "type": "object",
+      "properties": {
+        "primaryKey": {
+          "type": "boolean"
+        },
+        "foreignKey": {
+          "type": "boolean"
+        },
+        "numLines": {
+          "type": "integer"
+        },
+        "maxLength": {
+          "type": "integer"
+        },
+        "appendOnly": {
+          "type": "boolean"
+        },
+        "allowHTML": {
+          "type": "boolean"
+        },
+        "allowMentions": {
+          "type": "boolean"
+        },
+        "sortAsGiven": {
+          "type": "boolean"
+        },
+        "carryChoices": {
+          "type": "boolean"
+        },
+        "allowNewChoices": {
+          "type": "boolean"
+        },
+        "formula": {
+          "type": "string"
+        },
+        "defaultValue": {
+          "type": "string"
+        }
+      }
+    },
+    "FieldPermissionsInner": {
+      "type": "object",
+      "properties": {
+        "permissionType": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "integer"
+        }
+      }
     },
     "Table": {
       "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
       "properties": {
         "id": {
           "type": "string"
@@ -8333,7 +7798,7 @@
           "format": "date-time"
         },
         "defaultSortFieldId": {
-          "type": "number"
+          "type": "integer"
         },
         "defaultSortOrder": {
           "type": "string"
@@ -8342,13 +7807,13 @@
           "type": "string"
         },
         "keyFieldId": {
-          "type": "number"
+          "type": "integer"
         },
         "nextFieldId": {
-          "type": "number"
+          "type": "integer"
         },
         "nextRecordId": {
-          "type": "number"
+          "type": "integer"
         },
         "pluralRecordName": {
           "type": "string"
@@ -8369,42 +7834,163 @@
           "type": "string",
           "format": "date-time"
         }
-      },
-      "required": [
-        "id",
-        "name"
-      ]
+      }
     },
     "Record": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "number"
-        },
-        "fields": {
+        "additionalProperties": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
+          "properties": {
+            "value": {
+              "type": "any"
+            }
           }
         }
       },
+      "description": "A record with field ID keys and value objects."
+    },
+    "UpsertRequest": {
+      "type": "object",
       "required": [
-        "id"
-      ]
+        "to"
+      ],
+      "properties": {
+        "to": {
+          "type": "string",
+          "description": "The table identifier (dbid)."
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          },
+          "description": "Array of records to upsert."
+        },
+        "mergeFieldId": {
+          "type": "integer",
+          "description": "The field ID to merge on (optional)."
+        },
+        "fieldsToReturn": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Field IDs to return in the response (optional)."
+        }
+      }
     },
     "Upsert200Response": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "number"
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "any"
+                }
+              }
+            }
+          },
+          "description": "Array of upserted records with field IDs and values."
         },
-        "status": {
-          "type": "string"
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "createdRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "IDs of newly created records."
+            },
+            "updatedRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "IDs of updated records."
+            },
+            "unchangedRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": "IDs of unchanged records."
+            },
+            "totalNumberOfRecordsProcessed": {
+              "type": "integer",
+              "description": "Total records processed."
+            }
+          },
+          "required": [
+            "totalNumberOfRecordsProcessed"
+          ]
         }
-      },
-      "required": [
-        "id"
-      ]
+      }
+    },
+    "Upsert207Response": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "any"
+                }
+              }
+            }
+          },
+          "description": "Array of successfully upserted records (may be empty)."
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "createdRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "updatedRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "unchangedRecordIds": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "lineErrors": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "description": "Errors by line number (1-based index)."
+            },
+            "totalNumberOfRecordsProcessed": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "totalNumberOfRecordsProcessed"
+          ]
+        }
+      }
     },
     "ReportRunResponse": {
       "type": "object",
@@ -8415,21 +8001,18 @@
         "data": {
           "type": "object"
         }
-      },
-      "required": [
-        "id"
-      ]
+      }
     },
     "GetTempTokenDBID200Response": {
       "type": "object",
+      "required": [
+        "temporaryAuthorization"
+      ],
       "properties": {
         "temporaryAuthorization": {
           "type": "string"
         }
-      },
-      "required": [
-        "temporaryAuthorization"
-      ]
+      }
     }
   }
 }
