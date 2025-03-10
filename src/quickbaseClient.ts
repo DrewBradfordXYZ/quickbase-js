@@ -51,12 +51,12 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .map((p) => p.trim().split("=")[0].trim())
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
-// New utility function to extract dbid
+// Utility function to extract dbid, prioritizing dbid, then tableId, then appId
 const extractDbid = (
   params: Partial<TempTokenParams>,
   errorMessage: string
 ): string => {
-  const dbid = params.appId || params.tableId || params.dbid;
+  const dbid = params.dbid || params.tableId || params.appId;
   if (!dbid) {
     throw new Error(errorMessage);
   }
