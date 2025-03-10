@@ -272,6 +272,32 @@ export const definitions = {
       },
     },
   },
+  UpdateTableRequest: {
+    type: "object",
+    properties: {
+      name: {
+        type: "string",
+        description: "The new name for the table.",
+      },
+      singleRecordName: {
+        type: "string",
+        description:
+          "The new singular noun for records in the table. Defaults to 'Record' if not provided.",
+      },
+      pluralRecordName: {
+        type: "string",
+        description:
+          "The new plural noun for records in the table. Defaults to 'Records' if not provided.",
+      },
+      description: {
+        type: "string",
+        description:
+          "The new description for the table. Defaults to blank if not provided.",
+      },
+    },
+    description:
+      "Request body for updating table properties. At least one property must be provided.",
+  },
   Record: {
     type: "object",
     properties: {

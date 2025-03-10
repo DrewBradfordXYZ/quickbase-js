@@ -32,6 +32,7 @@ export const paths = {
           in: "path",
           required: true,
           type: "string",
+          description: "The application identifier.",
         },
       ],
       responses: {
@@ -53,12 +54,14 @@ export const paths = {
           in: "query",
           required: true,
           type: "string",
+          description: "The table identifier (dbid).",
         },
         {
           name: "includeFieldPerms",
           in: "query",
           required: false,
           type: "boolean",
+          description: "Whether to include field permissions.",
         },
       ],
       responses: {
@@ -83,6 +86,7 @@ export const paths = {
           in: "query",
           required: true,
           type: "string",
+          description: "The application identifier.",
         },
       ],
       responses: {
@@ -114,6 +118,64 @@ export const paths = {
         200: {
           description: "Success - table retrieved",
           schema: { $ref: "#/definitions/Table" },
+        },
+      },
+    },
+    patch: {
+      operationId: "updateTable",
+      summary: "Update a table by ID",
+      tags: ["Tables"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "path",
+          required: true,
+          type: "string",
+          description: "The table identifier (dbid).",
+        },
+        {
+          name: "appId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the app containing the table.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/UpdateTableRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - table updated",
+          schema: { $ref: "#/definitions/Table" },
+        },
+      },
+    },
+    delete: {
+      operationId: "deleteTable",
+      summary: "Delete a table by ID",
+      tags: ["Tables"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "path",
+          required: true,
+          type: "string",
+          description: "The table identifier (dbid).",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - table deleted",
+          schema: {
+            type: "object",
+            properties: {
+              deletedTableId: { type: "string" },
+            },
+          },
         },
       },
     },
@@ -188,6 +250,7 @@ export const paths = {
           in: "path",
           required: true,
           type: "string",
+          description: "The report identifier.",
         },
         {
           name: "generated",
@@ -218,6 +281,7 @@ export const paths = {
           in: "path",
           required: true,
           type: "string",
+          description: "The database identifier (dbid).",
         },
       ],
       responses: {
