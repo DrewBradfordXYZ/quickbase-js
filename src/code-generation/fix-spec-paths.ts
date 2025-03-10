@@ -113,6 +113,13 @@ export const paths = {
           type: "string",
           description: "The table identifier (dbid).",
         },
+        {
+          name: "appId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the app containing the table.",
+        },
       ],
       responses: {
         200: {
@@ -166,16 +173,18 @@ export const paths = {
           type: "string",
           description: "The table identifier (dbid).",
         },
+        {
+          name: "appId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the app containing the table.",
+        },
       ],
       responses: {
         200: {
           description: "Success - table deleted",
-          schema: {
-            type: "object",
-            properties: {
-              deletedTableId: { type: "string" },
-            },
-          },
+          schema: { $ref: "#/definitions/DeleteTableResponse" },
         },
       },
     },

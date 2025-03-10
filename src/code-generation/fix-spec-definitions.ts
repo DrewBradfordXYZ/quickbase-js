@@ -298,6 +298,15 @@ export const definitions = {
     description:
       "Request body for updating table properties. At least one property must be provided.",
   },
+  DeleteTableResponse: {
+    type: "object",
+    properties: {
+      deletedTableId: {
+        type: "string",
+        description: "The deleted table id.",
+      },
+    },
+  },
   Record: {
     type: "object",
     properties: {
