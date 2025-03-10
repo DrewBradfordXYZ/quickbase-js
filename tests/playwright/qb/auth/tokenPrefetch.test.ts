@@ -1,6 +1,6 @@
 // tests/playwright/qb/auth/tokenPrefetch.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -134,7 +134,7 @@ test.describe("QuickbaseClient Integration - Token Pre-Fetch and Cache Reuse", (
       return fetchResponse;
     };
 
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,

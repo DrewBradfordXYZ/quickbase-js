@@ -1,6 +1,6 @@
 // tests/playwright/qb/auth/tokenRenewal.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -70,7 +70,7 @@ test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
       });
     };
 
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,

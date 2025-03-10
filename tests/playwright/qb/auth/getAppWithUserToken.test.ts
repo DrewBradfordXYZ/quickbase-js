@@ -1,6 +1,6 @@
 // tests/integration/auth/getAppWithUserToken.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -89,7 +89,7 @@ test.describe("QuickbaseClient Integration - getApp with User Token", () => {
     console.log("Post-login URL after app navigation:", currentUrl);
 
     // Create Quickbase client with user token
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       userToken, // Use user token instead of temp tokens
       debug: true,

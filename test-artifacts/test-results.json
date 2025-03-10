@@ -86,7 +86,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15163,
+                      "duration": 19958,
                       "errors": [],
                       "stdout": [
                         {
@@ -166,9 +166,6 @@
                         },
                         {
                           "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                        },
-                        {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
                         },
                         {
                           "text": "Mapped upsert to upsert\n"
@@ -282,19 +279,19 @@
                           "text": "Cache state before fetch for buwai2zpe: []\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA==\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc=\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA== Expires at: 2025-03-09T22:35:36.712Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc= Expires at: 2025-03-10T18:48:38.541Z\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
@@ -309,22 +306,22 @@
                           "text": "Proxy called getFields with: { tableId: \u001b[32m'buwai2zws'\u001b[39m }\n"
                         },
                         {
-                          "text": "Cache state before fetch for buwai2zws: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m,\n      expiresAt: \u001b[33m1741559736712\u001b[39m\n    }\n  ]\n]\n"
+                          "text": "Cache state before fetch for buwai2zws: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m,\n      expiresAt: \u001b[33m1741632518541\u001b[39m\n    }\n  ]\n]\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zws: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czN3emtfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYmloM3llYjR4ejhpcGJyZWlmZmliZXljenMyY2hzdjM5cWMzYXgzajdjdHB3OWJwNHJjejR1X2l5azJoNWI=\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zws: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWc1dG1fYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYnBjZGtmNmJnMmNzYjNkaDJ5N2p4YmM1YnA0bmJ2a2pyaGl5eGI0cGlqM2l6YnhjZnJpZzV1X2l5bnBhZDQ=\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zws VEtU.OV9idXg4czN3emtfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYmloM3llYjR4ejhpcGJyZWlmZmliZXljenMyY2hzdjM5cWMzYXgzajdjdHB3OWJwNHJjejR1X2l5azJoNWI= Expires at: 2025-03-09T22:35:37.410Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zws VEtU.OV9idXlheWc1dG1fYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYnBjZGtmNmJnMmNzYjNkaDJ5N2p4YmM1YnA0bmJ2a2pyaGl5eGI0cGlqM2l6YnhjZnJpZzV1X2l5bnBhZDQ= Expires at: 2025-03-10T18:48:42.100Z\n"
                         },
                         {
                           "text": "Invoking getFields with params: { tableId: \u001b[32m'buwai2zws'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { tableId: \u001b[32m'buwai2zws'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3emtfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYmloM3llYjR4ejhpcGJyZWlmZmliZXljenMyY2hzdjM5cWMzYXgzajdjdHB3OWJwNHJjejR1X2l5azJoNWI='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { tableId: \u001b[32m'buwai2zws'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1dG1fYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYnBjZGtmNmJnMmNzYjNkaDJ5N2p4YmM1YnA0bmJ2a2pyaGl5eGI0cGlqM2l6YnhjZnJpZzV1X2l5bnBhZDQ='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/fields?tableId=buwai2zws with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3emtfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYmloM3llYjR4ejhpcGJyZWlmZmliZXljenMyY2hzdjM5cWMzYXgzajdjdHB3OWJwNHJjejR1X2l5azJoNWI='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/fields?tableId=buwai2zws with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1dG1fYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYnBjZGtmNmJnMmNzYjNkaDJ5N2p4YmM1YnA0bmJ2a2pyaGl5eGI0cGlqM2l6YnhjZnJpZzV1X2l5bnBhZDQ='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/fields?tableId=buwai2zws: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'[{\"appearsByDefault\":true,\"audited\":false,\"bold\":false,\"doesDataCopy\":true,\"fieldHelp\":\"\",\"fieldType\":\"text\",\"findEnabled\":true,\"id\":6,\"label\":\"Test\",\"mode\":\"\",\"noWrap\":false,\"properties\":{\"allowHTML\":false,\"allowMentions\":false,\"allowNewChoices\":false,\"appendOnly\":false,\"carryChoices\":true,\"defaultValue\":\"\",\"foreignKey\":false,\"formula\":\"\",\"maxLength\":0,\"numLines\":1,\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"timestamp\",\"findEnabled\":false,\"id\":1,\"label\":\"Date Created\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"carryChoices\":true,\"defaultToday\":false,\"defaultValue\":\"\",\"displayDayOfWeek\":false,\"displayMonth\":\"number\",\"displayRelative\":false,\"displayTime\":true,\"displayTimezone\":false,\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"timestamp\",\"findEnabled\":false,\"id\":2,\"label\":\"Date Modified\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"carryChoices\":true,\"defaultToday\":false,\"defaultValue\":\"\",\"displayDayOfWeek\":false,\"displayMonth\":\"number\",\"displayRelative\":false,\"displayTime\":true,\"displayTimezone\":false,\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"recordid\",\"findEnabled\":false,\"id\":3,\"label\":\"Record ID#\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":false,\"blankIsZero\":true,\"carryChoices\":true,\"commaStart\":4,\"decimalPlaces\":0,\"defaultValue\":\"\",\"doesAverage\":false,\"doesTotal\":false,\"foreignKey\":false,\"formula\":\"\",\"numberFormat\":0,\"primaryKey\":true,\"sortAsGiven\":true},\"required\":false,\"unique\":true},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"user\",\"findEnabled\":true,\"id\":4,\"label\":\"Record Owner\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":true,\"carryChoices\":true,\"defaultKind\":\"none\",\"defaultValue\":\"\",\"displayUser\":\"fullnamelf\",\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false},{\"appearsByDefault\":false,\"audited\":false,\"bold\":false,\"doesDataCopy\":false,\"fieldHelp\":\"\",\"fieldType\":\"user\",\"findEnabled\":true,\"id\":5,\"label\":\"Last Modified By\",\"mode\":\"\",\"noWrap\":true,\"properties\":{\"allowNewChoices\":true,\"carryChoices\":true,\"defaultKind\":\"none\",\"defaultValue\":\"\",\"displayUser\":\"fullnamelf\",\"foreignKey\":false,\"formula\":\"\",\"primaryKey\":false,\"sortAsGiven\":true},\"required\":false,\"unique\":false}]'\u001b[39m\n}\n"
@@ -339,19 +336,19 @@
                           "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m,\n      expiresAt: \u001b[33m1741559736712\u001b[39m\n    }\n  ],\n  [\n    \u001b[32m'buwai2zws'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czN3emtfYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYmloM3llYjR4ejhpcGJyZWlmZmliZXljenMyY2hzdjM5cWMzYXgzajdjdHB3OWJwNHJjejR1X2l5azJoNWI='\u001b[39m,\n      expiresAt: \u001b[33m1741559737410\u001b[39m\n    }\n  ]\n]\n"
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m,\n      expiresAt: \u001b[33m1741632518541\u001b[39m\n    }\n  ],\n  [\n    \u001b[32m'buwai2zws'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWc1dG1fYjlmM3BrX3E0amRfYV9idXdhaTJ6d3NfYnBjZGtmNmJnMmNzYjNkaDJ5N2p4YmM1YnA0bmJ2a2pyaGl5eGI0cGlqM2l6YnhjZnJpZzV1X2l5bnBhZDQ='\u001b[39m,\n      expiresAt: \u001b[33m1741632522100\u001b[39m\n    }\n  ]\n]\n"
                         },
                         {
-                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA==\n"
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc=\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN3YXRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmFjdTR6dWNrZXV0ZW1wem1hemJldTY5dWdkYWZtNXJ0ejdnc2V0ZHozeDU3aGJicHh1aHJfaXlrMmg0NA=='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWcyYnVfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfM2tqZTJwY3V4Y3o0c2Q1a2p3a2ozY3J4a2JrdHpocmlieGZ0cHo4NW5pNm00ZXoyamR4X2l5bnBhYnc='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
@@ -365,7 +362,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T22:30:32.794Z",
+                      "startTime": "2025-03-10T18:43:32.750Z",
                       "attachments": []
                     }
                   ],
@@ -382,20 +379,20 @@
       ]
     },
     {
-      "title": "qb/auth/getAppWithUserToken.test.ts",
-      "file": "qb/auth/getAppWithUserToken.test.ts",
+      "title": "qb/auth/fetchTempToken401.test.ts",
+      "file": "qb/auth/fetchTempToken401.test.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "QuickbaseClient Integration - getApp with User Token",
-          "file": "qb/auth/getAppWithUserToken.test.ts",
-          "line": 56,
+          "title": "QuickbaseClient Integration - Token Invalidation with Cached Token",
+          "file": "qb/auth/fetchTempToken401.test.ts",
+          "line": 57,
           "column": 6,
           "specs": [
             {
-              "title": "uses user token for getApp in browser",
+              "title": "retries with new token when cached token is unexpectedly invalidated",
               "ok": true,
               "tags": [],
               "tests": [
@@ -410,7 +407,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 14053,
+                      "duration": 25248,
                       "errors": [],
                       "stdout": [
                         {
@@ -477,7 +474,334 @@
                           "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
                         },
                         {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
+                          "text": "Mapped upsert to upsert\n"
+                        },
+                        {
+                          "text": "Mapped upsertRecords to upsertRecords\n"
+                        },
+                        {
+                          "text": "Mapped getReport to getReport\n"
+                        },
+                        {
+                          "text": "Mapped getTableReports to getTableReports\n"
+                        },
+                        {
+                          "text": "Mapped runReport to runReport\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolution to changesetSolution\n"
+                        },
+                        {
+                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped createSolution to createSolution\n"
+                        },
+                        {
+                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
+                        },
+                        {
+                          "text": "Mapped exportSolution to exportSolution\n"
+                        },
+                        {
+                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped updateSolution to updateSolution\n"
+                        },
+                        {
+                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
+                        },
+                        {
+                          "text": "Mapped createRelationship to createRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteRelationship to deleteRelationship\n"
+                        },
+                        {
+                          "text": "Mapped deleteTable to deleteTable\n"
+                        },
+                        {
+                          "text": "Mapped getAppTables to getAppTables\n"
+                        },
+                        {
+                          "text": "Mapped getRelationships to getRelationships\n"
+                        },
+                        {
+                          "text": "Mapped getTable to getTable\n"
+                        },
+                        {
+                          "text": "Mapped updateRelationship to updateRelationship\n"
+                        },
+                        {
+                          "text": "Mapped updateTable to updateTable\n"
+                        },
+                        {
+                          "text": "Mapped cloneUserToken to cloneUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
+                        },
+                        {
+                          "text": "Mapped deleteUserToken to deleteUserToken\n"
+                        },
+                        {
+                          "text": "Mapped transferUserToken to transferUserToken\n"
+                        },
+                        {
+                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
+                        },
+                        {
+                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
+                        },
+                        {
+                          "text": "Mapped denyUsers to denyUsers\n"
+                        },
+                        {
+                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
+                        },
+                        {
+                          "text": "Mapped getUsers to getUsers\n"
+                        },
+                        {
+                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
+                        },
+                        {
+                          "text": "Mapped undenyUsers to undenyUsers\n"
+                        },
+                        {
+                          "text": "Pre-fetching initial token...\n"
+                        },
+                        {
+                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: []\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
+                        },
+                        {
+                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Captured initial token: VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy Expires at: 2025-03-10T18:48:38.649Z\n"
+                        },
+                        {
+                          "text": "Initial token pre-fetched and cached: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy'\u001b[39m,\n      expiresAt: \u001b[33m1741632518649\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy'\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 2\n"
+                        },
+                        {
+                          "text": "getApp call count: 1\n"
+                        },
+                        {
+                          "text": "Simulating 401 Unauthorized for first getApp call\n"
+                        },
+                        {
+                          "text": "Authorization error for getApp, refreshing token: Response returned an error code\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
+                        },
+                        {
+                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc=\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Captured retry token: VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc=\n"
+                        },
+                        {
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc= Expires at: 2025-03-10T18:48:42.041Z\n"
+                        },
+                        {
+                          "text": "Retrying getApp with new token\n"
+                        },
+                        {
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc='\u001b[39m,\n      expiresAt: \u001b[33m1741632522041\u001b[39m\n    }\n  ]\n]\n"
+                        },
+                        {
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc=\n"
+                        },
+                        {
+                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc='\u001b[39m\n    }\n  }\n]\n"
+                        },
+                        {
+                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 4\n"
+                        },
+                        {
+                          "text": "getApp call count: 2\n"
+                        },
+                        {
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "App response after token invalidation and retry: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
+                        },
+                        {
+                          "text": "Final callCount: 4, Final getAppCallCount: 2\n"
+                        },
+                        {
+                          "text": "Initial token: VEtU.OV9idXlheWcyZThfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZGZkNW14c2Q3dzV0MmdjdnNhaHF0Y3k5OGZtMnBuYWI0cGNnNzk1aDJkNnd2OHh5ZGhhdXNxdF9peW5wYWIy\n"
+                        },
+                        {
+                          "text": "Retry token: VEtU.OV9idXlheWc1cHBfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY3ZhdnNxcWN5cTg1czZibWZzY3VmZHg4M3o5aGRlZzU3cDlrdm1mcmt0ZzM2Z2VjNWdhMjIzX2l5bnBhZHc=\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-03-10T18:43:32.799Z",
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "56648ac255b375940529-df3e4cfe3318a4ab96c9",
+              "file": "qb/auth/fetchTempToken401.test.ts",
+              "line": 58,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "qb/auth/getAppWithUserToken.test.ts",
+      "file": "qb/auth/getAppWithUserToken.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "QuickbaseClient Integration - getApp with User Token",
+          "file": "qb/auth/getAppWithUserToken.test.ts",
+          "line": 56,
+          "column": 6,
+          "specs": [
+            {
+              "title": "uses user token for getApp in browser",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 600000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 15664,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Logging in to QuickBase\n"
+                        },
+                        {
+                          "text": "Signed In to QuickBase.\n"
+                        },
+                        {
+                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
+                        },
+                        {
+                          "text": "Mapped copyApp to copyApp\n"
+                        },
+                        {
+                          "text": "Mapped createApp to createApp\n"
+                        },
+                        {
+                          "text": "Mapped getApp to getApp\n"
+                        },
+                        {
+                          "text": "Mapped getAppEvents to getAppEvents\n"
+                        },
+                        {
+                          "text": "Mapped audit to audit\n"
+                        },
+                        {
+                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
+                        },
+                        {
+                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
+                        },
+                        {
+                          "text": "Mapped generateDocument to generateDocument\n"
+                        },
+                        {
+                          "text": "Mapped getField to getField\n"
+                        },
+                        {
+                          "text": "Mapped getFieldUsage to getFieldUsage\n"
+                        },
+                        {
+                          "text": "Mapped getFields to getFields\n"
+                        },
+                        {
+                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
+                        },
+                        {
+                          "text": "Mapped updateField to updateField\n"
+                        },
+                        {
+                          "text": "Mapped deleteFile to deleteFile\n"
+                        },
+                        {
+                          "text": "Mapped downloadFile to downloadFile\n"
+                        },
+                        {
+                          "text": "Mapped runFormula to runFormula\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
+                        },
+                        {
+                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
                         },
                         {
                           "text": "Mapped upsert to upsert\n"
@@ -608,7 +932,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T22:30:32.834Z",
+                      "startTime": "2025-03-10T18:43:32.801Z",
                       "attachments": []
                     }
                   ],
@@ -650,10 +974,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 13974,
+                      "duration": 19751,
                       "errors": [],
                       "stdout": [
                         {
@@ -718,9 +1042,6 @@
                         },
                         {
                           "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                        },
-                        {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
                         },
                         {
                           "text": "Mapped upsert to upsert\n"
@@ -834,19 +1155,19 @@
                           "text": "Cache state before fetch for buwai2zpe: []\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czN2NjZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG15ZnBjdGJ1a3dnZHhicnRlaDJkYnczZTlpcXk2cjN5Y2RuM2lmZmZjcmF6cDhxeDJydjRnX2l5azJoNHk=\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWc1czZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZHNheWhuNmN0cncycnRibno4ZDk5Y21oM2d0eWI5OXZ1dzRkZ2I5aWE2cHg2ZjRiYm5oa252eF9peW5wYWQz\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czN2NjZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG15ZnBjdGJ1a3dnZHhicnRlaDJkYnczZTlpcXk2cjN5Y2RuM2lmZmZjcmF6cDhxeDJydjRnX2l5azJoNHk= Expires at: 2025-03-09T22:35:36.567Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWc1czZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZHNheWhuNmN0cncycnRibno4ZDk5Y21oM2d0eWI5OXZ1dzRkZ2I5aWE2cHg2ZjRiYm5oa252eF9peW5wYWQz Expires at: 2025-03-10T18:48:42.115Z\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN2NjZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG15ZnBjdGJ1a3dnZHhicnRlaDJkYnczZTlpcXk2cjN5Y2RuM2lmZmZjcmF6cDhxeDJydjRnX2l5azJoNHk='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1czZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZHNheWhuNmN0cncycnRibno4ZDk5Y21oM2d0eWI5OXZ1dzRkZ2I5aWE2cHg2ZjRiYm5oa252eF9peW5wYWQz'\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN2NjZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZG15ZnBjdGJ1a3dnZHhicnRlaDJkYnczZTlpcXk2cjN5Y2RuM2lmZmZjcmF6cDhxeDJydjRnX2l5azJoNHk='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc1czZfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZHNheWhuNmN0cncycnRibno4ZDk5Y21oM2d0eWI5OXZ1dzRkZ2I5aWE2cHg2ZjRiYm5oa252eF9peW5wYWQz'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
@@ -860,7 +1181,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T22:30:32.870Z",
+                      "startTime": "2025-03-10T18:43:32.836Z",
                       "attachments": []
                     }
                   ],
@@ -869,339 +1190,6 @@
               ],
               "id": "a701d3a6657df231384c-1f340fa9d9997340cef2",
               "file": "qb/auth/getTempToken.test.ts",
-              "line": 58,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "qb/auth/tokenInvalidation.test.ts",
-      "file": "qb/auth/tokenInvalidation.test.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "QuickbaseClient Integration - Token Invalidation with Cached Token",
-          "file": "qb/auth/tokenInvalidation.test.ts",
-          "line": 57,
-          "column": 6,
-          "specs": [
-            {
-              "title": "retries with new token when cached token is unexpectedly invalidated",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 600000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 14232,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "Logging in to QuickBase\n"
-                        },
-                        {
-                          "text": "Signed In to QuickBase.\n"
-                        },
-                        {
-                          "text": "Post-login URL after app navigation: https://builderprogram-dbradford6815.quickbase.com/nav/app/buwai2zpe/action/appoverview\n"
-                        },
-                        {
-                          "text": "Mapped copyApp to copyApp\n"
-                        },
-                        {
-                          "text": "Mapped createApp to createApp\n"
-                        },
-                        {
-                          "text": "Mapped getApp to getApp\n"
-                        },
-                        {
-                          "text": "Mapped getAppEvents to getAppEvents\n"
-                        },
-                        {
-                          "text": "Mapped audit to audit\n"
-                        },
-                        {
-                          "text": "Mapped exchangeSsoToken to exchangeSsoToken\n"
-                        },
-                        {
-                          "text": "Mapped getTempTokenDBID to getTempTokenDBID\n"
-                        },
-                        {
-                          "text": "Mapped generateDocument to generateDocument\n"
-                        },
-                        {
-                          "text": "Mapped getField to getField\n"
-                        },
-                        {
-                          "text": "Mapped getFieldUsage to getFieldUsage\n"
-                        },
-                        {
-                          "text": "Mapped getFields to getFields\n"
-                        },
-                        {
-                          "text": "Mapped getFieldsUsage to getFieldsUsage\n"
-                        },
-                        {
-                          "text": "Mapped updateField to updateField\n"
-                        },
-                        {
-                          "text": "Mapped deleteFile to deleteFile\n"
-                        },
-                        {
-                          "text": "Mapped downloadFile to downloadFile\n"
-                        },
-                        {
-                          "text": "Mapped runFormula to runFormula\n"
-                        },
-                        {
-                          "text": "Mapped platformAnalyticEventSummaries to platformAnalyticEventSummaries\n"
-                        },
-                        {
-                          "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                        },
-                        {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
-                        },
-                        {
-                          "text": "Mapped upsert to upsert\n"
-                        },
-                        {
-                          "text": "Mapped upsertRecords to upsertRecords\n"
-                        },
-                        {
-                          "text": "Mapped getReport to getReport\n"
-                        },
-                        {
-                          "text": "Mapped getTableReports to getTableReports\n"
-                        },
-                        {
-                          "text": "Mapped runReport to runReport\n"
-                        },
-                        {
-                          "text": "Mapped changesetSolution to changesetSolution\n"
-                        },
-                        {
-                          "text": "Mapped changesetSolutionFromRecord to changesetSolutionFromRecord\n"
-                        },
-                        {
-                          "text": "Mapped createSolution to createSolution\n"
-                        },
-                        {
-                          "text": "Mapped createSolutionFromRecord to createSolutionFromRecord\n"
-                        },
-                        {
-                          "text": "Mapped exportSolution to exportSolution\n"
-                        },
-                        {
-                          "text": "Mapped exportSolutionToRecord to exportSolutionToRecord\n"
-                        },
-                        {
-                          "text": "Mapped updateSolution to updateSolution\n"
-                        },
-                        {
-                          "text": "Mapped updateSolutionToRecord to updateSolutionToRecord\n"
-                        },
-                        {
-                          "text": "Mapped createRelationship to createRelationship\n"
-                        },
-                        {
-                          "text": "Mapped deleteRelationship to deleteRelationship\n"
-                        },
-                        {
-                          "text": "Mapped deleteTable to deleteTable\n"
-                        },
-                        {
-                          "text": "Mapped getAppTables to getAppTables\n"
-                        },
-                        {
-                          "text": "Mapped getRelationships to getRelationships\n"
-                        },
-                        {
-                          "text": "Mapped getTable to getTable\n"
-                        },
-                        {
-                          "text": "Mapped updateRelationship to updateRelationship\n"
-                        },
-                        {
-                          "text": "Mapped updateTable to updateTable\n"
-                        },
-                        {
-                          "text": "Mapped cloneUserToken to cloneUserToken\n"
-                        },
-                        {
-                          "text": "Mapped deactivateUserToken to deactivateUserToken\n"
-                        },
-                        {
-                          "text": "Mapped deleteUserToken to deleteUserToken\n"
-                        },
-                        {
-                          "text": "Mapped transferUserToken to transferUserToken\n"
-                        },
-                        {
-                          "text": "Mapped addManagersToGroup to addManagersToGroup\n"
-                        },
-                        {
-                          "text": "Mapped addMembersToGroup to addMembersToGroup\n"
-                        },
-                        {
-                          "text": "Mapped addSubgroupsToGroup to addSubgroupsToGroup\n"
-                        },
-                        {
-                          "text": "Mapped denyUsers to denyUsers\n"
-                        },
-                        {
-                          "text": "Mapped denyUsersAndGroups to denyUsersAndGroups\n"
-                        },
-                        {
-                          "text": "Mapped getUsers to getUsers\n"
-                        },
-                        {
-                          "text": "Mapped removeManagersFromGroup to removeManagersFromGroup\n"
-                        },
-                        {
-                          "text": "Mapped removeMembersFromGroup to removeMembersFromGroup\n"
-                        },
-                        {
-                          "text": "Mapped removeSubgroupsFromGroup to removeSubgroupsFromGroup\n"
-                        },
-                        {
-                          "text": "Mapped undenyUsers to undenyUsers\n"
-                        },
-                        {
-                          "text": "Pre-fetching initial token...\n"
-                        },
-                        {
-                          "text": "Proxy called getTempTokenDBID with: { dbid: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                        },
-                        {
-                          "text": "Cache state before fetch for buwai2zpe: []\n"
-                        },
-                        {
-                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
-                        },
-                        {
-                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
-                        },
-                        {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ=\"}'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Captured initial token: VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ=\n"
-                        },
-                        {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ= Expires at: 2025-03-09T22:35:36.272Z\n"
-                        },
-                        {
-                          "text": "Initial token pre-fetched and cached: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ='\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                        },
-                        {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ='\u001b[39m,\n      expiresAt: \u001b[33m1741559736272\u001b[39m\n    }\n  ]\n]\n"
-                        },
-                        {
-                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ=\n"
-                        },
-                        {
-                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                        },
-                        {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ='\u001b[39m\n    }\n  }\n]\n"
-                        },
-                        {
-                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 2\n"
-                        },
-                        {
-                          "text": "getApp call count: 1\n"
-                        },
-                        {
-                          "text": "Simulating 401 Unauthorized for first getApp call\n"
-                        },
-                        {
-                          "text": "Authorization error for getApp, refreshing token: Response returned an error code\n"
-                        },
-                        {
-                          "text": "fetchApi called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
-                        },
-                        {
-                          "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 3\n"
-                        },
-                        {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4\"}'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Captured retry token: VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4\n"
-                        },
-                        {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4 Expires at: 2025-03-09T22:35:36.526Z\n"
-                        },
-                        {
-                          "text": "Retrying getApp with new token\n"
-                        },
-                        {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4'\u001b[39m,\n      expiresAt: \u001b[33m1741559736526\u001b[39m\n    }\n  ]\n]\n"
-                        },
-                        {
-                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4\n"
-                        },
-                        {
-                          "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
-                        },
-                        {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4'\u001b[39m\n    }\n  }\n]\n"
-                        },
-                        {
-                          "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 4\n"
-                        },
-                        {
-                          "text": "getApp call count: 2\n"
-                        },
-                        {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Response from getApp: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                        },
-                        {
-                          "text": "App response after token invalidation and retry: {\n  id: \u001b[32m'buwai2zpe'\u001b[39m,\n  name: \u001b[32m'qb-copy'\u001b[39m,\n  created: \u001b[35m2025-02-13T18:22:33.000Z\u001b[39m,\n  updated: \u001b[35m2025-03-04T04:25:51.000Z\u001b[39m,\n  description: \u001b[32m''\u001b[39m,\n  timeZone: \u001b[32m'(UTC-08:00) Pacific Time (US & Canada)'\u001b[39m,\n  dateFormat: \u001b[32m'MM-DD-YYYY'\u001b[39m,\n  hasEveryoneOnTheInternet: \u001b[33mfalse\u001b[39m,\n  memoryInfo: { estMemory: \u001b[33m0\u001b[39m, estMemoryInclDependentApps: \u001b[33m0\u001b[39m },\n  securityProperties: {\n    allowClone: \u001b[33mfalse\u001b[39m,\n    allowExport: \u001b[33mtrue\u001b[39m,\n    enableAppTokens: \u001b[33mtrue\u001b[39m,\n    hideFromPublic: \u001b[33mfalse\u001b[39m,\n    mustBeRealmApproved: \u001b[33mfalse\u001b[39m,\n    useIPFilter: \u001b[33mfalse\u001b[39m\n  }\n}\n"
-                        },
-                        {
-                          "text": "Final callCount: 4, Final getAppCallCount: 2\n"
-                        },
-                        {
-                          "text": "Initial token: VEtU.OV9idXg4czN2dXdfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfY2pybjJ5ZmRudzI4a3NjaGZkcDhzeDhha3pyYzR5MmoyZjlrYWl2bWJ6N2VmMzdjOWJkZDZlX2l5azJoNHQ=\n"
-                        },
-                        {
-                          "text": "Retry token: VEtU.OV9idXg4czN2NTJfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNja3RiNWNucHNqbnlid2c5NTU5Y3EyMnFneng4aWVlM2JpdzdxOGticWJoMnVtYzg5Znc2Nl9peWsyaDR4\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-03-09T22:30:32.824Z",
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "272bfe78816e02eef771-9766bb63f911c5e5cc21",
-              "file": "qb/auth/tokenInvalidation.test.ts",
               "line": 58,
               "column": 3
             }
@@ -1238,7 +1226,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 15190,
+                      "duration": 8389,
                       "errors": [],
                       "stdout": [
                         {
@@ -1303,9 +1291,6 @@
                         },
                         {
                           "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                        },
-                        {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
                         },
                         {
                           "text": "Mapped upsert to upsert\n"
@@ -1428,16 +1413,16 @@
                           "text": "browserFetch called for https://api.quickbase.com/v1/auth/temporary/buwai2zpe, callCount: 1\n"
                         },
                         {
-                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM=\"}'\u001b[39m\n}\n"
+                          "text": "Raw response from https://api.quickbase.com/v1/auth/temporary/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m''\u001b[39m,\n  body: \u001b[32m'{\"temporaryAuthorization\":\"VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy\"}'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Captured pre-fetched token: VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM=\n"
+                          "text": "Captured pre-fetched token: VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM= Expires at: 2025-03-09T22:35:51.834Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy Expires at: 2025-03-10T18:48:46.624Z\n"
                         },
                         {
-                          "text": "Pre-fetched token result: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM='\u001b[39m\n}\n"
+                          "text": "Pre-fetched token result: {\n  temporaryAuthorization: \u001b[32m'VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Calling getApp with pre-fetched token...\n"
@@ -1446,22 +1431,22 @@
                           "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM='\u001b[39m,\n      expiresAt: \u001b[33m1741559751834\u001b[39m\n    }\n  ]\n]\n"
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy'\u001b[39m,\n      expiresAt: \u001b[33m1741632526624\u001b[39m\n    }\n  ]\n]\n"
                         },
                         {
-                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM=\n"
+                          "text": "Reusing cached token for dbid: buwai2zpe VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy'\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
                           "text": "fetchApi called for https://api.quickbase.com/v1/apps/buwai2zpe, callCount: 2\n"
                         },
                         {
-                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM='\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
+                          "text": "Fetching https://api.quickbase.com/v1/apps/buwai2zpe with init: {\n  method: \u001b[32m'GET'\u001b[39m,\n  headers: {\n    \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n    Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy'\u001b[39m\n  },\n  body: \u001b[90mundefined\u001b[39m,\n  credentials: \u001b[32m'include'\u001b[39m\n}\n"
                         },
                         {
                           "text": "Raw response from https://api.quickbase.com/v1/apps/buwai2zpe: {\n  status: \u001b[33m200\u001b[39m,\n  statusText: \u001b[32m'OK'\u001b[39m,\n  body: \u001b[32m'{\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}'\u001b[39m\n}\n"
@@ -1476,12 +1461,12 @@
                           "text": "Final callCount: 2\n"
                         },
                         {
-                          "text": "Pre-fetched token: VEtU.OV9idXg4czRjeWtfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjdjd2ZzN2I2azNnZGZjNmVmbTVzYjZnYXU3bno2YTM5YWM3OGQ3ajNwemprbWNkbXc1cm44X2l5azJpYXM=\n"
+                          "text": "Pre-fetched token: VEtU.OV9idXlheWc5NXlfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfZDh2eGZqaGNncWp6eW1kM254MnBrYmt3YmM1ZmRlYnczbWNicWpnanFxcGY0M3ZlYmFnc2ZtYV9peW5wYWdy\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T22:30:46.949Z",
+                      "startTime": "2025-03-10T18:43:48.577Z",
                       "attachments": []
                     }
                   ],
@@ -1523,10 +1508,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 322146,
+                      "duration": 322913,
                       "errors": [],
                       "stdout": [
                         {
@@ -1591,9 +1576,6 @@
                         },
                         {
                           "text": "Mapped platformAnalyticReads to platformAnalyticReads\n"
-                        },
-                        {
-                          "text": "Mapped deleteRecords to deleteRecords\n"
                         },
                         {
                           "text": "Mapped upsert to upsert\n"
@@ -1704,10 +1686,10 @@
                           "text": "Checking session state before getApp...\n"
                         },
                         {
-                          "text": "Session cookie present: \u001b[33mtrue\u001b[39m Cookies: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742164259\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'f499abc3-085c-4b95-85d3-adf9499d3a8e'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744151459\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742164248\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'1935e0e5-7488-48c3-b0ff-3b3f9a57baaa'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744151448\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750199459.267407\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742164247\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'714ebdc7-b023-43b6-89dd-b4970dc2e974'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744151447\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741559447125'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776119447.167162\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741559447125'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'XANKAtJJR4UbfFQcp04z5G743_c9_gk_wsHIsEeN0Is-1741559447-1.2.1.1-FFbHQfQHA7mvX0NuNpkAVM4yTlgGd2H7ycIKhBXxCdo3QyPgCS5sDEB2YBAEC1CpOyTAZ3DY_TVX3SrN7WgQM9cQmaay_DGfK5MOKNEsGqvqbArsjsXEKm7MPe5ZQ2shE7oQ9zqIGTJmFtE9XnUVPxcOeOs0Bklj5oyTlPSR7LY91u5i3a3UCWzWl9yBHMleV99Fs4ye6pUk3ifcMUJ3Zx2YW3z9JbTKapiGok61cnexQJModWvTHUAHNwEZBEv8fujHKJM9IWaco10XZQGoovYK0.rHizqI.iiN4VQ0iKwp9cU5vFKjka3QHqCw3oWr0OcrHqgsmHna.QFNmwATfSWiTczikwWctdv7ALd5gjLSAhbCJ.Iy4HMsZahilNaGJGxcF5xOSfgOU07Ut92mhfUcKnUrbfycAOE9KkmrJ6c'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773095447.706221\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_bux93y58f_b9f3pk_q4jd_a_-b_bwgcpue2ggsn7dc63566ck7vwftbkn74kkcwysi59jz5uabbemibtv_iyk2h5m'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_bux93y58f_b9f3pk_q4jd_a_-b_bwgcpue2ggsn7dc63566ck7vwftbkn74kkcwysi59jz5uabbemibtv_iyk2h5m'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744151448.055843\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741573848\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776119448.105989\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_ZF84htkoGz5'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199450\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741563060\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'cb2315d1-b43b-92a8-b7fb-69375032ead4'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiODJiMzczZWVhNTMwMzQ2MzBhNjZlYmIxYTllNWFiOTAiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.dfZWKLLutnTGClAt50txhBDlL87lb183NnNR6OJRPRA%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741563060\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'2283411137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
+                          "text": "Session cookie present: \u001b[33mtrue\u001b[39m Cookies: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742237039\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'c94a9cf9-4eeb-4aa0-a174-3f0e14e45d77'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744224239\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742237034\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'a998ec80-60bc-4819-990b-3718dd84147f'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744224234\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750272239.459736\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742237033\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'bbb96a09-8f53-4c31-b1c5-c9217f0deb2f'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744224233\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741632232867'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776192232.903665\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741632232867'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'EeU9MCr7pa1Ve5RnEbnv.FNAPQeGRu.tkId2sqeZLXw-1741632233-1.2.1.1-Z1SoPDSRg9w7_Gv3fv9.V2ck60lTj3YOVFY5k5i1sYwI6o_bd5oI52WMu.3G0rGTGIJHL.XUQ4yb0aomtMCw60.IqfDOm8_8UmaEYV6_FAHgYr40OFn2kZU2NaEI9gjj5LXGk5CZeoZPkY0SnlLJejf0pfMoV_D02li5TWHmDeTEjhLNUkry8tjUpylevpx2FAqniAyHyUrUQ43HhuM2LB.TNPZlSYTpQmJgJJVn8fovBd2pDq3GijzLvjC7dPHGWsSx0eREY8F4lmOBHHOjEzoC3VJHNy2INvOMWWidJELDo_HvdjykgNLo75O6utE8l3v6.gilzKljcHP5zTcetTOPwLBTSioF3ZpyOalO54E'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773168233.429709\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_buyb9ed32_b9f3pk_q4jd_a_-b_dr6vnsuc45pkv9c86qgkddmc26drc4kc6mhp9d63bdg6uhe6b57yuu2_iynpae5'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_buyb9ed32_b9f3pk_q4jd_a_-b_dr6vnsuc45pkv9c86qgkddmc26drc4kc6mhp9d63bdg6uhe6b57yuu2_iynpae5'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744224233.819924\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741646633\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776192233.959274\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_hsluhaq9F2t'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272235\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741635840\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_lastStepAdvanced.3719929843'\u001b[39m,\n    value: \u001b[32m'%5B%7B%22tabId%22%3A%22DzsIX9hG2oomtuPl%22%2C%22guideId%22%3A%22IVthd3ywe-KeAjfWu8DLGO1ym58%22%2C%22guideStepId%22%3A%22NLy5E8v8VkVnoiE5zr0AUuNbmh0%22%2C%22time%22%3A1741632236246%2C%22state%22%3A%22active%22%2C%22seenReason%22%3A%22auto%22%2C%22visitorId%22%3A%2266250154%3Aquickbase.com%22%7D%5D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741632246\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'2368e3f1-4cc5-9f39-afa1-807f68a8fef2'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiOTU1MDVjOTA4MDhjY2MwYzAzOWEwZGYxMmM2ODg0ZWIiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.qJxNUTCU-76QkkLxKqFzV7MuzURxFxZu8UE28nQyVrI%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741635840\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'3980026981'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
                         },
                         {
-                          "text": "Cookies after delay: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742164259\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'f499abc3-085c-4b95-85d3-adf9499d3a8e'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744151459\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742164248\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'1935e0e5-7488-48c3-b0ff-3b3f9a57baaa'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744151448\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750199459.267407\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742164247\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'714ebdc7-b023-43b6-89dd-b4970dc2e974'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744151447\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741559447125'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776119447.167162\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741559447125'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'XANKAtJJR4UbfFQcp04z5G743_c9_gk_wsHIsEeN0Is-1741559447-1.2.1.1-FFbHQfQHA7mvX0NuNpkAVM4yTlgGd2H7ycIKhBXxCdo3QyPgCS5sDEB2YBAEC1CpOyTAZ3DY_TVX3SrN7WgQM9cQmaay_DGfK5MOKNEsGqvqbArsjsXEKm7MPe5ZQ2shE7oQ9zqIGTJmFtE9XnUVPxcOeOs0Bklj5oyTlPSR7LY91u5i3a3UCWzWl9yBHMleV99Fs4ye6pUk3ifcMUJ3Zx2YW3z9JbTKapiGok61cnexQJModWvTHUAHNwEZBEv8fujHKJM9IWaco10XZQGoovYK0.rHizqI.iiN4VQ0iKwp9cU5vFKjka3QHqCw3oWr0OcrHqgsmHna.QFNmwATfSWiTczikwWctdv7ALd5gjLSAhbCJ.Iy4HMsZahilNaGJGxcF5xOSfgOU07Ut92mhfUcKnUrbfycAOE9KkmrJ6c'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773095447.706221\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_bux93y58f_b9f3pk_q4jd_a_-b_bwgcpue2ggsn7dc63566ck7vwftbkn74kkcwysi59jz5uabbemibtv_iyk2h5m'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_bux93y58f_b9f3pk_q4jd_a_-b_bwgcpue2ggsn7dc63566ck7vwftbkn74kkcwysi59jz5uabbemibtv_iyk2h5m'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744151448.055843\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741573848\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776119448.105989\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_ZF84htkoGz5'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199450\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741563060\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'cb2315d1-b43b-92a8-b7fb-69375032ead4'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiODJiMzczZWVhNTMwMzQ2MzBhNjZlYmIxYTllNWFiOTAiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.dfZWKLLutnTGClAt50txhBDlL87lb183NnNR6OJRPRA%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741563060\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'2283411137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750199460\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
+                          "text": "Cookies after delay: [\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1742237039\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'c94a9cf9-4eeb-4aa0-a174-3f0e14e45d77'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/app/buwai2zpe/action'\u001b[39m,\n    expires: \u001b[33m1744224239\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1742237034\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'a998ec80-60bc-4819-990b-3718dd84147f'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/nav/main/action'\u001b[39m,\n    expires: \u001b[33m1744224234\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'commonVars'\u001b[39m,\n    value: \u001b[32m'~qlb=v2~'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db/'\u001b[39m,\n    expires: \u001b[33m1750272239.459736\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'browserCharset'\u001b[39m,\n    value: \u001b[32m'UTF-8'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1742237033\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'UUID'\u001b[39m,\n    value: \u001b[32m'bbb96a09-8f53-4c31-b1c5-c9217f0deb2f'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/db'\u001b[39m,\n    expires: \u001b[33m1744224233\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'ptest'\u001b[39m,\n    value: \u001b[32m'1741632232867'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776192232.903665\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'stest'\u001b[39m,\n    value: \u001b[32m'1741632232867'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'shouldInitializeMetrics'\u001b[39m,\n    value: \u001b[32m'true'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'cf_clearance'\u001b[39m,\n    value: \u001b[32m'EeU9MCr7pa1Ve5RnEbnv.FNAPQeGRu.tkId2sqeZLXw-1741632233-1.2.1.1-Z1SoPDSRg9w7_Gv3fv9.V2ck60lTj3YOVFY5k5i1sYwI6o_bd5oI52WMu.3G0rGTGIJHL.XUQ4yb0aomtMCw60.IqfDOm8_8UmaEYV6_FAHgYr40OFn2kZU2NaEI9gjj5LXGk5CZeoZPkY0SnlLJejf0pfMoV_D02li5TWHmDeTEjhLNUkry8tjUpylevpx2FAqniAyHyUrUQ43HhuM2LB.TNPZlSYTpQmJgJJVn8fovBd2pDq3GijzLvjC7dPHGWsSx0eREY8F4lmOBHHOjEzoC3VJHNy2INvOMWWidJELDo_HvdjykgNLo75O6utE8l3v6.gilzKljcHP5zTcetTOPwLBTSioF3ZpyOalO54E'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1773168233.429709\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'None'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_accountId.3719929843'\u001b[39m,\n    value: \u001b[32m'822137'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET_builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    value: \u001b[32m'9_buyb9ed32_b9f3pk_q4jd_a_-b_dr6vnsuc45pkv9c86qgkddmc26drc4kc6mhp9d63bdg6uhe6b57yuu2_iynpae5'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'TICKET'\u001b[39m,\n    value: \u001b[32m'9_buyb9ed32_b9f3pk_q4jd_a_-b_dr6vnsuc45pkv9c86qgkddmc26drc4kc6mhp9d63bdg6uhe6b57yuu2_iynpae5'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'lrealm'\u001b[39m,\n    value: \u001b[32m'q4jd'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1744224233.819924\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_guides_blocked.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741646633\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'luid'\u001b[39m,\n    value: \u001b[32m'66250154.nvgc'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1776192233.959274\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'confmsg'\u001b[39m,\n    value: \u001b[32m''\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_visitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'66250154%3Aquickbase.com'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_oldVisitorId.3719929843'\u001b[39m,\n    value: \u001b[32m'_PENDO_T_hsluhaq9F2t'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272235\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'responsiveWindowSizeObjectCookie'\u001b[39m,\n    value: \u001b[32m'{%22small%22:false%2C%22xSmall%22:false%2C%22xxSmall%22:false}'\u001b[39m,\n    domain: \u001b[32m'.builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741635840\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mfalse\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_notification_count.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'0'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'sbIID'\u001b[39m,\n    value: \u001b[32m'2368e3f1-4cc5-9f39-afa1-807f68a8fef2'\u001b[39m,\n    domain: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m-1\u001b[39m,\n    httpOnly: \u001b[33mtrue\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Lax'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo___sg__.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22visitormetadata%22%3A%7B%22agent__qbancestorappid%22%3A%22none%22%2C%22agent__qbcurrentappid%22%3A%22buwai2zpe%22%2C%22agent__qbiscurrentappadmin%22%3Atrue%2C%22agent__qbisintrial%22%3Afalse%7D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_feedback_ping_sent.09267810-0233-4b58-65b5-6f5f6145f867'\u001b[39m,\n    value: \u001b[32m'%7B%22jwt%22%3A%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50Ijp7ImlkIjoiODIyMTM3In0sIm5vbmNlIjoiOTU1MDVjOTA4MDhjY2MwYzAzOWEwZGYxMmM2ODg0ZWIiLCJ2aXNpdG9yIjp7ImVtYWlsIjoiZHJld2JyYWRmb3JkeHl6QGdtYWlsLmNvbSIsImZ1bGxfbmFtZSI6IkRyZXcgQnJhZGZvcmQiLCJpZCI6IjY2MjUwMTU0OnF1aWNrYmFzZS5jb20iLCJxYkFuY2VzdG9yQXBwSWQiOiJub25lIiwicWJDdXJyZW50QXBwSWQiOiJidXdhaTJ6cGUiLCJxYkhhc0V2ZXJIYWRBcHBBZG1pbiI6dHJ1ZSwicWJIYXNQaXBlbGluZXNBY2Nlc3MiOnRydWUsInFiSXNDdXJyZW50QXBwQWRtaW4iOnRydWUsInFiSXNJblRyaWFsIjpmYWxzZSwicWJSZWFsbU5hbWUiOiJidWlsZGVycHJvZ3JhbS1kYnJhZGZvcmQ2ODE1IiwicWJSb290RG9tYWluIjoicXVpY2tiYXNlLmNvbSIsInFiVXNlcklkIjo2NjI1MDE1NH19.qJxNUTCU-76QkkLxKqFzV7MuzURxFxZu8UE28nQyVrI%22%2C%22signingKeyName%22%3A%22quic-quic-Va3sV%22%2C%22vendor%22%3A%7B%22id%22%3A%223ea4fa5d-2739-4262-ab84-252179156573%22%7D%2C%22allowed_products%22%3A%5B%7B%22id%22%3A%223c9d7e83-da43-482e-a58c-14265037ecd0%22%7D%5D%7D'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1741635840\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  },\n  {\n    name: \u001b[32m'_pendo_meta.3719929843'\u001b[39m,\n    value: \u001b[32m'3980026981'\u001b[39m,\n    domain: \u001b[32m'.quickbase.com'\u001b[39m,\n    path: \u001b[32m'/'\u001b[39m,\n    expires: \u001b[33m1750272240\u001b[39m,\n    httpOnly: \u001b[33mfalse\u001b[39m,\n    secure: \u001b[33mtrue\u001b[39m,\n    sameSite: \u001b[32m'Strict'\u001b[39m\n  }\n]\n"
                         },
                         {
                           "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
@@ -1716,16 +1698,16 @@
                           "text": "Cache state before fetch for buwai2zpe: []\n"
                         },
                         {
-                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXg4czRoc21fYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNwOHhiZGR5eXRkcnJkejR6dTVuY3A5anNkeWJwOGQ2YTQzd2ZpY212cG5ncWp0OHVya3VfaXlrMmllbQ==\"}\n"
+                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXlheWhzeGpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYzN1eHNuanhqbnF0d2NpaWZwMnViamRlNWhyYnE0eHR2anY1OXBxaGRpdXdpOWVjc2lwZXE3X2l5bnBhdTg=\"}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4czRoc21fYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNwOHhiZGR5eXRkcnJkejR6dTVuY3A5anNkeWJwOGQ2YTQzd2ZpY212cG5ncWp0OHVya3VfaXlrMmllbQ== Expires at: 2025-03-09T22:35:56.753Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheWhzeGpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYzN1eHNuanhqbnF0d2NpaWZwMnViamRlNWhyYnE0eHR2anY1OXBxaGRpdXdpOWVjc2lwZXE3X2l5bnBhdTg= Expires at: 2025-03-10T18:49:03.894Z\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4czRoc21fYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNwOHhiZGR5eXRkcnJkejR6dTVuY3A5anNkeWJwOGQ2YTQzd2ZpY212cG5ncWp0OHVya3VfaXlrMmllbQ=='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheWhzeGpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYzN1eHNuanhqbnF0d2NpaWZwMnViamRlNWhyYnE0eHR2anY1OXBxaGRpdXdpOWVjc2lwZXE3X2l5bnBhdTg='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
                           "text": "Response from: https://api.quickbase.com/v1/apps/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}\n"
@@ -1746,19 +1728,19 @@
                           "text": "Proxy called getApp with: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXg4czRoc21fYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYjNwOHhiZGR5eXRkcnJkejR6dTVuY3A5anNkeWJwOGQ2YTQzd2ZpY212cG5ncWp0OHVya3VfaXlrMmllbQ=='\u001b[39m,\n      expiresAt: \u001b[33m1741559756753\u001b[39m\n    }\n  ]\n]\n"
+                          "text": "Cache state before fetch for buwai2zpe: [\n  [\n    \u001b[32m'buwai2zpe'\u001b[39m,\n    {\n      token: \u001b[32m'VEtU.OV9idXlheWhzeGpfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYzN1eHNuanhqbnF0d2NpaWZwMnViamRlNWhyYnE0eHR2anY1OXBxaGRpdXdpOWVjc2lwZXE3X2l5bnBhdTg='\u001b[39m,\n      expiresAt: \u001b[33m1741632543894\u001b[39m\n    }\n  ]\n]\n"
                         },
                         {
-                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXg4dGRxdDNfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfaDl1Zm03Ynpmcmp4OWNwaHF1OGEyZHg0Y2VjemtkZXgyNHVtdGNkZGpjbXR2ZmJ3YzltNTNfaXlrMnBobQ==\"}\n"
+                          "text": "Response from: https://api.quickbase.com/v1/auth/temporary/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"temporaryAuthorization\":\"VEtU.OV9idXlheXN6ZmRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmc3ZTh2c2Jtd3N1YndjaG55cnA5Y3FtYWhoYnpxa250NDc4bnB3NW5ubW1jN2N2ZGIzc3lfaXlucGl2bg==\"}\n"
                         },
                         {
-                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXg4dGRxdDNfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfaDl1Zm03Ynpmcmp4OWNwaHF1OGEyZHg0Y2VjemtkZXgyNHVtdGNkZGpjbXR2ZmJ3YzltNTNfaXlrMnBobQ== Expires at: 2025-03-09T22:40:58.825Z\n"
+                          "text": "Fetched and cached new token for dbid: buwai2zpe VEtU.OV9idXlheXN6ZmRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmc3ZTh2c2Jtd3N1YndjaG55cnA5Y3FtYWhoYnpxa250NDc4bnB3NW5ubW1jN2N2ZGIzc3lfaXlucGl2bg== Expires at: 2025-03-10T18:54:05.303Z\n"
                         },
                         {
                           "text": "Invoking getApp with params: { appId: \u001b[32m'buwai2zpe'\u001b[39m }\n"
                         },
                         {
-                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXg4dGRxdDNfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfaDl1Zm03Ynpmcmp4OWNwaHF1OGEyZHg0Y2VjemtkZXgyNHVtdGNkZGpjbXR2ZmJ3YzltNTNfaXlrMnBobQ=='\u001b[39m\n    }\n  }\n]\n"
+                          "text": "Calling method with args: [\n  { appId: \u001b[32m'buwai2zpe'\u001b[39m },\n  {\n    headers: {\n      \u001b[32m'QB-Realm-Hostname'\u001b[39m: \u001b[32m'builderprogram-dbradford6815.quickbase.com'\u001b[39m,\n      \u001b[32m'Content-Type'\u001b[39m: \u001b[32m'application/json'\u001b[39m,\n      Authorization: \u001b[32m'QB-TEMP-TOKEN VEtU.OV9idXlheXN6ZmRfYjlmM3BrX3E0amRfYV9idXdhaTJ6cGVfYmc3ZTh2c2Jtd3N1YndjaG55cnA5Y3FtYWhoYnpxa250NDc4bnB3NW5ubW1jN2N2ZGIzc3lfaXlucGl2bg=='\u001b[39m\n    }\n  }\n]\n"
                         },
                         {
                           "text": "Response from: https://api.quickbase.com/v1/apps/buwai2zpe status: \u001b[33m200\u001b[39m body: {\"created\":\"2025-02-13T18:22:33Z\",\"dateFormat\":\"MM-DD-YYYY\",\"description\":\"\",\"hasEveryoneOnTheInternet\":false,\"id\":\"buwai2zpe\",\"memoryInfo\":{\"estMemory\":0.0,\"estMemoryInclDependentApps\":0.0},\"name\":\"qb-copy\",\"securityProperties\":{\"allowClone\":false,\"allowExport\":true,\"enableAppTokens\":true,\"hideFromPublic\":false,\"mustBeRealmApproved\":false,\"useIPFilter\":false},\"timeZone\":\"(UTC-08:00) Pacific Time (US & Canada)\",\"updated\":\"2025-03-04T04:25:51Z\"}\n"
@@ -1772,7 +1754,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-03-09T22:30:46.983Z",
+                      "startTime": "2025-03-10T18:43:52.693Z",
                       "attachments": []
                     }
                   ],
@@ -1791,8 +1773,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-03-09T22:30:31.913Z",
-    "duration": 337257.408,
+    "startTime": "2025-03-10T18:43:31.557Z",
+    "duration": 344096.776,
     "expected": 6,
     "skipped": 0,
     "unexpected": 0,

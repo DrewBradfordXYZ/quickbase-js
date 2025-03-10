@@ -28,14 +28,15 @@ describe("QuickbaseClient - 401 with fetchTempToken 401", () => {
         return Promise.resolve({
           ok: false,
           status: 401,
-          text: () => Promise.resolve("Unauthorized"),
+          json: () => Promise.resolve({ message: "Unauthorized" }),
         });
       }
       if (url.includes("auth/temporary") && callCount === 3) {
         return Promise.resolve({
           ok: false,
           status: 401,
-          text: () => Promise.resolve("Unauthorized in fetchTempToken"),
+          json: () =>
+            Promise.resolve({ message: "Unauthorized in fetchTempToken" }),
         });
       }
       return Promise.reject(new Error(`Unexpected fetch call: ${url}`));

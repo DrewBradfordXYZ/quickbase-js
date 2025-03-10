@@ -1,6 +1,6 @@
 // tests/playwright/qb/auth/cacheSwitching.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -137,7 +137,7 @@ test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", 
       return fetchResponse;
     };
 
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,

@@ -61,11 +61,11 @@ tree:
     - name: dist
       type: directory
       children:
-        - name: quickbaseClient.d.ts
+        - name: quickbase.d.ts
           type: file
-        - name: quickbaseClient.js
+        - name: quickbase.js
           type: file
-        - name: quickbaseClient.js.map
+        - name: quickbase.js.map
           type: file
     - name: examples
       type: directory
@@ -85,19 +85,19 @@ tree:
       contents: |
         {
           "name": "quickbase-js",
-          "main": "dist/quickbaseClient.js",
-          "types": "dist/quickbaseClient.d.ts",
+          "main": "dist/quickbase.js",
+          "types": "dist/quickbase.d.ts",
           "version": "1.0.1-beta.0",
           "publishConfig": {
             "access": "public"
           },
           "description": "QuickBase JavaScript client for frameworks and vanilla JS",
-          "module": "dist/quickbaseClient.js",
+          "module": "dist/quickbase.js",
           "type": "module",
           "exports": {
             ".": {
-              "import": "./dist/quickbaseClient.js",
-              "types": "./dist/quickbaseClient.d.ts"
+              "import": "./dist/quickbase.js",
+              "types": "./dist/quickbase.d.ts"
             }
           },
           "scripts": {
@@ -176,7 +176,7 @@ tree:
               format: "esm",
               sourcemap: true,
               compact: isProd,
-              entryFileNames: "quickbaseClient.js",
+              entryFileNames: "quickbase.js",
             },
             external: [
               "node:http",
@@ -204,7 +204,7 @@ tree:
           {
             input: "src/quickbaseClient.ts",
             output: {
-              file: "dist/quickbaseClient.d.ts",
+              file: "dist/quickbase.d.ts",
               format: "esm",
               // Optional: sourcemap for .d.ts if needed for debugging
               // sourcemap: true,
@@ -1952,7 +1952,7 @@ tree:
               return dbid;
             };
 
-            export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
+            export function quickbase(config: QuickbaseConfig): QuickbaseClient {
               const {
                 realm,
                 userToken,
@@ -2263,6 +2263,12 @@ tree:
             }
         - name: utils.ts
           type: file
+          contents: |
+            export const simplifyName = (name: string): string =>
+              name
+                .replace(/ById$/, "")
+                .replace(/Api$/, "")
+                .replace(/^(\w)/, (_, c) => c.toLowerCase());
     - name: test-artifacts
       type: directory
       children:

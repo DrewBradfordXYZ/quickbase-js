@@ -1,4 +1,4 @@
-import { quickbaseClient, QuickbaseConfig } from "../src/quickbaseClient.ts";
+import { quickbase, QuickbaseConfig } from "../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 import { vi } from "vitest";
 
@@ -8,7 +8,7 @@ export const createClient = (
   fetchApi?: any,
   config: Partial<QuickbaseConfig> = {}
 ) =>
-  quickbaseClient({
+  quickbase({
     realm: process.env.QB_REALM || "default-realm",
     userToken: process.env.QB_USER_TOKEN || "default-token",
     debug: true,

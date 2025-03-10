@@ -6,7 +6,7 @@ describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = createClient(mockFetch, { useTempTokens: true, debug: false }); // Keep debug off for unit test clarity
+    client = createClient(mockFetch, { useTempTokens: true, debug: false });
   });
 
   it("initializes without errors", () => {
@@ -25,7 +25,7 @@ describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
       ok: true,
       status: 200,
       json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-    } as Response);
+    });
 
     const result = await client.getTempTokenDBID({ dbid: mockDbid });
     expect(result).toEqual({ temporaryAuthorization: mockToken });
@@ -50,7 +50,7 @@ describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
       ok: true,
       status: 200,
       json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-    } as Response);
+    });
 
     const firstResult = await client.getTempTokenDBID({ dbid: mockDbid });
     expect(firstResult).toEqual({ temporaryAuthorization: mockToken });
@@ -64,13 +64,12 @@ describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
 
   it("handles API error", async () => {
     const mockDbid = "mockDbid123";
-    const errorResponse = {
+
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
-      text: () => Promise.resolve("Unauthorized"),
-    } as Response;
-
-    mockFetch.mockResolvedValueOnce(errorResponse);
+      json: () => Promise.resolve({ message: "Unauthorized" }),
+    });
 
     await expect(client.getTempTokenDBID({ dbid: mockDbid })).rejects.toSatisfy(
       (error: Error) => {

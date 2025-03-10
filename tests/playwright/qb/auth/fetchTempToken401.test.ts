@@ -1,6 +1,6 @@
 // tests/playwright/qb/auth/tokenInvalidation.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -141,7 +141,7 @@ test.describe("QuickbaseClient Integration - Token Invalidation with Cached Toke
       return fetchResponse;
     };
 
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,

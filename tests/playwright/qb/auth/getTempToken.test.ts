@@ -1,6 +1,6 @@
 // tests/integration/auth/getTempToken.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 
@@ -132,7 +132,7 @@ test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
     };
 
     // Single client with conditional fetch
-    const client = quickbaseClient({
+    const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,
