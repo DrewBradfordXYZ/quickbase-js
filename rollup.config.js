@@ -14,7 +14,7 @@ export default [
       format: "esm",
       sourcemap: true,
       compact: isProd,
-      entryFileNames: "quickbaseClient.js",
+      entryFileNames: "quickbase.js",
     },
     external: [
       "node:http",
@@ -42,7 +42,7 @@ export default [
   {
     input: "src/quickbaseClient.ts",
     output: {
-      file: "dist/quickbaseClient.d.ts",
+      file: "dist/quickbase.d.ts",
       format: "esm",
       // Optional: sourcemap for .d.ts if needed for debugging
       // sourcemap: true,

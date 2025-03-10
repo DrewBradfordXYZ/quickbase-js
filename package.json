@@ -1,18 +1,18 @@
 {
   "name": "quickbase-js",
-  "main": "dist/quickbaseClient.js",
-  "types": "dist/quickbaseClient.d.ts",
+  "main": "dist/quickbase.js",
+  "types": "dist/quickbase.d.ts",
   "version": "1.0.1-beta.0",
   "publishConfig": {
     "access": "public"
   },
   "description": "QuickBase JavaScript client for frameworks and vanilla JS",
-  "module": "dist/quickbaseClient.js",
+  "module": "dist/quickbase.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/quickbaseClient.js",
-      "types": "./dist/quickbaseClient.d.ts"
+      "import": "./dist/quickbase.js",
+      "types": "./dist/quickbase.d.ts"
     }
   },
   "scripts": {

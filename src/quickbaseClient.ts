@@ -63,7 +63,7 @@ const extractDbid = (
   return dbid;
 };
 
-export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
+export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
     userToken,
