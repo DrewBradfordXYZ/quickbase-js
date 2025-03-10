@@ -1,4 +1,4 @@
-// Generated on 2025-03-10T04:30:39.346Z
+// Generated on 2025-03-10T04:45:02.973Z
 import { App, CreateApp200Response, CreateAppRequest, Field, GetTempTokenDBID200Response, Record, ReportRunResponse, Table, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -7,9 +7,7 @@ export interface QuickbaseClient {
   getAppEvents: (params: { appId: string }) => Promise<any[]>;
   copyApp: (params: { appId: string; generated?: any }) => Promise<{ [key: string]: any }>;
   getAppTables: (params: { appId: string }) => Promise<Table[]>;
-  getTable: (params: { appId: string; tableId: string }) => Promise<{ [key: string]: any }>;
-  updateTable: (params: { appId: string; tableId: string; generated?: { [key: string]: any } }) => Promise<{ [key: string]: any }>;
-  deleteTable: (params: { appId: string; tableId: string }) => Promise<{ [key: string]: any }>;
+  getTable: (params: { tableId: string }) => Promise<Table>;
   getRelationships: (params: { skip?: number; tableId: string }) => Promise<{ [key: string]: any }>;
   createRelationship: (params: { tableId: string; generated?: any }) => Promise<{ [key: string]: any }>;
   updateRelationship: (params: { tableId: string; relationshipId: any; generated?: any }) => Promise<{ [key: string]: any }>;

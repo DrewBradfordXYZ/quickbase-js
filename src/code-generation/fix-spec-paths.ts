@@ -7,7 +7,7 @@ export const paths = {
       tags: ["Apps"],
       parameters: [
         {
-          name: "body", // Added back to satisfy OpenAPI v2
+          name: "body",
           in: "body",
           required: true,
           schema: { $ref: "#/definitions/CreateAppRequest" },
@@ -96,6 +96,28 @@ export const paths = {
       },
     },
   },
+  "/tables/{tableId}": {
+    get: {
+      operationId: "getTable",
+      summary: "Get a table by ID",
+      tags: ["Tables"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "path",
+          required: true,
+          type: "string",
+          description: "The table identifier (dbid).",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - table retrieved",
+          schema: { $ref: "#/definitions/Table" },
+        },
+      },
+    },
+  },
   "/records": {
     post: {
       operationId: "upsert",
@@ -103,7 +125,7 @@ export const paths = {
       tags: ["Records"],
       parameters: [
         {
-          name: "body", // Added back to satisfy OpenAPI v2
+          name: "body",
           in: "body",
           required: true,
           schema: { $ref: "#/definitions/UpsertRequest" },

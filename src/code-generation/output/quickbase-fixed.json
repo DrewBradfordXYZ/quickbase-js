@@ -422,343 +422,28 @@
     },
     "/tables/{tableId}": {
       "get": {
-        "description": "Gets the properties of an individual table that is part of an application.",
         "operationId": "getTable",
-        "summary": "Get a table",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Get a table by ID",
+        "tags": [
+          "Tables"
         ],
         "parameters": [
           {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
             "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
             "in": "path",
-            "type": "string"
+            "required": true,
+            "type": "string",
+            "description": "The table identifier (dbid)."
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Success - table retrieved",
             "schema": {
-              "example": {
-                "name": "Example Table",
-                "created": "2020-03-27T18:34:40Z",
-                "updated": "2020-04-03T19:12:40Z",
-                "alias": "_dbid_example_table",
-                "description": "Table as an example.",
-                "id": "bpqe82s0",
-                "nextRecordId": 1,
-                "nextFieldId": 1,
-                "defaultSortFieldId": 2,
-                "defaultSortOrder": "ASC",
-                "keyFieldId": 3,
-                "singleRecordName": "Example Record",
-                "pluralRecordName": "Example Records",
-                "sizeLimit": "150 MB",
-                "spaceUsed": "17 MB",
-                "spaceRemaining": "133 MB"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name of the table.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier (dbid) of the table.",
-                  "type": "string"
-                },
-                "alias": {
-                  "description": "The automatically-created table alias for the table.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the table, as configured by an application administrator.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "nextRecordId": {
-                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "nextFieldId": {
-                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "defaultSortFieldId": {
-                  "description": "The id of the field that is configured for default sorting.",
-                  "type": "integer"
-                },
-                "defaultSortOrder": {
-                  "description": "The configuration of the default sort order on the table.",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ],
-                  "type": "string"
-                },
-                "keyFieldId": {
-                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                  "type": "integer"
-                },
-                "singleRecordName": {
-                  "description": "The builder-configured singular noun of the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The builder-configured plural noun of the table.",
-                  "type": "string"
-                },
-                "sizeLimit": {
-                  "description": "The size limit for the table.",
-                  "type": "string"
-                },
-                "spaceUsed": {
-                  "description": "The amount of space currently being used by the table.",
-                  "type": "string"
-                },
-                "spaceRemaining": {
-                  "description": "The amount of space remaining for use by the table.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Table"
             }
           }
-        },
-        "tags": [
-          "Tables"
-        ]
-      },
-      "post": {
-        "description": "Updates the main properties of a specific table. Any properties of the table that you do not specify in the request body will remain unchanged.",
-        "summary": "Update a table",
-        "operationId": "updateTable",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
-            "in": "path",
-            "type": "string"
-          },
-          {
-            "x-amf-mediaType": "application/json",
-            "in": "body",
-            "name": "generated",
-            "schema": {
-              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-              "example": {
-                "name": "My table",
-                "description": "my first table",
-                "singleRecordName": "record",
-                "pluralRecordName": "records"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name for the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
-                  "type": "string"
-                },
-                "singleRecordName": {
-                  "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the table. If this value is not passed the default value is blank.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "name": "Example Table",
-                "created": "2020-03-27T18:34:40Z",
-                "updated": "2020-04-03T19:12:40Z",
-                "alias": "_dbid_example_table",
-                "description": "Table as an example.",
-                "id": "bpqe82s0",
-                "nextRecordId": 1,
-                "nextFieldId": 1,
-                "defaultSortFieldId": 2,
-                "defaultSortOrder": "ASC",
-                "keyFieldId": 3,
-                "singleRecordName": "Example Record",
-                "pluralRecordName": "Example Records",
-                "sizeLimit": "150 MB",
-                "spaceUsed": "17 MB",
-                "spaceRemaining": "133 MB"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "name": {
-                  "description": "The name of the table.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier (dbid) of the table.",
-                  "type": "string"
-                },
-                "alias": {
-                  "description": "The automatically-created table alias for the table.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the table, as configured by an application administrator.",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "nextRecordId": {
-                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "nextFieldId": {
-                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                  "type": "integer"
-                },
-                "defaultSortFieldId": {
-                  "description": "The id of the field that is configured for default sorting.",
-                  "type": "integer"
-                },
-                "defaultSortOrder": {
-                  "description": "The configuration of the default sort order on the table.",
-                  "enum": [
-                    "ASC",
-                    "DESC"
-                  ],
-                  "type": "string"
-                },
-                "keyFieldId": {
-                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                  "type": "integer"
-                },
-                "singleRecordName": {
-                  "description": "The builder-configured singular noun of the table.",
-                  "type": "string"
-                },
-                "pluralRecordName": {
-                  "description": "The builder-configured plural noun of the table.",
-                  "type": "string"
-                },
-                "sizeLimit": {
-                  "description": "The size limit for the table.",
-                  "type": "string"
-                },
-                "spaceUsed": {
-                  "description": "The amount of space currently being used by the table.",
-                  "type": "string"
-                },
-                "spaceRemaining": {
-                  "description": "The amount of space remaining for use by the table.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Tables"
-        ]
-      },
-      "delete": {
-        "description": "Deletes a specific table in an application, including all of the data within it.",
-        "operationId": "deleteTable",
-        "summary": "Delete a table",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the table.",
-            "required": true,
-            "in": "path",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
-            "schema": {
-              "example": {
-                "deletedTableId": "bck7gp3q2"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "properties": {
-                "deletedTableId": {
-                  "description": "The deleted table id.",
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Tables"
-        ]
+        }
       }
     },
     "/tables/{tableId}/relationships": {
@@ -7785,54 +7470,74 @@
       ],
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "The unique identifier (dbid) of the table."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the table."
         },
         "alias": {
-          "type": "string"
+          "type": "string",
+          "description": "The automatically-created table alias for the table."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the table, as configured by an application administrator."
         },
         "created": {
           "type": "string",
-          "format": "date-time"
-        },
-        "defaultSortFieldId": {
-          "type": "integer"
-        },
-        "defaultSortOrder": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "keyFieldId": {
-          "type": "integer"
-        },
-        "nextFieldId": {
-          "type": "integer"
-        },
-        "nextRecordId": {
-          "type": "integer"
-        },
-        "pluralRecordName": {
-          "type": "string"
-        },
-        "singleRecordName": {
-          "type": "string"
-        },
-        "sizeLimit": {
-          "type": "string"
-        },
-        "spaceRemaining": {
-          "type": "string"
-        },
-        "spaceUsed": {
-          "type": "string"
+          "format": "date-time",
+          "description": "The time and date when the table was created, in ISO 8601 format (UTC)."
         },
         "updated": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "The time and date when the table schema or data was last updated, in ISO 8601 format (UTC)."
+        },
+        "nextRecordId": {
+          "type": "integer",
+          "description": "The incremental Record ID that will be used when the next record is created."
+        },
+        "nextFieldId": {
+          "type": "integer",
+          "description": "The incremental Field ID that will be used when the next field is created."
+        },
+        "defaultSortFieldId": {
+          "type": "integer",
+          "description": "The id of the field that is configured for default sorting."
+        },
+        "defaultSortOrder": {
+          "type": "string",
+          "enum": [
+            "ASC",
+            "DESC"
+          ],
+          "description": "The default sort order for the table, either ascending (ASC) or descending (DESC)."
+        },
+        "keyFieldId": {
+          "type": "integer",
+          "description": "The id of the field that is configured to be the key on this table, usually the Quickbase Record ID."
+        },
+        "singleRecordName": {
+          "type": "string",
+          "description": "The builder-configured singular noun of the table."
+        },
+        "pluralRecordName": {
+          "type": "string",
+          "description": "The builder-configured plural noun of the table."
+        },
+        "sizeLimit": {
+          "type": "string",
+          "description": "The size limit for the table (e.g., '150 MB')."
+        },
+        "spaceUsed": {
+          "type": "string",
+          "description": "The amount of space currently being used by the table (e.g., '17 MB')."
+        },
+        "spaceRemaining": {
+          "type": "string",
+          "description": "The amount of space remaining for use by the table (e.g., '133 MB')."
         }
       }
     },
