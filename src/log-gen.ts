@@ -158,9 +158,9 @@ function generateTreeSnapshot(): string {
 
 try {
   const output: string = generateTreeSnapshot();
-  fs.writeFileSync("logGen.yaml", output, "utf8");
+  fs.writeFileSync("log-gen.yaml", output, "utf8");
   const lineCount: number = output.split("\n").length - 1;
-  console.log("logGen.yaml");
+  console.log("log-gen.yaml");
   console.log(`Lines: ${lineCount}`);
 } catch (error: unknown) {
   console.error("Failed to generate tree snapshot:", (error as Error).message);
