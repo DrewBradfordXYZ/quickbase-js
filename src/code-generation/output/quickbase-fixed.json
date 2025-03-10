@@ -19,7 +19,7 @@
         ],
         "parameters": [
           {
-            "name": "request",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
@@ -4224,7 +4224,7 @@
         ],
         "parameters": [
           {
-            "name": "request",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {

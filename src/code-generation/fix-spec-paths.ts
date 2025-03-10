@@ -7,7 +7,7 @@ export const paths = {
       tags: ["Apps"],
       parameters: [
         {
-          name: "request",
+          name: "body", // Added back to satisfy OpenAPI v2
           in: "body",
           required: true,
           schema: { $ref: "#/definitions/CreateAppRequest" },
@@ -103,7 +103,7 @@ export const paths = {
       tags: ["Records"],
       parameters: [
         {
-          name: "request",
+          name: "body", // Added back to satisfy OpenAPI v2
           in: "body",
           required: true,
           schema: { $ref: "#/definitions/UpsertRequest" },
