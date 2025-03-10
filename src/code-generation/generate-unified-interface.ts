@@ -38,7 +38,7 @@ function generateInterface() {
       const op = operation as OpenAPIV2.OperationObject | undefined;
       if (!op || !op.operationId) continue;
 
-      const opId = op.operationId; // Use operationId directly, no simplification
+      const opId = op.operationId;
       const params = (op.parameters || [])
         .filter((p) => {
           const param = p as OpenAPIV2.ParameterObject;
@@ -48,30 +48,51 @@ function generateInterface() {
         })
         .map((p) => {
           const param = p as OpenAPIV2.ParameterObject;
-          const type = param.type
+          let type = param.type
             ? mapOpenApiTypeToTs(param.type)
             : param.schema
             ? mapRefToType(param.schema, modelImports)
             : "any";
+          // Special handling for upsertRecords 'generated' parameter
+          if (opId === "upsertRecords" && param.name === "generated") {
+            type = "{ [key: string]: string }[]";
+          }
           return `${param.name}${param.required ? "" : "?"}: ${type}`;
         })
         .join("; ");
-      const response = op.responses?.["200"] as
-        | OpenAPIV2.ResponseObject
-        | undefined;
-      const returnType = response?.schema
-        ? mapRefToType(response.schema, modelImports)
-        : "void";
+
+      // Handle responses, ensuring distinct types for 200 and 207
+      const successResponses = ["200", "207"]
+        .map((code) => ({
+          code,
+          response: op.responses?.[code] as
+            | OpenAPIV2.ResponseObject
+            | undefined,
+        }))
+        .filter(({ response }) => response?.schema);
+      const returnTypes = successResponses.map(({ response }) =>
+        mapRefToType(response!.schema, modelImports)
+      );
+      // Deduplicate return types and join with " | ", default to "void" if empty
+      const uniqueReturnTypes = [...new Set(returnTypes)];
+      const returnType =
+        uniqueReturnTypes.length > 0 ? uniqueReturnTypes.join(" | ") : "void";
+
       methods.push(
         `  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
       );
     }
   }
 
-  const importLines = Array.from(modelImports)
-    .map((m) => `import { ${m} } from "../generated/models/${m}.ts";`)
-    .join("\n");
-  const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importLines}\n\nexport interface QuickbaseClient {\n${methods.join(
+  // Generate import statements for all model types
+  const importStatement =
+    modelImports.size > 0
+      ? `import { ${Array.from(modelImports)
+          .sort()
+          .join(", ")} } from "../generated/models";`
+      : "";
+
+  const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importStatement}\n\nexport interface QuickbaseClient {\n${methods.join(
     "\n"
   )}\n}\n`;
 
@@ -112,6 +133,13 @@ function mapRefToType(
         : mapOpenApiTypeToTs(schema.items.type || "any");
     if ("$ref" in schema.items) modelImports.add(itemType);
     return `${itemType}[]`;
+  }
+  if (schema.type === "object" && schema.additionalProperties) {
+    const valueType = schema.additionalProperties.$ref
+      ? schema.additionalProperties.$ref.split("/").pop()!
+      : mapOpenApiTypeToTs(schema.additionalProperties.type || "any");
+    if (schema.additionalProperties.$ref) modelImports.add(valueType);
+    return `{ [key: string]: ${valueType} }`;
   }
   return mapOpenApiTypeToTs(schema.type || "any");
 }

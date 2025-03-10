@@ -4951,7 +4951,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Upsert200Response"
+                "$ref": "#/definitions/Upsert207Response"
               }
             }
           }

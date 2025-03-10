@@ -33,8 +33,8 @@ export default [
       nodeResolve({ preferBuiltins: true }),
       commonjs(),
       typescript({
-        tsconfig: "./tsconfig.json", // Updated to single tsconfig
-        declaration: false, // Rollup handles this separately
+        tsconfig: "./tsconfig.json",
+        declaration: false, // No .d.ts here, handled by dts plugin
       }),
       isProd && terser(),
     ],
@@ -44,10 +44,14 @@ export default [
     output: {
       file: "dist/quickbaseClient.d.ts",
       format: "esm",
+      // Optional: sourcemap for .d.ts if needed for debugging
+      // sourcemap: true,
     },
     plugins: [
       dts({
-        tsconfig: "./tsconfig.json", // Updated to single tsconfig
+        tsconfig: "./tsconfig.json",
+        // Ensure all referenced files are included
+        respectExternal: true,
       }),
     ],
   },

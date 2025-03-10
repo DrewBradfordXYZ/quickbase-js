@@ -8,7 +8,7 @@ npm run regenerate
 npm run generate-unified
 npm run build
 npm run test
-npm run test:integration
+npm run test:pw:qb:all
 ```
 
 ## In QuickBase Code Pages (Browser Environment)

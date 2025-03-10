@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext", // Changed from NodeNext to match bundler
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ES2015", "ESNext", "DOM"], // Explicitly include ES2015 for Record
     "types": ["node", "playwright/test"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "outDir": "dist",
-    "rootDir": ".", // Includes src/ and tests/
+    "rootDir": ".",
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": ".", // Added to set the root for path resolution
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"] // Maps '@/*' to root directory
+      "@/*": ["./*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

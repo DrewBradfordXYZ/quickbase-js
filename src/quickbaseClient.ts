@@ -1,5 +1,5 @@
 // src/quickbaseClient.ts
-import { QuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
+import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
 import {
   Configuration,
   HTTPHeaders,
@@ -8,6 +8,12 @@ import {
 import * as apis from "./generated/apis/index.ts";
 import { simplifyName } from "./utils.ts";
 import { TokenCache } from "./tokenCache.ts";
+
+// Re-export all model types from generated/models
+export * from "./generated/models";
+
+// Rename the interface to avoid naming conflict if needed
+export interface QuickbaseClient extends IQuickbaseClient {}
 
 export interface QuickbaseConfig {
   realm: string;
@@ -18,7 +24,7 @@ export interface QuickbaseConfig {
   fetchApi?: typeof fetch;
 }
 
-interface TempTokenParams {
+export interface TempTokenParams {
   appId?: string;
   tableId?: string;
   dbid?: string;
@@ -81,8 +87,10 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
   }
 
-  const defaultFetch =
-    typeof window !== "undefined" ? window.fetch.bind(window) : undefined;
+  const defaultFetch: typeof fetch | undefined =
+    typeof globalThis.window !== "undefined"
+      ? globalThis.window.fetch.bind(globalThis.window)
+      : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
     headers: { ...headers },
@@ -90,7 +98,7 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     credentials: useTempTokens ? "include" : "omit",
   });
 
-  if (!configuration.fetchApi && typeof window === "undefined") {
+  if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
     throw new Error(
       "fetchApi must be provided in non-browser environments (e.g., Node.js)"
     );
@@ -159,8 +167,12 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
     );
 
     if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`API Error: ${errorBody} (Status: ${response.status})`);
+      const errorBody: { message?: string } = await response.json();
+      throw new Error(
+        `API Error: ${errorBody.message || "Unknown error"} (Status: ${
+          response.status
+        })`
+      );
     }
 
     const tokenResult = await response.json();
@@ -196,7 +208,6 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
       initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
     let initOverrides: RequestInit = {};
 
-    // Early return for getTempTokenDBID if cached token exists
     if (methodName === "getTempTokenDBID" && useTempTokens) {
       const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
       const cachedToken = tokenCache.get(dbid);
@@ -219,13 +230,12 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
         token = cachedToken;
         if (debug) console.log(`Reusing cached token for dbid: ${dbid}`, token);
       } else {
-        if (typeof window === "undefined" && !fetchApi) {
+        if (typeof globalThis.window === "undefined" && !fetchApi) {
           throw new Error(
             "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
           );
         }
         token = await fetchTempToken(dbid);
-        // Return immediately for getTempTokenDBID after fetching
         if (methodName === "getTempTokenDBID") {
           return { temporaryAuthorization: token } as ReturnType<
             QuickbaseClient[K]
@@ -272,12 +282,12 @@ export function quickbaseClient(config: QuickbaseConfig): QuickbaseClient {
           Authorization: `QB-TEMP-TOKEN ${token}`,
         };
         if (debug) console.log(`Retrying ${methodName} with new token`);
-        return invokeMethod(methodName, params, retryCount + 1); // Retry once
+        return invokeMethod(methodName, params, retryCount + 1);
       }
       if (error instanceof ResponseError) {
         let errorMessage = error.message;
         try {
-          const errorBody = await error.response.json();
+          const errorBody: { message?: string } = await error.response.json();
           console.log(`Error response body for ${methodName}:`, errorBody);
           errorMessage = errorBody.message || errorMessage;
         } catch (e) {

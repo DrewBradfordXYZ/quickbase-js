@@ -1,3 +1,4 @@
+// src/code-generation/fix-spec-paths.ts
 export const paths = {
   "/apps/{appId}": {
     get: {
@@ -102,7 +103,7 @@ export const paths = {
           description: "Multi-Status (partial success)",
           schema: {
             type: "array",
-            items: { $ref: "#/definitions/Upsert200Response" },
+            items: { $ref: "#/definitions/Upsert207Response" }, // Corrected from Upsert200Response
           },
         },
       },
