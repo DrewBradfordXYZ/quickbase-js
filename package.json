@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "release": "standard-release",
+    "release": "standard-release release",
     "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
     "regenerate": "node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "generate-unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
