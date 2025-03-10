@@ -141,8 +141,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
               method: boundMethod as ApiMethod<typeof simplifiedName>,
               paramMap: getParamNames(method),
             };
-            if (debug)
-              console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
+            //  if (debug)
+            // console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
           }
         });
     }

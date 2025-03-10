@@ -444,4 +444,33 @@ export const definitions = {
       temporaryAuthorization: { type: "string" },
     },
   },
+  DeleteRecordsRequest: {
+    type: "object",
+    required: ["from", "where"],
+    properties: {
+      from: {
+        type: "string",
+        description:
+          "The table identifier (dbid) from which to delete records.",
+      },
+      where: {
+        type: "string",
+        description:
+          "A QuickBase query string specifying which records to delete.",
+      },
+    },
+    description:
+      "Request body for deleting records from a table using a query.",
+  },
+  DeleteRecords200Response: {
+    type: "object",
+    properties: {
+      numberDeleted: {
+        type: "integer",
+        description: "The number of records successfully deleted.",
+      },
+    },
+    required: ["numberDeleted"],
+    description: "Response body for successful deletion of records.",
+  },
 };

@@ -258,6 +258,25 @@ export const paths = {
         },
       },
     },
+    delete: {
+      operationId: "deleteRecords",
+      summary: "Delete records in a table",
+      tags: ["Records"],
+      parameters: [
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/DeleteRecordsRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - records deleted",
+          schema: { $ref: "#/definitions/DeleteRecords200Response" },
+        },
+      },
+    },
   },
   "/records/query": {
     post: {

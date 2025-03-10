@@ -113,6 +113,7 @@ tree:
             "test": "vitest run tests/vitest/**/**/*.test.ts",
             "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
             "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
+            "test:vitest:unit": "vitest run tests/vitest/unit/**/*.test.ts",
             "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/**/*.test.ts",
             "test:vitest:qb:auth": "vitest run tests/vitest/qb/auth/**/*.test.ts",
             "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/**/*.test.ts",
@@ -969,6 +970,51 @@ tree:
                         },
                       },
                     },
+                    post: {
+                      operationId: "createTable",
+                      summary: "Create a new table in an app",
+                      tags: ["Tables"],
+                      parameters: [
+                        {
+                          name: "appId",
+                          in: "query",
+                          required: true,
+                          type: "string",
+                          description:
+                            "The unique identifier of the app where the table will be created.",
+                        },
+                        {
+                          name: "body",
+                          in: "body",
+                          required: true,
+                          schema: {
+                            type: "object",
+                            properties: {
+                              name: { type: "string", description: "The name of the table." },
+                              description: {
+                                type: "string",
+                                description: "The description of the table.",
+                              },
+                              singleRecordName: {
+                                type: "string",
+                                description: "Singular noun for records.",
+                              },
+                              pluralRecordName: {
+                                type: "string",
+                                description: "Plural noun for records.",
+                              },
+                            },
+                            required: ["name"],
+                          },
+                        },
+                      ],
+                      responses: {
+                        200: {
+                          description: "Success - table created",
+                          schema: { $ref: "#/definitions/Table" },
+                        },
+                      },
+                    },
                   },
                   "/tables/{tableId}": {
                     get: {
@@ -998,7 +1044,7 @@ tree:
                         },
                       },
                     },
-                    patch: {
+                    post: {
                       operationId: "updateTable",
                       summary: "Update a table by ID",
                       tags: ["Tables"],
@@ -1529,6 +1575,8 @@ tree:
                   type: file
                 - name: CreateRelationshipRequest.ts
                   type: file
+                - name: CreateTableRequest.ts
+                  type: file
                 - name: DeactivateUserToken200Response.ts
                   type: file
                 - name: DeleteFile200Response.ts
@@ -1817,7 +1865,7 @@ tree:
             - name: QuickbaseClient.ts
               type: file
               contents: |
-                // Generated on 2025-03-10T05:25:52.099Z
+                // Generated on 2025-03-10T20:40:03.040Z
                 import { App, CreateApp200Response, CreateAppRequest, DeleteTableResponse, Field, GetTempTokenDBID200Response, Record, ReportRunResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
                 export interface QuickbaseClient {
@@ -1826,6 +1874,7 @@ tree:
                   getAppEvents: (params: { appId: string }) => Promise<any[]>;
                   copyApp: (params: { appId: string; generated?: any }) => Promise<{ [key: string]: any }>;
                   getAppTables: (params: { appId: string }) => Promise<Table[]>;
+                  createTable: (params: { appId: string; body: any }) => Promise<Table>;
                   getTable: (params: { tableId: string; appId: string }) => Promise<Table>;
                   updateTable: (params: { tableId: string; appId: string; body: UpdateTableRequest }) => Promise<Table>;
                   deleteTable: (params: { tableId: string; appId: string }) => Promise<DeleteTableResponse>;
@@ -2325,6 +2374,10 @@ tree:
                 - name: tables
                   type: directory
                   children:
+                    - name: createTable.test.ts
+                      type: file
+                    - name: deleteTable.test.ts
+                      type: file
                     - name: getAppTables.test.ts
                       type: file
                     - name: getTable.test.ts
@@ -2360,6 +2413,10 @@ tree:
                 - name: tables
                   type: directory
                   children:
+                    - name: createTable.test.ts
+                      type: file
+                    - name: deleteTable.test.ts
+                      type: file
                     - name: getAppTables.test.ts
                       type: file
                     - name: getTable.test.ts
