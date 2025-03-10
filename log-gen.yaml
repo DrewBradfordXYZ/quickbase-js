@@ -74,7 +74,7 @@ tree:
           type: file
         - name: vanillajs.html
           type: file
-    - name: logGen.yaml
+    - name: log-gen.yaml
       type: file
     - name: openapitools.json
       type: file
@@ -1940,12 +1940,12 @@ tree:
                 .map((p) => p.trim().split("=")[0].trim())
                 .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
-            // New utility function to extract dbid
+            // Utility function to extract dbid, prioritizing dbid, then tableId, then appId
             const extractDbid = (
               params: Partial<TempTokenParams>,
               errorMessage: string
             ): string => {
-              const dbid = params.appId || params.tableId || params.dbid;
+              const dbid = params.dbid || params.tableId || params.appId;
               if (!dbid) {
                 throw new Error(errorMessage);
               }
@@ -2327,6 +2327,10 @@ tree:
                   children:
                     - name: getAppTables.test.ts
                       type: file
+                    - name: getTable.test.ts
+                      type: file
+                    - name: updateTable.test.ts
+                      type: file
             - name: unit
               type: directory
               children:
@@ -2357,6 +2361,10 @@ tree:
                   type: directory
                   children:
                     - name: getAppTables.test.ts
+                      type: file
+                    - name: getTable.test.ts
+                      type: file
+                    - name: updateTable.test.ts
                       type: file
     - name: text.txt
       type: file

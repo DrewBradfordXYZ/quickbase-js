@@ -128,7 +128,7 @@ export const paths = {
         },
       },
     },
-    patch: {
+    post: {
       operationId: "updateTable",
       summary: "Update a table by ID",
       tags: ["Tables"],

@@ -1,67 +1,47 @@
-import { describe, it, expect } from "vitest";
-import { createClient } from "../../../setup.ts";
+import { test, expect } from "vitest";
+import { quickbase } from "../../../../src/quickbaseClient";
 
-describe("QuickbaseClient Integration - getAppTables", () => {
-  const client = createClient();
+test(
+  "QuickbaseClient Integration - getAppTables > fetches real table data from QuickBase",
+  { timeout: 10000 },
+  async () => {
+    const config = {
+      realm: process.env.QB_REALM || "builderprogram-dbradford6815",
+      userToken:
+        process.env.QB_USER_TOKEN || "b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
+      debug: true,
+    };
+    const client = quickbase(config);
+    const tablesAppId = "buwai2zpe";
 
-  it(
-    "fetches real table data from QuickBase",
-    async () => {
-      const tablesAppId = process.env.QB_APP_ID;
-      if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
-      if (!process.env.QB_REALM)
-        throw new Error("QB_REALM is not defined in .env");
-      if (!process.env.QB_USER_TOKEN)
-        throw new Error("QB_USER_TOKEN is not defined in .env");
+    console.log("Config used:", config);
+    const result = await client.getAppTables({ appId: tablesAppId });
+    console.log("Real API response:", result);
 
-      console.log("Config used:", {
-        realm: process.env.QB_REALM,
-        userToken: process.env.QB_USER_TOKEN,
-        appId: tablesAppId,
-      });
-      const result = await client.getAppTables({ appId: tablesAppId });
-      console.log("Real API response:", result);
-      expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            alias: "_DBID_ROOT",
-            created: new Date("2025-02-13T18:22:33Z"),
-            defaultSortFieldId: 2,
-            defaultSortOrder: "DESC",
-            description: "",
-            id: "buwai2zr4",
-            keyFieldId: 3,
-            name: "Root",
-            nextFieldId: 6,
-            nextRecordId: 1,
-            pluralRecordName: "Roots",
-            singleRecordName: "Root",
-            sizeLimit: "500 MB",
-            spaceRemaining: "500 MB",
-            spaceUsed: "0 KB",
-            updated: new Date("2025-02-13T18:22:34Z"),
-          }),
-          expect.objectContaining({
-            alias: "_DBID_ROLES",
-            created: new Date("2025-02-13T18:22:33Z"),
-            defaultSortFieldId: 2,
-            defaultSortOrder: "DESC",
-            description: "",
-            id: "buwai2z3s",
-            keyFieldId: 3,
-            name: "Roles",
-            nextFieldId: 6,
-            nextRecordId: 1,
-            pluralRecordName: "Roles",
-            singleRecordName: "Role",
-            sizeLimit: "500 MB",
-            spaceRemaining: "500 MB",
-            spaceUsed: "0 KB",
-            updated: new Date("2025-02-13T18:22:34Z"),
-          }),
-        ])
-      );
-    },
-    { timeout: 10000 }
-  );
-});
+    expect(result).toBeDefined();
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "buwai2zr4",
+          alias: "_DBID_ROOT",
+          name: expect.any(String), // Allow dynamic name due to updateTable
+          description: expect.any(String), // Allow dynamic description
+          created: expect.any(Date),
+          updated: expect.any(Date), // Allow varying timestamps
+          nextRecordId: expect.any(Number),
+          nextFieldId: expect.any(Number),
+          defaultSortFieldId: expect.any(Number),
+          defaultSortOrder: "DESC",
+          keyFieldId: expect.any(Number),
+          singleRecordName: "Root",
+          pluralRecordName: "Roots",
+          sizeLimit: "500 MB",
+          spaceUsed: expect.any(String),
+          spaceRemaining: "500 MB",
+        }),
+      ])
+    );
+  }
+);

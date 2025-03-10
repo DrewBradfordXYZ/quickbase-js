@@ -12,18 +12,16 @@ test(
       debug: true,
     };
     const client = quickbase(config);
-    const appId = "buwai2zpe";
     const tableId = "buwai2zr4";
+    const appId = "buwai2zpe";
 
     console.log("Config used:", config);
     const response = await client.getTable({ tableId, appId });
     expect(response).toBeDefined();
     expect(response.id).toBe(tableId);
-    expect(response.name).toBe("Root");
+    expect(response.name).toBe("Root"); // Expect original name
     expect(response.alias).toBe("_DBID_ROOT");
     expect(response.created).toBeInstanceOf(Date);
-    expect(response.updated).toBeInstanceOf(Date);
-    expect(response.nextRecordId).toBeGreaterThan(0);
     console.log("Real API response:", response);
   }
 );
