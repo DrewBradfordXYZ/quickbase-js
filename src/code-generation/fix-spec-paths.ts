@@ -99,6 +99,51 @@ export const paths = {
         },
       },
     },
+    post: {
+      operationId: "createTable",
+      summary: "Create a new table in an app",
+      tags: ["Tables"],
+      parameters: [
+        {
+          name: "appId",
+          in: "query",
+          required: true,
+          type: "string",
+          description:
+            "The unique identifier of the app where the table will be created.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "The name of the table." },
+              description: {
+                type: "string",
+                description: "The description of the table.",
+              },
+              singleRecordName: {
+                type: "string",
+                description: "Singular noun for records.",
+              },
+              pluralRecordName: {
+                type: "string",
+                description: "Plural noun for records.",
+              },
+            },
+            required: ["name"],
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - table created",
+          schema: { $ref: "#/definitions/Table" },
+        },
+      },
+    },
   },
   "/tables/{tableId}": {
     get: {
