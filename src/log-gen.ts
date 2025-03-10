@@ -2,47 +2,78 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import yaml from "js-yaml"; // Requires "js-yaml": "^4.1.0" in package.json
+import yaml from "js-yaml";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const rootDir: string = "./";
-const excludeDirs: string[] = ["node_modules", ".git"];
+const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
-const importantFolders: string[] = [];
+// prettier-ignore
+const includeFolders: string[] = [
+  "src/code-generation",
+];
 
-const importantFiles: string[] = [
+// prettier-ignore
+const includeRecursiveFolders: string[] = [
+  // "tests",
+];
+
+// prettier-ignore
+const includeFiles: string[] = [
   "package.json",
   "tsconfig.json",
   "rollup.config.js",
   "vitest.config.ts",
-  "generated-unified/QuickbaseClient.ts",
+  "src/generated-unified/QuickbaseClient.ts",
   "src/quickbaseClient.ts",
   "src/tokenCache.ts",
-  "src/code-generation/fix-spec-main.ts",
-  "src/code-generation/fix-spec-paths.ts",
-  "src/code-generation/fix-spec-definitions.ts",
-  "src/code-generation/regenerate-client.ts",
-  "src/code-generation/generate-unified-interface.ts",
 ];
 
 const projectGoals: string[] = [
-  "Implement a QuickBase API client in TypeScript.",
-  "Generate client methods from the QuickBase RESTful API spec.",
-  "Provide a simple and intuitive interface for interacting with QuickBase.",
-  "Support both Node.js and browser environments.",
+  "A library for interacting with the QuickBase RESTful API.",
+  "Use OpenAPI to generate types and methods using a proxy. Validate with tests.",
+  "Provide robust and intuitive temporary token support for browser environments.",
+  "User Tokens support both Node.js and browser environments.",
   "Use case: JS frameworks like React, Vue, and Angular hosted in QuickBase code pages.",
-  "Node.js is supported using User Tokens",
-  "Use OpenAPI to generate the TypeScript types and methods.",
-  "Use the latest ES6+ features and TypeScript features.",
+  "Enable a flexible or native fetch in the browser.",
+  "Enable a flexible fetch framework in Node.js.",
   "#",
   "No manual updating methods when the QuickBase API changes.",
-  "The proxy magic dynamically maps generated methods.",
-  "No manual endpoint definitions—endpoints come from the generated apis (e.g., AppsApi.getApp).",
+  "The proxy magic dynamically maps generated methods and types.",
   "#",
-  "Per-Instance Store: tokenCache is defined per quickbaseClient call, so each instance has its own isolated TokenCache.",
-  "No Singleton: No shared state—tokens are fetched and cached within the current instance.",
+  "TokenCache is defined per quickbaseClient call, so each instance has its own isolated TokenCache.",
+  "Each quickbase client instance has an isolated and individual token cache.",
+];
+
+const pipelineOverview: string[] = [
+  "fix-spec-main.ts: Input: Reads the latest QuickBase_RESTful*.json file from the specs/ folder and applies fixes to the parameters and paths.",
+  "filters out the QB-Realm-Hostname, Authorization, and User-Agent parameters.",
+  "Converts parameter names to camelCase.",
+  "Fixes array schemas and applies custom paths.",
+  "Merges paths from fix-spec-paths.ts and definitions from fix-spec-definitions.ts.",
+  "Output: writes quickbase-fixed.json to src/code-generation/output/.",
+  "Key Behavior: The merge (spec.paths = { ...spec.paths, ...paths }) preserves all origional endpoints, only overriding those defined in fix-spec-paths.ts.",
+  "#",
+  "regenerate-client.ts: Uses quickbase-fixed.json to generate raw TypeScript-fetch files (src/generated/). including models and APIs.",
+  "#",
+  "generate-unified-interface.ts: Uses quickbase-fixed.json to generate a unified QuickbaseClient.ts interface in src/generated-unified/.",
+  "QuickbaseClient.ts includes all endpoints from src/code-generation/output/quickbase-fixed, and types from src/generated.",
+  "#",
+  "/specs/QuickBase_RESTful_API_*.json is over 46k lines of JSON, so it's not included in the snapshot, its too large to give to an AI.",
+  "which creates difficulties in understanding the structure of the API.",
+  "It makes it difficult to model the src/code-generation/fix-spec-*.ts files in the snapshot.",
+  "#",
+  "vitest unit and integration tests. Integration tests use the real QuickBase API with user token auth.",
+  "playwright is used to test the real QuickBase API in a browser enviornment with temporary token auth.",
+  "temp tokens can only be generated in a browser enviornment and can not be fetched with a user token.",
+  "#",
+  "getTempTokenDBID() method is wrapped to enhance temporary token generation reuse interacting with a token cache.",
+  "#",
+  "npm run fix-spec: Generates quickbase-fixed.json from the latest QuickBase_RESTful*.json file.",
+  "npm run regenerate: Generates raw TypeScript-fetch files in src/generated/.",
+  "npm run generate-unified: Generates a unified QuickbaseClient.ts interface in src/generated-unified/.",
 ];
 
 interface TreeNode {
@@ -77,11 +108,25 @@ function buildTree(dir: string): TreeNode {
     if (file.isDirectory()) {
       childNode.children = buildTree(filePath).children;
     } else {
-      const isInImportantFolder = importantFolders.some(
+      const isInIncludeFolder = includeFolders.some((folder) => {
+        const folderPath = folder.endsWith("/") ? folder : folder + "/";
+        return (
+          relativePath.startsWith(folderPath) &&
+          relativePath.split("/").length === folderPath.split("/").length
+        );
+      });
+
+      const isInIncludeRecursiveFolder = includeRecursiveFolders.some(
         (folder) =>
           relativePath.startsWith(folder + "/") || relativePath === folder
       );
-      if (importantFiles.includes(relativePath) || isInImportantFolder) {
+
+      const shouldInclude =
+        includeFiles.includes(relativePath) ||
+        isInIncludeFolder ||
+        isInIncludeRecursiveFolder;
+
+      if (shouldInclude) {
         try {
           childNode.contents = fs.readFileSync(filePath, "utf8");
         } catch (err: unknown) {
@@ -104,16 +149,17 @@ function generateTreeSnapshot(): string {
     date: new Date().toLocaleDateString(),
     root: path.resolve(rootDir),
     goals: projectGoals,
+    pipelineOverview: pipelineOverview,
     tree: buildTree(rootDir),
   };
 
-  return yaml.dump(snapshot, { lineWidth: -1 }); // No line wrapping for readability
+  return yaml.dump(snapshot, { lineWidth: -1 });
 }
 
 try {
   const output: string = generateTreeSnapshot();
   fs.writeFileSync("logGen.yaml", output, "utf8");
-  const lineCount: number = output.split("\n").length - 1; // Exclude trailing newline
+  const lineCount: number = output.split("\n").length - 1;
   console.log("logGen.yaml");
   console.log(`Lines: ${lineCount}`);
 } catch (error: unknown) {
