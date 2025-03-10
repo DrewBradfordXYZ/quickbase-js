@@ -3,6 +3,9 @@
   "main": "dist/quickbaseClient.js",
   "types": "dist/quickbaseClient.d.ts",
   "version": "1.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "QuickBase JavaScript client for frameworks and vanilla JS",
   "module": "dist/quickbaseClient.js",
   "type": "module",
