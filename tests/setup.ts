@@ -1,3 +1,4 @@
+// tests/setup.ts
 import { quickbase, QuickbaseConfig } from "../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 import { vi } from "vitest";
