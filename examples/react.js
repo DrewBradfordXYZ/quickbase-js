@@ -1,7 +1,7 @@
-import { quickbaseClient } from "quickbase-js";
+import { quickbase } from "quickbase-js";
 import { useEffect, useState } from "react";
 
-const client = quickbaseClient({
+const qb = quickbase({
   realm: "myrealm",
   userToken: "my-user-token",
 });
@@ -10,8 +10,7 @@ function App() {
   const [app, setApp] = useState < any > null;
 
   useEffect(() => {
-    client
-      .getApp({ appId: "my-app-id" })
+    qb.getApp({ appId: "my-app-id" })
       .then((data) => setApp(data))
       .catch((err) => console.error(err));
   }, []);

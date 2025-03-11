@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Quickbase Test</title>
 </head>
+
 <body>
   <div id="app-name"></div>
   <script type="module">
-    import { quickbaseClient } from './dist/quickbaseClient.js';
+    import { quickbaseClient } from './dist/quickbase.js';
 
-    const client = quickbaseClient({
+    const qb = quickbase({
       realm: 'myrealm',
       userToken: 'my-user-token',
     });
 
-    client.getApp({ appId: 'my-app-id' })
+    qb.getApp({ appId: 'my-app-id' })
       .then((app) => {
         document.getElementById('app-name').textContent = app.name;
       })
       .catch((err) => console.error(err));
   </script>
 </body>
+
 </html>
