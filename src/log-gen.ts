@@ -17,7 +17,7 @@ const includeFolders: string[] = [
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  // "tests",
+  "tests",
 ];
 
 // prettier-ignore

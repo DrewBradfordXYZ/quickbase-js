@@ -182,6 +182,15 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error("No temporary token returned from API");
     }
     tokenCache.set(dbid, token);
+    if (debug) {
+      console.log(
+        `Fetched and cached new token for dbid: ${dbid}`,
+        token,
+        `Expires at: ${new Date(
+          Date.now() + (4 * 60 + 50) * 1000
+        ).toISOString()}`
+      );
+    }
     return token;
   };
 
@@ -252,6 +261,12 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         error.response.status === 401 &&
         retryCount < 1
       ) {
+        if (debug) {
+          console.log(
+            `Authorization error for ${methodName}, refreshing token:`,
+            error.message
+          );
+        }
         const dbid = extractDbid(
           params,
           `No dbid to refresh token after authorization error`
@@ -263,12 +278,18 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             Authorization: `QB-TEMP-TOKEN ${token}`,
           },
         };
+        if (debug) {
+          console.log(`Retrying ${methodName} with new token`);
+        }
         return invokeMethod(methodName, params, retryCount + 1);
       }
       if (error instanceof ResponseError) {
         let errorMessage = error.message;
         try {
           const errorBody: { message?: string } = await error.response.json();
+          if (debug) {
+            console.log(`Error response body for ${methodName}:`, errorBody);
+          }
           errorMessage = errorBody.message || errorMessage;
         } catch (e) {
           // Silent fail on parse error
