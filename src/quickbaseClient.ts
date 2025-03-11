@@ -11,14 +11,12 @@ import { TokenCache } from "./tokenCache.ts";
 // Re-export all model types from generated/models
 export * from "./generated/models";
 
-// Moved from utils.ts
 const simplifyName = (name: string): string =>
   name
     .replace(/ById$/, "")
     .replace(/Api$/, "")
     .replace(/^(\w)/, (_, c) => c.toLowerCase());
 
-// Rename the interface to avoid naming conflict if needed
 export interface QuickbaseClient extends IQuickbaseClient {}
 
 export interface QuickbaseConfig {
@@ -57,7 +55,6 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .map((p) => p.trim().split("=")[0].trim())
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
-// Utility function to extract dbid, prioritizing dbid, then tableId, then appId
 const extractDbid = (
   params: Partial<TempTokenParams>,
   errorMessage: string
@@ -140,15 +137,13 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             rawMethodName
           ) as keyof QuickbaseClient;
           const method = api[rawMethodName as keyof typeof api];
-          const boundMethod = method.bind(api) as unknown;
+          const boundMethod = method.bind(api as any) as unknown;
           if (typeof boundMethod === "function" && boundMethod.length <= 2) {
             methodMap[simplifiedName] = {
               api,
               method: boundMethod as ApiMethod<typeof simplifiedName>,
               paramMap: getParamNames(method),
             };
-            // if (debug)
-            //   console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
           }
         });
     }
@@ -187,15 +182,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error("No temporary token returned from API");
     }
     tokenCache.set(dbid, token);
-    if (debug) {
-      console.log(
-        `Fetched and cached new token for dbid: ${dbid}`,
-        token,
-        `Expires at: ${new Date(
-          Date.now() + (4 * 60 + 50) * 1000
-        ).toISOString()}`
-      );
-    }
     return token;
   };
 
@@ -206,13 +192,17 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   ): Promise<ReturnType<QuickbaseClient[K]>> => {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
-      console.error(`Method ${methodName} not found in methodMap`, methodMap);
       throw new Error(`Method ${methodName} not found`);
     }
 
+    const args: [any, RequestInit | undefined] =
+      methodInfo.paramMap.length === 1 &&
+      methodInfo.paramMap[0] === "requestParameters"
+        ? [{ requestParameters: params }, undefined]
+        : [params, undefined];
+
     let token =
       initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
-    let initOverrides: RequestInit = {};
 
     if (methodName === "getTempTokenDBID" && useTempTokens) {
       const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
@@ -229,12 +219,9 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         params,
         `No dbid found in params for ${methodName} to fetch temp token`
       );
-      if (debug)
-        console.log(`Cache state before fetch for ${dbid}:`, tokenCache.dump());
       const cachedToken = tokenCache.get(dbid);
       if (cachedToken) {
         token = cachedToken;
-        if (debug) console.log(`Reusing cached token for dbid: ${dbid}`, token);
       } else {
         if (typeof globalThis.window === "undefined" && !fetchApi) {
           throw new Error(
@@ -248,24 +235,16 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           >;
         }
       }
-      initOverrides.headers = {
-        ...headers,
-        Authorization: `QB-TEMP-TOKEN ${token}`,
+      args[1] = {
+        headers: {
+          ...headers,
+          Authorization: `QB-TEMP-TOKEN ${token}`,
+        },
       };
     }
 
-    if (debug) console.log(`Invoking ${methodName} with params:`, params);
-    if (debug)
-      console.log(`Calling method with args:`, [params, initOverrides]);
-    const args: [any, RequestInit | undefined] =
-      methodInfo.paramMap.length === 1 &&
-      methodInfo.paramMap[0] === "requestParameters"
-        ? [params, initOverrides]
-        : [params, initOverrides];
-
     try {
       const response = await methodInfo.method(...args);
-      if (debug) console.log(`Response from ${methodName}:`, response);
       return response;
     } catch (error) {
       if (
@@ -273,34 +252,26 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         error.response.status === 401 &&
         retryCount < 1
       ) {
-        if (debug)
-          console.log(
-            `Authorization error for ${methodName}, refreshing token:`,
-            error.message
-          );
         const dbid = extractDbid(
           params,
           `No dbid to refresh token after authorization error`
         );
         token = await fetchTempToken(dbid);
-        initOverrides.headers = {
-          ...headers,
-          Authorization: `QB-TEMP-TOKEN ${token}`,
+        args[1] = {
+          headers: {
+            ...headers,
+            Authorization: `QB-TEMP-TOKEN ${token}`,
+          },
         };
-        if (debug) console.log(`Retrying ${methodName} with new token`);
         return invokeMethod(methodName, params, retryCount + 1);
       }
       if (error instanceof ResponseError) {
         let errorMessage = error.message;
         try {
           const errorBody: { message?: string } = await error.response.json();
-          console.log(`Error response body for ${methodName}:`, errorBody);
           errorMessage = errorBody.message || errorMessage;
         } catch (e) {
-          console.log(
-            `Failed to parse error response for ${methodName}:`,
-            error.message
-          );
+          // Silent fail on parse error
         }
         throw new Error(
           `API Error: ${errorMessage} (Status: ${error.response.status})`
@@ -310,17 +281,16 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
   };
 
-  return new Proxy<QuickbaseClient>({} as QuickbaseClient, {
+  const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, {
     get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
-        return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) => {
-          if (debug) console.log(`Proxy called ${methodName} with:`, params);
-          return invokeMethod(methodName, params);
-        };
+        return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
+          invokeMethod(methodName, params);
       }
-      console.warn(`Method ${prop} not found in methodMap`);
       return undefined;
     },
   });
+
+  return proxy;
 }

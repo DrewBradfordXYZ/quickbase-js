@@ -7736,16 +7736,29 @@
     "Record": {
       "type": "object",
       "properties": {
-        "additionalProperties": {
-          "type": "object",
-          "properties": {
-            "value": {
-              "type": "any"
-            }
-          }
+        "_dummy": {
+          "type": "string",
+          "description": "Unused dummy property to force model generation.",
+          "nullable": true
         }
       },
-      "description": "A record with field ID keys and value objects."
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "object",
+              "array",
+              "null"
+            ]
+          }
+        },
+        "description": "The value object for a field ID key."
+      },
+      "description": "A record with field ID keys (e.g., '6') and value objects (e.g., { value: 'data' })."
     },
     "UpsertRequest": {
       "type": "object",
