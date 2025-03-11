@@ -10,6 +10,8 @@ const App: React.FC = () => {
     const qb = quickbase({
       realm: "your-realm", // Replace with actual QuickBase realm
       // ------------------------------
+      // Authentication Options
+      // ------------------------------
       // OPTION 1: User Token Authentication
       // - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
       // - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase

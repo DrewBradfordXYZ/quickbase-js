@@ -6,12 +6,17 @@
 </head>
 
 <body>
-  <div id="app-name">Loading...</div>
+  <div>
+    <h1>Quickbase Test</h1>
+    <p id="result">Loading...</p>
+  </div>
   <script type="module">
     import { quickbase } from 'quickbase-js';
 
     const qb = quickbase({
       realm: 'your-realm', // Replace with actual QuickBase realm
+      // ------------------------------
+      // Authentication Options
       // ----------------------------
       // OPTION 1: User Token Authentication
       // - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
@@ -29,11 +34,11 @@
 
     qb.getApp({ appId: 'your-app-id' }) // Replace with actual app ID
       .then((app) => {
-        document.getElementById('app-name').textContent = app.name;
+        document.getElementById('result').textContent = `App Name: ${app.name}`;
       })
       .catch((err) => {
         console.error('Error fetching app:', err);
-        document.getElementById('app-name').textContent = 'Failed to load app';
+        document.getElementById('result').textContent = err.message || 'Failed to load app';
       });
   </script>
 </body>
