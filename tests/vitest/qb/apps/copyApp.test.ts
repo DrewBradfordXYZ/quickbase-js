@@ -46,7 +46,7 @@ test(
       expect(response.created).toBeInstanceOf(Date);
       expect(response.updated).toBeInstanceOf(Date);
       expect(response.dateFormat).toMatch(/^\w{2}-\w{2}-\w{4}$/); // e.g., "MM-DD-YYYY"
-      expect(typeof response.timeZone).toBe("string"); // Simplified to check if it’s a string
+      expect(typeof response.timeZone).toBe("string"); // Simplified check
       expect(typeof response.hasEveryoneOnTheInternet).toBe("boolean");
       expect(response.ancestorId).toBe(appId); // Should match the source app ID
       expect(
@@ -62,10 +62,15 @@ test(
       throw error; // Re-throw to fail the test
     }
 
-    // Cleanup note: No direct REST API to delete app
-    console.log(
-      "Cleanup note: No direct REST API to delete app. Manually delete app with ID:",
-      response.id
-    );
+    // Cleanup: Delete the copied app using deleteApp
+    const deleteStartTime = Date.now();
+    const deleteResponse = await client.deleteApp({
+      appId: response.id,
+      body: { name: copyAppName },
+    });
+    const deleteDuration = Date.now() - deleteStartTime;
+    console.log(`deleteApp completed in ${deleteDuration}ms`);
+    console.log("Cleanup - Deleted app:", deleteResponse);
+    expect(deleteResponse.deletedAppId).toBe(response.id);
   }
 );

@@ -79,15 +79,15 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const tokenCache = new TokenCache();
 
-  const headers: HTTPHeaders = {
+  const baseHeaders: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
     "Content-Type": "application/json",
   };
 
   if (initialTempToken) {
-    headers["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
+    baseHeaders["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
   } else if (userToken && !useTempTokens) {
-    headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
+    baseHeaders["Authorization"] = `QB-USER-TOKEN ${userToken}`;
   }
 
   const defaultFetch: typeof fetch | undefined =
@@ -96,7 +96,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
-    headers: { ...headers },
+    headers: { ...baseHeaders },
     fetchApi: fetchApi || defaultFetch,
     credentials: useTempTokens ? "include" : "omit",
   });
@@ -162,7 +162,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       `https://api.quickbase.com/v1/auth/temporary/${dbid}`,
       {
         method: "GET",
-        headers: { ...headers },
+        headers: { ...baseHeaders },
         credentials: "include",
       }
     );
@@ -194,23 +194,24 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     return token;
   };
 
-  const invokeMethod = async <K extends keyof QuickbaseClient>(
+  async function invokeMethod<K extends keyof QuickbaseClient>(
     methodName: K,
     params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>,
     retryCount: number = 0
-  ): Promise<ReturnType<QuickbaseClient[K]>> => {
+  ): Promise<ReturnType<QuickbaseClient[K]>> {
     const methodInfo = methodMap[methodName];
     if (!methodInfo) {
       throw new Error(`Method ${methodName} not found`);
     }
 
-    const args: [any, RequestInit | undefined] =
+    const requestParameters =
       methodInfo.paramMap.length === 1 &&
       methodInfo.paramMap[0] === "requestParameters"
-        ? [{ requestParameters: params }, undefined]
-        : [params, undefined];
+        ? { requestParameters: params }
+        : params;
+    let requestOptions: RequestInit = {};
 
-    let token =
+    const selectedToken =
       initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
 
     if (methodName === "getTempTokenDBID" && useTempTokens) {
@@ -223,43 +224,38 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       }
     }
 
-    if (useTempTokens && !token) {
+    let authorizationToken = selectedToken;
+    if (useTempTokens && !authorizationToken) {
       const dbid = extractDbid(
         params,
         `No dbid found in params for ${methodName} to fetch temp token`
       );
       const cachedToken = tokenCache.get(dbid);
-      if (cachedToken) {
-        token = cachedToken;
-      } else {
-        if (typeof globalThis.window === "undefined" && !fetchApi) {
-          throw new Error(
-            "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
-          );
-        }
-        token = await fetchTempToken(dbid);
-        if (methodName === "getTempTokenDBID") {
-          return { temporaryAuthorization: token } as ReturnType<
-            QuickbaseClient[K]
-          >;
-        }
+      authorizationToken = cachedToken || (await fetchTempToken(dbid));
+      if (methodName === "getTempTokenDBID") {
+        return { temporaryAuthorization: authorizationToken } as ReturnType<
+          QuickbaseClient[K]
+        >;
       }
-      args[1] = {
-        headers: {
-          ...headers,
-          Authorization: `QB-TEMP-TOKEN ${token}`,
-        },
+      requestOptions.headers = {
+        ...baseHeaders,
+        Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+      };
+    } else if (authorizationToken) {
+      requestOptions.headers = {
+        ...baseHeaders,
+        Authorization: `QB-USER-TOKEN ${authorizationToken}`,
       };
     }
 
     try {
-      const response = await methodInfo.method(...args);
-      return response;
+      return await methodInfo.method(requestParameters, requestOptions);
     } catch (error) {
       if (
         error instanceof ResponseError &&
         error.response.status === 401 &&
-        retryCount < 1
+        retryCount < 1 &&
+        useTempTokens
       ) {
         if (debug) {
           console.log(
@@ -271,12 +267,10 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           params,
           `No dbid to refresh token after authorization error`
         );
-        token = await fetchTempToken(dbid);
-        args[1] = {
-          headers: {
-            ...headers,
-            Authorization: `QB-TEMP-TOKEN ${token}`,
-          },
+        authorizationToken = await fetchTempToken(dbid);
+        requestOptions.headers = {
+          ...baseHeaders,
+          Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
         };
         if (debug) {
           console.log(`Retrying ${methodName} with new token`);
@@ -300,7 +294,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       }
       throw error;
     }
-  };
+  }
 
   const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, {
     get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
