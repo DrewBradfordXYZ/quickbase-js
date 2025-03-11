@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["tests/vitest/**/**/*.test.ts"],
-    setupFiles: ["tests/setup.ts"],
+    setupFiles: ["tests/setup.ts"], // Relative path from root
     pool: "forks",
     poolOptions: {
       forks: {
@@ -15,7 +15,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./"),
+      "@": path.resolve(__dirname, "./src"), // For src/ imports
+      "@tests": path.resolve(__dirname, "./tests"), // For tests/ imports
     },
   },
 });

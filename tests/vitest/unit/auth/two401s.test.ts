@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@/tests/setup.ts";
+import { createClient, mockFetch } from "@tests/setup.ts";
 
 describe("QuickbaseClient - Two 401s in a Row", () => {
   let client: ReturnType<typeof createClient>;

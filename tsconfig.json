@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "lib": ["ES2015", "ESNext", "DOM"], // Explicitly include ES2015 for Record
+    "lib": ["ES2015", "ESNext", "DOM"],
     "types": ["node", "playwright/test"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -16,7 +16,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["src/*"],      // Matches Vite's @ -> src/
+      "@tests/*": ["tests/*"] // Matches Vite's @tests -> tests/
     }
   },
   "include": ["src/**/*", "tests/**/*"],

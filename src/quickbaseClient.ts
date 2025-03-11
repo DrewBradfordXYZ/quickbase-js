@@ -6,11 +6,17 @@ import {
   ResponseError,
 } from "./generated/runtime.ts";
 import * as apis from "./generated/apis/index.ts";
-import { simplifyName } from "./utils.ts";
 import { TokenCache } from "./tokenCache.ts";
 
 // Re-export all model types from generated/models
 export * from "./generated/models";
+
+// Moved from utils.ts
+const simplifyName = (name: string): string =>
+  name
+    .replace(/ById$/, "")
+    .replace(/Api$/, "")
+    .replace(/^(\w)/, (_, c) => c.toLowerCase());
 
 // Rename the interface to avoid naming conflict if needed
 export interface QuickbaseClient extends IQuickbaseClient {}
@@ -141,8 +147,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
               method: boundMethod as ApiMethod<typeof simplifiedName>,
               paramMap: getParamNames(method),
             };
-            //  if (debug)
-            // console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
+            // if (debug)
+            //   console.log(`Mapped ${rawMethodName} to ${simplifiedName}`);
           }
         });
     }

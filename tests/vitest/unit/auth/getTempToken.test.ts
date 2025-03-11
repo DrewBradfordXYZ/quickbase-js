@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { createClient, mockFetch } from "@/tests/setup.ts";
+import { createClient, mockFetch } from "@tests/setup.ts";
 
 describe("QuickbaseClient - getTempTokenDBID (Unit)", () => {
   let client: ReturnType<typeof createClient>;

@@ -1,6 +1,6 @@
 // tests/vitest/unit/records/deleteRecords.test.ts
 import { describe, expect, test, beforeEach } from "vitest"; // Added 'describe'
-import { createClient, mockFetch } from "@/tests/setup.ts";
+import { createClient, mockFetch } from "@tests/setup.ts";
 
 describe("QuickbaseClient - deleteRecords (Unit)", () => {
   beforeEach(() => {
