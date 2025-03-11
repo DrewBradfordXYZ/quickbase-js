@@ -3,6 +3,7 @@ import { describe, expect, test, beforeEach } from "vitest";
 import { createClient, mockFetch } from "@tests/setup.ts";
 import { vi } from "vitest";
 
+// Note: Type augmentation moved to src/types.d.ts
 describe("QuickbaseClient - upsert (Unit)", () => {
   beforeEach(() => {
     vi.resetModules(); // Reset module cache
@@ -133,7 +134,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
     const result = await qb.upsert({
       body: { to: "test-table-id", data: [{ "7": { value: "value2" } }] },
       dbid: "test-dbid",
-    });
+    } as any); // Temporary type assertion until types.d.ts is applied
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenNthCalledWith(
@@ -218,6 +219,10 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       })
     );
 
-    expect(result.data[0]["6"].value).toBe("value1");
+    if (result.data && result.data.length > 0) {
+      expect((result.data[0]["6"] as { value: any }).value).toBe("value1");
+    } else {
+      throw new Error("Expected data array to have at least one element");
+    }
   });
 });
