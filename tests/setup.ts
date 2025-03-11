@@ -15,6 +15,12 @@ export const QB_USER_TOKEN =
 export const QB_APP_ID = process.env.QB_APP_ID || "app-id-1234567890";
 export const QB_TABLE_ID_1 = process.env.QB_TABLE_ID_1 || "table-id-1234567890";
 
+// Mock env variables for consistency, using .env values if available
+vi.stubEnv("QB_REALM", QB_REALM);
+vi.stubEnv("QB_USER_TOKEN", QB_USER_TOKEN);
+vi.stubEnv("QB_APP_ID", QB_APP_ID);
+vi.stubEnv("QB_TABLE_ID_1", QB_TABLE_ID_1);
+
 export const createClient = (
   fetchApi?: any,
   config: Partial<QuickbaseConfig> = {}
@@ -39,9 +45,3 @@ export const createClient = (
   console.log("[createClient] Returning:", client);
   return client;
 };
-
-// Mock env variables for consistency, using .env values if available
-vi.stubEnv("QB_REALM", QB_REALM);
-vi.stubEnv("QB_USER_TOKEN", QB_USER_TOKEN);
-vi.stubEnv("QB_APP_ID", QB_APP_ID);
-vi.stubEnv("QB_TABLE_ID_1", QB_TABLE_ID_1);

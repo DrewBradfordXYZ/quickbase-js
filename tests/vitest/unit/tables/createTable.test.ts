@@ -1,7 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+// tests/vitest/unit/records/createTable.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_REALM,
+  QB_USER_TOKEN,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - createTable (Unit)", () => {
+describe("QuickbaseClient Unit - createTable", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -10,7 +17,6 @@ describe("QuickbaseClient - createTable (Unit)", () => {
   });
 
   it("calls createTable successfully with user token", async () => {
-    const appId = "buwai2zpe";
     const mockBody = {
       name: "TestTable",
       description: "Unit test table",
@@ -18,7 +24,7 @@ describe("QuickbaseClient - createTable (Unit)", () => {
       pluralRecordName: "Tests",
     };
     const mockResponse = {
-      id: "buya8h9iz",
+      id: "newly-created-table-id-1234567890", // Changed from "buya8h9iz"
       name: "TestTable",
       alias: "_DBID_TESTTABLE",
       description: "Unit test table",
@@ -42,18 +48,20 @@ describe("QuickbaseClient - createTable (Unit)", () => {
       json: () => Promise.resolve(mockResponse),
     });
 
-    const response = await client.createTable({ appId, body: mockBody });
+    const response = await client.createTable({
+      appId: QB_APP_ID,
+      body: mockBody,
+    });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables?appId=${appId}`,
+      `https://api.quickbase.com/v1/tables?appId=${QB_APP_ID}`,
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
           "Content-Type": "application/json",
-          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
-          Authorization:
-            "QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
         }),
         body: JSON.stringify(mockBody),
       })

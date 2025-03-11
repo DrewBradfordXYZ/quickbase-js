@@ -1,7 +1,13 @@
+// tests/vitest/unit/auth/retryOn401.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - 401 Retry Creates New Token", () => {
+describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -10,7 +16,6 @@ describe("QuickbaseClient - 401 Retry Creates New Token", () => {
   });
 
   it("creates a new token on 401 and retries successfully", async () => {
-    const mockDbid = "mockDbid123";
     const mockToken = "new_token_456";
     const mockFields = [{ id: 1, label: "Field1" }];
     let callCount = 0;
@@ -51,16 +56,45 @@ describe("QuickbaseClient - 401 Retry Creates New Token", () => {
     });
 
     const consoleSpy = vi.spyOn(console, "log");
-    const result = await client.getFields({ tableId: mockDbid });
+    const result = await client.getFields({ tableId: QB_TABLE_ID_1 });
 
     expect(result).toEqual(mockFields);
     expect(mockFetch).toHaveBeenCalledTimes(4);
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      3,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      4,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+        }),
+      })
+    );
+
     expect(consoleSpy).toHaveBeenCalledWith(
       "Authorization error for getFields, refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Fetched and cached new token for dbid: mockDbid123",
+      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
       mockToken + "_retry",
       expect.any(String)
     );

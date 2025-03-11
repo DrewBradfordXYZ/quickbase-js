@@ -1,7 +1,14 @@
+// tests/vitest/unit/fields/getFields.test.ts
 import { describe, it, expect } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_USER_TOKEN,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - getFields (Unit)", () => {
+describe("QuickbaseClient Unit - getFields", () => {
   it("calls getFields successfully", async () => {
     mockFetch.mockImplementation((url: string, options: any) => {
       console.log("Mock fetch for getFields:", url, options);
@@ -47,9 +54,9 @@ describe("QuickbaseClient - getFields (Unit)", () => {
       } as Response);
     });
 
-    const client = createClient(mockFetch);
+    const client = createClient(mockFetch, { debug: true }); // Add debug: true for consistency
     const result = await client.getFields({
-      tableId: "dummyTableId",
+      tableId: QB_TABLE_ID_1,
       includeFieldPerms: true,
     });
     console.log("getFields response:", result);
@@ -103,11 +110,11 @@ describe("QuickbaseClient - getFields (Unit)", () => {
       ])
     );
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/fields?tableId=dummyTableId&includeFieldPerms=true`,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}&includeFieldPerms=true`,
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-          "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
         }),
       })
     );

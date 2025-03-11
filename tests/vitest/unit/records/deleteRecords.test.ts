@@ -1,18 +1,22 @@
 // tests/vitest/unit/records/deleteRecords.test.ts
-import { describe, expect, test, beforeEach } from "vitest"; // Added 'describe'
-import { createClient, mockFetch } from "@tests/setup.ts";
+import { describe, expect, test, beforeEach } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_USER_TOKEN,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - deleteRecords (Unit)", () => {
+describe("QuickbaseClient Unit - deleteRecords", () => {
+  let qb: ReturnType<typeof createClient>;
+
   beforeEach(() => {
-    mockFetch.mockClear(); // Clear mock state between tests
+    mockFetch.mockClear();
+    qb = createClient(mockFetch, { debug: true }); // Use debug: true for consistency with other tests
   });
 
-  test("deleteRecords - sends correct DELETE request and handles success", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-    });
-
+  test("sends correct DELETE request and handles success", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -21,7 +25,7 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
 
     const result = await qb.deleteRecords({
       body: {
-        from: "test-table-id",
+        from: QB_TABLE_ID_1,
         where: "{3.EX.'5'}", // Simulate deleting Record ID 5
       },
     });
@@ -31,22 +35,17 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify({ from: "test-table-id", where: "{3.EX.'5'}" }),
+        body: JSON.stringify({ from: QB_TABLE_ID_1, where: "{3.EX.'5'}" }),
       })
     );
     expect(result).toEqual({ numberDeleted: 1 });
   });
 
-  test("deleteRecords - handles no records deleted", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-    });
-
+  test("handles no records deleted", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -55,7 +54,7 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
 
     const result = await qb.deleteRecords({
       body: {
-        from: "test-table-id",
+        from: QB_TABLE_ID_1,
         where: "{3.EX.'999999'}", // Non-existent Record ID
       },
     });
@@ -65,12 +64,12 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          from: "test-table-id",
+          from: QB_TABLE_ID_1,
           where: "{3.EX.'999999'}",
         }),
       })
@@ -78,12 +77,7 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
     expect(result).toEqual({ numberDeleted: 0 });
   });
 
-  test("deleteRecords - throws error on API failure", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-    });
-
+  test("throws error on API failure", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 400,
@@ -93,7 +87,7 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
     await expect(() =>
       qb.deleteRecords({
         body: {
-          from: "test-table-id",
+          from: QB_TABLE_ID_1,
           where: "{3.EX.'invalid'}",
         },
       })
@@ -104,12 +98,12 @@ describe("QuickbaseClient - deleteRecords (Unit)", () => {
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          from: "test-table-id",
+          from: QB_TABLE_ID_1,
           where: "{3.EX.'invalid'}",
         }),
       })

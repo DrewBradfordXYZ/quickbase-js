@@ -1,21 +1,23 @@
 // tests/vitest/unit/records/upsert.test.ts
 import { describe, expect, test, beforeEach } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_USER_TOKEN,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 import { vi } from "vitest";
 
 // Note: Type augmentation moved to src/types.d.ts
-describe("QuickbaseClient - upsert (Unit)", () => {
+describe("QuickbaseClient Unit - upsert", () => {
   beforeEach(() => {
     vi.resetModules(); // Reset module cache
     mockFetch.mockClear();
   });
 
   test("sends correct POST request and handles successful upsert", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-      debug: true,
-    });
+    const qb = createClient(mockFetch, { debug: true });
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -33,10 +35,10 @@ describe("QuickbaseClient - upsert (Unit)", () => {
     });
 
     console.log("[Test] Calling qb.upsert with:", {
-      body: { to: "test-table-id", data: [{ "6": { value: "value1" } }] },
+      body: { to: QB_TABLE_ID_1, data: [{ "6": { value: "value1" } }] },
     });
     const result = await qb.upsert({
-      body: { to: "test-table-id", data: [{ "6": { value: "value1" } }] },
+      body: { to: QB_TABLE_ID_1, data: [{ "6": { value: "value1" } }] },
     });
 
     console.log("[Test] mockFetch calls:", mockFetch.mock.calls);
@@ -45,12 +47,12 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          to: "test-table-id",
+          to: QB_TABLE_ID_1,
           data: [{ "6": { value: "value1" } }],
         }),
       })
@@ -68,11 +70,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
   });
 
   test("handles API error with invalid data", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-      debug: true,
-    });
+    const qb = createClient(mockFetch, { debug: true });
 
     mockFetch.mockResolvedValueOnce({
       ok: false,
@@ -82,7 +80,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
 
     await expect(
       qb.upsert({
-        body: { to: "test-table-id", data: [{ "999": { value: "invalid" } }] },
+        body: { to: QB_TABLE_ID_1, data: [{ "999": { value: "invalid" } }] },
       })
     ).rejects.toThrow("API Error: Invalid data format (Status: 400)");
 
@@ -91,12 +89,12 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          to: "test-table-id",
+          to: QB_TABLE_ID_1,
           data: [{ "999": { value: "invalid" } }],
         }),
       })
@@ -104,11 +102,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
   });
 
   test("handles upsert with temp token", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      useTempTokens: true,
-      debug: true,
-    });
+    const qb = createClient(mockFetch, { useTempTokens: true, debug: true });
 
     mockFetch
       .mockResolvedValueOnce({
@@ -132,18 +126,18 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       });
 
     const result = await qb.upsert({
-      body: { to: "test-table-id", data: [{ "7": { value: "value2" } }] },
-      dbid: "test-dbid",
+      body: { to: QB_TABLE_ID_1, data: [{ "7": { value: "value2" } }] },
+      dbid: QB_TABLE_ID_1, // Use QB_TABLE_ID_1 as dbid for temp token
     } as any); // Temporary type assertion until types.d.ts is applied
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
-      "https://api.quickbase.com/v1/auth/temporary/test-dbid",
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           "Content-Type": "application/json",
         }),
         credentials: "include",
@@ -155,12 +149,12 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp-token",
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          to: "test-table-id",
+          to: QB_TABLE_ID_1,
           data: [{ "7": { value: "value2" } }],
         }),
       })
@@ -178,11 +172,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
   });
 
   test("sends correct POST request with data fields", async () => {
-    const qb = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-      debug: true,
-    });
+    const qb = createClient(mockFetch, { debug: true });
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -200,7 +190,7 @@ describe("QuickbaseClient - upsert (Unit)", () => {
     });
 
     const result = await qb.upsert({
-      body: { to: "test-table-id", data: [{ "6": { value: "value1" } }] },
+      body: { to: QB_TABLE_ID_1, data: [{ "6": { value: "value1" } }] },
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -208,12 +198,12 @@ describe("QuickbaseClient - upsert (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify({
-          to: "test-table-id",
+          to: QB_TABLE_ID_1,
           data: [{ "6": { value: "value1" } }],
         }),
       })

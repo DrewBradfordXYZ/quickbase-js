@@ -1,7 +1,21 @@
-import { describe, it, expect } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+// tests/vitest/unit/tables/getAppTables.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_REALM,
+  QB_USER_TOKEN,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - getAppTables (Unit)", () => {
+describe("QuickbaseClient Unit - getAppTables", () => {
+  let client: ReturnType<typeof createClient>;
+
+  beforeEach(() => {
+    mockFetch.mockClear();
+    client = createClient(mockFetch, { debug: true }); // Add debug: true for consistency
+  });
+
   it("calls getAppTables successfully", async () => {
     mockFetch.mockImplementation((url: string, options: any) => {
       console.log("Mock fetch for getAppTables:", url, options);
@@ -11,60 +25,59 @@ describe("QuickbaseClient - getAppTables (Unit)", () => {
         json: () =>
           Promise.resolve([
             {
+              id: "buwai2zr4",
+              name: "Root",
               alias: "_DBID_ROOT",
-              created: "2025-02-13T18:22:33Z",
+              description: "",
+              created: new Date("2025-02-13T18:22:33.000Z"),
+              updated: new Date("2025-02-13T18:22:34.000Z"),
+              nextRecordId: 1,
+              nextFieldId: 6,
               defaultSortFieldId: 2,
               defaultSortOrder: "DESC",
-              description: "",
-              id: "buwai2zr4",
               keyFieldId: 3,
-              name: "Root",
-              nextFieldId: 6,
-              nextRecordId: 1,
-              pluralRecordName: "Roots",
               singleRecordName: "Root",
+              pluralRecordName: "Roots",
               sizeLimit: "500 MB",
-              spaceRemaining: "500 MB",
               spaceUsed: "0 KB",
-              updated: "2025-02-13T18:22:34Z",
+              spaceRemaining: "500 MB",
             },
           ]),
       } as Response);
     });
 
-    const client = createClient(mockFetch);
-    const tablesAppId = process.env.QB_APP_ID;
-    if (!tablesAppId) throw new Error("QB_APP_ID is not defined in .env");
-    const result = await client.getAppTables({ appId: tablesAppId });
+    const result = await client.getAppTables({ appId: QB_APP_ID });
     console.log("getAppTables response:", result);
     expect(result).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          id: "buwai2zr4",
+          name: "Root",
           alias: "_DBID_ROOT",
-          created: new Date("2025-02-13T18:22:33Z"),
+          description: "",
+          created: new Date("2025-02-13T18:22:33.000Z"),
+          updated: new Date("2025-02-13T18:22:34.000Z"),
+          nextRecordId: 1,
+          nextFieldId: 6,
           defaultSortFieldId: 2,
           defaultSortOrder: "DESC",
-          description: "",
-          id: "buwai2zr4",
           keyFieldId: 3,
-          name: "Root",
-          nextFieldId: 6,
-          nextRecordId: 1,
-          pluralRecordName: "Roots",
           singleRecordName: "Root",
+          pluralRecordName: "Roots",
           sizeLimit: "500 MB",
-          spaceRemaining: "500 MB",
           spaceUsed: "0 KB",
-          updated: new Date("2025-02-13T18:22:34Z"),
+          spaceRemaining: "500 MB",
         }),
       ])
     );
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables?appId=${tablesAppId}`,
+      `https://api.quickbase.com/v1/tables?appId=${QB_APP_ID}`,
       expect.objectContaining({
+        method: "GET",
         headers: expect.objectContaining({
-          Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-          "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+          "Content-Type": "application/json",
         }),
       })
     );

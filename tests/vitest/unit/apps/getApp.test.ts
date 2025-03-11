@@ -1,11 +1,19 @@
+// tests/vitest/unit/apps/getApp.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_REALM,
+  QB_USER_TOKEN,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - getApp (Unit)", () => {
-  const client = createClient(mockFetch);
+describe("QuickbaseClient Unit - getApp", () => {
+  let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
     mockFetch.mockClear();
+    client = createClient(mockFetch, { debug: true }); // Add debug: true for consistency
   });
 
   it("initializes without errors", () => {
@@ -24,7 +32,7 @@ describe("QuickbaseClient - getApp (Unit)", () => {
         status: 200,
         json: () =>
           Promise.resolve({
-            id: process.env.QB_APP_ID,
+            id: QB_APP_ID,
             name: "qb-copy",
             created: "2025-02-13T18:22:33Z",
             updated: "2025-03-04T04:25:51Z",
@@ -45,12 +53,9 @@ describe("QuickbaseClient - getApp (Unit)", () => {
       } as Response);
     });
 
-    const getAppId = process.env.QB_APP_ID;
-    if (!getAppId) throw new Error("QB_APP_ID is not defined in .env");
-    console.log("Test appId:", getAppId);
-    const result = await client.getApp({ appId: getAppId });
+    const result = await client.getApp({ appId: QB_APP_ID });
     expect(result).toEqual({
-      id: getAppId,
+      id: QB_APP_ID,
       name: "qb-copy",
       created: new Date("2025-02-13T18:22:33Z"),
       updated: new Date("2025-03-04T04:25:51Z"),
@@ -69,11 +74,11 @@ describe("QuickbaseClient - getApp (Unit)", () => {
       },
     });
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/apps/${getAppId}`,
+      `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: `QB-USER-TOKEN ${process.env.QB_USER_TOKEN}`,
-          "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
         }),
       })
     );

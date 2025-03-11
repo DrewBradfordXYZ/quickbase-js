@@ -1,7 +1,15 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+// tests/vitest/unit/records/deleteTable.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_TABLE_ID_1,
+  QB_REALM,
+  QB_USER_TOKEN,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - deleteTable (Unit)", () => {
+describe("QuickbaseClient Unit - deleteTable", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -10,10 +18,8 @@ describe("QuickbaseClient - deleteTable (Unit)", () => {
   });
 
   it("calls deleteTable successfully with user token", async () => {
-    const appId = "buwai2zpe";
-    const tableId = "buya8h9iz";
     const mockResponse = {
-      deletedTableId: tableId,
+      deletedTableId: QB_TABLE_ID_1,
     };
 
     mockFetch.mockResolvedValueOnce({
@@ -22,27 +28,26 @@ describe("QuickbaseClient - deleteTable (Unit)", () => {
       json: () => Promise.resolve(mockResponse),
     });
 
-    const response = await client.deleteTable({ tableId, appId });
+    const response = await client.deleteTable({
+      tableId: QB_TABLE_ID_1,
+      appId: QB_APP_ID,
+    });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${tableId}?appId=${appId}`,
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
           "Content-Type": "application/json",
-          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
-          Authorization:
-            "QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
         }),
       })
     );
   });
 
   it("handles 404 error for non-existent table", async () => {
-    const appId = "buwai2zpe";
-    const tableId = "nonexistent";
-
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
@@ -53,15 +58,19 @@ describe("QuickbaseClient - deleteTable (Unit)", () => {
         }),
     });
 
-    await expect(client.deleteTable({ tableId, appId })).rejects.toThrow(
-      "API Error: Invalid DBID (Status: 404)"
-    );
+    await expect(
+      client.deleteTable({ tableId: QB_TABLE_ID_1, appId: QB_APP_ID })
+    ).rejects.toThrow("API Error: Invalid DBID (Status: 404)");
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${tableId}?appId=${appId}`,
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
         method: "DELETE",
-        headers: expect.any(Object),
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+        }),
       })
     );
   });

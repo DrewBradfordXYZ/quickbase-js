@@ -1,5 +1,5 @@
-// tests/vitest/unit/records/getTable.test.ts
-import { describe, it, expect, beforeEach, vi } from "vitest";
+// tests/vitest/unit/tables/getTable.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
   mockFetch,
@@ -14,10 +14,11 @@ describe("QuickbaseClient Unit - getTable", () => {
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = createClient(mockFetch, { debug: true });
   });
 
   it("calls getTable successfully with user token", async () => {
+    client = createClient(mockFetch, { debug: true });
+
     const mockResponse = {
       id: QB_TABLE_ID_1,
       name: "Root",
@@ -165,7 +166,7 @@ describe("QuickbaseClient Unit - getTable", () => {
       appId: QB_APP_ID,
     });
     expect(response).toEqual(mockResponse);
-    expect(mockFetch).toHaveBeenCalledTimes(4); // Initial token, 401, retry token, success
+    expect(mockFetch).toHaveBeenCalledTimes(4);
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
@@ -207,6 +208,8 @@ describe("QuickbaseClient Unit - getTable", () => {
   });
 
   it("handles 404 Not Found", async () => {
+    client = createClient(mockFetch, { debug: true });
+
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,

@@ -1,7 +1,13 @@
+// tests/vitest/unit/auth/fetchTempToken401.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - 401 with fetchTempToken 401", () => {
+describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -10,7 +16,6 @@ describe("QuickbaseClient - 401 with fetchTempToken 401", () => {
   });
 
   it("fails without infinite loop when fetchTempToken returns 401 after initial 401", async () => {
-    const mockDbid = "mockDbid123";
     let callCount = 0;
 
     mockFetch.mockImplementation((url) => {
@@ -43,11 +48,31 @@ describe("QuickbaseClient - 401 with fetchTempToken 401", () => {
     });
 
     const consoleSpy = vi.spyOn(console, "log");
-    await expect(client.getFields({ tableId: mockDbid })).rejects.toThrow(
+    await expect(client.getFields({ tableId: QB_TABLE_ID_1 })).rejects.toThrow(
       "API Error: Unauthorized in fetchTempToken (Status: 401)"
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      3,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+
     expect(consoleSpy).toHaveBeenCalledWith(
       "Authorization error for getFields, refreshing token:",
       expect.any(String)

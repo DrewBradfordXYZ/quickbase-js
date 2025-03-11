@@ -1,7 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+// tests/vitest/unit/records/updateTable.test.ts
+import { describe, it, expect, beforeEach } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - updateTable (Unit)", () => {
+describe("QuickbaseClient Unit - updateTable", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -11,14 +17,13 @@ describe("QuickbaseClient - updateTable (Unit)", () => {
 
   it("calls updateTable successfully with temp token", async () => {
     client = createClient(mockFetch, { debug: true, useTempTokens: true });
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "buwai2zr4";
+
     const mockBody = {
       name: "Updated Root",
       description: "Updated description",
     };
     const mockResponse = {
-      id: mockTableId,
+      id: QB_TABLE_ID_1,
       name: "Updated Root",
       alias: "_DBID_ROOT",
       description: "Updated description",
@@ -49,21 +54,22 @@ describe("QuickbaseClient - updateTable (Unit)", () => {
       });
 
     const response = await client.updateTable({
-      tableId: mockTableId,
-      appId: mockAppId,
+      tableId: QB_TABLE_ID_1,
+      appId: QB_APP_ID,
       body: mockBody,
     });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/auth/temporary/${mockTableId}`,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
       expect.any(Object)
     );
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${mockTableId}?appId=${mockAppId}`,
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Updated to match QuickBase API spec
+        method: "POST",
         headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${process.env.QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp_token",
           "Content-Type": "application/json",
         }),

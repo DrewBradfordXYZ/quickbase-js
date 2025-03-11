@@ -1,23 +1,25 @@
 // tests/vitest/unit/records/runQuery.test.ts
 import { describe, test, expect, beforeEach } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_USER_TOKEN,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 import { RunQueryRequest, RunQueryResponse } from "@/generated";
 
-describe("QuickbaseClient - runQuery (Unit)", () => {
+describe("QuickbaseClient Unit - runQuery", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = createClient(mockFetch, {
-      realm: "test-realm",
-      userToken: "test-token",
-      debug: true,
-    });
+    client = createClient(mockFetch, { debug: true });
   });
 
   test("sends correct POST request and handles successful query response", async () => {
     const queryRequest: RunQueryRequest = {
-      from: "test-table-id",
+      from: QB_TABLE_ID_1,
       select: [3, 6, 7],
       where: "{6.EX.'Task 1'}",
       sortBy: [{ fieldId: 6, order: "ASC" }],
@@ -49,7 +51,6 @@ describe("QuickbaseClient - runQuery (Unit)", () => {
       json: () => Promise.resolve(mockResponse),
     });
 
-    // Note: This will fail until runQuery is added to fix-spec-paths.ts and regenerated
     const result = await client.runQuery({ body: queryRequest });
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -57,8 +58,8 @@ describe("QuickbaseClient - runQuery (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify(queryRequest),
@@ -70,7 +71,7 @@ describe("QuickbaseClient - runQuery (Unit)", () => {
 
   test("handles API error with invalid query", async () => {
     const invalidQueryRequest = {
-      from: "test-table-id",
+      from: QB_TABLE_ID_1,
       select: [3],
       where: "{999.EX.'Invalid'}", // Invalid field ID
     };
@@ -90,8 +91,8 @@ describe("QuickbaseClient - runQuery (Unit)", () => {
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": "test-realm.quickbase.com",
-          Authorization: "QB-USER-TOKEN test-token",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
         body: JSON.stringify(invalidQueryRequest),
