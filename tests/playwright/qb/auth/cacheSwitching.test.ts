@@ -67,13 +67,13 @@ test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", 
     console.log("Starting cacheSwitching test");
     const realm = process.env.QB_REALM;
     const appId = process.env.QB_APP_ID;
-    const tableId = process.env.QB_TABLE_ID;
+    const tableId = process.env.QB_TABLE_ID_1;
     const username = process.env.QB_USERNAME;
     const password = process.env.QB_PASSWORD;
 
     if (!realm) throw new Error("QB_REALM is not defined in .env");
     if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-    if (!tableId) throw new Error("QB_TABLE_ID is not defined in .env");
+    if (!tableId) throw new Error("QB_TABLE_ID_1 is not defined in .env");
     if (!username) throw new Error("QB_USERNAME is not defined in .env");
     if (!password) throw new Error("QB_PASSWORD is not defined in .env");
 

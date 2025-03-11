@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createClient } from "../../../setup.ts";
+import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 
 describe("QuickbaseClient Integration - getFields", () => {
   const client = createClient();
@@ -7,8 +7,6 @@ describe("QuickbaseClient Integration - getFields", () => {
   it(
     "fetches real field data from QuickBase",
     async () => {
-      const tableId = "buwai2z3s";
-      if (!tableId) throw new Error("Table ID is not defined");
       if (!process.env.QB_REALM)
         throw new Error("QB_REALM is not defined in .env");
       if (!process.env.QB_USER_TOKEN)
@@ -17,10 +15,10 @@ describe("QuickbaseClient Integration - getFields", () => {
       console.log("Config used:", {
         realm: process.env.QB_REALM,
         userToken: process.env.QB_USER_TOKEN,
-        tableId,
+        tableId: QB_TABLE_ID_1,
       });
       const result = await client.getFields({
-        tableId,
+        tableId: QB_TABLE_ID_1,
         includeFieldPerms: true,
       });
       console.log("Real API response:", result);

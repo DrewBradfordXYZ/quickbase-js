@@ -1,5 +1,10 @@
+// vitest.config.ts
 import { defineConfig } from "vitest/config";
 import path from "path";
+import dotenv from "dotenv"; // Add this import
+
+// Load .env variables before tests run
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 export default defineConfig({
   test: {
