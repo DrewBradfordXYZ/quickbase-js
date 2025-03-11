@@ -1,7 +1,12 @@
 // tests/vitest/qb/records/runQuery.test.ts
 import { describe, it, expect } from "vitest";
-import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts"; // Import QB_TABLE_ID_1
+import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 import { RunQueryRequest, RunQueryResponse } from "@/generated/models";
+
+// Define a type for field data with a value property
+interface FieldData {
+  value: any; // Adjust type based on your needs (e.g., string | number)
+}
 
 describe("QuickbaseClient Integration - runQuery", () => {
   let createdRecordId: number;
@@ -46,10 +51,22 @@ describe("QuickbaseClient Integration - runQuery", () => {
       });
       console.log("Real API response:", response);
 
-      // Assertions
-      expect(response.data).toHaveLength(1);
-      expect(response.data[0]["3"].value).toBe(createdRecordId);
-      expect(response.data[0]["6"].value).toContain("Test Task");
+      // Assertions with safety checks and type assertion
+      expect(response.data).toBeDefined(); // Ensure data exists
+      if (response.data && response.data.length > 0) {
+        expect(response.data).toHaveLength(1);
+        expect((response.data[0]["3"] as FieldData).value).toBe(
+          createdRecordId
+        );
+        expect((response.data[0]["6"] as FieldData).value).toContain(
+          "Test Task"
+        );
+      } else {
+        throw new Error(
+          "Expected response.data to contain at least one record"
+        );
+      }
+
       expect(response.fields).toContainEqual({
         id: 3,
         label: expect.any(String),
