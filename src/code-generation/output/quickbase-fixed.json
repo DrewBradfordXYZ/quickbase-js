@@ -580,222 +580,35 @@
     },
     "/tables/{tableId}/relationships": {
       "get": {
-        "description": "Get a list of all relationships, and their definitions, for a specific table. Details are provided for the child side of relationships within a given application. Limited details are returned for cross-application relationships.",
         "operationId": "getRelationships",
-        "summary": "Get all relationships",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Get relationships for a table",
+        "tags": [
+          "Relationships"
         ],
         "parameters": [
           {
-            "name": "skip",
-            "description": "The number of relationships to skip.",
-            "required": false,
-            "in": "query",
-            "type": "integer"
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique identifier (dbid) of the child table."
           },
           {
-            "name": "tableId",
-            "description": "The unique identifier (dbid) of the child table.",
-            "required": true,
-            "in": "path",
-            "type": "string"
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "The number of relationships to skip."
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Success - relationships retrieved",
             "schema": {
-              "example": {
-                "metadata": {
-                  "numRelationships": 1,
-                  "skip": 0,
-                  "totalRelationships": 1
-                },
-                "relationships": [
-                  {
-                    "childTableId": "bqqjnwsuy",
-                    "foreignKeyField": {
-                      "id": 6,
-                      "label": "Related record",
-                      "type": "numeric"
-                    },
-                    "id": 6,
-                    "isCrossApp": false,
-                    "lookupFields": [
-                      {
-                        "id": 3,
-                        "label": "Name",
-                        "type": "text"
-                      }
-                    ],
-                    "parentTableId": "bck7gp3q2",
-                    "summaryFields": [
-                      {
-                        "id": 8,
-                        "label": "my summary field",
-                        "type": "numeric"
-                      }
-                    ]
-                  }
-                ]
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "relationships"
-              ],
-              "properties": {
-                "relationships": {
-                  "description": "The relationships in a table.",
-                  "type": "array",
-                  "items": {
-                    "example": {
-                      "id": 6,
-                      "foreignKeyField": {
-                        "id": 6,
-                        "label": "Related record",
-                        "type": "numeric"
-                      },
-                      "lookupFields": [
-                        {
-                          "id": 7,
-                          "label": "record - text field",
-                          "type": "text"
-                        }
-                      ],
-                      "isCrossApp": false,
-                      "parentTableId": "bck7gp3q2",
-                      "childTableId": "bck7gp3q3",
-                      "summaryFields": [
-                        {
-                          "id": 8,
-                          "label": "Summary of Record ID#2",
-                          "type": "numeric"
-                        }
-                      ]
-                    },
-                    "type": "object",
-                    "additionalProperties": true,
-                    "required": [
-                      "id",
-                      "parentTableId",
-                      "childTableId",
-                      "isCrossApp"
-                    ],
-                    "properties": {
-                      "id": {
-                        "description": "The relationship id (foreign key field id).",
-                        "type": "integer"
-                      },
-                      "parentTableId": {
-                        "description": "The parent table id of the relationship.",
-                        "type": "string"
-                      },
-                      "childTableId": {
-                        "description": "The child table id of the relationship.",
-                        "type": "string"
-                      },
-                      "foreignKeyField": {
-                        "description": "The foreign key field information.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "properties": {
-                          "id": {
-                            "description": "Field id.",
-                            "type": "integer"
-                          },
-                          "label": {
-                            "description": "Field label.",
-                            "type": "string"
-                          },
-                          "type": {
-                            "description": "Field type.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "isCrossApp": {
-                        "description": "Whether this is a cross-app relationship.",
-                        "type": "boolean"
-                      },
-                      "lookupFields": {
-                        "description": "The lookup fields array.",
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "properties": {
-                            "id": {
-                              "description": "Field id.",
-                              "type": "integer"
-                            },
-                            "label": {
-                              "description": "Field label.",
-                              "type": "string"
-                            },
-                            "type": {
-                              "description": "Field type.",
-                              "type": "string"
-                            }
-                          }
-                        }
-                      },
-                      "summaryFields": {
-                        "description": "The summary fields array.",
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "properties": {
-                            "id": {
-                              "description": "Field id.",
-                              "type": "integer"
-                            },
-                            "label": {
-                              "description": "Field label.",
-                              "type": "string"
-                            },
-                            "type": {
-                              "description": "Field type.",
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "metadata": {
-                  "description": "Additional information about the results that may be helpful.",
-                  "type": "object",
-                  "additionalProperties": true,
-                  "properties": {
-                    "skip": {
-                      "description": "The number of relationships to skip.",
-                      "type": "integer"
-                    },
-                    "totalRelationships": {
-                      "description": "The total number of relationships.",
-                      "type": "integer"
-                    },
-                    "numRelationships": {
-                      "description": "The number of relationships in the current response object.",
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/GetRelationships200Response"
             }
           }
-        },
-        "tags": [
-          "Tables"
-        ]
+        }
       }
     },
     "/tables/{tableId}/relationship": {
@@ -8137,6 +7950,116 @@
           "description": "Query metadata"
         }
       }
+    },
+    "GetRelationships200Response": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "numRelationships": {
+              "type": "integer",
+              "description": "The number of relationships in the current response object."
+            },
+            "skip": {
+              "type": "integer",
+              "description": "The number of relationships skipped."
+            },
+            "totalRelationships": {
+              "type": "integer",
+              "description": "The total number of relationships."
+            }
+          },
+          "required": [
+            "numRelationships",
+            "skip",
+            "totalRelationships"
+          ],
+          "description": "Additional information about the results that may be helpful."
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Relationship"
+          },
+          "description": "The relationships in a table."
+        }
+      },
+      "required": [
+        "metadata",
+        "relationships"
+      ],
+      "description": "Response containing relationships for a table."
+    },
+    "Relationship": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "The relationship id (foreign key field id)."
+        },
+        "parentTableId": {
+          "type": "string",
+          "description": "The parent table id of the relationship."
+        },
+        "childTableId": {
+          "type": "string",
+          "description": "The child table id of the relationship."
+        },
+        "foreignKeyField": {
+          "$ref": "#/definitions/RelationshipField",
+          "description": "The foreign key field information."
+        },
+        "isCrossApp": {
+          "type": "boolean",
+          "description": "Whether this is a cross-app relationship."
+        },
+        "lookupFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RelationshipField"
+          },
+          "description": "The lookup fields array."
+        },
+        "summaryFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RelationshipField"
+          },
+          "description": "The summary fields array."
+        }
+      },
+      "required": [
+        "id",
+        "parentTableId",
+        "childTableId",
+        "foreignKeyField",
+        "isCrossApp"
+      ],
+      "description": "A relationship between tables."
+    },
+    "RelationshipField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Field id."
+        },
+        "label": {
+          "type": "string",
+          "description": "Field label."
+        },
+        "type": {
+          "type": "string",
+          "description": "Field type."
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "type"
+      ],
+      "description": "A field involved in a relationship (foreign key, lookup, or summary)."
     }
   }
 }

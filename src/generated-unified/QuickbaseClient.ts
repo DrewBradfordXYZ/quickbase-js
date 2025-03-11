@@ -1,5 +1,5 @@
-// Generated on 2025-03-11T19:28:08.891Z
-import { App, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-11T20:10:25.809Z
+import { App, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   createApp: (params: { body: CreateAppRequest }) => Promise<CreateApp200Response>;
@@ -11,7 +11,7 @@ export interface QuickbaseClient {
   getTable: (params: { tableId: string; appId: string }) => Promise<Table>;
   updateTable: (params: { tableId: string; appId: string; body: UpdateTableRequest }) => Promise<Table>;
   deleteTable: (params: { tableId: string; appId: string }) => Promise<DeleteTableResponse>;
-  getRelationships: (params: { skip?: number; tableId: string }) => Promise<{ [key: string]: any }>;
+  getRelationships: (params: { tableId: string; skip?: number }) => Promise<GetRelationships200Response>;
   createRelationship: (params: { tableId: string; generated?: any }) => Promise<{ [key: string]: any }>;
   updateRelationship: (params: { tableId: string; relationshipId: any; generated?: any }) => Promise<{ [key: string]: any }>;
   deleteRelationship: (params: { tableId: string; relationshipId: any }) => Promise<{ [key: string]: any }>;
