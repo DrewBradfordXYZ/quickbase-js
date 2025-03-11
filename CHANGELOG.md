@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0-beta.3](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2025-03-11)
+
+
+### Features
+
+* copyApp fix-spec updates ([4c10ab4](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4c10ab41464df047402a207c7b9e81026a7b6202))
+* copyApp unit test passes ([b121bf1](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b121bf1d0130f338f131de5417896d798fe90db3))
+* deleteApp fix spec added ([b27ce11](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b27ce11e2b08bc631d7656dedec57f6f5e579450))
+* fix-spec-* for getRelationship interface ([aad9fbd](https://github.com/DrewBradfordXYZ/quickbase-js/commit/aad9fbd7fc92b8aaaef901174c81169543ae86d2))
+* getRelationship unit and integration test pass ([a1269bb](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a1269bb60523944bdf5030404539043c967f0b83))
+* updated Upsert200Response and Upsert207Response, deleteRecords.test.ts integration type issues resolved ([d39dad5](https://github.com/DrewBradfordXYZ/quickbase-js/commit/d39dad55d783d280db9dbae2ca4c782df3a1f12e))
+* usertokens 401s do not generate a toke,createApp unit and integration tests, deleteApp integration tests pass ([e3a092d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/e3a092d76f283d5c5200ddbb5afd32782fc15379))
+
 ## [1.1.0-beta.2](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2025-03-11)
 
 ## [1.1.0-beta.1](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.0...v1.1.0-beta.1) (2025-03-11)
