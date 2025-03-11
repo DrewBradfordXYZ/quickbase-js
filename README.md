@@ -1,5 +1,58 @@
 # quickbase-js
 
+## Example
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quickbase Test</title>
+  </head>
+
+  <body>
+    <div>
+      <h1>Quickbase Test</h1>
+      <p id="result">Loading...</p>
+    </div>
+    <script type="module">
+      import { quickbase } from "quickbase-js";
+      // Initalize the QuickBase client
+      const qb = quickbase({
+        realm: "your-realm", // Replace with actual QuickBase realm
+        // ------------------------------
+        // Authentication Options
+        // ----------------------------
+        // OPTION 1: User Token Authentication
+        // - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
+        // - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase
+        // - Uncomment the line below and replace with your token; comment out 'useTempTokens'
+        // userToken: "your-user-token",
+
+        // ----------------------------
+        // OPTION 2: Temporary Token Authentication
+        // - Use this for QuickBase code pages, leveraging the browser’s authenticated session
+        // - No user token needed; requires running in a QuickBase browser context
+        // - Uncomment the line below and comment out 'userToken' if using this option
+        // useTempTokens: true,
+      });
+
+      // Fetch the app
+      qb.getApp({ appId: "your-app-id" }) // Replace with actual app ID
+        .then((app) => {
+          document.getElementById(
+            "result"
+          ).textContent = `App Name: ${app.name}`;
+        })
+        .catch((err) => {
+          console.error("Error fetching app:", err);
+          document.getElementById("result").textContent =
+            err.message || "Failed to load app";
+        });
+    </script>
+  </body>
+</html>
+```
+
 # Development workflow
 
 ```bash
