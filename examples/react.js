@@ -1,21 +1,46 @@
+import React, { useState, useEffect } from "react";
 import { quickbase } from "quickbase-js";
-import { useEffect, useState } from "react";
 
-const qb = quickbase({
-  realm: "myrealm",
-  userToken: "my-user-token",
-});
-
-function App() {
-  const [app, setApp] = useState < any > null;
+const App: React.FC = () => {
+  const [appName, setAppName] = useState < string > "Loading...";
+  const [error, setError] = (useState < string) | (null > null);
 
   useEffect(() => {
-    qb.getApp({ appId: "my-app-id" })
-      .then((data) => setApp(data))
-      .catch((err) => console.error(err));
-  }, []);
+    // Initialize the QuickBase client
+    const qb = quickbase({
+      realm: "your-realm", // Replace with actual QuickBase realm
+      // ------------------------------
+      // OPTION 1: User Token Authentication
+      // - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
+      // - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase
+      // - Use the line below and replace with your token; comment out 'useTempTokens'
+      // userToken: "your-user-token",
 
-  return <div>{app ? app.name : "Loading..."}</div>;
-}
+      // ------------------------------
+      // OPTION 2: Temporary Token Authentication
+      // - Use this for QuickBase code pages, leveraging the browser’s authenticated session
+      // - No user token needed; requires running in a QuickBase browser context
+      // - Uncomment the line below and comment out 'userToken' if using this option
+      // useTempTokens: true,
+    });
+
+    // Fetch the app
+    qb.getApp({ appId: "your-app-id" }) // Replace with actual app ID
+      .then((app) => {
+        setAppName(app.name);
+      })
+      .catch((err) => {
+        console.error("Error fetching app:", err);
+        setError("Failed to load app");
+      });
+  }, []); // Empty dependency array to run once on mount
+
+  return (
+    <div>
+      <h1>Quickbase Test</h1>
+      {error ? <p>{error}</p> : <p>App Name: {appName}</p>}
+    </div>
+  );
+};
 
 export default App;
