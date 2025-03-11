@@ -1,9 +1,14 @@
 // tests/vitest/qb/records/runQuery.test.ts
 import { describe, it, expect } from "vitest";
 import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
-import { RunQueryRequest, RunQueryResponse } from "@/generated/models";
+import {
+  RunQueryRequest,
+  RunQueryResponse,
+  Upsert200Response,
+  Upsert207Response,
+} from "@/generated/models";
 
-// Define a type for field data with a value property
+// Define a type for field data with a value property (matches generated Record type)
 interface FieldData {
   value: any; // Adjust type based on your needs (e.g., string | number)
 }
@@ -17,18 +22,39 @@ describe("QuickbaseClient Integration - runQuery", () => {
       const client = createClient();
 
       // Upsert a test record to query later
-      const upsertResponse = await client.upsert({
-        body: {
-          to: QB_TABLE_ID_1,
-          data: [
-            {
-              "6": { value: "Test Task " + Date.now() }, // Assuming field 6 is a text field
-            },
-          ],
-          fieldsToReturn: [3, 6], // Record ID# and the text field
-        },
-      });
-      createdRecordId = upsertResponse.metadata.createdRecordIds[0];
+      const upsertResponse: Upsert200Response | Upsert207Response =
+        await client.upsert({
+          body: {
+            to: QB_TABLE_ID_1,
+            data: [
+              {
+                "6": { value: "Test Task " + Date.now() }, // Assuming field 6 is a text field
+              },
+            ],
+            fieldsToReturn: [3, 6], // Record ID# and the text field
+          },
+        });
+
+      // Check metadata and createdRecordIds with null safety
+      expect(
+        upsertResponse.metadata,
+        "Expected metadata to be defined"
+      ).toBeDefined();
+      expect(
+        upsertResponse.metadata?.createdRecordIds,
+        "Expected createdRecordIds to be defined"
+      ).toBeDefined();
+
+      const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
+      if (!createdRecordIds || createdRecordIds.length === 0) {
+        throw new Error("Expected at least one created record ID from upsert");
+      }
+
+      createdRecordId = createdRecordIds[0];
+      expect(
+        createdRecordId,
+        "Expected createdRecordId to be defined"
+      ).toBeDefined();
       console.log("Created test record with ID:", createdRecordId);
 
       // Query the record
@@ -52,21 +78,34 @@ describe("QuickbaseClient Integration - runQuery", () => {
       console.log("Real API response:", response);
 
       // Assertions with safety checks and type assertion
-      expect(response.data).toBeDefined(); // Ensure data exists
-      if (response.data && response.data.length > 0) {
-        expect(response.data).toHaveLength(1);
-        expect((response.data[0]["3"] as FieldData).value).toBe(
-          createdRecordId
-        );
-        expect((response.data[0]["6"] as FieldData).value).toContain(
-          "Test Task"
-        );
-      } else {
+      expect(
+        response.data,
+        "Expected response.data to be defined"
+      ).toBeDefined();
+      if (!response.data || response.data.length === 0) {
         throw new Error(
           "Expected response.data to contain at least one record"
         );
       }
 
+      expect(response.data).toHaveLength(1);
+      const record = response.data[0] as { [key: string]: FieldData };
+      expect(
+        record["3"]?.value,
+        "Expected field 3 to match createdRecordId"
+      ).toBe(createdRecordId);
+      expect(
+        record["6"]?.value,
+        "Expected field 6 to contain 'Test Task'"
+      ).toContain("Test Task");
+
+      expect(
+        response.fields,
+        "Expected response.fields to be defined"
+      ).toBeDefined();
+      if (!response.fields) {
+        throw new Error("Expected response.fields to contain field metadata");
+      }
       expect(response.fields).toContainEqual({
         id: 3,
         label: expect.any(String),
@@ -77,6 +116,14 @@ describe("QuickbaseClient Integration - runQuery", () => {
         label: expect.any(String),
         type: expect.any(String),
       });
+
+      expect(
+        response.metadata,
+        "Expected response.metadata to be defined"
+      ).toBeDefined();
+      if (!response.metadata) {
+        throw new Error("Expected response.metadata to be present");
+      }
       expect(response.metadata).toMatchObject({
         numFields: 2,
         numRecords: 1,
