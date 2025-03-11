@@ -3,9 +3,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Build output
-dist/
-
 # Generated files (optional, depending on versioning preference)
 /src/generated/
 /src/generated-old/
