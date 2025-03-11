@@ -12,7 +12,7 @@
   </div>
   <script type="module">
     import { quickbase } from 'quickbase-js';
-
+    // Initalize the QuickBase client
     const qb = quickbase({
       realm: 'your-realm', // Replace with actual QuickBase realm
       // ------------------------------
@@ -32,6 +32,7 @@
       // useTempTokens: true,
     });
 
+    // Fetch the app
     qb.getApp({ appId: 'your-app-id' }) // Replace with actual app ID
       .then((app) => {
         document.getElementById('result').textContent = `App Name: ${app.name}`;
