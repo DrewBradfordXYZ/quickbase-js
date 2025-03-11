@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { quickbase } from "quickbase-js";
 
-const App: React.FC = () => {
+const App = () => {
   const [appName, setAppName] = useState < string > "Loading...";
   const [error, setError] = (useState < string) | (null > null);
 
