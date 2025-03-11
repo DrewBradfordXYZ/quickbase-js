@@ -12,24 +12,24 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "src/code-generation",
+  "src/code-generation",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  "tests",
+  // "tests",
 ];
 
 // prettier-ignore
 const includeFiles: string[] = [
-  // "package.json",
-  // "tsconfig.json",
-  // "rollup.config.js",
-  // "vitest.config.ts",
-  // "src/utils.ts",
-  // "src/tokenCache.ts",
-  // "src/generated-unified/QuickbaseClient.ts",
-  // "src/quickbaseClient.ts",
+  "package.json",
+  "tsconfig.json",
+  "rollup.config.js",
+  "vitest.config.ts",
+  "src/utils.ts",
+  "src/tokenCache.ts",
+  "src/generated-unified/QuickbaseClient.ts",
+  "src/quickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [

@@ -1,4 +1,4 @@
-// Generated on 2025-03-11T14:12:45.650Z
+// Generated on 2025-03-11T19:28:08.891Z
 import { App, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {

@@ -308,9 +308,18 @@ export const definitions = {
       type: "object",
       properties: {
         value: {
-          type: ["string", "number", "boolean", "object", "array", "null"],
+          anyOf: [
+            { type: "string" },
+            { type: "number" },
+            { type: "boolean" },
+            { type: "object" },
+            { type: "array" },
+            { type: "null" },
+          ],
+          description: "The value of the field.",
         },
       },
+      required: ["value"],
       description: "The value object for a field ID key.",
     },
     description:
@@ -346,7 +355,20 @@ export const definitions = {
           type: "object",
           additionalProperties: {
             type: "object",
-            properties: { value: { type: "any" } },
+            properties: {
+              value: {
+                anyOf: [
+                  { type: "string" },
+                  { type: "number" },
+                  { type: "boolean" },
+                  { type: "object" },
+                  { type: "array" },
+                  { type: "null" },
+                ],
+                description: "The value of the field.",
+              },
+            },
+            required: ["value"],
           },
         },
         description: "Array of upserted records with field IDs and values.",
@@ -387,7 +409,20 @@ export const definitions = {
           type: "object",
           additionalProperties: {
             type: "object",
-            properties: { value: { type: "any" } },
+            properties: {
+              value: {
+                anyOf: [
+                  { type: "string" },
+                  { type: "number" },
+                  { type: "boolean" },
+                  { type: "object" },
+                  { type: "array" },
+                  { type: "null" },
+                ],
+                description: "The value of the field.",
+              },
+            },
+            required: ["value"],
           },
         },
         description: "Array of successfully upserted records (may be empty).",

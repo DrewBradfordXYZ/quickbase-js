@@ -1,6 +1,10 @@
 // tests/vitest/qb/records/deleteRecords.test.ts
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { quickbase } from "@/quickbaseClient.ts";
+import {
+  Upsert200Response,
+  Upsert207Response,
+} from "/home/drew/Projects/quickbase-js/src/generated/models";
 
 const TABLE_ID = "buwai2zws";
 const UNIQUE_FIELD_ID = 3; // Record ID field
@@ -40,16 +44,44 @@ describe("QuickbaseClient - DeleteRecords Integration", () => {
   test(
     "deletes a newly upserted record",
     async () => {
-      const upsertResponse = await qb.upsert({
-        body: {
-          to: TABLE_ID,
-          data: [{ [MARKER_FIELD_ID]: { value: "test-marker-delete" } }],
-          fieldsToReturn: [UNIQUE_FIELD_ID], // Return record ID
-        },
-      });
-      const recordId = upsertResponse.metadata.createdRecordIds[0];
-      expect(recordId).toBeDefined();
-      expect(upsertResponse.data[0][UNIQUE_FIELD_ID].value).toBe(recordId);
+      const upsertResponse: Upsert200Response | Upsert207Response =
+        await qb.upsert({
+          body: {
+            to: TABLE_ID,
+            data: [{ [MARKER_FIELD_ID]: { value: "test-marker-delete" } }],
+            fieldsToReturn: [UNIQUE_FIELD_ID], // Return record ID
+          },
+        });
+
+      // Check metadata and createdRecordIds
+      expect(
+        upsertResponse.metadata,
+        "Expected metadata to be defined"
+      ).toBeDefined();
+      expect(
+        upsertResponse.metadata?.createdRecordIds,
+        "Expected createdRecordIds to be defined"
+      ).toBeDefined();
+
+      const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
+      if (!createdRecordIds || createdRecordIds.length === 0) {
+        throw new Error("Expected at least one created record ID");
+      }
+
+      const recordId = createdRecordIds[0];
+      expect(recordId, "Expected recordId to be defined").toBeDefined();
+
+      // Check data
+      expect(upsertResponse.data, "Expected data to be defined").toBeDefined();
+      if (!upsertResponse.data || upsertResponse.data.length === 0) {
+        throw new Error("Expected at least one data entry");
+      }
+
+      const recordData = upsertResponse.data[0];
+      expect(
+        recordData[UNIQUE_FIELD_ID]?.value,
+        "Expected record ID in data to match created record ID"
+      ).toBe(recordId);
 
       const deleteResponse = await qb.deleteRecords({
         body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },

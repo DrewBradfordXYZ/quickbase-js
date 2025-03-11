@@ -7731,16 +7731,32 @@
         "type": "object",
         "properties": {
           "value": {
-            "type": [
-              "string",
-              "number",
-              "boolean",
-              "object",
-              "array",
-              "null"
-            ]
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "object"
+              },
+              {
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The value of the field."
           }
         },
+        "required": [
+          "value"
+        ],
         "description": "The value object for a field ID key."
       },
       "description": "A record with field ID keys (e.g., '6') and value objects (e.g., { value: 'data' })."
@@ -7786,9 +7802,32 @@
               "type": "object",
               "properties": {
                 "value": {
-                  "type": "any"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The value of the field."
                 }
-              }
+              },
+              "required": [
+                "value"
+              ]
             }
           },
           "description": "Array of upserted records with field IDs and values."
@@ -7839,9 +7878,32 @@
               "type": "object",
               "properties": {
                 "value": {
-                  "type": "any"
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The value of the field."
                 }
-              }
+              },
+              "required": [
+                "value"
+              ]
             }
           },
           "description": "Array of successfully upserted records (may be empty)."
