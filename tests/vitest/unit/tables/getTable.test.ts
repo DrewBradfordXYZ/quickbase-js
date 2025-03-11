@@ -1,7 +1,15 @@
+// tests/vitest/unit/records/getTable.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createClient, mockFetch } from "@tests/setup.ts";
+import {
+  createClient,
+  mockFetch,
+  QB_APP_ID,
+  QB_TABLE_ID_1,
+  QB_REALM,
+  QB_USER_TOKEN,
+} from "@tests/setup.ts";
 
-describe("QuickbaseClient - getTable (Unit)", () => {
+describe("QuickbaseClient Unit - getTable", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -10,10 +18,8 @@ describe("QuickbaseClient - getTable (Unit)", () => {
   });
 
   it("calls getTable successfully with user token", async () => {
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "buwai2zr4";
     const mockResponse = {
-      id: mockTableId,
+      id: QB_TABLE_ID_1,
       name: "Root",
       alias: "_DBID_ROOT",
       description: "",
@@ -38,17 +44,17 @@ describe("QuickbaseClient - getTable (Unit)", () => {
     });
 
     const response = await client.getTable({
-      tableId: mockTableId,
-      appId: mockAppId,
+      tableId: QB_TABLE_ID_1,
+      appId: QB_APP_ID,
     });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${mockTableId}?appId=${mockAppId}`,
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization:
-            "QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
         }),
       })
     );
@@ -56,10 +62,9 @@ describe("QuickbaseClient - getTable (Unit)", () => {
 
   it("calls getTable successfully with temp token", async () => {
     client = createClient(mockFetch, { debug: true, useTempTokens: true });
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "buwai2zr4";
+
     const mockResponse = {
-      id: mockTableId,
+      id: QB_TABLE_ID_1,
       name: "Root",
       alias: "_DBID_ROOT",
       description: "",
@@ -90,19 +95,20 @@ describe("QuickbaseClient - getTable (Unit)", () => {
       });
 
     const response = await client.getTable({
-      tableId: mockTableId,
-      appId: mockAppId,
+      tableId: QB_TABLE_ID_1,
+      appId: QB_APP_ID,
     });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/auth/temporary/${mockTableId}`,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
       expect.any(Object)
     );
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${mockTableId}?appId=${mockAppId}`,
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
       expect.objectContaining({
         headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp_token",
         }),
       })
@@ -111,10 +117,9 @@ describe("QuickbaseClient - getTable (Unit)", () => {
 
   it("retries successfully after 401 with temp token", async () => {
     client = createClient(mockFetch, { debug: true, useTempTokens: true });
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "buwai2zr4";
+
     const mockResponse = {
-      id: mockTableId,
+      id: QB_TABLE_ID_1,
       name: "Root",
       alias: "_DBID_ROOT",
       description: "",
@@ -156,17 +161,23 @@ describe("QuickbaseClient - getTable (Unit)", () => {
       });
 
     const response = await client.getTable({
-      tableId: mockTableId,
-      appId: mockAppId,
+      tableId: QB_TABLE_ID_1,
+      appId: QB_APP_ID,
     });
     expect(response).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledTimes(4); // Initial token, 401, retry token, success
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN new_token",
+        }),
+      })
+    );
   });
 
   it("handles 401 with failed temp token retry", async () => {
     client = createClient(mockFetch, { debug: true, useTempTokens: true });
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "buwai2zr4";
 
     mockFetch
       .mockResolvedValueOnce({
@@ -188,7 +199,7 @@ describe("QuickbaseClient - getTable (Unit)", () => {
       });
 
     await expect(
-      client.getTable({ tableId: mockTableId, appId: mockAppId })
+      client.getTable({ tableId: QB_TABLE_ID_1, appId: QB_APP_ID })
     ).rejects.toThrow(
       "API Error: Unauthorized in fetchTempToken (Status: 401)"
     );
@@ -196,9 +207,6 @@ describe("QuickbaseClient - getTable (Unit)", () => {
   });
 
   it("handles 404 Not Found", async () => {
-    const mockAppId = "buwai2zpe";
-    const mockTableId = "invalidTableId";
-
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
@@ -206,7 +214,17 @@ describe("QuickbaseClient - getTable (Unit)", () => {
     });
 
     await expect(
-      client.getTable({ tableId: mockTableId, appId: mockAppId })
+      client.getTable({ tableId: QB_TABLE_ID_1, appId: QB_APP_ID })
     ).rejects.toThrow("API Error: Table not found (Status: 404)");
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.quickbase.com/v1/tables/${QB_TABLE_ID_1}?appId=${QB_APP_ID}`,
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+        }),
+      })
+    );
   });
 });
