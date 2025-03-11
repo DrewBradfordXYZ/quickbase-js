@@ -280,34 +280,21 @@ export const paths = {
   },
   "/records/query": {
     post: {
-      operationId: "upsertRecords",
-      summary: "Upsert records (alternative endpoint)",
+      operationId: "runQuery",
+      summary: "Query records in a table",
       tags: ["Records"],
       parameters: [
         {
-          name: "generated",
+          name: "body",
           in: "body",
           required: true,
-          schema: {
-            type: "array",
-            items: { $ref: "#/definitions/Record" },
-          },
+          schema: { $ref: "#/definitions/RunQueryRequest" },
         },
       ],
       responses: {
         200: {
-          description: "Success",
-          schema: {
-            type: "array",
-            items: { $ref: "#/definitions/Upsert200Response" },
-          },
-        },
-        207: {
-          description: "Multi-Status (partial success)",
-          schema: {
-            type: "array",
-            items: { $ref: "#/definitions/Upsert207Response" },
-          },
+          description: "Success - records returned",
+          schema: { $ref: "#/definitions/RunQueryResponse" },
         },
       },
     },

@@ -79,10 +79,7 @@ export const definitions = {
         type: "string",
         description: "The unique identifier for this application.",
       },
-      name: {
-        type: "string",
-        description: "The app name.",
-      },
+      name: { type: "string", description: "The app name." },
       description: {
         type: "string",
         description: "The description for the app.",
@@ -197,10 +194,7 @@ export const definitions = {
         type: "string",
         description: "The unique identifier (dbid) of the table.",
       },
-      name: {
-        type: "string",
-        description: "The name of the table.",
-      },
+      name: { type: "string", description: "The name of the table." },
       alias: {
         type: "string",
         description: "The automatically-created table alias for the table.",
@@ -275,10 +269,7 @@ export const definitions = {
   UpdateTableRequest: {
     type: "object",
     properties: {
-      name: {
-        type: "string",
-        description: "The new name for the table.",
-      },
+      name: { type: "string", description: "The new name for the table." },
       singleRecordName: {
         type: "string",
         description:
@@ -301,10 +292,7 @@ export const definitions = {
   DeleteTableResponse: {
     type: "object",
     properties: {
-      deletedTableId: {
-        type: "string",
-        description: "The deleted table id.",
-      },
+      deletedTableId: { type: "string", description: "The deleted table id." },
     },
   },
   Record: {
@@ -358,9 +346,7 @@ export const definitions = {
           type: "object",
           additionalProperties: {
             type: "object",
-            properties: {
-              value: { type: "any" },
-            },
+            properties: { value: { type: "any" } },
           },
         },
         description: "Array of upserted records with field IDs and values.",
@@ -401,9 +387,7 @@ export const definitions = {
           type: "object",
           additionalProperties: {
             type: "object",
-            properties: {
-              value: { type: "any" },
-            },
+            properties: { value: { type: "any" } },
           },
         },
         description: "Array of successfully upserted records (may be empty).",
@@ -411,29 +395,15 @@ export const definitions = {
       metadata: {
         type: "object",
         properties: {
-          createdRecordIds: {
-            type: "array",
-            items: { type: "integer" },
-          },
-          updatedRecordIds: {
-            type: "array",
-            items: { type: "integer" },
-          },
-          unchangedRecordIds: {
-            type: "array",
-            items: { type: "integer" },
-          },
+          createdRecordIds: { type: "array", items: { type: "integer" } },
+          updatedRecordIds: { type: "array", items: { type: "integer" } },
+          unchangedRecordIds: { type: "array", items: { type: "integer" } },
           lineErrors: {
             type: "object",
-            additionalProperties: {
-              type: "array",
-              items: { type: "string" },
-            },
+            additionalProperties: { type: "array", items: { type: "string" } },
             description: "Errors by line number (1-based index).",
           },
-          totalNumberOfRecordsProcessed: {
-            type: "integer",
-          },
+          totalNumberOfRecordsProcessed: { type: "integer" },
         },
         required: ["totalNumberOfRecordsProcessed"],
       },
@@ -481,5 +451,93 @@ export const definitions = {
     },
     required: ["numberDeleted"],
     description: "Response body for successful deletion of records.",
+  },
+  RunQueryRequest: {
+    type: "object",
+    required: ["from"],
+    properties: {
+      from: { type: "string", description: "Table ID (dbid)" },
+      select: {
+        type: "array",
+        items: { type: "integer" },
+        description: "Field IDs to return",
+      },
+      where: { type: "string", description: "Query string" },
+      sortBy: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            fieldId: { type: "integer" },
+            order: { type: "string", enum: ["ASC", "DESC"] },
+          },
+        },
+        description: "Sort criteria",
+      },
+      groupBy: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            fieldId: { type: "integer" },
+            grouping: { type: "string", enum: ["equal-values"] },
+          },
+        },
+        description: "Grouping criteria",
+      },
+      options: {
+        type: "object",
+        properties: {
+          skip: { type: "integer", description: "Number of records to skip" },
+          top: {
+            type: "integer",
+            description: "Max number of records to return",
+          },
+          compareWithAppLocalTime: {
+            type: "boolean",
+            description: "Compare times with app local time",
+          },
+        },
+      },
+    },
+  },
+  RunQueryResponse: {
+    type: "object",
+    properties: {
+      data: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: {
+            type: "object",
+            properties: { value: { type: "any" } },
+          },
+        },
+        description: "Array of record data with field IDs as keys",
+      },
+      fields: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            label: { type: "string" },
+            type: { type: "string" },
+          },
+        },
+        description: "Field metadata",
+      },
+      metadata: {
+        type: "object",
+        properties: {
+          numFields: { type: "integer" },
+          numRecords: { type: "integer" },
+          skip: { type: "integer" },
+          top: { type: "integer" },
+          totalRecords: { type: "integer" },
+        },
+        description: "Query metadata",
+      },
+    },
   },
 };

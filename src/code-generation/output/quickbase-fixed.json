@@ -4095,41 +4095,26 @@
     },
     "/records/query": {
       "post": {
-        "operationId": "upsertRecords",
-        "summary": "Upsert records (alternative endpoint)",
+        "operationId": "runQuery",
+        "summary": "Query records in a table",
         "tags": [
           "Records"
         ],
         "parameters": [
           {
-            "name": "generated",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Record"
-              }
+              "$ref": "#/definitions/RunQueryRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Success - records returned",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Upsert200Response"
-              }
-            }
-          },
-          "207": {
-            "description": "Multi-Status (partial success)",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Upsert207Response"
-              }
+              "$ref": "#/definitions/RunQueryResponse"
             }
           }
         }
@@ -7954,6 +7939,142 @@
         "numberDeleted"
       ],
       "description": "Response body for successful deletion of records."
+    },
+    "RunQueryRequest": {
+      "type": "object",
+      "required": [
+        "from"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "Table ID (dbid)"
+        },
+        "select": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Field IDs to return"
+        },
+        "where": {
+          "type": "string",
+          "description": "Query string"
+        },
+        "sortBy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fieldId": {
+                "type": "integer"
+              },
+              "order": {
+                "type": "string",
+                "enum": [
+                  "ASC",
+                  "DESC"
+                ]
+              }
+            }
+          },
+          "description": "Sort criteria"
+        },
+        "groupBy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fieldId": {
+                "type": "integer"
+              },
+              "grouping": {
+                "type": "string",
+                "enum": [
+                  "equal-values"
+                ]
+              }
+            }
+          },
+          "description": "Grouping criteria"
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "skip": {
+              "type": "integer",
+              "description": "Number of records to skip"
+            },
+            "top": {
+              "type": "integer",
+              "description": "Max number of records to return"
+            },
+            "compareWithAppLocalTime": {
+              "type": "boolean",
+              "description": "Compare times with app local time"
+            }
+          }
+        }
+      }
+    },
+    "RunQueryResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "any"
+                }
+              }
+            }
+          },
+          "description": "Array of record data with field IDs as keys"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "description": "Field metadata"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "numFields": {
+              "type": "integer"
+            },
+            "numRecords": {
+              "type": "integer"
+            },
+            "skip": {
+              "type": "integer"
+            },
+            "top": {
+              "type": "integer"
+            },
+            "totalRecords": {
+              "type": "integer"
+            }
+          },
+          "description": "Query metadata"
+        }
+      }
     }
   }
 }

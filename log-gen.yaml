@@ -1,5 +1,5 @@
 project: quickbase-js
-date: 3/10/2025
+date: 3/11/2025
 root: /home/drew/Projects/quickbase-js
 goals:
   - A library for interacting with the QuickBase RESTful API.
@@ -286,184 +286,6 @@ tree:
                 - name: Upsert207ResponseMetadata.ts
                   type: file
                 - name: UpsertRequest.ts
-                  type: file
-                - name: index.ts
-                  type: file
-            - name: runtime.ts
-              type: file
-        - name: generated-old
-          type: directory
-          children:
-            - name: .openapi-generator
-              type: directory
-              children:
-                - name: FILES
-                  type: file
-                - name: VERSION
-                  type: file
-            - name: .openapi-generator-ignore
-              type: file
-            - name: apis
-              type: directory
-              children:
-                - name: AppsApi.ts
-                  type: file
-                - name: AuditApi.ts
-                  type: file
-                - name: AuthApi.ts
-                  type: file
-                - name: DocumentTemplatesApi.ts
-                  type: file
-                - name: FieldsApi.ts
-                  type: file
-                - name: FilesApi.ts
-                  type: file
-                - name: FormulasApi.ts
-                  type: file
-                - name: PlatformAnalyticsApi.ts
-                  type: file
-                - name: RecordsApi.ts
-                  type: file
-                - name: ReportsApi.ts
-                  type: file
-                - name: SolutionsApi.ts
-                  type: file
-                - name: TablesApi.ts
-                  type: file
-                - name: UserTokenApi.ts
-                  type: file
-                - name: UsersApi.ts
-                  type: file
-                - name: index.ts
-                  type: file
-            - name: index.ts
-              type: file
-            - name: models
-              type: directory
-              children:
-                - name: AddMembersToGroup200Response.ts
-                  type: file
-                - name: AddSubgroupsToGroup200Response.ts
-                  type: file
-                - name: App.ts
-                  type: file
-                - name: AppMemoryInfo.ts
-                  type: file
-                - name: AppSecurityProperties.ts
-                  type: file
-                - name: Audit200Response.ts
-                  type: file
-                - name: Audit202Response.ts
-                  type: file
-                - name: AuditRequest.ts
-                  type: file
-                - name: CloneUserToken200Response.ts
-                  type: file
-                - name: CloneUserTokenRequest.ts
-                  type: file
-                - name: CopyApp200Response.ts
-                  type: file
-                - name: CopyAppRequest.ts
-                  type: file
-                - name: CreateApp200Response.ts
-                  type: file
-                - name: CreateAppRequest.ts
-                  type: file
-                - name: CreateField200Response.ts
-                  type: file
-                - name: CreateRelationship200Response.ts
-                  type: file
-                - name: CreateRelationshipRequest.ts
-                  type: file
-                - name: DeactivateUserToken200Response.ts
-                  type: file
-                - name: DeleteApp200Response.ts
-                  type: file
-                - name: DeleteAppRequest.ts
-                  type: file
-                - name: DeleteFields200Response.ts
-                  type: file
-                - name: DeleteFile200Response.ts
-                  type: file
-                - name: DeleteRelationship200Response.ts
-                  type: file
-                - name: DenyUsers200Response.ts
-                  type: file
-                - name: ExchangeSsoToken200Response.ts
-                  type: file
-                - name: ExchangeSsoTokenRequest.ts
-                  type: file
-                - name: Field.ts
-                  type: file
-                - name: FieldPermissionsInner.ts
-                  type: file
-                - name: FieldProperties.ts
-                  type: file
-                - name: GenerateDocument200Response.ts
-                  type: file
-                - name: GetField200Response.ts
-                  type: file
-                - name: GetRelationships200Response.ts
-                  type: file
-                - name: GetReport200Response.ts
-                  type: file
-                - name: GetTempTokenDBID200Response.ts
-                  type: file
-                - name: GetUsers200Response.ts
-                  type: file
-                - name: GetUsersRequest.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200Response.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseMetadata.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseResultsInner.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseTotals.ts
-                  type: file
-                - name: PlatformAnalyticEventSummaries200ResponseWhereInner.ts
-                  type: file
-                - name: PlatformAnalyticEventSummariesRequest.ts
-                  type: file
-                - name: PlatformAnalyticEventSummariesRequestWhereInner.ts
-                  type: file
-                - name: PlatformAnalyticReads200Response.ts
-                  type: file
-                - name: RemoveMembersFromGroup200Response.ts
-                  type: file
-                - name: RemoveSubgroupsFromGroup200Response.ts
-                  type: file
-                - name: RunFormula200Response.ts
-                  type: file
-                - name: RunFormulaRequest.ts
-                  type: file
-                - name: RunQuery200Response.ts
-                  type: file
-                - name: RunQueryRequest.ts
-                  type: file
-                - name: RunReport200Response.ts
-                  type: file
-                - name: Table.ts
-                  type: file
-                - name: TransferUserToken200Response.ts
-                  type: file
-                - name: TransferUserTokenRequest.ts
-                  type: file
-                - name: UndenyUsers200Response.ts
-                  type: file
-                - name: UpdateApp200Response.ts
-                  type: file
-                - name: UpdateAppRequest.ts
-                  type: file
-                - name: UpdateFieldRequest.ts
-                  type: file
-                - name: UpdateRelationshipRequest.ts
-                  type: file
-                - name: Upsert200Response.ts
                   type: file
                 - name: index.ts
                   type: file
@@ -1901,36 +1723,157 @@ tree:
                       type: file
                       contents: |
                         // tests/vitest/qb/records/deleteRecords.test.ts
-                        import { describe, test, expect } from "vitest";
+                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
                         import { quickbase } from "@/quickbaseClient.ts";
 
-                        // Temporarily skip this suite due to timeout issues possibly related to upsert
-                        describe.skip("deleteRecords", () => {
+                        const TABLE_ID = "buwai2zws";
+                        const UNIQUE_FIELD_ID = 3; // Record ID field
+                        const MARKER_FIELD_ID = 6; // Text field for marking test records
+
+                        describe("QuickbaseClient - DeleteRecords Integration", () => {
                           const qb = quickbase({
                             realm: "builderprogram-dbradford6815",
                             userToken: process.env.QB_USER_TOKEN,
                             debug: true,
                           });
 
-                          test("deletes records matching query", async () => {
-                            const upsertResponse = await qb.upsert({
-                              body: { to: "buwai2zws", data: [{}] },
-                            });
-                            const recordId = upsertResponse.metadata.createdRecordIds[0];
-
-                            const deleteResponse = await qb.deleteRecords({
-                              body: { from: "buwai2zws", where: `{3.EX.${recordId}}` },
-                            });
-
-                            expect(deleteResponse).toEqual({ numberDeleted: 1 });
+                          beforeEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
+                                },
+                              });
+                            } catch (e) {
+                              // Ignore if no records exist
+                            }
                           });
 
-                          test("handles empty result", async () => {
-                            const response = await qb.deleteRecords({
-                              body: { from: "buwai2zws", where: "{3.EX.'999999'}" },
-                            });
-                            expect(response).toEqual({ numberDeleted: 0 });
+                          afterEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
+                                },
+                              });
+                            } catch (e) {}
                           });
+
+                          test(
+                            "deletes a newly upserted record",
+                            async () => {
+                              const upsertResponse = await qb.upsert({
+                                body: {
+                                  to: TABLE_ID,
+                                  data: [{ [MARKER_FIELD_ID]: { value: "test-marker-delete" } }],
+                                  fieldsToReturn: [UNIQUE_FIELD_ID], // Return record ID
+                                },
+                              });
+                              const recordId = upsertResponse.metadata.createdRecordIds[0];
+                              expect(recordId).toBeDefined();
+                              expect(upsertResponse.data[0][UNIQUE_FIELD_ID].value).toBe(recordId);
+
+                              const deleteResponse = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
+                              });
+
+                              expect(deleteResponse).toEqual({ numberDeleted: 1 });
+
+                              const checkResponse = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
+                              });
+                              expect(checkResponse.numberDeleted).toBe(0);
+                            },
+                            { timeout: 10000 }
+                          );
+
+                          test(
+                            "handles empty result when no records match",
+                            async () => {
+                              const response = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: "{3.EX.'999999'}" },
+                              });
+                              expect(response).toEqual({ numberDeleted: 0 });
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
+                    - name: upsert.test.ts
+                      type: file
+                      contents: |
+                        // tests/vitest/qb/records/upsert.test.ts
+                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
+                        import { quickbase } from "@/quickbaseClient.ts";
+
+                        const TABLE_ID = "buwai2zws";
+                        const MARKER_FIELD_ID = 6; // Text field for marking test records
+
+                        describe("QuickbaseClient - Upsert Integration", () => {
+                          const qb = quickbase({
+                            realm: "builderprogram-dbradford6815",
+                            userToken: process.env.QB_USER_TOKEN,
+                            debug: true,
+                          });
+
+                          beforeEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
+                                },
+                              });
+                            } catch (e) {
+                              // Ignore if no records exist
+                            }
+                          });
+
+                          afterEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
+                                },
+                              });
+                            } catch (e) {}
+                          });
+
+                          test(
+                            "creates a new record successfully",
+                            async () => {
+                              const response = await qb.upsert({
+                                body: {
+                                  to: TABLE_ID,
+                                  data: [{ [MARKER_FIELD_ID]: { value: "test-marker-upsert" } }],
+                                  fieldsToReturn: [MARKER_FIELD_ID, 3], // Return marker and record ID
+                                },
+                              });
+
+                              expect(response.metadata.createdRecordIds.length).toBe(1);
+                              expect(response.data).toHaveLength(1);
+                              expect(response.data[0][MARKER_FIELD_ID].value).toBe(
+                                "test-marker-upsert"
+                              );
+                              expect(response.data[0][3].value).toBeDefined(); // Record ID assigned by QuickBase
+                              expect(response.metadata.totalNumberOfRecordsProcessed).toBe(1);
+                            },
+                            { timeout: 10000 }
+                          );
+
+                          test(
+                            "handles empty data gracefully",
+                            async () => {
+                              await expect(
+                                qb.upsert({
+                                  body: { to: TABLE_ID, data: [] },
+                                })
+                              ).rejects.toThrow("API Error: Bad Request (Status: 400)");
+                            },
+                            { timeout: 10000 }
+                          );
                         });
                 - name: tables
                   type: directory
@@ -2831,6 +2774,7 @@ tree:
                         import { createClient, mockFetch } from "@tests/setup.ts";
                         import { vi } from "vitest";
 
+                        // Note: Type augmentation moved to src/types.d.ts
                         describe("QuickbaseClient - upsert (Unit)", () => {
                           beforeEach(() => {
                             vi.resetModules(); // Reset module cache
@@ -2961,7 +2905,7 @@ tree:
                             const result = await qb.upsert({
                               body: { to: "test-table-id", data: [{ "7": { value: "value2" } }] },
                               dbid: "test-dbid",
-                            });
+                            } as any); // Temporary type assertion until types.d.ts is applied
 
                             expect(mockFetch).toHaveBeenCalledTimes(2);
                             expect(mockFetch).toHaveBeenNthCalledWith(
@@ -3046,7 +2990,11 @@ tree:
                               })
                             );
 
-                            expect(result.data[0]["6"].value).toBe("value1");
+                            if (result.data && result.data.length > 0) {
+                              expect((result.data[0]["6"] as { value: any }).value).toBe("value1");
+                            } else {
+                              throw new Error("Expected data array to have at least one element");
+                            }
                           });
                         });
                 - name: tables

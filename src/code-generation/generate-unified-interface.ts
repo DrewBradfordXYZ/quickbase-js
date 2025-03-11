@@ -48,20 +48,15 @@ function generateInterface() {
         })
         .map((p) => {
           const param = p as OpenAPIV2.ParameterObject;
-          let type = param.type
+          const type = param.type
             ? mapOpenApiTypeToTs(param.type)
             : param.schema
             ? mapRefToType(param.schema, modelImports)
             : "any";
-          // Special handling for upsertRecords 'generated' parameter
-          if (opId === "upsertRecords" && param.name === "generated") {
-            type = "{ [key: string]: string }[]";
-          }
           return `${param.name}${param.required ? "" : "?"}: ${type}`;
         })
         .join("; ");
 
-      // Handle responses, ensuring distinct types for 200 and 207
       const successResponses = ["200", "207"]
         .map((code) => ({
           code,
@@ -73,7 +68,6 @@ function generateInterface() {
       const returnTypes = successResponses.map(({ response }) =>
         mapRefToType(response!.schema, modelImports)
       );
-      // Deduplicate return types and join with " | ", default to "void" if empty
       const uniqueReturnTypes = [...new Set(returnTypes)];
       const returnType =
         uniqueReturnTypes.length > 0 ? uniqueReturnTypes.join(" | ") : "void";
@@ -84,7 +78,6 @@ function generateInterface() {
     }
   }
 
-  // Generate import statements for all model types
   const importStatement =
     modelImports.size > 0
       ? `import { ${Array.from(modelImports)

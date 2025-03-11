@@ -1,5 +1,5 @@
-// Generated on 2025-03-11T02:50:18.896Z
-import { App, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetTempTokenDBID200Response, Record, ReportRunResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-11T14:12:45.650Z
+import { App, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   createApp: (params: { body: CreateAppRequest }) => Promise<CreateApp200Response>;
@@ -26,7 +26,7 @@ export interface QuickbaseClient {
   runFormula: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
   upsert: (params: { body: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;
   deleteRecords: (params: { body: DeleteRecordsRequest }) => Promise<DeleteRecords200Response>;
-  upsertRecords: (params: { generated: { [key: string]: string }[] }) => Promise<Upsert200Response[] | Upsert207Response[]>;
+  runQuery: (params: { body: RunQueryRequest }) => Promise<RunQueryResponse>;
   getTempTokenDBID: (params: { dbid: string }) => Promise<GetTempTokenDBID200Response>;
   exchangeSsoToken: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
   cloneUserToken: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
