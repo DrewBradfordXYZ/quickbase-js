@@ -19,7 +19,7 @@ const includeFolders: string[] = [
 const includeRecursiveFolders: string[] = [
   // "tests",
   "tests/vitest/unit",
-  "tests/vitest/qb"
+  // "tests/vitest/qb"
 ];
 
 // prettier-ignore
@@ -30,8 +30,8 @@ const includeFiles: string[] = [
   // "vitest.config.ts",
   // "src/utils.ts",
   // "src/tokenCache.ts",
-  // "src/generated-unified/QuickbaseClient.ts",
-  // "src/quickbaseClient.ts",
+  "src/generated-unified/QuickbaseClient.ts",
+  "src/quickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [

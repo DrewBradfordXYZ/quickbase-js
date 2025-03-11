@@ -43,6 +43,34 @@ export const paths = {
       },
     },
   },
+  "/apps/{appId}/copy": {
+    post: {
+      operationId: "copyApp",
+      summary: "Copy an existing application",
+      tags: ["Apps"],
+      parameters: [
+        {
+          name: "appId",
+          in: "path",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the app to copy.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/CopyAppRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - application copied",
+          schema: { $ref: "#/definitions/CopyApp200Response" },
+        },
+      },
+    },
+  },
   "/fields": {
     get: {
       operationId: "getFields",

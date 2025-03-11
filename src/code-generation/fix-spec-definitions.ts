@@ -575,7 +575,6 @@ export const definitions = {
       },
     },
   },
-  // New definitions for getRelationships
   GetRelationships200Response: {
     type: "object",
     properties: {
@@ -671,5 +670,114 @@ export const definitions = {
     required: ["id", "label", "type"],
     description:
       "A field involved in a relationship (foreign key, lookup, or summary).",
+  },
+  CopyAppRequest: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        description: "The name of the newly copied app.",
+      },
+      description: {
+        type: "string",
+        description: "The description of the newly copied app.",
+      },
+      properties: {
+        type: "object",
+        properties: {
+          keepData: {
+            type: "boolean",
+            description:
+              "Whether to copy the app's data along with the schema.",
+          },
+          excludeFiles: {
+            type: "boolean",
+            description:
+              "If keepData is true, whether to copy file attachments. Ignored if keepData is false.",
+          },
+          usersAndRoles: {
+            type: "boolean",
+            description:
+              "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned.",
+          },
+          assignUserToken: {
+            type: "boolean",
+            description:
+              "Whether to add the user token used to make this request to the new app.",
+          },
+        },
+        description:
+          "The configuration properties for performing the app copy.",
+      },
+    },
+    description: "Request body for copying an existing application.",
+  },
+  CopyApp200Response: {
+    type: "object",
+    required: ["id", "name"],
+    properties: {
+      id: {
+        type: "string",
+        description: "The unique identifier for the copied application.",
+      },
+      name: {
+        type: "string",
+        description:
+          "The app name. Multiple apps with the same name are allowed in the same realm.",
+      },
+      description: {
+        type: "string",
+        description: "The description for the app.",
+      },
+      created: {
+        type: "string",
+        format: "date-time",
+        description: "The time and date the app was created (ISO 8601, UTC).",
+      },
+      updated: {
+        type: "string",
+        format: "date-time",
+        description:
+          "The time and date the app was last updated (ISO 8601, UTC).",
+      },
+      dateFormat: {
+        type: "string",
+        description:
+          "The format used for displaying dates in the app (e.g., MM-DD-YYYY).",
+      },
+      timeZone: {
+        type: "string",
+        description:
+          "The time zone used for displaying time values (e.g., (UTC-08:00) Pacific Time).",
+      },
+      hasEveryoneOnTheInternet: {
+        type: "boolean",
+        description:
+          "Indicates if the app includes Everyone On The Internet access.",
+      },
+      variables: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            value: { type: "string" },
+          },
+          required: ["name", "value"],
+        },
+        description: "The app variables.",
+      },
+      ancestorId: {
+        type: "string",
+        description: "The id of the app from which this app was copied.",
+      },
+      dataClassification: {
+        type: "string",
+        description:
+          "The Data Classification label assigned to the app (optional, may be 'None').",
+      },
+    },
+    description: "Response body for successful app copy operation.",
   },
 };

@@ -183,6 +183,8 @@ tree:
                   type: file
                 - name: CopyAppRequest.ts
                   type: file
+                - name: CopyAppRequestProperties.ts
+                  type: file
                 - name: CreateApp200Response.ts
                   type: file
                 - name: CreateAppRequest.ts
@@ -322,6 +324,67 @@ tree:
           children:
             - name: QuickbaseClient.ts
               type: file
+              contents: |
+                // Generated on 2025-03-11T21:24:23.349Z
+                import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+
+                export interface QuickbaseClient {
+                  createApp: (params: { body: CreateAppRequest }) => Promise<CreateApp200Response>;
+                  getApp: (params: { appId: string }) => Promise<App>;
+                  getAppEvents: (params: { appId: string }) => Promise<any[]>;
+                  copyApp: (params: { appId: string; body: CopyAppRequest }) => Promise<CopyApp200Response>;
+                  getAppTables: (params: { appId: string }) => Promise<Table[]>;
+                  createTable: (params: { appId: string; body: any }) => Promise<Table>;
+                  getTable: (params: { tableId: string; appId: string }) => Promise<Table>;
+                  updateTable: (params: { tableId: string; appId: string; body: UpdateTableRequest }) => Promise<Table>;
+                  deleteTable: (params: { tableId: string; appId: string }) => Promise<DeleteTableResponse>;
+                  getRelationships: (params: { tableId: string; skip?: number }) => Promise<GetRelationships200Response>;
+                  createRelationship: (params: { tableId: string; generated?: any }) => Promise<{ [key: string]: any }>;
+                  updateRelationship: (params: { tableId: string; relationshipId: any; generated?: any }) => Promise<{ [key: string]: any }>;
+                  deleteRelationship: (params: { tableId: string; relationshipId: any }) => Promise<{ [key: string]: any }>;
+                  getTableReports: (params: { tableId: string }) => Promise<any[]>;
+                  getReport: (params: { tableId: string; reportId: string }) => Promise<{ [key: string]: any }>;
+                  runReport: (params: { reportId: string; generated: any }) => Promise<ReportRunResponse[]>;
+                  getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<Field[]>;
+                  getField: (params: { tableId: string; includeFieldPerms?: boolean; fieldId: number }) => Promise<{ [key: string]: any }>;
+                  updateField: (params: { tableId: string; fieldId: number; generated?: any }) => Promise<{ [key: string]: any }>;
+                  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<any[]>;
+                  getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<any[]>;
+                  runFormula: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
+                  upsert: (params: { body: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;
+                  deleteRecords: (params: { body: DeleteRecordsRequest }) => Promise<DeleteRecords200Response>;
+                  runQuery: (params: { body: RunQueryRequest }) => Promise<RunQueryResponse>;
+                  getTempTokenDBID: (params: { dbid: string }) => Promise<GetTempTokenDBID200Response>;
+                  exchangeSsoToken: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
+                  cloneUserToken: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
+                  transferUserToken: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
+                  deactivateUserToken: (params: {  }) => Promise<{ [key: string]: any }>;
+                  deleteUserToken: (params: {  }) => Promise<{ [key: string]: any }>;
+                  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<any>;
+                  deleteFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<{ [key: string]: any }>;
+                  getUsers: (params: { accountId?: any; generated?: { [key: string]: any } }) => Promise<{ [key: string]: any }>;
+                  denyUsers: (params: { accountId?: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  denyUsersAndGroups: (params: { accountId?: any; shouldDeleteFromGroups: boolean; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  undenyUsers: (params: { accountId?: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  addMembersToGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  removeMembersFromGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  addManagersToGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  removeManagersFromGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  addSubgroupsToGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  removeSubgroupsFromGroup: (params: { gid: any; generated?: string[] }) => Promise<{ [key: string]: any }>;
+                  audit: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
+                  platformAnalyticReads: (params: { day?: string }) => Promise<{ [key: string]: any }>;
+                  platformAnalyticEventSummaries: (params: { accountId?: any; generated?: any }) => Promise<any>;
+                  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<any>;
+                  updateSolution: (params: { solutionId: string; generated?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  createSolution: (params: { generated?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<any>;
+                  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  changesetSolution: (params: { solutionId: string; generated?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+                  generateDocument: (params: { templateId: any; tableId: string; recordId?: any; filename: string; accept?: string; format?: string; margin?: string; unit?: string; pageSize?: string; orientation?: string; realm?: string }) => Promise<{ [key: string]: any }>;
+                }
         - name: index.ts
           type: file
         - name: log-gen.ts
@@ -333,6 +396,324 @@ tree:
               type: file
         - name: quickbaseClient.ts
           type: file
+          contents: |
+            // src/quickbaseClient.ts
+            import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
+            import {
+              Configuration,
+              HTTPHeaders,
+              ResponseError,
+            } from "./generated/runtime.ts";
+            import * as apis from "./generated/apis/index.ts";
+            import { TokenCache } from "./tokenCache.ts";
+
+            // Re-export all model types from generated/models
+            export * from "./generated/models";
+
+            const simplifyName = (name: string): string =>
+              name
+                .replace(/ById$/, "")
+                .replace(/Api$/, "")
+                .replace(/^(\w)/, (_, c) => c.toLowerCase());
+
+            export interface QuickbaseClient extends IQuickbaseClient {}
+
+            export interface QuickbaseConfig {
+              realm: string;
+              userToken?: string;
+              tempToken?: string;
+              useTempTokens?: boolean;
+              debug?: boolean;
+              fetchApi?: typeof fetch;
+            }
+
+            export interface TempTokenParams {
+              appId?: string;
+              tableId?: string;
+              dbid?: string;
+            }
+
+            type ApiMethod<K extends keyof QuickbaseClient> = (
+              requestParameters: Parameters<QuickbaseClient[K]>[0],
+              initOverrides?: RequestInit
+            ) => Promise<ReturnType<QuickbaseClient[K]>>;
+
+            interface MethodInfo<K extends keyof QuickbaseClient> {
+              api: any;
+              method: ApiMethod<K>;
+              paramMap: string[];
+            }
+
+            type MethodMap = { [K in keyof QuickbaseClient]: MethodInfo<K> };
+
+            const getParamNames = (fn: (...args: any[]) => any): string[] =>
+              fn
+                .toString()
+                .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
+                .split(",")
+                .map((p) => p.trim().split("=")[0].trim())
+                .filter((p) => p && !p.match(/^\{/) && p !== "options");
+
+            const extractDbid = (
+              params: Partial<TempTokenParams>,
+              errorMessage: string
+            ): string => {
+              const dbid = params.dbid || params.tableId || params.appId;
+              if (!dbid) {
+                throw new Error(errorMessage);
+              }
+              return dbid;
+            };
+
+            export function quickbase(config: QuickbaseConfig): QuickbaseClient {
+              const {
+                realm,
+                userToken,
+                tempToken: initialTempToken,
+                useTempTokens,
+                fetchApi,
+                debug,
+              } = config;
+              const baseUrl = `https://api.quickbase.com/v1`;
+
+              const tokenCache = new TokenCache();
+
+              const headers: HTTPHeaders = {
+                "QB-Realm-Hostname": `${realm}.quickbase.com`,
+                "Content-Type": "application/json",
+              };
+
+              if (initialTempToken) {
+                headers["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
+              } else if (userToken && !useTempTokens) {
+                headers["Authorization"] = `QB-USER-TOKEN ${userToken}`;
+              }
+
+              const defaultFetch: typeof fetch | undefined =
+                typeof globalThis.window !== "undefined"
+                  ? globalThis.window.fetch.bind(globalThis.window)
+                  : undefined;
+              const configuration = new Configuration({
+                basePath: baseUrl,
+                headers: { ...headers },
+                fetchApi: fetchApi || defaultFetch,
+                credentials: useTempTokens ? "include" : "omit",
+              });
+
+              if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
+                throw new Error(
+                  "fetchApi must be provided in non-browser environments (e.g., Node.js)"
+                );
+              }
+
+              const apiInstances = Object.fromEntries(
+                Object.entries(apis)
+                  .filter(([name]) => name.endsWith("Api"))
+                  .map(([name, ApiClass]) => [
+                    name.replace("Api", "").toLowerCase(),
+                    new ApiClass(configuration),
+                  ])
+              );
+
+              const methodMap = buildMethodMap();
+
+              function buildMethodMap(): MethodMap {
+                const methodMap: Partial<MethodMap> = {};
+                const isValidMethod = (name: string) =>
+                  !name.startsWith("_") &&
+                  name !== "constructor" &&
+                  !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
+
+                for (const [apiName, api] of Object.entries(apiInstances)) {
+                  Object.getOwnPropertyNames(Object.getPrototypeOf(api))
+                    .filter(
+                      (name) =>
+                        isValidMethod(name) &&
+                        typeof api[name as keyof typeof api] === "function"
+                    )
+                    .forEach((rawMethodName) => {
+                      const simplifiedName = simplifyName(
+                        rawMethodName
+                      ) as keyof QuickbaseClient;
+                      const method = api[rawMethodName as keyof typeof api];
+                      const boundMethod = method.bind(api as any) as unknown;
+                      if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+                        methodMap[simplifiedName] = {
+                          api,
+                          method: boundMethod as ApiMethod<typeof simplifiedName>,
+                          paramMap: getParamNames(method),
+                        };
+                      }
+                    });
+                }
+                return methodMap as MethodMap;
+              }
+
+              const fetchTempToken = async (dbid: string): Promise<string> => {
+                const effectiveFetch = fetchApi || defaultFetch;
+                if (!effectiveFetch) {
+                  throw new Error(
+                    "No fetch implementation available for fetching temp token"
+                  );
+                }
+
+                const response = await effectiveFetch(
+                  `https://api.quickbase.com/v1/auth/temporary/${dbid}`,
+                  {
+                    method: "GET",
+                    headers: { ...headers },
+                    credentials: "include",
+                  }
+                );
+
+                if (!response.ok) {
+                  const errorBody: { message?: string } = await response.json();
+                  throw new Error(
+                    `API Error: ${errorBody.message || "Unknown error"} (Status: ${
+                      response.status
+                    })`
+                  );
+                }
+
+                const tokenResult = await response.json();
+                const token = tokenResult.temporaryAuthorization;
+                if (!token) {
+                  throw new Error("No temporary token returned from API");
+                }
+                tokenCache.set(dbid, token);
+                if (debug) {
+                  console.log(
+                    `Fetched and cached new token for dbid: ${dbid}`,
+                    token,
+                    `Expires at: ${new Date(
+                      Date.now() + (4 * 60 + 50) * 1000
+                    ).toISOString()}`
+                  );
+                }
+                return token;
+              };
+
+              const invokeMethod = async <K extends keyof QuickbaseClient>(
+                methodName: K,
+                params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>,
+                retryCount: number = 0
+              ): Promise<ReturnType<QuickbaseClient[K]>> => {
+                const methodInfo = methodMap[methodName];
+                if (!methodInfo) {
+                  throw new Error(`Method ${methodName} not found`);
+                }
+
+                const args: [any, RequestInit | undefined] =
+                  methodInfo.paramMap.length === 1 &&
+                  methodInfo.paramMap[0] === "requestParameters"
+                    ? [{ requestParameters: params }, undefined]
+                    : [params, undefined];
+
+                let token =
+                  initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
+
+                if (methodName === "getTempTokenDBID" && useTempTokens) {
+                  const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
+                  const cachedToken = tokenCache.get(dbid);
+                  if (cachedToken) {
+                    return { temporaryAuthorization: cachedToken } as ReturnType<
+                      QuickbaseClient[K]
+                    >;
+                  }
+                }
+
+                if (useTempTokens && !token) {
+                  const dbid = extractDbid(
+                    params,
+                    `No dbid found in params for ${methodName} to fetch temp token`
+                  );
+                  const cachedToken = tokenCache.get(dbid);
+                  if (cachedToken) {
+                    token = cachedToken;
+                  } else {
+                    if (typeof globalThis.window === "undefined" && !fetchApi) {
+                      throw new Error(
+                        "Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
+                      );
+                    }
+                    token = await fetchTempToken(dbid);
+                    if (methodName === "getTempTokenDBID") {
+                      return { temporaryAuthorization: token } as ReturnType<
+                        QuickbaseClient[K]
+                      >;
+                    }
+                  }
+                  args[1] = {
+                    headers: {
+                      ...headers,
+                      Authorization: `QB-TEMP-TOKEN ${token}`,
+                    },
+                  };
+                }
+
+                try {
+                  const response = await methodInfo.method(...args);
+                  return response;
+                } catch (error) {
+                  if (
+                    error instanceof ResponseError &&
+                    error.response.status === 401 &&
+                    retryCount < 1
+                  ) {
+                    if (debug) {
+                      console.log(
+                        `Authorization error for ${methodName}, refreshing token:`,
+                        error.message
+                      );
+                    }
+                    const dbid = extractDbid(
+                      params,
+                      `No dbid to refresh token after authorization error`
+                    );
+                    token = await fetchTempToken(dbid);
+                    args[1] = {
+                      headers: {
+                        ...headers,
+                        Authorization: `QB-TEMP-TOKEN ${token}`,
+                      },
+                    };
+                    if (debug) {
+                      console.log(`Retrying ${methodName} with new token`);
+                    }
+                    return invokeMethod(methodName, params, retryCount + 1);
+                  }
+                  if (error instanceof ResponseError) {
+                    let errorMessage = error.message;
+                    try {
+                      const errorBody: { message?: string } = await error.response.json();
+                      if (debug) {
+                        console.log(`Error response body for ${methodName}:`, errorBody);
+                      }
+                      errorMessage = errorBody.message || errorMessage;
+                    } catch (e) {
+                      // Silent fail on parse error
+                    }
+                    throw new Error(
+                      `API Error: ${errorMessage} (Status: ${error.response.status})`
+                    );
+                  }
+                  throw error;
+                }
+              };
+
+              const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, {
+                get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
+                  if (prop in methodMap) {
+                    const methodName = prop as keyof QuickbaseClient;
+                    return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
+                      invokeMethod(methodName, params);
+                  }
+                  return undefined;
+                },
+              });
+
+              return proxy;
+            }
         - name: tokenCache.ts
           type: file
     - name: test-artifacts
@@ -381,905 +762,37 @@ tree:
                   children:
                     - name: getApp.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - getApp > fetches real app data from QuickBase",
-                          { timeout: 10000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const getAppId = "buwai2zpe";
-
-                            console.log("Config used:", config);
-                            const result = await client.getApp({ appId: getAppId });
-                            console.log("Real API response:", result);
-
-                            expect(result).toEqual({
-                              id: getAppId,
-                              name: "qb-copy",
-                              created: expect.any(Date), // Matches Date object from client
-                              updated: expect.any(Date), // Matches Date object from client
-                              description: "",
-                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
-                              dateFormat: "MM-DD-YYYY",
-                              hasEveryoneOnTheInternet: false,
-                              memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
-                              securityProperties: {
-                                allowClone: false,
-                                allowExport: true,
-                                enableAppTokens: true,
-                                hideFromPublic: false,
-                                mustBeRealmApproved: false,
-                                useIPFilter: false,
-                              },
-                            });
-                          }
-                        );
                 - name: fields
                   type: directory
                   children:
                     - name: getFields.test.ts
                       type: file
-                      contents: |
-                        import { describe, it, expect } from "vitest";
-                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
-
-                        describe("QuickbaseClient Integration - getFields", () => {
-                          const client = createClient();
-
-                          it(
-                            "fetches real field data from QuickBase",
-                            async () => {
-                              if (!process.env.QB_REALM)
-                                throw new Error("QB_REALM is not defined in .env");
-                              if (!process.env.QB_USER_TOKEN)
-                                throw new Error("QB_USER_TOKEN is not defined in .env");
-
-                              console.log("Config used:", {
-                                realm: process.env.QB_REALM,
-                                userToken: process.env.QB_USER_TOKEN,
-                                tableId: QB_TABLE_ID_1,
-                              });
-                              const result = await client.getFields({
-                                tableId: QB_TABLE_ID_1,
-                                includeFieldPerms: true,
-                              });
-                              console.log("Real API response:", result);
-                              expect(result).toEqual(
-                                expect.arrayContaining([
-                                  expect.objectContaining({
-                                    id: 1,
-                                    label: "Date Created",
-                                    fieldType: "timestamp",
-                                    noWrap: true,
-                                    bold: false,
-                                    required: false,
-                                    appearsByDefault: false,
-                                    findEnabled: false,
-                                    unique: false,
-                                    doesDataCopy: false,
-                                    fieldHelp: "",
-                                    audited: false,
-                                    properties: expect.objectContaining({
-                                      primaryKey: false,
-                                      foreignKey: false,
-                                      sortAsGiven: true,
-                                      carryChoices: true,
-                                      allowNewChoices: false,
-                                      formula: "",
-                                      defaultValue: "",
-                                    }),
-                                    permissions: expect.arrayContaining([
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Viewer",
-                                        roleId: 10,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Participant",
-                                        roleId: 11,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Administrator",
-                                        roleId: 12,
-                                      }),
-                                    ]),
-                                  }),
-                                  expect.objectContaining({
-                                    id: 2,
-                                    label: "Date Modified",
-                                    fieldType: "timestamp",
-                                    noWrap: true,
-                                    bold: false,
-                                    required: false,
-                                    appearsByDefault: false,
-                                    findEnabled: false,
-                                    unique: false,
-                                    doesDataCopy: false,
-                                    fieldHelp: "",
-                                    audited: false,
-                                    properties: expect.objectContaining({
-                                      primaryKey: false,
-                                      foreignKey: false,
-                                      sortAsGiven: true,
-                                      carryChoices: true,
-                                      allowNewChoices: false,
-                                      formula: "",
-                                      defaultValue: "",
-                                    }),
-                                    permissions: expect.arrayContaining([
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Viewer",
-                                        roleId: 10,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Participant",
-                                        roleId: 11,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Administrator",
-                                        roleId: 12,
-                                      }),
-                                    ]),
-                                  }),
-                                  expect.objectContaining({
-                                    id: 3,
-                                    label: "Record ID#",
-                                    fieldType: "recordid",
-                                    noWrap: true,
-                                    bold: false,
-                                    required: false,
-                                    appearsByDefault: false,
-                                    findEnabled: false,
-                                    unique: true,
-                                    doesDataCopy: false,
-                                    fieldHelp: "",
-                                    audited: false,
-                                    properties: expect.objectContaining({
-                                      primaryKey: true,
-                                      foreignKey: false,
-                                      sortAsGiven: true,
-                                      carryChoices: true,
-                                      allowNewChoices: false,
-                                      formula: "",
-                                      defaultValue: "",
-                                    }),
-                                    permissions: expect.arrayContaining([
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Viewer",
-                                        roleId: 10,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Participant",
-                                        roleId: 11,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Administrator",
-                                        roleId: 12,
-                                      }),
-                                    ]),
-                                  }),
-                                  expect.objectContaining({
-                                    id: 4,
-                                    label: "Record Owner",
-                                    fieldType: "user",
-                                    noWrap: true,
-                                    bold: false,
-                                    required: false,
-                                    appearsByDefault: false,
-                                    findEnabled: true,
-                                    unique: false,
-                                    doesDataCopy: false,
-                                    fieldHelp: "",
-                                    audited: false,
-                                    properties: expect.objectContaining({
-                                      primaryKey: false,
-                                      foreignKey: false,
-                                      sortAsGiven: true,
-                                      carryChoices: true,
-                                      allowNewChoices: true,
-                                      formula: "",
-                                      defaultValue: "",
-                                    }),
-                                    permissions: expect.arrayContaining([
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Viewer",
-                                        roleId: 10,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Participant",
-                                        roleId: 11,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Administrator",
-                                        roleId: 12,
-                                      }),
-                                    ]),
-                                  }),
-                                  expect.objectContaining({
-                                    id: 5,
-                                    label: "Last Modified By",
-                                    fieldType: "user",
-                                    noWrap: true,
-                                    bold: false,
-                                    required: false,
-                                    appearsByDefault: false,
-                                    findEnabled: true,
-                                    unique: false,
-                                    doesDataCopy: false,
-                                    fieldHelp: "",
-                                    audited: false,
-                                    properties: expect.objectContaining({
-                                      primaryKey: false,
-                                      foreignKey: false,
-                                      sortAsGiven: true,
-                                      carryChoices: true,
-                                      allowNewChoices: true,
-                                      formula: "",
-                                      defaultValue: "",
-                                    }),
-                                    permissions: expect.arrayContaining([
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Viewer",
-                                        roleId: 10,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Participant",
-                                        roleId: 11,
-                                      }),
-                                      expect.objectContaining({
-                                        permissionType: "Modify",
-                                        role: "Administrator",
-                                        roleId: 12,
-                                      }),
-                                    ]),
-                                  }),
-                                ])
-                              );
-                            },
-                            { timeout: 10000 }
-                          );
-                        });
                 - name: index.ts
                   type: file
-                  contents: |
-                    // Optional: Only add if you need to export tests
-                    export * from "./apps/getApp.test.ts";
-                    export * from "./fields/getFields.test.ts";
-                    export * from "./tables/getAppTables.test.ts";
                 - name: records
                   type: directory
                   children:
                     - name: deleteRecords.test.ts
                       type: file
-                      contents: |
-                        // tests/vitest/qb/records/deleteRecords.test.ts
-                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
-                        import { quickbase } from "@/quickbaseClient.ts";
-                        import {
-                          Upsert200Response,
-                          Upsert207Response,
-                        } from "/home/drew/Projects/quickbase-js/src/generated/models";
-
-                        const TABLE_ID = "buwai2zws";
-                        const UNIQUE_FIELD_ID = 3; // Record ID field
-                        const MARKER_FIELD_ID = 6; // Text field for marking test records
-
-                        describe("QuickbaseClient - DeleteRecords Integration", () => {
-                          const qb = quickbase({
-                            realm: "builderprogram-dbradford6815",
-                            userToken: process.env.QB_USER_TOKEN,
-                            debug: true,
-                          });
-
-                          beforeEach(async () => {
-                            try {
-                              await qb.deleteRecords({
-                                body: {
-                                  from: TABLE_ID,
-                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
-                                },
-                              });
-                            } catch (e) {
-                              // Ignore if no records exist
-                            }
-                          });
-
-                          afterEach(async () => {
-                            try {
-                              await qb.deleteRecords({
-                                body: {
-                                  from: TABLE_ID,
-                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
-                                },
-                              });
-                            } catch (e) {}
-                          });
-
-                          test(
-                            "deletes a newly upserted record",
-                            async () => {
-                              const upsertResponse: Upsert200Response | Upsert207Response =
-                                await qb.upsert({
-                                  body: {
-                                    to: TABLE_ID,
-                                    data: [{ [MARKER_FIELD_ID]: { value: "test-marker-delete" } }],
-                                    fieldsToReturn: [UNIQUE_FIELD_ID], // Return record ID
-                                  },
-                                });
-
-                              // Check metadata and createdRecordIds
-                              expect(
-                                upsertResponse.metadata,
-                                "Expected metadata to be defined"
-                              ).toBeDefined();
-                              expect(
-                                upsertResponse.metadata?.createdRecordIds,
-                                "Expected createdRecordIds to be defined"
-                              ).toBeDefined();
-
-                              const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
-                              if (!createdRecordIds || createdRecordIds.length === 0) {
-                                throw new Error("Expected at least one created record ID");
-                              }
-
-                              const recordId = createdRecordIds[0];
-                              expect(recordId, "Expected recordId to be defined").toBeDefined();
-
-                              // Check data
-                              expect(upsertResponse.data, "Expected data to be defined").toBeDefined();
-                              if (!upsertResponse.data || upsertResponse.data.length === 0) {
-                                throw new Error("Expected at least one data entry");
-                              }
-
-                              const recordData = upsertResponse.data[0];
-                              expect(
-                                recordData[UNIQUE_FIELD_ID]?.value,
-                                "Expected record ID in data to match created record ID"
-                              ).toBe(recordId);
-
-                              const deleteResponse = await qb.deleteRecords({
-                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
-                              });
-
-                              expect(deleteResponse).toEqual({ numberDeleted: 1 });
-
-                              const checkResponse = await qb.deleteRecords({
-                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
-                              });
-                              expect(checkResponse.numberDeleted).toBe(0);
-                            },
-                            { timeout: 10000 }
-                          );
-
-                          test(
-                            "handles empty result when no records match",
-                            async () => {
-                              const response = await qb.deleteRecords({
-                                body: { from: TABLE_ID, where: "{3.EX.'999999'}" },
-                              });
-                              expect(response).toEqual({ numberDeleted: 0 });
-                            },
-                            { timeout: 10000 }
-                          );
-                        });
                     - name: runQuery.test.ts
                       type: file
-                      contents: |
-                        // tests/vitest/qb/records/runQuery.test.ts
-                        import { describe, it, expect } from "vitest";
-                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
-                        import {
-                          RunQueryRequest,
-                          RunQueryResponse,
-                          Upsert200Response,
-                          Upsert207Response,
-                        } from "@/generated/models";
-
-                        // Define a type for field data with a value property (matches generated Record type)
-                        interface FieldData {
-                          value: any; // Adjust type based on your needs (e.g., string | number)
-                        }
-
-                        describe("QuickbaseClient Integration - runQuery", () => {
-                          let createdRecordId: number;
-
-                          it(
-                            "queries real records from QuickBase",
-                            async () => {
-                              const client = createClient();
-
-                              // Upsert a test record to query later
-                              const upsertResponse: Upsert200Response | Upsert207Response =
-                                await client.upsert({
-                                  body: {
-                                    to: QB_TABLE_ID_1,
-                                    data: [
-                                      {
-                                        "6": { value: "Test Task " + Date.now() }, // Assuming field 6 is a text field
-                                      },
-                                    ],
-                                    fieldsToReturn: [3, 6], // Record ID# and the text field
-                                  },
-                                });
-
-                              // Check metadata and createdRecordIds with null safety
-                              expect(
-                                upsertResponse.metadata,
-                                "Expected metadata to be defined"
-                              ).toBeDefined();
-                              expect(
-                                upsertResponse.metadata?.createdRecordIds,
-                                "Expected createdRecordIds to be defined"
-                              ).toBeDefined();
-
-                              const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
-                              if (!createdRecordIds || createdRecordIds.length === 0) {
-                                throw new Error("Expected at least one created record ID from upsert");
-                              }
-
-                              createdRecordId = createdRecordIds[0];
-                              expect(
-                                createdRecordId,
-                                "Expected createdRecordId to be defined"
-                              ).toBeDefined();
-                              console.log("Created test record with ID:", createdRecordId);
-
-                              // Query the record
-                              const queryRequest: RunQueryRequest = {
-                                from: QB_TABLE_ID_1,
-                                select: [3, 6], // Query Record ID# and the text field
-                                where: `{3.EX.${createdRecordId}}`, // Filter by the created record
-                                sortBy: [{ fieldId: 6, order: "ASC" }],
-                                options: { skip: 0, top: 1 },
-                              };
-
-                              console.log("Config used:", {
-                                realm: process.env.QB_REALM,
-                                userToken: process.env.QB_USER_TOKEN,
-                                tableId: QB_TABLE_ID_1,
-                              });
-                              console.log("Query request:", queryRequest);
-                              const response: RunQueryResponse = await client.runQuery({
-                                body: queryRequest,
-                              });
-                              console.log("Real API response:", response);
-
-                              // Assertions with safety checks and type assertion
-                              expect(
-                                response.data,
-                                "Expected response.data to be defined"
-                              ).toBeDefined();
-                              if (!response.data || response.data.length === 0) {
-                                throw new Error(
-                                  "Expected response.data to contain at least one record"
-                                );
-                              }
-
-                              expect(response.data).toHaveLength(1);
-                              const record = response.data[0] as { [key: string]: FieldData };
-                              expect(
-                                record["3"]?.value,
-                                "Expected field 3 to match createdRecordId"
-                              ).toBe(createdRecordId);
-                              expect(
-                                record["6"]?.value,
-                                "Expected field 6 to contain 'Test Task'"
-                              ).toContain("Test Task");
-
-                              expect(
-                                response.fields,
-                                "Expected response.fields to be defined"
-                              ).toBeDefined();
-                              if (!response.fields) {
-                                throw new Error("Expected response.fields to contain field metadata");
-                              }
-                              expect(response.fields).toContainEqual({
-                                id: 3,
-                                label: expect.any(String),
-                                type: expect.any(String),
-                              });
-                              expect(response.fields).toContainEqual({
-                                id: 6,
-                                label: expect.any(String),
-                                type: expect.any(String),
-                              });
-
-                              expect(
-                                response.metadata,
-                                "Expected response.metadata to be defined"
-                              ).toBeDefined();
-                              if (!response.metadata) {
-                                throw new Error("Expected response.metadata to be present");
-                              }
-                              expect(response.metadata).toMatchObject({
-                                numFields: 2,
-                                numRecords: 1,
-                                skip: 0,
-                                top: 1,
-                                totalRecords: expect.any(Number),
-                              });
-
-                              // Cleanup: Delete the test record
-                              await client.deleteRecords({
-                                body: {
-                                  from: QB_TABLE_ID_1,
-                                  where: `{3.EX.${createdRecordId}}`, // Assuming field 3 is Record ID#
-                                },
-                              });
-                              console.log("Cleaned up test record with ID:", createdRecordId);
-                            },
-                            { timeout: 10000 }
-                          );
-                        });
                     - name: upsert.test.ts
                       type: file
-                      contents: |
-                        // tests/vitest/qb/records/upsert.test.ts
-                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
-                        import { quickbase } from "@/quickbaseClient.ts";
-                        import {
-                          Upsert200Response,
-                          Upsert207Response,
-                        } from "/home/drew/Projects/quickbase-js/src/generated/models";
-
-                        const TABLE_ID = "buwai2zws";
-                        const MARKER_FIELD_ID = 6; // Text field for marking test records
-
-                        describe("QuickbaseClient - Upsert Integration", () => {
-                          const qb = quickbase({
-                            realm: "builderprogram-dbradford6815",
-                            userToken: process.env.QB_USER_TOKEN,
-                            debug: true,
-                          });
-
-                          beforeEach(async () => {
-                            try {
-                              await qb.deleteRecords({
-                                body: {
-                                  from: TABLE_ID,
-                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
-                                },
-                              });
-                            } catch (e) {
-                              // Ignore if no records exist
-                            }
-                          });
-
-                          afterEach(async () => {
-                            try {
-                              await qb.deleteRecords({
-                                body: {
-                                  from: TABLE_ID,
-                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
-                                },
-                              });
-                            } catch (e) {}
-                          });
-
-                          test(
-                            "creates a new record successfully",
-                            async () => {
-                              const response: Upsert200Response | Upsert207Response = await qb.upsert({
-                                body: {
-                                  to: TABLE_ID,
-                                  data: [{ [MARKER_FIELD_ID]: { value: "test-marker-upsert" } }],
-                                  fieldsToReturn: [MARKER_FIELD_ID, 3], // Return marker and record ID
-                                },
-                              });
-
-                              // Check metadata with null safety
-                              expect(
-                                response.metadata,
-                                "Expected metadata to be defined"
-                              ).toBeDefined();
-                              if (!response.metadata) {
-                                throw new Error("Expected metadata to be present in upsert response");
-                              }
-
-                              expect(
-                                response.metadata.createdRecordIds,
-                                "Expected createdRecordIds to be defined"
-                              ).toBeDefined();
-                              if (!response.metadata.createdRecordIds) {
-                                throw new Error(
-                                  "Expected createdRecordIds to be present in upsert response"
-                                );
-                              }
-                              expect(response.metadata.createdRecordIds.length).toBe(1);
-
-                              // Check data with null safety
-                              expect(response.data, "Expected data to be defined").toBeDefined();
-                              if (!response.data || response.data.length === 0) {
-                                throw new Error("Expected at least one record in data");
-                              }
-                              expect(response.data).toHaveLength(1);
-                              expect(response.data[0][MARKER_FIELD_ID]?.value).toBe(
-                                "test-marker-upsert"
-                              );
-                              expect(response.data[0][3]?.value).toBeDefined(); // Record ID assigned by QuickBase
-
-                              // Check totalNumberOfRecordsProcessed
-                              expect(response.metadata.totalNumberOfRecordsProcessed).toBe(1);
-                            },
-                            { timeout: 10000 }
-                          );
-
-                          test(
-                            "handles empty data gracefully",
-                            async () => {
-                              await expect(
-                                qb.upsert({
-                                  body: { to: TABLE_ID, data: [] },
-                                })
-                              ).rejects.toThrow("API Error: Bad Request (Status: 400)");
-                            },
-                            { timeout: 10000 }
-                          );
-                        });
                 - name: tables
                   type: directory
                   children:
                     - name: createTable.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - createTable > creates a new table in QuickBase",
-                          { timeout: 10000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const appId = "buwai2zpe";
-
-                            const tableName = `TestTable_${Date.now()}`;
-                            const createBody = {
-                              name: tableName,
-                              description: "Test table creation",
-                              singleRecordName: "TestRecord",
-                              pluralRecordName: "TestRecords",
-                            };
-
-                            console.log("Config used:", config);
-                            console.log("Creating table with:", createBody);
-                            const response = await client.createTable({ appId, body: createBody });
-
-                            expect(response).toBeDefined();
-                            expect(response.id).toBeDefined();
-                            expect(response.name).toBe(tableName);
-                            expect(response.description).toBe(createBody.description);
-                            expect(response.singleRecordName).toBe(createBody.singleRecordName);
-                            expect(response.pluralRecordName).toBe(createBody.pluralRecordName);
-                            expect(response.alias).toMatch(/^_DBID_/);
-                            expect(response.created).toBeInstanceOf(Date);
-                            expect(response.updated).toBeInstanceOf(Date);
-                            expect(response.nextRecordId).toBeGreaterThanOrEqual(1);
-                            expect(response.nextFieldId).toBeGreaterThanOrEqual(1);
-                            expect(response.defaultSortFieldId).toBeGreaterThanOrEqual(0);
-                            expect(response.keyFieldId).toBeGreaterThanOrEqual(1);
-                            expect(response.sizeLimit).toMatch(/^\d+\sMB$/); // e.g., "500 MB"
-                            expect(response.spaceUsed).toMatch(/^\d+\s(KB|MB)$/); // e.g., "0 KB"
-                            expect(response.spaceRemaining).toMatch(/^\d+\sMB$/); // e.g., "500 MB"
-
-                            console.log("Real API response:", response);
-
-                            // Cleanup: Delete the table to avoid clutter
-                            const deleteResponse = await client.deleteTable({
-                              tableId: response.id,
-                              appId,
-                            });
-                            expect(deleteResponse.deletedTableId).toBe(response.id);
-                            console.log("Cleanup - Deleted table:", deleteResponse);
-                          }
-                        );
                     - name: deleteTable.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - deleteTable > deletes a table in QuickBase",
-                          { timeout: 20000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const appId = "buwai2zpe";
-
-                            // Step 1: Create a temporary table to delete
-                            const tableName = `DeleteTest_${Date.now()}`;
-                            const createBody = {
-                              name: tableName,
-                              description: "Temporary table for delete test",
-                              singleRecordName: "DeleteTest",
-                              pluralRecordName: "DeleteTests",
-                            };
-                            console.log("Creating temporary table with:", createBody);
-                            const createResponse = await client.createTable({
-                              appId,
-                              body: createBody,
-                            });
-                            expect(createResponse.id).toBeDefined();
-                            expect(createResponse.name).toBe(tableName);
-                            console.log("Created table:", createResponse);
-                            const tableId = createResponse.id;
-
-                            // Step 2: Delete the table
-                            console.log("Deleting table:", { tableId, appId });
-                            const deleteResponse = await client.deleteTable({ tableId, appId });
-                            expect(deleteResponse).toBeDefined();
-                            expect(deleteResponse.deletedTableId).toBe(tableId);
-                            console.log("Delete API response:", deleteResponse);
-
-                            // Step 3: Verify the table is gone
-                            try {
-                              await client.getTable({ tableId, appId });
-                              throw new Error("Table should not exist after deletion");
-                            } catch (error) {
-                              expect(error.message).toMatch(/404|not found/i); // Expect a 404 error
-                              console.log("Verified table deletion:", error.message);
-                            }
-                          }
-                        );
                     - name: getAppTables.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - getAppTables > fetches real table data from QuickBase",
-                          { timeout: 10000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const tablesAppId = "buwai2zpe";
-
-                            console.log("Config used:", config);
-                            const result = await client.getAppTables({ appId: tablesAppId });
-                            console.log("Real API response:", result);
-
-                            expect(result).toBeDefined();
-                            expect(result).toBeInstanceOf(Array);
-                            expect(result.length).toBeGreaterThan(0);
-                            expect(result).toEqual(
-                              expect.arrayContaining([
-                                expect.objectContaining({
-                                  id: "buwai2zr4",
-                                  alias: "_DBID_ROOT",
-                                  name: expect.any(String), // Allow dynamic name due to updateTable
-                                  description: expect.any(String), // Allow dynamic description
-                                  created: expect.any(Date),
-                                  updated: expect.any(Date), // Allow varying timestamps
-                                  nextRecordId: expect.any(Number),
-                                  nextFieldId: expect.any(Number),
-                                  defaultSortFieldId: expect.any(Number),
-                                  defaultSortOrder: "DESC",
-                                  keyFieldId: expect.any(Number),
-                                  singleRecordName: "Root",
-                                  pluralRecordName: "Roots",
-                                  sizeLimit: "500 MB",
-                                  spaceUsed: expect.any(String),
-                                  spaceRemaining: "500 MB",
-                                }),
-                              ])
-                            );
-                          }
-                        );
+                    - name: getRelationships.test.ts
+                      type: file
                     - name: getTable.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - getTable > fetches real table data from QuickBase",
-                          { timeout: 10000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const tableId = "buwai2zr4";
-                            const appId = "buwai2zpe";
-
-                            console.log("Config used:", config);
-                            const response = await client.getTable({ tableId, appId });
-                            expect(response).toBeDefined();
-                            expect(response.id).toBe(tableId);
-                            expect(response.name).toBe("Root"); // Expect original name
-                            expect(response.alias).toBe("_DBID_ROOT");
-                            expect(response.created).toBeInstanceOf(Date);
-                            console.log("Real API response:", response);
-                          }
-                        );
                     - name: updateTable.test.ts
                       type: file
-                      contents: |
-                        import { test, expect } from "vitest";
-                        import { quickbase } from "../../../../src/quickbaseClient";
-
-                        test(
-                          "QuickbaseClient Integration - updateTable > updates real table data in QuickBase",
-                          { timeout: 10000 },
-                          async () => {
-                            const config = {
-                              realm: process.env.QB_REALM || "",
-                              userToken: process.env.QB_USER_TOKEN || "",
-                              debug: true,
-                            };
-                            const client = quickbase(config);
-                            const appId = "buwai2zpe";
-                            const tableId = "buwai2zr4";
-                            const updatedBody = {
-                              name: "Root Updated " + Date.now(),
-                              description: "Integration test update",
-                            };
-                            const originalBody = {
-                              name: "Root",
-                              description: "",
-                            };
-
-                            console.log("Config used:", config);
-                            // Update the table
-                            const response = await client.updateTable({
-                              tableId,
-                              appId,
-                              body: updatedBody,
-                            });
-                            expect(response).toBeDefined();
-                            expect(response.id).toBe(tableId);
-                            expect(response.name).toBe(updatedBody.name);
-                            expect(response.description).toBe(updatedBody.description);
-                            console.log("Real API response:", response);
-
-                            // Cleanup: Revert the table to original state
-                            const cleanupResponse = await client.updateTable({
-                              tableId,
-                              appId,
-                              body: originalBody,
-                            });
-                            expect(cleanupResponse.name).toBe(originalBody.name);
-                            expect(cleanupResponse.description).toBe(originalBody.description);
-                            console.log("Cleanup API response:", cleanupResponse);
-                          }
-                        );
             - name: unit
               type: directory
               children:

@@ -230,167 +230,36 @@
     },
     "/apps/{appId}/copy": {
       "post": {
-        "description": "Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.",
-        "summary": "Copy an app",
         "operationId": "copyApp",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
+        "summary": "Copy an existing application",
+        "tags": [
+          "Apps"
         ],
         "parameters": [
           {
             "name": "appId",
-            "description": "The unique identifier of an app",
-            "required": true,
             "in": "path",
-            "type": "string"
+            "required": true,
+            "type": "string",
+            "description": "The unique identifier of the app to copy."
           },
           {
-            "x-amf-mediaType": "application/json",
+            "name": "body",
             "in": "body",
-            "name": "generated",
+            "required": true,
             "schema": {
-              "example": {
-                "name": "my copied app",
-                "description": "copied from my original app",
-                "properties": {
-                  "keepData": false,
-                  "excludeFiles": true,
-                  "usersAndRoles": false,
-                  "assignUserToken": true
-                }
-              },
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The name of the newly copied app",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description of the newly copied app",
-                  "type": "string"
-                },
-                "properties": {
-                  "description": "The configuration properties for performing the app copy",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "assignUserToken": {
-                      "description": "Whether to add the user token used to make this request to the new app",
-                      "type": "boolean"
-                    },
-                    "excludeFiles": {
-                      "description": "If keepData is true, whether to copy the file attachments as well. If keepData is false, this property is ignored",
-                      "type": "boolean"
-                    },
-                    "keepData": {
-                      "description": "Whether to copy the app's data along with the schema",
-                      "type": "boolean"
-                    },
-                    "usersAndRoles": {
-                      "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned",
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/CopyAppRequest"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "x-amf-mediaType": "application/json",
+            "description": "Success - application copied",
             "schema": {
-              "example": {
-                "ancestorId": "bqhskthaq",
-                "created": "2020-03-27T18:34:12Z",
-                "dateFormat": "MM-DD-YYYY",
-                "description": "My testing app",
-                "hasEveryoneOnTheInternet": true,
-                "id": "bpqe82s1",
-                "name": "Testing App",
-                "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
-                "updated": "2020-04-03T19:12:20Z",
-                "dataClassification": "None"
-              },
-              "type": "object",
-              "additionalProperties": true,
-              "required": [
-                "name"
-              ],
-              "properties": {
-                "name": {
-                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-                  "type": "string"
-                },
-                "description": {
-                  "description": "The description for the app",
-                  "type": "string"
-                },
-                "created": {
-                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "updated": {
-                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                  "type": "string"
-                },
-                "dateFormat": {
-                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
-                  "type": "string"
-                },
-                "timeZone": {
-                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
-                  "type": "string"
-                },
-                "id": {
-                  "description": "The unique identifier for this application.",
-                  "type": "string"
-                },
-                "hasEveryoneOnTheInternet": {
-                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
-                  "type": "boolean"
-                },
-                "variables": {
-                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "Variable name.",
-                        "type": "string"
-                      },
-                      "value": {
-                        "description": "Variable value.",
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "ancestorId": {
-                  "description": "The id of the app from which this app was copied",
-                  "type": "string"
-                },
-                "dataClassification": {
-                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/CopyApp200Response"
             }
           }
-        },
-        "tags": [
-          "Apps"
-        ]
+        }
       }
     },
     "/tables": {
@@ -8060,6 +7929,116 @@
         "type"
       ],
       "description": "A field involved in a relationship (foreign key, lookup, or summary)."
+    },
+    "CopyAppRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the newly copied app."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the newly copied app."
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "keepData": {
+              "type": "boolean",
+              "description": "Whether to copy the app's data along with the schema."
+            },
+            "excludeFiles": {
+              "type": "boolean",
+              "description": "If keepData is true, whether to copy file attachments. Ignored if keepData is false."
+            },
+            "usersAndRoles": {
+              "type": "boolean",
+              "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned."
+            },
+            "assignUserToken": {
+              "type": "boolean",
+              "description": "Whether to add the user token used to make this request to the new app."
+            }
+          },
+          "description": "The configuration properties for performing the app copy."
+        }
+      },
+      "description": "Request body for copying an existing application."
+    },
+    "CopyApp200Response": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the copied application."
+        },
+        "name": {
+          "type": "string",
+          "description": "The app name. Multiple apps with the same name are allowed in the same realm."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the app."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was created (ISO 8601, UTC)."
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was last updated (ISO 8601, UTC)."
+        },
+        "dateFormat": {
+          "type": "string",
+          "description": "The format used for displaying dates in the app (e.g., MM-DD-YYYY)."
+        },
+        "timeZone": {
+          "type": "string",
+          "description": "The time zone used for displaying time values (e.g., (UTC-08:00) Pacific Time)."
+        },
+        "hasEveryoneOnTheInternet": {
+          "type": "boolean",
+          "description": "Indicates if the app includes Everyone On The Internet access."
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          },
+          "description": "The app variables."
+        },
+        "ancestorId": {
+          "type": "string",
+          "description": "The id of the app from which this app was copied."
+        },
+        "dataClassification": {
+          "type": "string",
+          "description": "The Data Classification label assigned to the app (optional, may be 'None')."
+        }
+      },
+      "description": "Response body for successful app copy operation."
     }
   }
 }
