@@ -780,4 +780,30 @@ export const definitions = {
     },
     description: "Response body for successful app copy operation.",
   },
+  DeleteAppRequest: {
+    // New definition for deleteApp request
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: {
+        type: "string",
+        description:
+          "The name of the application to delete, required for confirmation.",
+      },
+    },
+    description:
+      "Request body for deleting an application, requiring the app name for confirmation.",
+  },
+  DeleteApp200Response: {
+    // New definition for deleteApp response
+    type: "object",
+    properties: {
+      deletedAppId: {
+        type: "string",
+        description: "The ID of the deleted application.",
+      },
+    },
+    required: ["deletedAppId"],
+    description: "Response body for successful deletion of an application.",
+  },
 };

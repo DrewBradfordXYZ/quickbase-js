@@ -42,6 +42,33 @@ export const paths = {
         },
       },
     },
+    delete: {
+      // New DELETE method for deleteApp
+      operationId: "deleteApp",
+      summary: "Delete an application by ID",
+      tags: ["Apps"],
+      parameters: [
+        {
+          name: "appId",
+          in: "path",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the app to delete.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/DeleteAppRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - application deleted",
+          schema: { $ref: "#/definitions/DeleteApp200Response" },
+        },
+      },
+    },
   },
   "/apps/{appId}/copy": {
     post: {
