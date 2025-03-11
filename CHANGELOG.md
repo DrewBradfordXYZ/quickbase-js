@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0-beta.1](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.0...v1.1.0-beta.1) (2025-03-11)
+
+
+### Features
+
+* runQuery.test.ts integration test pass ([180b17f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/180b17f265c26a0d23bde3ca6993bad1ba4f65ee))
+* runQuery.test.ts unit test pass ([84e2fc4](https://github.com/DrewBradfordXYZ/quickbase-js/commit/84e2fc4f237d5f558fcd20d7b6b8eb83f685d7ac))
+
+
+### Bug Fixes
+
+* added stub variables to unit tests ([d84b534](https://github.com/DrewBradfordXYZ/quickbase-js/commit/d84b5344201300d8d59e622b025d96ad9813d4eb))
+* create env stubs for mock tests and update getTables.test.ts ([3d31c9e](https://github.com/DrewBradfordXYZ/quickbase-js/commit/3d31c9ebc9f852b99d1a807759490055d75c6396))
+
 ## [1.1.0-beta.0](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.0.1-beta.0...v1.1.0-beta.0) (2025-03-11)
 
 
