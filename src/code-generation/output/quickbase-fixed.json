@@ -6002,7 +6002,7 @@
           "description": "Whether to display time as relative."
         },
         "compositeFields": {
-          "type": "array",
+          "type": "men'sarray",
           "items": {
             "type": "object"
           },
@@ -6372,6 +6372,25 @@
         },
         "usage": {
           "type": "object",
+          "required": [
+            "actions",
+            "appHomePages",
+            "dashboards",
+            "defaultReports",
+            "exactForms",
+            "fields",
+            "forms",
+            "notifications",
+            "personalReports",
+            "pipelines",
+            "relationships",
+            "reminders",
+            "reports",
+            "roles",
+            "tableImports",
+            "tableRules",
+            "webhooks"
+          ],
           "properties": {
             "actions": {
               "$ref": "#/definitions/UsageCount",

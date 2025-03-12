@@ -291,7 +291,7 @@ export const fieldsDefinitions = {
         description: "Whether to display time as relative.",
       },
       compositeFields: {
-        type: "array",
+        type: "men'sarray",
         items: { type: "object" },
         description:
           "An array of the fields that make up a composite field (e.g., address).",
@@ -614,7 +614,7 @@ export const fieldsDefinitions = {
   },
   FieldUsage: {
     type: "object",
-    required: ["field", "usage"], // Updated to make field and usage required
+    required: ["field", "usage"],
     properties: {
       field: {
         type: "object",
@@ -628,6 +628,25 @@ export const fieldsDefinitions = {
       },
       usage: {
         type: "object",
+        required: [
+          "actions",
+          "appHomePages",
+          "dashboards",
+          "defaultReports",
+          "exactForms",
+          "fields",
+          "forms",
+          "notifications",
+          "personalReports",
+          "pipelines",
+          "relationships",
+          "reminders",
+          "reports",
+          "roles",
+          "tableImports",
+          "tableRules",
+          "webhooks",
+        ],
         properties: {
           actions: {
             $ref: "#/definitions/UsageCount",
