@@ -12,13 +12,13 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "src/code-generation",
+  "src/code-generation",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
   // "tests",
-  "tests/vitest/unit",
+  // "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
@@ -30,8 +30,8 @@ const includeFiles: string[] = [
   // "vitest.config.ts",
   // "src/utils.ts",
   // "src/tokenCache.ts",
-  "src/generated-unified/QuickbaseClient.ts",
-  "src/quickbaseClient.ts",
+  // "src/generated-unified/QuickbaseClient.ts",
+  // "src/quickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [

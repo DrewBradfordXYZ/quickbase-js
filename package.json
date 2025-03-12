@@ -24,7 +24,7 @@
     "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
     "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm src/code-generation/regenerate-client.ts",
     "regenerate:unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
-    "regenerate:all": "npm run fix-spec && npm run regenerate && npm run regenerate-unified",
+    "regenerate:all": "npm run fix-spec && npm run regenerate:openapi && npm run regenerate:unified",
     "log-gen": "node --loader ts-node/esm src/log-gen.ts",
     "build": "rimraf dist && rollup -c",
     "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",

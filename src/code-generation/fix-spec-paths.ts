@@ -43,7 +43,6 @@ export const paths = {
       },
     },
     delete: {
-      // New DELETE method for deleteApp
       operationId: "deleteApp",
       summary: "Delete an application by ID",
       tags: ["Apps"],
@@ -126,6 +125,32 @@ export const paths = {
             type: "array",
             items: { $ref: "#/definitions/Field" },
           },
+        },
+      },
+    },
+    post: {
+      operationId: "createField",
+      summary: "Create a new field in a table",
+      tags: ["Fields"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the table.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/CreateFieldRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - field created",
+          schema: { $ref: "#/definitions/CreateField200Response" },
         },
       },
     },
