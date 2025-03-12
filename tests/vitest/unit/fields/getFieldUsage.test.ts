@@ -27,7 +27,7 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       field: {
         id: 6,
         name: "name",
-        type: "Text",
+        type: "text", // Match QuickBase's lowercase response
       },
       usage: {
         actions: { count: 0 },
@@ -50,8 +50,9 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       },
     };
 
+    // Mock the response as an array to match the updated API behavior
     mockFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify(mockResponse), {
+      new Response(JSON.stringify([mockResponse]), {
         status: 200,
         statusText: "OK",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +64,12 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       tableId: QB_TABLE_ID_1,
     });
 
-    expect(result).toEqual(mockResponse);
+    // Expect an array and unwrap the first item
+    expect(result).toBeInstanceOf(Array);
+    expect(result).toHaveLength(1);
+    const fieldUsage = result[0];
+
+    expect(fieldUsage).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields/usage/6?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
@@ -75,9 +81,9 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
         }),
       })
     );
-    expect(result.field.id).toBe(6);
-    expect(result.field.name).toBe("name");
-    expect(result.usage.dashboards.count).toBe(2);
+    expect(fieldUsage.field.id).toBe(6);
+    expect(fieldUsage.field.name).toBe("name");
+    expect(fieldUsage.usage.dashboards.count).toBe(2);
   });
 
   it("handles 404 error for non-existent field", async () => {

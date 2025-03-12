@@ -1672,7 +1672,11 @@
           "200": {
             "description": "Success - field usage statistics retrieved",
             "schema": {
-              "$ref": "#/definitions/FieldUsage"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FieldUsage"
+              },
+              "maxItems": 1
             }
           }
         }

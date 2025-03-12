@@ -196,7 +196,9 @@ export const fieldsPaths = {
         200: {
           description: "Success - field usage statistics retrieved",
           schema: {
-            $ref: "#/definitions/FieldUsage",
+            type: "array",
+            items: { $ref: "#/definitions/FieldUsage" },
+            maxItems: 1, // Ensures a single-item array as per QuickBase API behavior
           },
         },
       },
