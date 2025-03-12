@@ -1,18 +1,20 @@
 {
   "name": "quickbase-js",
-  "main": "dist/quickbase.js",
-  "types": "dist/quickbase.d.ts",
   "version": "1.1.0-beta.4",
+  "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+  "type": "module",
+  "main": "dist/esm/quickbase.js",
+  "module": "dist/esm/quickbase.js",
+  "types": "dist/esm/quickbase.d.ts",
   "publishConfig": {
     "access": "public"
   },
-  "description": "QuickBase JavaScript client for frameworks and vanilla JS",
-  "module": "dist/quickbase.js",
-  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/quickbase.js",
-      "types": "./dist/quickbase.d.ts"
+      "import": "./dist/esm/quickbase.js",
+      "require": "./dist/umd/quickbase.umd.js",
+      "types": "./dist/esm/quickbase.d.ts",
+      "umd:types": "./dist/umd/quickbase.umd.d.ts"
     }
   },
   "scripts": {
@@ -21,13 +23,19 @@
     "release:alpha": "standard-version --prerelease alpha",
     "release:push": "npm run release:beta && git push --follow-tags origin main",
     "release:publish": "npm run release:push && npm publish --tag beta",
-    "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
-    "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm src/code-generation/regenerate-client.ts",
-    "regenerate:unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
+  
+
+    "fix-spec": "node --loader ts-node/esm open-api/fix-spec-main.ts",
+    "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm open-api/regenerate-client.ts",
+    "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
     "regenerate:all": "npm run fix-spec && npm run regenerate:openapi && npm run regenerate:unified",
-    "log-gen": "node --loader ts-node/esm src/log-gen.ts",
-    "build": "rimraf dist && rollup -c",
-    "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
+    "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
+    "build": "rimraf dist && node --loader ts-node/esm build.js",
+    "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
+
+
+    "build-old": "rimraf dist && rollup -c",
+    "build:prod-old": "rimraf dist && NODE_ENV=production rollup -c",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
     "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
@@ -55,6 +63,7 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.13.10",
     "dotenv": "^16.4.7",
     "glob": "^11.0.1",
@@ -69,6 +78,7 @@
     "ts-morph": "^25.0.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
+    "undici-types": "^7.5.0",
     "vitest": "^3.0.8"
   }
 }

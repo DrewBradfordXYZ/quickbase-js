@@ -5,7 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "lib": ["ES2015", "ESNext", "DOM"],
-    "types": ["node", "playwright/test"],
+    "types": ["node", "playwright/test", "undici-types"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
@@ -16,12 +16,12 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],      // Matches Vite's @ -> src/
-      "@tests/*": ["tests/*"] // Matches Vite's @tests -> tests/
+      "@/*": ["src/*"],
+      "@tests/*": ["tests/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist", "src/generated-old"],
+  "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
+  "exclude": ["node_modules", "dist", "specs"],
   "ts-node": {
     "esm": true,
     "transpileOnly": true

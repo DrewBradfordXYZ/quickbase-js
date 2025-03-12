@@ -67,6 +67,60 @@ npm run build
 npm run test:all
 ```
 
+## Usage
+
+### Node.js (ESM - Recommended)
+
+For modern Node.js applications, use ES modules:
+
+```javascript
+// ESM (Node.js) - Recommended
+import { quickbase } from "quickbase-js";
+const qb = quickbase({ realm: "example", userToken: "your-token" });
+
+// Example: Fetching an app
+const app = await qb.getApp({ appId: "your-app-id" });
+console.log(app);
+
+// Example: Creating a record with temporary token
+const qbTemp = quickbase({ realm: "example", useTempTokens: true });
+const record = await qbTemp.upsert({
+  body: {
+    to: "your-table-id",
+    data: [
+      {
+        /* record data */
+      },
+    ],
+  },
+});
+console.log(record);
+```
+
+```javascript
+// Example: TypeScript ESM (Recommended)
+import { quickbase } from "quickbase-js";
+const qbTyped: QuickbaseClient = quickbase({
+  realm: "example",
+  userToken: "your-token",
+});
+const typedApp = await qbTyped.getApp({ appId: "your-app-id" });
+console.log(typedApp);
+```
+
+```javascript
+// Example: UMD via CDN (QuickBase Code Pages)
+// Note: This is HTML, not JavaScript, and should be used in a browser environment
+
+<script src="https://cdn.jsdelivr.net/npm/quickbase-js@1.1.0-beta.4/dist/umd/quickbase.umd.js"></script>
+<script>
+  const qb = new QuickbaseJS({ realm: 'example', useTempTokens: true });
+  // Example: Fetching an app
+  qb.getApp({ appId: 'your-app-id' }).then(app => console.log(app));
+</script>
+
+```
+
 ## In QuickBase Code Pages (Browser Environment)
 
 ### useTempTokens: true:
