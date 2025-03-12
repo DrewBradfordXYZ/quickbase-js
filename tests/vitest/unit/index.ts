@@ -16,6 +16,7 @@ export * from "./fields/getFields.test.ts";
 export * from "./fields/getField.test.ts";
 export * from "./fields/createField.test.ts";
 export * from "./fields/deleteFields.test.ts";
+export * from "./fields/getFieldsUsage.test.ts";
 
 // Records
 export * from "./records/deleteRecords.test.ts";

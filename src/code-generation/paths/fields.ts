@@ -24,7 +24,10 @@ export const fieldsPaths = {
       responses: {
         200: {
           description: "Success",
-          schema: { type: "array", items: { $ref: "#/definitions/Field" } },
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/Field" },
+          },
         },
       },
     },

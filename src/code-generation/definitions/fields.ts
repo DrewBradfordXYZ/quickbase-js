@@ -614,6 +614,7 @@ export const fieldsDefinitions = {
   },
   FieldUsage: {
     type: "object",
+    required: ["field", "usage"], // Updated to make field and usage required
     properties: {
       field: {
         type: "object",
