@@ -1,5 +1,5 @@
-// Generated on 2025-03-12T02:42:36.265Z
-import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-12T03:04:36.143Z
+import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, FieldUsage, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   createApp: (params: { body: CreateAppRequest }) => Promise<CreateApp200Response>;
@@ -23,7 +23,7 @@ export interface QuickbaseClient {
   createField: (params: { tableId: string; body: CreateFieldRequest }) => Promise<CreateField200Response>;
   deleteFields: (params: { tableId: string; body: DeleteFieldsRequest }) => Promise<DeleteFields200Response>;
   getField: (params: { fieldId: number; tableId: string; includeFieldPerms?: boolean }) => Promise<Field>;
-  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<any[]>;
+  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<FieldUsage[]>;
   getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<any[]>;
   runFormula: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
   upsert: (params: { body: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;

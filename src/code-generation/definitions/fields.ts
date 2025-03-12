@@ -292,7 +292,7 @@ export const fieldsDefinitions = {
       },
       compositeFields: {
         type: "array",
-        items: { type: "object" }, // Simplified; could reference Field if recursive
+        items: { type: "object" },
         description:
           "An array of the fields that make up a composite field (e.g., address).",
       },
@@ -611,5 +611,123 @@ export const fieldsDefinitions = {
     },
     description:
       "Response body for successful field deletion, with possible errors.",
+  },
+  FieldUsage: {
+    type: "object",
+    properties: {
+      field: {
+        type: "object",
+        required: ["id", "name", "type"],
+        properties: {
+          id: { type: "integer", description: "Field id." },
+          name: { type: "string", description: "Field name." },
+          type: { type: "string", description: "Field type." },
+        },
+        description: "Basic information about the field.",
+      },
+      usage: {
+        type: "object",
+        properties: {
+          actions: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of QuickBase actions where the given field is referenced.",
+          },
+          appHomePages: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of app home pages where the given field is referenced.",
+          },
+          dashboards: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of dashboards where the given field is referenced.",
+          },
+          defaultReports: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of default reports where the given field is referenced.",
+          },
+          exactForms: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of exact forms where the given field is referenced.",
+          },
+          fields: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of fields where the given field is referenced.",
+          },
+          forms: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of forms where the given field is referenced.",
+          },
+          notifications: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of notifications where the given field is referenced.",
+          },
+          personalReports: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of personal reports where the given field is referenced.",
+          },
+          pipelines: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of pipelines where the given field is referenced.",
+          },
+          relationships: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of relationships where the given field is referenced.",
+          },
+          reminders: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of reminders where the given field is referenced.",
+          },
+          reports: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of reports where the given field is referenced.",
+          },
+          roles: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of roles where the given field is referenced.",
+          },
+          tableImports: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of table imports where the given field is referenced.",
+          },
+          tableRules: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of table rules where the given field is referenced.",
+          },
+          webhooks: {
+            $ref: "#/definitions/UsageCount",
+            description:
+              "The number of webhooks where the given field is referenced.",
+          },
+        },
+        description: "Usage information about the field.",
+      },
+    },
+    description: "Represents usage statistics for a field in a table.",
+  },
+  UsageCount: {
+    type: "object",
+    properties: {
+      count: {
+        type: "integer",
+        description:
+          "The number of times a field has been used for the given item.",
+      },
+    },
+    description: "A count of usage for a specific category.",
   },
 };

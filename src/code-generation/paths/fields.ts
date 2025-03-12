@@ -24,10 +24,7 @@ export const fieldsPaths = {
       responses: {
         200: {
           description: "Success",
-          schema: {
-            type: "array",
-            items: { $ref: "#/definitions/Field" },
-          },
+          schema: { type: "array", items: { $ref: "#/definitions/Field" } },
         },
       },
     },
@@ -117,6 +114,45 @@ export const fieldsPaths = {
         200: {
           description: "Success - field properties retrieved",
           schema: { $ref: "#/definitions/Field" },
+        },
+      },
+    },
+  },
+  "/fields/usage": {
+    get: {
+      operationId: "getFieldsUsage",
+      summary: "Get usage statistics for all fields in a table",
+      tags: ["Fields"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier (dbid) of the table.",
+        },
+        {
+          name: "skip",
+          in: "query",
+          required: false,
+          type: "integer",
+          description: "The number of fields to skip from the list.",
+        },
+        {
+          name: "top",
+          in: "query",
+          required: false,
+          type: "integer",
+          description: "The maximum number of fields to return.",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - field usage statistics retrieved",
+          schema: {
+            type: "array",
+            items: { $ref: "#/definitions/FieldUsage" },
+          },
         },
       },
     },
