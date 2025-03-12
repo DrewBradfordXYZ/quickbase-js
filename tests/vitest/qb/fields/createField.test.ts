@@ -5,7 +5,7 @@ import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 describe("QuickbaseClient Integration - createField", () => {
   const client = createClient();
 
-  // Array to store field IDs for cleanup
+  // Array to store field IDs for cleanup, explicitly initialized
   const createdFieldIds: number[] = [];
 
   afterAll(async () => {
@@ -19,11 +19,17 @@ describe("QuickbaseClient Integration - createField", () => {
         });
         console.log(
           `Cleaned up fields: ${JSON.stringify(response.deletedFieldIds)}`,
-          response.errors.length > 0 ? `Errors: ${response.errors}` : ""
+          response.errors && response.errors.length > 0
+            ? `Errors: ${response.errors}`
+            : ""
         );
       } catch (error) {
         console.error("Cleanup failed:", error);
+        // Log the fields that weren't cleaned up
+        console.log(`Fields left in table: ${createdFieldIds}`);
       }
+    } else {
+      console.log("No fields to clean up.");
     }
   });
 
