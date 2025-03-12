@@ -29,7 +29,7 @@ const config = defineConfig({
 });
 
 console.log(
-  `Loading Playwright config with timeout: ${config.timeout}ms, workers: ${
+  `Loading Playwright: Testing temp token authorization in browser. Be patient, this should take at least 5min. Workers: ${
     config.workers || "default (half CPU cores)"
   }`
 );
