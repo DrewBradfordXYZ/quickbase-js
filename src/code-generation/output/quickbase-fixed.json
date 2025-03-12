@@ -7244,6 +7244,153 @@
         "name"
       ]
     },
+    "CopyAppRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the newly copied app."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the newly copied app."
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "keepData": {
+              "type": "boolean",
+              "description": "Whether to copy the app's data along with the schema."
+            },
+            "excludeFiles": {
+              "type": "boolean",
+              "description": "If keepData is true, whether to copy file attachments. Ignored if keepData is false."
+            },
+            "usersAndRoles": {
+              "type": "boolean",
+              "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned."
+            },
+            "assignUserToken": {
+              "type": "boolean",
+              "description": "Whether to add the user token used to make this request to the new app."
+            }
+          },
+          "description": "The configuration properties for performing the app copy."
+        }
+      },
+      "description": "Request body for copying an existing application."
+    },
+    "CopyApp200Response": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the copied application."
+        },
+        "name": {
+          "type": "string",
+          "description": "The app name. Multiple apps with the same name are allowed in the same realm."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the app."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was created (ISO 8601, UTC)."
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time and date the app was last updated (ISO 8601, UTC)."
+        },
+        "dateFormat": {
+          "type": "string",
+          "description": "The format used for displaying dates in the app (e.g., MM-DD-YYYY)."
+        },
+        "timeZone": {
+          "type": "string",
+          "description": "The time zone used for displaying time values (e.g., (UTC-08:00) Pacific Time)."
+        },
+        "hasEveryoneOnTheInternet": {
+          "type": "boolean",
+          "description": "Indicates if the app includes Everyone On The Internet access."
+        },
+        "variables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ]
+          },
+          "description": "The app variables."
+        },
+        "ancestorId": {
+          "type": "string",
+          "description": "The id of the app from which this app was copied."
+        },
+        "dataClassification": {
+          "type": "string",
+          "description": "The Data Classification label assigned to the app (optional, may be 'None')."
+        }
+      },
+      "description": "Response body for successful app copy operation."
+    },
+    "DeleteAppRequest": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the application to delete, required for confirmation."
+        }
+      },
+      "description": "Request body for deleting an application, requiring the app name for confirmation."
+    },
+    "DeleteApp200Response": {
+      "type": "object",
+      "properties": {
+        "deletedAppId": {
+          "type": "string",
+          "description": "The ID of the deleted application."
+        }
+      },
+      "required": [
+        "deletedAppId"
+      ],
+      "description": "Response body for successful deletion of an application."
+    },
+    "GetTempTokenDBID200Response": {
+      "type": "object",
+      "required": [
+        "temporaryAuthorization"
+      ],
+      "properties": {
+        "temporaryAuthorization": {
+          "type": "string"
+        }
+      }
+    },
     "Field": {
       "type": "object",
       "required": [
@@ -7818,116 +7965,6 @@
       },
       "description": "Response body for successful field creation."
     },
-    "Table": {
-      "type": "object",
-      "required": [
-        "id",
-        "name"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The unique identifier (dbid) of the table."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the table."
-        },
-        "alias": {
-          "type": "string",
-          "description": "The automatically-created table alias for the table."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of the table, as configured by an application administrator."
-        },
-        "created": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The time and date when the table was created, in ISO 8601 format (UTC)."
-        },
-        "updated": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The time and date when the table schema or data was last updated, in ISO 8601 format (UTC)."
-        },
-        "nextRecordId": {
-          "type": "integer",
-          "description": "The incremental Record ID that will be used when the next record is created."
-        },
-        "nextFieldId": {
-          "type": "integer",
-          "description": "The incremental Field ID that will be used when the next field is created."
-        },
-        "defaultSortFieldId": {
-          "type": "integer",
-          "description": "The id of the field that is configured for default sorting."
-        },
-        "defaultSortOrder": {
-          "type": "string",
-          "enum": [
-            "ASC",
-            "DESC"
-          ],
-          "description": "The default sort order for the table, either ascending (ASC) or descending (DESC)."
-        },
-        "keyFieldId": {
-          "type": "integer",
-          "description": "The id of the field that is configured to be the key on this table, usually the Quickbase Record ID."
-        },
-        "singleRecordName": {
-          "type": "string",
-          "description": "The builder-configured singular noun of the table."
-        },
-        "pluralRecordName": {
-          "type": "string",
-          "description": "The builder-configured plural noun of the table."
-        },
-        "sizeLimit": {
-          "type": "string",
-          "description": "The size limit for the table (e.g., '150 MB')."
-        },
-        "spaceUsed": {
-          "type": "string",
-          "description": "The amount of space currently being used by the table (e.g., '17 MB')."
-        },
-        "spaceRemaining": {
-          "type": "string",
-          "description": "The amount of space remaining for use by the table (e.g., '133 MB')."
-        }
-      }
-    },
-    "UpdateTableRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The new name for the table."
-        },
-        "singleRecordName": {
-          "type": "string",
-          "description": "The new singular noun for records in the table. Defaults to 'Record' if not provided."
-        },
-        "pluralRecordName": {
-          "type": "string",
-          "description": "The new plural noun for records in the table. Defaults to 'Records' if not provided."
-        },
-        "description": {
-          "type": "string",
-          "description": "The new description for the table. Defaults to blank if not provided."
-        }
-      },
-      "description": "Request body for updating table properties. At least one property must be provided."
-    },
-    "DeleteTableResponse": {
-      "type": "object",
-      "properties": {
-        "deletedTableId": {
-          "type": "string",
-          "description": "The deleted table id."
-        }
-      }
-    },
     "Record": {
       "type": "object",
       "properties": {
@@ -8156,28 +8193,6 @@
           "required": [
             "totalNumberOfRecordsProcessed"
           ]
-        }
-      }
-    },
-    "ReportRunResponse": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "data": {
-          "type": "object"
-        }
-      }
-    },
-    "GetTempTokenDBID200Response": {
-      "type": "object",
-      "required": [
-        "temporaryAuthorization"
-      ],
-      "properties": {
-        "temporaryAuthorization": {
-          "type": "string"
         }
       }
     },
@@ -8458,46 +8473,18 @@
       ],
       "description": "A field involved in a relationship (foreign key, lookup, or summary)."
     },
-    "CopyAppRequest": {
+    "ReportRunResponse": {
       "type": "object",
-      "required": [
-        "name"
-      ],
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the newly copied app."
+        "id": {
+          "type": "string"
         },
-        "description": {
-          "type": "string",
-          "description": "The description of the newly copied app."
-        },
-        "properties": {
-          "type": "object",
-          "properties": {
-            "keepData": {
-              "type": "boolean",
-              "description": "Whether to copy the app's data along with the schema."
-            },
-            "excludeFiles": {
-              "type": "boolean",
-              "description": "If keepData is true, whether to copy file attachments. Ignored if keepData is false."
-            },
-            "usersAndRoles": {
-              "type": "boolean",
-              "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned."
-            },
-            "assignUserToken": {
-              "type": "boolean",
-              "description": "Whether to add the user token used to make this request to the new app."
-            }
-          },
-          "description": "The configuration properties for performing the app copy."
+        "data": {
+          "type": "object"
         }
-      },
-      "description": "Request body for copying an existing application."
+      }
     },
-    "CopyApp200Response": {
+    "Table": {
       "type": "object",
       "required": [
         "id",
@@ -8506,93 +8493,106 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique identifier for the copied application."
+          "description": "The unique identifier (dbid) of the table."
         },
         "name": {
           "type": "string",
-          "description": "The app name. Multiple apps with the same name are allowed in the same realm."
+          "description": "The name of the table."
+        },
+        "alias": {
+          "type": "string",
+          "description": "The automatically-created table alias for the table."
         },
         "description": {
           "type": "string",
-          "description": "The description for the app."
+          "description": "The description of the table, as configured by an application administrator."
         },
         "created": {
           "type": "string",
           "format": "date-time",
-          "description": "The time and date the app was created (ISO 8601, UTC)."
+          "description": "The time and date when the table was created, in ISO 8601 format (UTC)."
         },
         "updated": {
           "type": "string",
           "format": "date-time",
-          "description": "The time and date the app was last updated (ISO 8601, UTC)."
+          "description": "The time and date when the table schema or data was last updated, in ISO 8601 format (UTC)."
         },
-        "dateFormat": {
+        "nextRecordId": {
+          "type": "integer",
+          "description": "The incremental Record ID that will be used when the next record is created."
+        },
+        "nextFieldId": {
+          "type": "integer",
+          "description": "The incremental Field ID that will be used when the next field is created."
+        },
+        "defaultSortFieldId": {
+          "type": "integer",
+          "description": "The id of the field that is configured for default sorting."
+        },
+        "defaultSortOrder": {
           "type": "string",
-          "description": "The format used for displaying dates in the app (e.g., MM-DD-YYYY)."
+          "enum": [
+            "ASC",
+            "DESC"
+          ],
+          "description": "The default sort order for the table, either ascending (ASC) or descending (DESC)."
         },
-        "timeZone": {
+        "keyFieldId": {
+          "type": "integer",
+          "description": "The id of the field that is configured to be the key on this table, usually the Quickbase Record ID."
+        },
+        "singleRecordName": {
           "type": "string",
-          "description": "The time zone used for displaying time values (e.g., (UTC-08:00) Pacific Time)."
+          "description": "The builder-configured singular noun of the table."
         },
-        "hasEveryoneOnTheInternet": {
-          "type": "boolean",
-          "description": "Indicates if the app includes Everyone On The Internet access."
-        },
-        "variables": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "name",
-              "value"
-            ]
-          },
-          "description": "The app variables."
-        },
-        "ancestorId": {
+        "pluralRecordName": {
           "type": "string",
-          "description": "The id of the app from which this app was copied."
+          "description": "The builder-configured plural noun of the table."
         },
-        "dataClassification": {
+        "sizeLimit": {
           "type": "string",
-          "description": "The Data Classification label assigned to the app (optional, may be 'None')."
+          "description": "The size limit for the table (e.g., '150 MB')."
+        },
+        "spaceUsed": {
+          "type": "string",
+          "description": "The amount of space currently being used by the table (e.g., '17 MB')."
+        },
+        "spaceRemaining": {
+          "type": "string",
+          "description": "The amount of space remaining for use by the table (e.g., '133 MB')."
         }
-      },
-      "description": "Response body for successful app copy operation."
+      }
     },
-    "DeleteAppRequest": {
+    "UpdateTableRequest": {
       "type": "object",
-      "required": [
-        "name"
-      ],
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the application to delete, required for confirmation."
+          "description": "The new name for the table."
+        },
+        "singleRecordName": {
+          "type": "string",
+          "description": "The new singular noun for records in the table. Defaults to 'Record' if not provided."
+        },
+        "pluralRecordName": {
+          "type": "string",
+          "description": "The new plural noun for records in the table. Defaults to 'Records' if not provided."
+        },
+        "description": {
+          "type": "string",
+          "description": "The new description for the table. Defaults to blank if not provided."
         }
       },
-      "description": "Request body for deleting an application, requiring the app name for confirmation."
+      "description": "Request body for updating table properties. At least one property must be provided."
     },
-    "DeleteApp200Response": {
+    "DeleteTableResponse": {
       "type": "object",
       "properties": {
-        "deletedAppId": {
+        "deletedTableId": {
           "type": "string",
-          "description": "The ID of the deleted application."
+          "description": "The deleted table id."
         }
-      },
-      "required": [
-        "deletedAppId"
-      ],
-      "description": "Response body for successful deletion of an application."
+      }
     }
   }
 }

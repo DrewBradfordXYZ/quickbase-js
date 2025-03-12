@@ -3,8 +3,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import * as glob from "glob";
-import { paths } from "./fix-spec-paths.ts";
-import { definitions } from "./fix-spec-definitions.ts";
+import { paths } from "./paths/index.ts";
+import { definitions } from "./definitions/index.ts";
 
 interface Parameter {
   name: string;

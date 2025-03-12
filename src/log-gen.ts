@@ -75,8 +75,8 @@ const pipelineOverview: string[] = [
   "getTempTokenDBID() method is wrapped to enhance temporary token generation reuse interacting with a token cache.",
   "#",
   "npm run fix-spec: Generates quickbase-fixed.json from the latest QuickBase_RESTful*.json file.",
-  "npm run regenerate: Generates raw TypeScript-fetch files in src/generated/.",
-  "npm run generate-unified: Generates a unified QuickbaseClient.ts interface in src/generated-unified/.",
+  "npm run regenerate:openapi Generates raw TypeScript-fetch files in src/generated/.",
+  "npm run generate:unified: Generates a unified QuickbaseClient.ts interface in src/generated-unified/.",
 ];
 
 interface TreeNode {
