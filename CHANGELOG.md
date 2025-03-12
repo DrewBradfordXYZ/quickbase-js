@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0-beta.4](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2025-03-12)
+
+
+### Features
+
+* createField and deleteFields tests are passing ([4b47c4d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4b47c4deb9b3d731e6e7938c12fcebe97830568b))
+* createField mock and integration tests pass ([b227c73](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b227c73b08f7efa5ce5f3d0c2897f82c8976a009))
+* deleteFields spec update ([1f8beca](https://github.com/DrewBradfordXYZ/quickbase-js/commit/1f8becaca0d6b7950648c1b9bc2b0215781fa829))
+* getFeildsUsage.test.ts unit and integration tests pass ([82a4886](https://github.com/DrewBradfordXYZ/quickbase-js/commit/82a488622967ec24a8767cbb19c59ef4ce808749))
+* getField.test.ts unit and integration tests pass ([3e50b70](https://github.com/DrewBradfordXYZ/quickbase-js/commit/3e50b704f0ebea47f2fee3d02d811ea1b43db6c4))
+* getFieldsUsage fix spec ([031faaa](https://github.com/DrewBradfordXYZ/quickbase-js/commit/031faaaeab9597f35fdd1ddcf5157ce5d774390b))
+* getFieldUsage spec and unit test pass ([ac2824b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ac2824b226140dde99e33cf594d57bd6ffd4dc39))
+* getFieldUsage unit and integration tests pass ([e62b586](https://github.com/DrewBradfordXYZ/quickbase-js/commit/e62b586d534620479a25dda2796ba5dcb8043705))
+* split up fix-spec-paths and fix-spec-definitions into many files ([20d3246](https://github.com/DrewBradfordXYZ/quickbase-js/commit/20d32464e6337028778845fa55fbb19c5543f7eb))
+
+
+### Bug Fixes
+
+* cleanup createField.test.ts logging ([7b1306b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/7b1306bd8eb49e2c932ce267f33457e949e0f74b))
+* createField test syntax update ([043f964](https://github.com/DrewBradfordXYZ/quickbase-js/commit/043f964a47346878440eb73cc10c110dab904ad7))
+* getFieldsUsage type fix ([4c6f271](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4c6f271d123131ae13a236664f28fbbdfde3d564))
+* update deleteFields error type spec ([1788e1c](https://github.com/DrewBradfordXYZ/quickbase-js/commit/1788e1ce6d4d2c8df871ec8b112be908d706f884))
+
 ## [1.1.0-beta.3](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2025-03-11)
 
 ### Features
