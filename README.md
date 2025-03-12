@@ -1,5 +1,11 @@
 # quickbase-js
 
+# Installation
+
+```bash
+npm install --save quickbase-js
+```
+
 ## Example
 
 ```html

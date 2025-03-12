@@ -160,4 +160,46 @@ export const fieldsPaths = {
       },
     },
   },
+  "/fields/usage/{fieldId}": {
+    get: {
+      operationId: "getFieldUsage",
+      summary: "Get usage statistics for a single field",
+      description:
+        "Retrieve usage statistics for a specific field, summarizing where it is referenced across QuickBase features such as reports, forms, and pipelines.",
+      tags: ["Fields"],
+      parameters: [
+        {
+          name: "fieldId",
+          in: "path",
+          required: true,
+          type: "integer",
+          description: "The unique identifier (fid) of the field.",
+        },
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+          description:
+            "The unique identifier (dbid) of the table containing the field.",
+        },
+        {
+          name: "User-Agent",
+          in: "header",
+          required: false,
+          type: "string",
+          description:
+            "Identifies the client making the request. Can be custom or default from your toolkit.",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - field usage statistics retrieved",
+          schema: {
+            $ref: "#/definitions/FieldUsage",
+          },
+        },
+      },
+    },
+  },
 };

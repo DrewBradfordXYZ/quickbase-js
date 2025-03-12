@@ -1,5 +1,5 @@
 project: quickbase-js
-date: 3/11/2025
+date: 3/12/2025
 root: /home/drew/Projects/quickbase-js
 goals:
   - A library for interacting with the QuickBase RESTful API.
@@ -272,6 +272,12 @@ tree:
                   type: file
                 - name: FieldProperties.ts
                   type: file
+                - name: FieldUsage.ts
+                  type: file
+                - name: FieldUsageField.ts
+                  type: file
+                - name: FieldUsageUsage.ts
+                  type: file
                 - name: GenerateDocument200Response.ts
                   type: file
                 - name: GetRelationships200Response.ts
@@ -362,6 +368,8 @@ tree:
                   type: file
                 - name: UpsertRequest.ts
                   type: file
+                - name: UsageCount.ts
+                  type: file
                 - name: index.ts
                   type: file
             - name: runtime.ts
@@ -405,18 +413,1115 @@ tree:
                   children:
                     - name: cacheSwitching.test.ts
                       type: file
+                      contents: |
+                        // tests/playwright/qb/auth/cacheSwitching.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              console.log("Navigating to login page");
+                              await page.goto(quickbaseUrl, { timeout: 30000 });
+                              console.log("Waiting for loginid selector");
+                              await page.waitForSelector("input[name='loginid']", { timeout: 30000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              console.log("Clicking signin");
+                              await page.click("#signin");
+                              console.log("Waiting for navigation");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 30000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
+                          // Removed test.use({ context: ... })
+
+                          test("caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence", async ({
+                            page,
+                          }) => {
+                            console.log("Starting cacheSwitching test");
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const tableId = process.env.QB_TABLE_ID_1;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!tableId) throw new Error("QB_TABLE_ID_1 is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 30000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              fetchResponse.json = async () => {
+                                if (!response.body) throw new Error("Empty response body from API");
+                                try {
+                                  return JSON.parse(response.body);
+                                } catch (e) {
+                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                }
+                              };
+
+                              return fetchResponse;
+                            };
+
+                            const client = quickbase({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init);
+                                }
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit);
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                const fetchResponse = new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!body) throw new Error("Empty response body from API");
+                                  try {
+                                    return JSON.parse(body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
+                            });
+
+                            const appResult1 = await client.getApp({ appId });
+                            console.log("First getApp response:", appResult1);
+                            expect(appResult1.id).toBe(appId);
+
+                            const fieldsResult = await client.getFields({ tableId });
+                            console.log("getFields response:", fieldsResult);
+                            expect(fieldsResult.length).toBeGreaterThan(0);
+
+                            const appResult2 = await client.getApp({ appId });
+                            console.log("Second getApp response:", appResult2);
+                            expect(appResult2.id).toBe(appId);
+                          });
+                        });
                     - name: fetchTempToken401.test.ts
                       type: file
+                      contents: |
+                        // tests/playwright/qb/auth/tokenInvalidation.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - Token Invalidation with Cached Token", () => {
+                          test("retries with new token when cached token is unexpectedly invalidated", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            // Login to QuickBase
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            // Navigate to the app page to ensure session context
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            // Track tokens and call counts
+                            let callCount = 0;
+                            let getAppCallCount = 0;
+                            let initialToken: string | null = null;
+                            let retryToken: string | null = null;
+
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              console.log(`browserFetch called for ${url}, callCount: ${callCount}`);
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              // Capture token from response
+                              if (url.includes("/auth/temporary/")) {
+                                const json = await fetchResponse.clone().json();
+                                const token = json.temporaryAuthorization;
+                                if (!initialToken) {
+                                  initialToken = token;
+                                  console.log(`Captured initial token: ${initialToken}`);
+                                } else if (!retryToken) {
+                                  retryToken = token;
+                                  console.log(`Captured retry token: ${retryToken}`);
+                                }
+                              }
+
+                              return fetchResponse;
+                            };
+
+                            const client = quickbase({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                callCount++;
+                                console.log(`fetchApi called for ${url}, callCount: ${callCount}`);
+
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init); // Use browser fetch for temp tokens
+                                }
+
+                                if (url.includes(`/apps/${appId}`)) {
+                                  getAppCallCount++;
+                                  console.log(`getApp call count: ${getAppCallCount}`);
+                                  // Simulate 401 on the first getApp call to trigger retry
+                                  if (getAppCallCount === 1) {
+                                    console.log("Simulating 401 Unauthorized for first getApp call");
+                                    return new Response(JSON.stringify({ message: "Unauthorized" }), {
+                                      status: 401,
+                                      statusText: "Unauthorized",
+                                      headers: { "Content-Type": "application/json" },
+                                    });
+                                  }
+                                }
+
+                                // Use node-fetch for subsequent calls (including retries)
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit);
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                return new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+                              },
+                            });
+
+                            // Pre-fetch token to simulate cached token
+                            console.log("Pre-fetching initial token...");
+                            const preFetchResult = await client.getTempTokenDBID({ dbid: appId });
+                            console.log("Initial token pre-fetched and cached:", preFetchResult);
+
+                            // Call getApp, expecting a 401 followed by a retry with a new token
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response after token invalidation and retry:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+
+                            // Verify call counts and token behavior
+                            console.log(
+                              `Final callCount: ${callCount}, Final getAppCallCount: ${getAppCallCount}`
+                            );
+                            expect(callCount).toBe(4); // Pre-fetch, 401, token retry, getApp success
+                            expect(getAppCallCount).toBe(2); // Initial 401, retry success
+
+                            // Validate pre-fetch and retry tokens
+                            console.log(`Initial token: ${initialToken}`);
+                            console.log(`Retry token: ${retryToken}`);
+                            expect(initialToken).toBeDefined();
+                            expect(initialToken).toBe(preFetchResult.temporaryAuthorization); // Confirm pre-fetch token was used
+                            expect(retryToken).toBeDefined();
+                            expect(initialToken).not.toBe(retryToken); // Confirm retry used a new token
+                          });
+                        });
                     - name: getAppWithUserToken.test.ts
                       type: file
+                      contents: |
+                        // tests/integration/auth/getAppWithUserToken.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - getApp with User Token", () => {
+                          test("uses user token for getApp in browser", async ({ page }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+                            const userToken = process.env.QB_USER_TOKEN;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+                            if (!userToken) throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                            // Login to Quickbase (optional, to mimic code page context)
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            // Navigate to the app page to ensure session context (optional)
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+
+                            const currentUrl = page.url();
+                            console.log("Post-login URL after app navigation:", currentUrl);
+
+                            // Create Quickbase client with user token
+                            const client = quickbase({
+                              realm,
+                              userToken, // Use user token instead of temp tokens
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await page.evaluate(
+                                  async ([fetchUrl, fetchInit]) => {
+                                    const res = await fetch(fetchUrl, {
+                                      ...fetchInit,
+                                      credentials: "omit", // No cookies needed with user token
+                                    });
+                                    const body = await res.text();
+                                    return {
+                                      ok: res.ok,
+                                      status: res.status,
+                                      statusText: res.statusText,
+                                      headers: Object.fromEntries(res.headers.entries()),
+                                      body,
+                                    };
+                                  },
+                                  [url, init] as [string, RequestInit]
+                                );
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body: response.body,
+                                });
+
+                                const fetchResponse = new Response(response.body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: response.headers,
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!response.body) {
+                                    throw new Error("Empty response body from API");
+                                  }
+                                  try {
+                                    return JSON.parse(response.body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
+                            });
+
+                            // Call getApp directly
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response using user token:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+                          });
+                        });
                     - name: getTempToken.test.ts
                       type: file
+                      contents: |
+                        // tests/integration/auth/getTempToken.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - getApp with Temp Tokens", () => {
+                          test("uses temp tokens automatically for getApp in browser", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            // Login to QuickBase
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            // Navigate to the app page to ensure session context
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            // Define browser fetch function
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              fetchResponse.json = async () => {
+                                if (!response.body) throw new Error("Empty response body from API");
+                                try {
+                                  return JSON.parse(response.body);
+                                } catch (e) {
+                                  throw new SyntaxError(`Invalid JSON response: ${response.body}`);
+                                }
+                              };
+
+                              return fetchResponse;
+                            };
+
+                            // Single client with conditional fetch
+                            const client = quickbase({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init); // Use browser context for temp token
+                                }
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit); // Node-fetch for API calls
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                const fetchResponse = new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+
+                                fetchResponse.json = async () => {
+                                  if (!body) throw new Error("Empty response body from API");
+                                  try {
+                                    return JSON.parse(body);
+                                  } catch (e) {
+                                    throw new SyntaxError(`Invalid JSON response: ${body}`);
+                                  }
+                                };
+
+                                return fetchResponse;
+                              },
+                            });
+
+                            // Call getApp directly, letting the library handle temp token logic
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response using auto-fetched temp token:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+                          });
+                        });
                     - name: tokenPrefetch.test.ts
                       type: file
+                      contents: |
+                        // tests/playwright/qb/auth/tokenPrefetch.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import fetch from "node-fetch";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page: import("@playwright/test").Page,
+                          quickbaseUrl: string,
+                          username: string,
+                          password: string
+                        ): Promise<boolean> => {
+                          console.log("Logging in to QuickBase");
+                          let loginSuccess = false;
+                          const maxLoginAttempts = 3;
+                          let loginAttempt = 0;
+
+                          while (!loginSuccess && loginAttempt < maxLoginAttempts) {
+                            try {
+                              loginAttempt++;
+                              if (loginAttempt > 1) console.log(`Login attempt ${loginAttempt}`);
+
+                              await page.goto(quickbaseUrl, { timeout: 60000 });
+                              await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                              await page.fill("input[name='loginid']", username);
+                              await page.fill("input[name='password']", password);
+                              await page.click("#signin");
+                              await page.waitForURL(`https://*.quickbase.com/**`, {
+                                waitUntil: "networkidle",
+                                timeout: 60000,
+                              });
+
+                              const loginError = await page.$(".login-error");
+                              if (loginError) {
+                                throw new Error("Login failed. Please check your credentials.");
+                              }
+
+                              console.log("Signed In to QuickBase.");
+                              loginSuccess = true;
+                            } catch (error) {
+                              console.error(
+                                `Login attempt ${loginAttempt} failed: ${(error as Error).message}`
+                              );
+                              if (loginAttempt >= maxLoginAttempts) {
+                                console.error("Max login attempts reached. Exiting.");
+                                await page.context().browser()!.close();
+                                return false;
+                              }
+                              await new Promise((resolve) => setTimeout(resolve, 5000));
+                            }
+                          }
+                          return loginSuccess;
+                        };
+
+                        test.describe("QuickbaseClient Integration - Token Pre-Fetch and Cache Reuse", () => {
+                          test("pre-fetches token and reuses it for subsequent API calls", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM;
+                            const appId = process.env.QB_APP_ID;
+                            const username = process.env.QB_USERNAME;
+                            const password = process.env.QB_PASSWORD;
+
+                            if (!realm) throw new Error("QB_REALM is not defined in .env");
+                            if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+                            if (!username) throw new Error("QB_USERNAME is not defined in .env");
+                            if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+
+                            // Login to QuickBase
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const loginSuccess = await loginToQuickbase(
+                              page,
+                              quickbaseUrl,
+                              username,
+                              password
+                            );
+                            if (!loginSuccess) {
+                              throw new Error("Failed to log in to QuickBase after max attempts.");
+                            }
+
+                            // Navigate to the app page to ensure session context
+                            await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
+                              waitUntil: "networkidle",
+                              timeout: 60000,
+                            });
+                            console.log("Post-login URL after app navigation:", page.url());
+
+                            // Track tokens and call counts
+                            let callCount = 0;
+                            let cachedToken: string | null = null;
+
+                            const browserFetch = async (url: string, init?: RequestInit) => {
+                              console.log(`browserFetch called for ${url}, callCount: ${callCount}`);
+                              const response = await page.evaluate(
+                                async ([fetchUrl, fetchInit]) => {
+                                  const res = await fetch(fetchUrl, {
+                                    ...fetchInit,
+                                    credentials: "include",
+                                  });
+                                  const body = await res.text();
+                                  return {
+                                    ok: res.ok,
+                                    status: res.status,
+                                    statusText: res.statusText,
+                                    headers: Object.fromEntries(res.headers.entries()),
+                                    body,
+                                  };
+                                },
+                                [url, init] as [string, RequestInit]
+                              );
+
+                              console.log(`Raw response from ${url}:`, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                body: response.body,
+                              });
+
+                              const fetchResponse = new Response(response.body || null, {
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: response.headers,
+                              });
+
+                              // Capture token from response
+                              if (url.includes("/auth/temporary/")) {
+                                const json = await fetchResponse.clone().json();
+                                const token = json.temporaryAuthorization;
+                                cachedToken = token; // Store the pre-fetched token
+                                console.log(`Captured pre-fetched token: ${cachedToken}`);
+                              }
+
+                              return fetchResponse;
+                            };
+
+                            const client = quickbase({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: async (url, init) => {
+                                callCount++;
+                                console.log(`fetchApi called for ${url}, callCount: ${callCount}`);
+
+                                if (url.includes("/auth/temporary/")) {
+                                  return browserFetch(url, init); // Use browser fetch for temp tokens
+                                }
+
+                                // Use node-fetch for app calls, ensuring we track reuse
+                                console.log(`Fetching ${url} with init:`, init);
+                                const response = await fetch(url, init as RequestInit);
+                                const body = await response.text();
+
+                                console.log(`Raw response from ${url}:`, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  body,
+                                });
+
+                                return new Response(body || null, {
+                                  status: response.status,
+                                  statusText: response.statusText,
+                                  headers: Object.fromEntries(response.headers.entries()),
+                                });
+                              },
+                            });
+
+                            // Step 1: Pre-fetch token
+                            console.log("Pre-fetching token...");
+                            const tokenResult = await client.getTempTokenDBID({ dbid: appId });
+                            console.log("Pre-fetched token result:", tokenResult);
+                            expect(tokenResult).toHaveProperty("temporaryAuthorization");
+                            expect(cachedToken).toBe(tokenResult.temporaryAuthorization);
+
+                            // Step 2: Call getApp, expecting it to reuse the cached token
+                            console.log("Calling getApp with pre-fetched token...");
+                            const appResult = await client.getApp({ appId });
+                            console.log("App response:", appResult);
+
+                            // Validate the app response
+                            expect(appResult).toHaveProperty("id", appId);
+                            expect(appResult).toHaveProperty("name");
+
+                            // Verify call count and token reuse
+                            console.log(`Final callCount: ${callCount}`);
+                            expect(callCount).toBe(2); // One for pre-fetch, one for getApp
+                            expect(cachedToken).toBeDefined();
+
+                            // Check that getApp reused the token by inspecting logs manually or adding a header check if needed
+                            console.log(`Pre-fetched token: ${cachedToken}`);
+                          });
+                        });
                     - name: tokenRenewal.test.ts
                       type: file
+                      contents: |
+                        // tests/playwright/qb/auth/tokenRenewal.test.ts
+                        import { test, expect } from "@playwright/test";
+                        import { quickbase } from "../../../../src/quickbaseClient.ts";
+                        import dotenv from "dotenv";
+
+                        dotenv.config();
+
+                        const loginToQuickbase = async (
+                          page,
+                          quickbaseUrl,
+                          username,
+                          password,
+                          appUrl
+                        ) => {
+                          console.log("Logging in to QuickBase");
+                          await page.goto(quickbaseUrl, { timeout: 60000 });
+                          await page.waitForSelector("input[name='loginid']", { timeout: 60000 });
+                          await page.fill("input[name='loginid']", username);
+                          await page.fill("input[name='password']", password);
+                          await page.click("#signin");
+                          await page.waitForURL(`https://*.quickbase.com/**`, {
+                            waitUntil: "networkidle",
+                            timeout: 60000,
+                          });
+                          console.log("Signed In to QuickBase.");
+                          await page.goto(appUrl, { waitUntil: "networkidle", timeout: 60000 });
+                          console.log("Navigated to app URL:", page.url());
+                        };
+
+                        test.describe("QuickbaseClient Integration - Temp Token Renewal", () => {
+                          test("renews temp token after 5 minutes with getApp → wait → getApp sequence", async ({
+                            page,
+                          }) => {
+                            const realm = process.env.QB_REALM!;
+                            const appId = process.env.QB_APP_ID!;
+                            const username = process.env.QB_USERNAME!;
+                            const password = process.env.QB_PASSWORD!;
+                            const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
+                            const appUrl = `https://${realm}.quickbase.com/db/${appId}`;
+
+                            await loginToQuickbase(page, quickbaseUrl, username, password, appUrl);
+
+                            const browserFetch = async (
+                              url: string,
+                              init: RequestInit
+                            ): Promise<Response> => {
+                              const response = await page.request.fetch(url, {
+                                method: init.method || "GET",
+                                headers: {
+                                  ...init.headers,
+                                  Referer: `https://${realm}.quickbase.com/db/${appId}`,
+                                  Origin: `https://${realm}.quickbase.com`,
+                                },
+                                data: init.body,
+                                credentials: "include",
+                              });
+                              const body = await response.text();
+                              console.log(
+                                "Response from:",
+                                url,
+                                "status:",
+                                response.status(),
+                                "body:",
+                                body
+                              );
+                              return new Response(body, {
+                                status: response.status(),
+                                statusText: response.statusText(),
+                                headers: response.headers(),
+                              });
+                            };
+
+                            const client = quickbase({
+                              realm,
+                              useTempTokens: true,
+                              debug: true,
+                              fetchApi: browserFetch,
+                            });
+
+                            console.log("Checking session state before getApp...");
+                            const cookies = await page.context().cookies();
+                            const sessionCookie = cookies.find(
+                              (c) => c.name === "TICKET" || c.name.startsWith("TICKET_")
+                            );
+                            console.log(
+                              "Session cookie present:",
+                              !!sessionCookie,
+                              "Cookies:",
+                              cookies
+                            );
+                            if (!sessionCookie) throw new Error("TICKET session cookie not found");
+
+                            await page.waitForTimeout(5000); // Debug delay
+                            console.log("Cookies after delay:", await page.context().cookies());
+
+                            const appResult1 = await client.getApp({ appId });
+                            console.log("First getApp response:", appResult1);
+                            expect(appResult1.id).toBe(appId);
+
+                            console.log("Waiting 5 minutes to test token expiration...");
+                            await new Promise((resolve) => setTimeout(resolve, 5 * 60 * 1000));
+
+                            await page.reload({ waitUntil: "load", timeout: 60000 });
+                            console.log("Refreshed page after 5 minutes, URL:", page.url());
+
+                            const appResult2 = await client.getApp({ appId });
+                            console.log("Second getApp response:", appResult2);
+                            expect(appResult2.id).toBe(appId);
+                          });
+                        });
         - name: setup.ts
           type: file
+          contents: |
+            // @tests/setup.ts
+            import { vi } from "vitest";
+            import { quickbase } from "../src/quickbaseClient.ts";
+            import type { QuickbaseConfig } from "../src/quickbaseClient.ts";
+            import dotenv from "dotenv";
+
+            // Load environment variables from .env file
+            dotenv.config({ path: "./.env" }); // Assumes .env is at project root
+
+            export const mockFetch = vi.fn();
+
+            export const QB_REALM = process.env.QB_REALM || "test-realm";
+            export const QB_USER_TOKEN =
+              process.env.QB_USER_TOKEN || "user-token-1234567890";
+            export const QB_APP_ID = process.env.QB_APP_ID || "app-id-1234567890";
+            export const QB_TABLE_ID_1 =
+              process.env.QB_TABLE_ID_1 || "table-id-1-1234567890";
+            export const QB_TABLE_ID_2 =
+              process.env.QB_TABLE_ID_2 || "table-id-2-1234567890";
+
+            // Mock env variables for consistency, using .env values if available
+            vi.stubEnv("QB_REALM", QB_REALM);
+            vi.stubEnv("QB_USER_TOKEN", QB_USER_TOKEN);
+            vi.stubEnv("QB_APP_ID", QB_APP_ID);
+            vi.stubEnv("QB_TABLE_ID_1", QB_TABLE_ID_1);
+            vi.stubEnv("QB_TABLE_ID_2", QB_TABLE_ID_2);
+
+            export const createClient = (
+              fetchApi?: any,
+              config: Partial<QuickbaseConfig> = {}
+            ) => {
+              // Use loaded env vars with fallbacks for safety
+              const realm = QB_REALM;
+              const userToken = QB_USER_TOKEN;
+
+              const client = quickbase({
+                realm,
+                userToken,
+                debug: true,
+                fetchApi,
+                ...config, // Allow overrides if provided
+              });
+              console.log("[createClient] Config:", {
+                realm,
+                userToken,
+                debug: true,
+                ...config,
+              });
+              console.log("[createClient] Returning:", client);
+              return client;
+            };
         - name: vitest
           type: directory
           children:
@@ -428,47 +1533,1577 @@ tree:
                   children:
                     - name: copyApp.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/apps/copyApp.test.ts
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - copyApp > creates a new copied app in QuickBase",
+                          { timeout: 30000 }, // Increased to 30 seconds
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const appId = process.env.QB_APP_ID || ""; // The source app ID to copy from
+
+                            const copyAppName = `CopiedApp_${Date.now()}`; // Unique name to avoid conflicts
+                            const copyBody = {
+                              name: copyAppName,
+                              description: "Test copied app",
+                              properties: {
+                                keepData: false,
+                                excludeFiles: true,
+                                usersAndRoles: false,
+                                assignUserToken: true,
+                              },
+                            };
+
+                            console.log("Config used:", {
+                              ...config,
+                              userToken: config.userToken ? "[REDACTED]" : "", // Avoid logging sensitive token
+                            });
+                            console.log("Copying app with:", copyBody);
+                            const startTime = Date.now();
+                            let response;
+                            try {
+                              response = await client.copyApp({ appId, body: copyBody });
+                              const duration = Date.now() - startTime;
+                              console.log(`copyApp completed in ${duration}ms`);
+                              console.log("Real API response:", response);
+
+                              expect(response).toBeDefined();
+                              expect(response.id).toBeDefined();
+                              expect(response.name).toBe(copyAppName);
+                              expect(response.description).toBe(copyBody.description);
+                              expect(response.created).toBeInstanceOf(Date);
+                              expect(response.updated).toBeInstanceOf(Date);
+                              expect(response.dateFormat).toMatch(/^\w{2}-\w{2}-\w{4}$/); // e.g., "MM-DD-YYYY"
+                              expect(typeof response.timeZone).toBe("string"); // Simplified check
+                              expect(typeof response.hasEveryoneOnTheInternet).toBe("boolean");
+                              expect(response.ancestorId).toBe(appId); // Should match the source app ID
+                              expect(
+                                response.dataClassification === undefined ||
+                                  typeof response.dataClassification === "string"
+                              ).toBe(true); // Allow undefined or string
+                              expect(
+                                response.variables === undefined || Array.isArray(response.variables)
+                              ).toBe(true); // Allow undefined or array
+                            } catch (error) {
+                              const duration = Date.now() - startTime;
+                              console.error(`copyApp failed after ${duration}ms:`, error);
+                              throw error; // Re-throw to fail the test
+                            }
+
+                            // Cleanup: Delete the copied app using deleteApp
+                            const deleteStartTime = Date.now();
+                            const deleteResponse = await client.deleteApp({
+                              appId: response.id,
+                              body: { name: copyAppName },
+                            });
+                            const deleteDuration = Date.now() - deleteStartTime;
+                            console.log(`deleteApp completed in ${deleteDuration}ms`);
+                            console.log("Cleanup - Deleted app:", deleteResponse);
+                            expect(deleteResponse.deletedAppId).toBe(response.id);
+                          }
+                        );
                     - name: createApp.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/apps/createApp.test.ts
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - createApp > creates a new app in QuickBase",
+                          { timeout: 30000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                              useTempTokens: false,
+                            };
+                            const client = quickbase(config);
+
+                            const appName = `TestApp_${Date.now()}`;
+                            const createBody = {
+                              name: appName,
+                              description: "Test app creation",
+                              assignToken: true,
+                            };
+
+                            console.log("Config used:", {
+                              ...config,
+                              userToken: config.userToken ? "[REDACTED]" : "",
+                            });
+                            console.log("Creating app with:", createBody);
+                            const createStartTime = Date.now();
+                            let response;
+                            try {
+                              response = await client.createApp({ body: createBody });
+                              const createDuration = Date.now() - createStartTime;
+                              console.log(`createApp completed in ${createDuration}ms`);
+                              console.log("Real API response:", response);
+
+                              expect(response).toBeDefined();
+                              expect(response.id).toBeDefined();
+                              expect(response.name).toBe(appName);
+                              expect(response.description).toBe(createBody.description);
+                              expect(response.created).toBeInstanceOf(Date);
+                              expect(response.updated).toBeInstanceOf(Date);
+                              expect(response.dateFormat).toMatch(/^\w{2}-\w{2}-\w{4}$/);
+                              expect(typeof response.timeZone).toBe("string");
+                              expect(typeof response.hasEveryoneOnTheInternet).toBe("boolean");
+                              expect(
+                                response.dataClassification === undefined ||
+                                  typeof response.dataClassification === "string"
+                              ).toBe(true);
+                              expect(
+                                response.variables === undefined || Array.isArray(response.variables)
+                              ).toBe(true);
+
+                              // Cleanup: Delete the app after assertions
+                              const deleteBody = { name: appName };
+                              await client.deleteApp({ appId: response.id, body: deleteBody });
+                              console.log("Cleanup: App deleted:", response.id);
+                            } catch (error) {
+                              const createDuration = Date.now() - createStartTime;
+                              console.error(`createApp failed after ${createDuration}ms:`, error);
+                              throw error;
+                            }
+                          }
+                        );
                     - name: deleteApp.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/apps/deleteApp.test.ts
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - deleteApp > deletes an app in QuickBase",
+                          { timeout: 30000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                              useTempTokens: false,
+                            };
+                            const client = quickbase(config);
+
+                            const appName = `TempApp_${Date.now()}`;
+                            const createBody = {
+                              name: appName,
+                              description: "Temporary app for deleteApp test",
+                              assignToken: true, // Match createApp.test.ts
+                            };
+
+                            console.log("Config used:", {
+                              ...config,
+                              userToken: config.userToken ? "[REDACTED]" : "",
+                            });
+                            console.log("Creating temporary app with:", createBody);
+                            const createStartTime = Date.now();
+                            let createResponse;
+                            try {
+                              createResponse = await client.createApp({ body: createBody });
+                              const createDuration = Date.now() - createStartTime;
+                              console.log(`createApp completed in ${createDuration}ms`);
+                              console.log("Created app response:", createResponse);
+
+                              expect(createResponse).toBeDefined();
+                              expect(createResponse.id).toBeDefined();
+                              expect(createResponse.name).toBe(appName);
+                            } catch (error) {
+                              const createDuration = Date.now() - createStartTime;
+                              console.error(`createApp failed after ${createDuration}ms:`, error);
+                              throw error;
+                            }
+
+                            const deleteBody = {
+                              name: appName,
+                            };
+                            console.log("Deleting app with:", deleteBody);
+                            const deleteStartTime = Date.now();
+                            try {
+                              const deleteResponse = await client.deleteApp({
+                                appId: createResponse.id,
+                                body: deleteBody,
+                              });
+                              const deleteDuration = Date.now() - deleteStartTime;
+                              console.log(`deleteApp completed in ${deleteDuration}ms`);
+                              console.log("Delete app response:", deleteResponse);
+
+                              expect(deleteResponse).toBeDefined();
+                              expect(deleteResponse.deletedAppId).toBe(createResponse.id);
+                            } catch (error) {
+                              const deleteDuration = Date.now() - deleteStartTime;
+                              console.error(`deleteApp failed after ${deleteDuration}ms:`, error);
+                              if (error instanceof Error && "response" in error) {
+                                try {
+                                  const errorBody = await (error as any).response.json();
+                                  console.error("Full deleteApp error response:", errorBody);
+                                } catch (e) {
+                                  console.error("Could not parse error response:", e);
+                                }
+                              }
+                              throw error;
+                            }
+                          }
+                        );
                     - name: getApp.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - getApp > fetches real app data from QuickBase",
+                          { timeout: 10000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const getAppId = "buwai2zpe";
+
+                            console.log("Config used:", config);
+                            const result = await client.getApp({ appId: getAppId });
+                            console.log("Real API response:", result);
+
+                            expect(result).toEqual({
+                              id: getAppId,
+                              name: "qb-copy",
+                              created: expect.any(Date), // Matches Date object from client
+                              updated: expect.any(Date), // Matches Date object from client
+                              description: "",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              dateFormat: "MM-DD-YYYY",
+                              hasEveryoneOnTheInternet: false,
+                              memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+                              securityProperties: {
+                                allowClone: false,
+                                allowExport: true,
+                                enableAppTokens: true,
+                                hideFromPublic: false,
+                                mustBeRealmApproved: false,
+                                useIPFilter: false,
+                              },
+                            });
+                          }
+                        );
                 - name: fields
                   type: directory
                   children:
                     - name: createField.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/fields/createField.test.ts (updated)
+                        import { describe, it, expect, afterAll } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+
+                        describe("QuickbaseClient Integration - createField", () => {
+                          const client = createClient();
+
+                          const createdFieldIds: number[] = [];
+
+                          afterAll(async () => {
+                            if (createdFieldIds.length > 0) {
+                              try {
+                                const response = await client.deleteFields({
+                                  tableId: QB_TABLE_ID_1,
+                                  body: { fieldIds: createdFieldIds },
+                                });
+                                console.log(
+                                  `Cleaned up fields: ${JSON.stringify(response.deletedFieldIds)}`,
+                                  response.errors && response.errors.length > 0
+                                    ? `Errors: ${response.errors}`
+                                    : ""
+                                );
+                              } catch (error) {
+                                console.error("Cleanup failed:", error);
+                                console.log(`Fields left in table: ${createdFieldIds}`);
+                              }
+                            } else {
+                              console.log("No fields to clean up.");
+                            }
+                          });
+
+                          it("creates a field with user token", async () => {
+                            const uniqueLabel = `TestField_${Date.now()}`;
+                            const response = await client.createField({
+                              tableId: QB_TABLE_ID_1,
+                              body: {
+                                label: uniqueLabel,
+                                fieldType: "text",
+                                fieldHelp: "Created via integration test",
+                                addToForms: true,
+                              },
+                            });
+
+                            expect(response.id).toBeDefined();
+                            expect(response.label).toBe(uniqueLabel);
+                            expect(response.fieldType).toBe("text");
+                            expect(response.fieldHelp).toBe("Created via integration test");
+
+                            createdFieldIds.push(response.id);
+                            console.log(`Created field ${uniqueLabel} with ID ${response.id}`);
+                          });
+
+                          it("fails with invalid field type", async () => {
+                            const uniqueLabel = `InvalidField_${Date.now()}`;
+                            await expect(
+                              client.createField({
+                                tableId: QB_TABLE_ID_1,
+                                body: {
+                                  label: uniqueLabel,
+                                  fieldType: "invalid_type" as "text", // Type assertion to bypass compile-time check
+                                  fieldHelp: "Should fail",
+                                },
+                              })
+                            ).rejects.toThrow("API Error: Bad Request (Status: 400)");
+                          });
+
+                          it("fails with missing label", async () => {
+                            await expect(
+                              client.createField({
+                                tableId: QB_TABLE_ID_1,
+                                body: {
+                                  label: "",
+                                  fieldType: "text",
+                                },
+                              })
+                            ).rejects.toThrow("API Error: Invalid input (Status: 400)");
+                          });
+                        });
                     - name: deleteFields.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/fields/deleteFields.test.ts
+                        import { describe, it, expect, beforeAll } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+
+                        describe("QuickbaseClient Integration - deleteFields", () => {
+                          const client = createClient();
+
+                          let fieldIdsToDelete: number[] = [];
+
+                          beforeAll(async () => {
+                            try {
+                              // Create test fields to delete
+                              const fieldLabels = ["DeleteTest1", "DeleteTest2"];
+                              for (const label of fieldLabels) {
+                                const response = await client.createField({
+                                  tableId: QB_TABLE_ID_1,
+                                  body: {
+                                    label,
+                                    fieldType: "text",
+                                    fieldHelp: "Test field for deletion",
+                                  },
+                                });
+                                fieldIdsToDelete.push(response.id);
+                                console.log(`Created field ${label} with ID ${response.id}`);
+                              }
+                              if (fieldIdsToDelete.length !== 2) {
+                                throw new Error("Failed to create all test fields");
+                              }
+                            } catch (error) {
+                              console.error("beforeAll failed:", error);
+                              throw error; // Fail the suite if setup fails
+                            }
+                          });
+
+                          it("deletes fields successfully with user token", async () => {
+                            try {
+                              const response = await client.deleteFields({
+                                tableId: QB_TABLE_ID_1,
+                                body: {
+                                  fieldIds: fieldIdsToDelete,
+                                },
+                              });
+
+                              console.log("deleteFields response:", JSON.stringify(response, null, 2));
+
+                              expect(response).toBeDefined();
+                              expect(response.deletedFieldIds).toEqual(
+                                expect.arrayContaining(fieldIdsToDelete)
+                              );
+                              expect(response.errors ?? []).toHaveLength(0); // Handle undefined errors
+                            } catch (error) {
+                              console.error("deleteFields failed:", error);
+                              throw error; // Re-throw to fail the test with details
+                            }
+                          });
+
+                          it("handles partial success with errors", async () => {
+                            const newField = await client.createField({
+                              tableId: QB_TABLE_ID_1,
+                              body: {
+                                label: "DeleteTest3",
+                                fieldType: "text",
+                              },
+                            });
+                            console.log(`Created field DeleteTest3 with ID ${newField.id}`);
+
+                            const invalidFieldId = 999999; // Assume this ID doesn’t exist
+                            const fieldIds = [newField.id, invalidFieldId];
+
+                            const response = await client.deleteFields({
+                              tableId: QB_TABLE_ID_1,
+                              body: { fieldIds },
+                            });
+
+                            expect(response.deletedFieldIds).toContain(newField.id);
+                            expect(response.deletedFieldIds).not.toContain(invalidFieldId);
+                            expect(response.errors).toHaveLength(1);
+                            expect(response.errors[0]).toMatch(/Field: 999999 was not found/i);
+                          });
+
+                          it("fails with invalid request (empty fieldIds)", async () => {
+                            await expect(
+                              client.deleteFields({
+                                tableId: QB_TABLE_ID_1,
+                                body: { fieldIds: [] },
+                              })
+                            ).rejects.toThrow("API Error: Bad Request (Status: 400)");
+                          });
+                        });
+                    - name: getField.test.ts
+                      type: file
+                      contents: |
+                        // tests/vitest/qb/fields/getField.test.ts
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+
+                        describe("QuickbaseClient Integration - getField", () => {
+                          const client = createClient();
+
+                          it("retrieves an existing field with user token", async () => {
+                            // Create a field to ensure we have a known field ID to retrieve
+                            const uniqueLabel = `TestField_${Date.now()}`;
+                            const createResponse = await client.createField({
+                              tableId: QB_TABLE_ID_1,
+                              body: {
+                                label: uniqueLabel,
+                                fieldType: "text",
+                                fieldHelp: "Created for getField integration test",
+                                addToForms: true,
+                              },
+                            });
+
+                            expect(createResponse.id).toBeDefined();
+                            const fieldId = createResponse.id;
+                            console.log(`Created field ${uniqueLabel} with ID ${fieldId} for testing`);
+
+                            // Test getField with the created field
+                            const response = await client.getField({
+                              fieldId: fieldId,
+                              tableId: QB_TABLE_ID_1,
+                              includeFieldPerms: true,
+                            });
+
+                            expect(response.id).toBe(fieldId);
+                            expect(response.label).toBe(uniqueLabel);
+                            expect(response.fieldType).toBe("text");
+                            expect(response.fieldHelp).toBe("Created for getField integration test");
+                            expect(response.permissions).toBeDefined();
+                            expect(Array.isArray(response.permissions)).toBe(true);
+                            console.log(`Retrieved field ${response.label} with ID ${response.id}`);
+
+                            // Clean up the created field
+                            try {
+                              const deleteResponse = await client.deleteFields({
+                                tableId: QB_TABLE_ID_1,
+                                body: { fieldIds: [fieldId] },
+                              });
+                              console.log(
+                                `Cleaned up field ${fieldId}: ${JSON.stringify(deleteResponse)}`
+                              );
+                            } catch (error) {
+                              console.error(`Failed to clean up field ${fieldId}:`, error);
+                            }
+                          }, 10000); // Increase timeout to 10 seconds
+
+                          it("fails with non-existent field ID", async () => {
+                            const nonExistentFieldId = 999999; // Assuming this ID doesn’t exist
+                            await expect(
+                              client.getField({
+                                fieldId: nonExistentFieldId,
+                                tableId: QB_TABLE_ID_1,
+                              })
+                            ).rejects.toMatchObject({
+                              message: expect.stringContaining(
+                                "API Error: No such field (Status: 404)"
+                              ),
+                            });
+                            console.log(
+                              `Confirmed 404 for non-existent field ID ${nonExistentFieldId}`
+                            );
+                          });
+
+                          it("fails with invalid table ID", async () => {
+                            const invalidTableId = "invalid_dbid";
+                            await expect(
+                              client.getField({
+                                fieldId: 1, // Arbitrary field ID
+                                tableId: invalidTableId,
+                              })
+                            ).rejects.toMatchObject({
+                              message: expect.stringContaining(
+                                "API Error: Invalid request (Status: 400)"
+                              ),
+                            });
+                            console.log(`Confirmed 400 for invalid table ID ${invalidTableId}`);
+                          });
+                        });
                     - name: getFields.test.ts
                       type: file
+                      contents: |
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+
+                        describe("QuickbaseClient Integration - getFields", () => {
+                          const client = createClient();
+
+                          it(
+                            "fetches real field data from QuickBase",
+                            async () => {
+                              if (!process.env.QB_REALM)
+                                throw new Error("QB_REALM is not defined in .env");
+                              if (!process.env.QB_USER_TOKEN)
+                                throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                              console.log("Config used:", {
+                                realm: process.env.QB_REALM,
+                                userToken: process.env.QB_USER_TOKEN,
+                                tableId: QB_TABLE_ID_1,
+                              });
+                              const result = await client.getFields({
+                                tableId: QB_TABLE_ID_1,
+                                includeFieldPerms: true,
+                              });
+                              console.log("Real API response:", result);
+                              expect(result).toEqual(
+                                expect.arrayContaining([
+                                  expect.objectContaining({
+                                    id: 1,
+                                    label: "Date Created",
+                                    fieldType: "timestamp",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 2,
+                                    label: "Date Modified",
+                                    fieldType: "timestamp",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 3,
+                                    label: "Record ID#",
+                                    fieldType: "recordid",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: false,
+                                    unique: true,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: true,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: false,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 4,
+                                    label: "Record Owner",
+                                    fieldType: "user",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: true,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: true,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                  expect.objectContaining({
+                                    id: 5,
+                                    label: "Last Modified By",
+                                    fieldType: "user",
+                                    noWrap: true,
+                                    bold: false,
+                                    required: false,
+                                    appearsByDefault: false,
+                                    findEnabled: true,
+                                    unique: false,
+                                    doesDataCopy: false,
+                                    fieldHelp: "",
+                                    audited: false,
+                                    properties: expect.objectContaining({
+                                      primaryKey: false,
+                                      foreignKey: false,
+                                      sortAsGiven: true,
+                                      carryChoices: true,
+                                      allowNewChoices: true,
+                                      formula: "",
+                                      defaultValue: "",
+                                    }),
+                                    permissions: expect.arrayContaining([
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Viewer",
+                                        roleId: 10,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Participant",
+                                        roleId: 11,
+                                      }),
+                                      expect.objectContaining({
+                                        permissionType: "Modify",
+                                        role: "Administrator",
+                                        roleId: 12,
+                                      }),
+                                    ]),
+                                  }),
+                                ])
+                              );
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
+                    - name: getFieldsUsage.test.ts
+                      type: file
+                      contents: |
+                        // tests/vitest/qb/fields/getFieldsUsage.test.ts
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+                        import { FieldUsage } from "@/generated/models";
+
+                        describe("QuickbaseClient Integration - getFieldsUsage", () => {
+                          const client = createClient();
+
+                          it("retrieves field usage statistics for a valid table", async () => {
+                            console.log("Starting retrieval of full field usage list");
+                            const response = await client.getFieldsUsage({
+                              tableId: QB_TABLE_ID_1,
+                            });
+
+                            expect(response).toBeInstanceOf(Array);
+                            expect(response.length).toBeGreaterThan(0); // Assumes the table has fields
+                            response.forEach((usage: FieldUsage) => {
+                              expect(usage.field).toHaveProperty("id");
+                              expect(usage.field).toHaveProperty("name");
+                              expect(usage.field).toHaveProperty("type");
+                              expect(usage.usage).toHaveProperty("actions");
+                              expect(usage.usage.actions).toHaveProperty("count");
+                              expect(typeof usage.usage.actions.count).toBe("number");
+                              expect(usage.usage).toHaveProperty("dashboards");
+                              expect(usage.usage).toHaveProperty("forms");
+                              expect(usage.usage).toHaveProperty("reports");
+                            });
+                            console.log(
+                              `Retrieved ${response.length} field usage entries for table ${QB_TABLE_ID_1}`
+                            );
+                          }, 15000); // 15-second timeout
+
+                          it("retrieves field usage with skip and top parameters", async () => {
+                            console.log(
+                              "Starting retrieval of full field usage list for skip/top test"
+                            );
+                            const fullResponse = await client.getFieldsUsage({
+                              tableId: QB_TABLE_ID_1,
+                            });
+                            console.log(`Full list retrieved: ${fullResponse.length} fields`);
+
+                            const totalFields = fullResponse.length;
+                            if (totalFields <= 1) {
+                              console.log("Skipping skip/top test: table has too few fields");
+                              return; // Skip if not enough fields to test pagination
+                            }
+
+                            console.log("Starting retrieval with skip=1 and top=1");
+                            const response = await client.getFieldsUsage({
+                              tableId: QB_TABLE_ID_1,
+                              skip: 1,
+                              top: 1,
+                            });
+
+                            expect(response).toBeInstanceOf(Array);
+                            expect(response.length).toBe(1); // Should return exactly 1 field
+                            expect(response[0].field.id).not.toBe(fullResponse[0].field.id); // Should skip the first field
+                            console.log(
+                              `Retrieved ${response.length} field usage entries with skip=1 and top=1`
+                            );
+                          }, 15000); // 15-second timeout
+
+                          it("fails with invalid table ID", async () => {
+                            const invalidTableId = "invalid_dbid";
+                            console.log(`Starting retrieval with invalid table ID ${invalidTableId}`);
+                            await expect(
+                              client.getFieldsUsage({
+                                tableId: invalidTableId,
+                              })
+                            ).rejects.toMatchObject({
+                              message: expect.stringContaining(
+                                "API Error: Access denied (Status: 401)"
+                              ),
+                            });
+                            console.log(`Confirmed 401 for invalid table ID ${invalidTableId}`);
+                          }, 15000); // 15-second timeout
+                        });
                 - name: index.ts
                   type: file
+                  contents: |
+                    // tests/vitest/qb/index.ts
+
+                    // Apps
+                    export * from "./apps/copyApp.test.ts";
+                    export * from "./apps/createApp.test.ts";
+                    export * from "./apps/deleteApp.test.ts";
+                    export * from "./apps/getApp.test.ts";
+
+                    // Fields
+                    export * from "./fields/createField.test.ts";
+                    export * from "./fields/deleteFields.test.ts";
+                    export * from "./fields/getFields.test.ts";
+                    export * from "./fields/getField.test.ts"; // Added new getField test
+                    export * from "./fields/getFieldsUsage.test.ts";
+
+                    // Records
+                    export * from "./records/deleteRecords.test.ts";
+                    export * from "./records/runQuery.test.ts";
+                    export * from "./records/upsert.test.ts";
+
+                    // Tables
+                    export * from "./tables/createTable.test.ts";
+                    export * from "./tables/deleteTable.test.ts";
+                    export * from "./tables/getAppTables.test.ts";
+                    export * from "./tables/getRelationships.test.ts";
+                    export * from "./tables/getTable.test.ts";
+                    export * from "./tables/updateTable.test.ts";
                 - name: records
                   type: directory
                   children:
                     - name: deleteRecords.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/records/deleteRecords.test.ts
+                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
+                        import { quickbase } from "@/quickbaseClient.ts";
+                        import {
+                          Upsert200Response,
+                          Upsert207Response,
+                        } from "/home/drew/Projects/quickbase-js/src/generated/models";
+
+                        const TABLE_ID = "buwai2zws";
+                        const UNIQUE_FIELD_ID = 3; // Record ID field
+                        const MARKER_FIELD_ID = 6; // Text field for marking test records
+
+                        describe("QuickbaseClient - DeleteRecords Integration", () => {
+                          const qb = quickbase({
+                            realm: "builderprogram-dbradford6815",
+                            userToken: process.env.QB_USER_TOKEN,
+                            debug: true,
+                          });
+
+                          beforeEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
+                                },
+                              });
+                            } catch (e) {
+                              // Ignore if no records exist
+                            }
+                          });
+
+                          afterEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-delete'}`,
+                                },
+                              });
+                            } catch (e) {}
+                          });
+
+                          test(
+                            "deletes a newly upserted record",
+                            async () => {
+                              const upsertResponse: Upsert200Response | Upsert207Response =
+                                await qb.upsert({
+                                  body: {
+                                    to: TABLE_ID,
+                                    data: [{ [MARKER_FIELD_ID]: { value: "test-marker-delete" } }],
+                                    fieldsToReturn: [UNIQUE_FIELD_ID], // Return record ID
+                                  },
+                                });
+
+                              // Check metadata and createdRecordIds
+                              expect(
+                                upsertResponse.metadata,
+                                "Expected metadata to be defined"
+                              ).toBeDefined();
+                              expect(
+                                upsertResponse.metadata?.createdRecordIds,
+                                "Expected createdRecordIds to be defined"
+                              ).toBeDefined();
+
+                              const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
+                              if (!createdRecordIds || createdRecordIds.length === 0) {
+                                throw new Error("Expected at least one created record ID");
+                              }
+
+                              const recordId = createdRecordIds[0];
+                              expect(recordId, "Expected recordId to be defined").toBeDefined();
+
+                              // Check data
+                              expect(upsertResponse.data, "Expected data to be defined").toBeDefined();
+                              if (!upsertResponse.data || upsertResponse.data.length === 0) {
+                                throw new Error("Expected at least one data entry");
+                              }
+
+                              const recordData = upsertResponse.data[0];
+                              expect(
+                                recordData[UNIQUE_FIELD_ID]?.value,
+                                "Expected record ID in data to match created record ID"
+                              ).toBe(recordId);
+
+                              const deleteResponse = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
+                              });
+
+                              expect(deleteResponse).toEqual({ numberDeleted: 1 });
+
+                              const checkResponse = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: `{${UNIQUE_FIELD_ID}.EX.${recordId}}` },
+                              });
+                              expect(checkResponse.numberDeleted).toBe(0);
+                            },
+                            { timeout: 10000 }
+                          );
+
+                          test(
+                            "handles empty result when no records match",
+                            async () => {
+                              const response = await qb.deleteRecords({
+                                body: { from: TABLE_ID, where: "{3.EX.'999999'}" },
+                              });
+                              expect(response).toEqual({ numberDeleted: 0 });
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
                     - name: runQuery.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/records/runQuery.test.ts
+                        import { describe, it, expect } from "vitest";
+                        import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
+                        import {
+                          RunQueryRequest,
+                          RunQueryResponse,
+                          Upsert200Response,
+                          Upsert207Response,
+                        } from "@/generated/models";
+
+                        // Define a type for field data with a value property (matches generated Record type)
+                        interface FieldData {
+                          value: any; // Adjust type based on your needs (e.g., string | number)
+                        }
+
+                        describe("QuickbaseClient Integration - runQuery", () => {
+                          let createdRecordId: number;
+
+                          it(
+                            "queries real records from QuickBase",
+                            async () => {
+                              const client = createClient();
+
+                              // Upsert a test record to query later
+                              const upsertResponse: Upsert200Response | Upsert207Response =
+                                await client.upsert({
+                                  body: {
+                                    to: QB_TABLE_ID_1,
+                                    data: [
+                                      {
+                                        "6": { value: "Test Task " + Date.now() }, // Assuming field 6 is a text field
+                                      },
+                                    ],
+                                    fieldsToReturn: [3, 6], // Record ID# and the text field
+                                  },
+                                });
+
+                              // Check metadata and createdRecordIds with null safety
+                              expect(
+                                upsertResponse.metadata,
+                                "Expected metadata to be defined"
+                              ).toBeDefined();
+                              expect(
+                                upsertResponse.metadata?.createdRecordIds,
+                                "Expected createdRecordIds to be defined"
+                              ).toBeDefined();
+
+                              const createdRecordIds = upsertResponse.metadata?.createdRecordIds;
+                              if (!createdRecordIds || createdRecordIds.length === 0) {
+                                throw new Error("Expected at least one created record ID from upsert");
+                              }
+
+                              createdRecordId = createdRecordIds[0];
+                              expect(
+                                createdRecordId,
+                                "Expected createdRecordId to be defined"
+                              ).toBeDefined();
+                              console.log("Created test record with ID:", createdRecordId);
+
+                              // Query the record
+                              const queryRequest: RunQueryRequest = {
+                                from: QB_TABLE_ID_1,
+                                select: [3, 6], // Query Record ID# and the text field
+                                where: `{3.EX.${createdRecordId}}`, // Filter by the created record
+                                sortBy: [{ fieldId: 6, order: "ASC" }],
+                                options: { skip: 0, top: 1 },
+                              };
+
+                              console.log("Config used:", {
+                                realm: process.env.QB_REALM,
+                                userToken: process.env.QB_USER_TOKEN,
+                                tableId: QB_TABLE_ID_1,
+                              });
+                              console.log("Query request:", queryRequest);
+                              const response: RunQueryResponse = await client.runQuery({
+                                body: queryRequest,
+                              });
+                              console.log("Real API response:", response);
+
+                              // Assertions with safety checks and type assertion
+                              expect(
+                                response.data,
+                                "Expected response.data to be defined"
+                              ).toBeDefined();
+                              if (!response.data || response.data.length === 0) {
+                                throw new Error(
+                                  "Expected response.data to contain at least one record"
+                                );
+                              }
+
+                              expect(response.data).toHaveLength(1);
+                              const record = response.data[0] as { [key: string]: FieldData };
+                              expect(
+                                record["3"]?.value,
+                                "Expected field 3 to match createdRecordId"
+                              ).toBe(createdRecordId);
+                              expect(
+                                record["6"]?.value,
+                                "Expected field 6 to contain 'Test Task'"
+                              ).toContain("Test Task");
+
+                              expect(
+                                response.fields,
+                                "Expected response.fields to be defined"
+                              ).toBeDefined();
+                              if (!response.fields) {
+                                throw new Error("Expected response.fields to contain field metadata");
+                              }
+                              expect(response.fields).toContainEqual({
+                                id: 3,
+                                label: expect.any(String),
+                                type: expect.any(String),
+                              });
+                              expect(response.fields).toContainEqual({
+                                id: 6,
+                                label: expect.any(String),
+                                type: expect.any(String),
+                              });
+
+                              expect(
+                                response.metadata,
+                                "Expected response.metadata to be defined"
+                              ).toBeDefined();
+                              if (!response.metadata) {
+                                throw new Error("Expected response.metadata to be present");
+                              }
+                              expect(response.metadata).toMatchObject({
+                                numFields: 2,
+                                numRecords: 1,
+                                skip: 0,
+                                top: 1,
+                                totalRecords: expect.any(Number),
+                              });
+
+                              // Cleanup: Delete the test record
+                              await client.deleteRecords({
+                                body: {
+                                  from: QB_TABLE_ID_1,
+                                  where: `{3.EX.${createdRecordId}}`, // Assuming field 3 is Record ID#
+                                },
+                              });
+                              console.log("Cleaned up test record with ID:", createdRecordId);
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
                     - name: upsert.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/records/upsert.test.ts
+                        import { describe, test, expect, beforeEach, afterEach } from "vitest";
+                        import { quickbase } from "@/quickbaseClient.ts";
+                        import {
+                          Upsert200Response,
+                          Upsert207Response,
+                        } from "/home/drew/Projects/quickbase-js/src/generated/models";
+
+                        const TABLE_ID = "buwai2zws";
+                        const MARKER_FIELD_ID = 6; // Text field for marking test records
+
+                        describe("QuickbaseClient - Upsert Integration", () => {
+                          const qb = quickbase({
+                            realm: "builderprogram-dbradford6815",
+                            userToken: process.env.QB_USER_TOKEN,
+                            debug: true,
+                          });
+
+                          beforeEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
+                                },
+                              });
+                            } catch (e) {
+                              // Ignore if no records exist
+                            }
+                          });
+
+                          afterEach(async () => {
+                            try {
+                              await qb.deleteRecords({
+                                body: {
+                                  from: TABLE_ID,
+                                  where: `{${MARKER_FIELD_ID}.CT.'test-marker-upsert'}`,
+                                },
+                              });
+                            } catch (e) {}
+                          });
+
+                          test(
+                            "creates a new record successfully",
+                            async () => {
+                              const response: Upsert200Response | Upsert207Response = await qb.upsert({
+                                body: {
+                                  to: TABLE_ID,
+                                  data: [{ [MARKER_FIELD_ID]: { value: "test-marker-upsert" } }],
+                                  fieldsToReturn: [MARKER_FIELD_ID, 3], // Return marker and record ID
+                                },
+                              });
+
+                              // Check metadata with null safety
+                              expect(
+                                response.metadata,
+                                "Expected metadata to be defined"
+                              ).toBeDefined();
+                              if (!response.metadata) {
+                                throw new Error("Expected metadata to be present in upsert response");
+                              }
+
+                              expect(
+                                response.metadata.createdRecordIds,
+                                "Expected createdRecordIds to be defined"
+                              ).toBeDefined();
+                              if (!response.metadata.createdRecordIds) {
+                                throw new Error(
+                                  "Expected createdRecordIds to be present in upsert response"
+                                );
+                              }
+                              expect(response.metadata.createdRecordIds.length).toBe(1);
+
+                              // Check data with null safety
+                              expect(response.data, "Expected data to be defined").toBeDefined();
+                              if (!response.data || response.data.length === 0) {
+                                throw new Error("Expected at least one record in data");
+                              }
+                              expect(response.data).toHaveLength(1);
+                              expect(response.data[0][MARKER_FIELD_ID]?.value).toBe(
+                                "test-marker-upsert"
+                              );
+                              expect(response.data[0][3]?.value).toBeDefined(); // Record ID assigned by QuickBase
+
+                              // Check totalNumberOfRecordsProcessed
+                              expect(response.metadata.totalNumberOfRecordsProcessed).toBe(1);
+                            },
+                            { timeout: 10000 }
+                          );
+
+                          test(
+                            "handles empty data gracefully",
+                            async () => {
+                              await expect(
+                                qb.upsert({
+                                  body: { to: TABLE_ID, data: [] },
+                                })
+                              ).rejects.toThrow("API Error: Bad Request (Status: 400)");
+                            },
+                            { timeout: 10000 }
+                          );
+                        });
                 - name: tables
                   type: directory
                   children:
                     - name: createTable.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - createTable > creates a new table in QuickBase",
+                          { timeout: 10000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const appId = "buwai2zpe";
+
+                            const tableName = `TestTable_${Date.now()}`;
+                            const createBody = {
+                              name: tableName,
+                              description: "Test table creation",
+                              singleRecordName: "TestRecord",
+                              pluralRecordName: "TestRecords",
+                            };
+
+                            console.log("Config used:", config);
+                            console.log("Creating table with:", createBody);
+                            const response = await client.createTable({ appId, body: createBody });
+
+                            expect(response).toBeDefined();
+                            expect(response.id).toBeDefined();
+                            expect(response.name).toBe(tableName);
+                            expect(response.description).toBe(createBody.description);
+                            expect(response.singleRecordName).toBe(createBody.singleRecordName);
+                            expect(response.pluralRecordName).toBe(createBody.pluralRecordName);
+                            expect(response.alias).toMatch(/^_DBID_/);
+                            expect(response.created).toBeInstanceOf(Date);
+                            expect(response.updated).toBeInstanceOf(Date);
+                            expect(response.nextRecordId).toBeGreaterThanOrEqual(1);
+                            expect(response.nextFieldId).toBeGreaterThanOrEqual(1);
+                            expect(response.defaultSortFieldId).toBeGreaterThanOrEqual(0);
+                            expect(response.keyFieldId).toBeGreaterThanOrEqual(1);
+                            expect(response.sizeLimit).toMatch(/^\d+\sMB$/); // e.g., "500 MB"
+                            expect(response.spaceUsed).toMatch(/^\d+\s(KB|MB)$/); // e.g., "0 KB"
+                            expect(response.spaceRemaining).toMatch(/^\d+\sMB$/); // e.g., "500 MB"
+
+                            console.log("Real API response:", response);
+
+                            // Cleanup: Delete the table to avoid clutter
+                            const deleteResponse = await client.deleteTable({
+                              tableId: response.id,
+                              appId,
+                            });
+                            expect(deleteResponse.deletedTableId).toBe(response.id);
+                            console.log("Cleanup - Deleted table:", deleteResponse);
+                          }
+                        );
                     - name: deleteTable.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - deleteTable > deletes a table in QuickBase",
+                          { timeout: 20000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const appId = "buwai2zpe";
+
+                            // Step 1: Create a temporary table to delete
+                            const tableName = `DeleteTest_${Date.now()}`;
+                            const createBody = {
+                              name: tableName,
+                              description: "Temporary table for delete test",
+                              singleRecordName: "DeleteTest",
+                              pluralRecordName: "DeleteTests",
+                            };
+                            console.log("Creating temporary table with:", createBody);
+                            const createResponse = await client.createTable({
+                              appId,
+                              body: createBody,
+                            });
+                            expect(createResponse.id).toBeDefined();
+                            expect(createResponse.name).toBe(tableName);
+                            console.log("Created table:", createResponse);
+                            const tableId = createResponse.id;
+
+                            // Step 2: Delete the table
+                            console.log("Deleting table:", { tableId, appId });
+                            const deleteResponse = await client.deleteTable({ tableId, appId });
+                            expect(deleteResponse).toBeDefined();
+                            expect(deleteResponse.deletedTableId).toBe(tableId);
+                            console.log("Delete API response:", deleteResponse);
+
+                            // Step 3: Verify the table is gone
+                            try {
+                              await client.getTable({ tableId, appId });
+                              throw new Error("Table should not exist after deletion");
+                            } catch (error) {
+                              expect(error.message).toMatch(/404|not found/i); // Expect a 404 error
+                              console.log("Verified table deletion:", error.message);
+                            }
+                          }
+                        );
                     - name: getAppTables.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - getAppTables > fetches real table data from QuickBase",
+                          { timeout: 10000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const tablesAppId = "buwai2zpe";
+
+                            console.log("Config used:", config);
+                            const result = await client.getAppTables({ appId: tablesAppId });
+                            console.log("Real API response:", result);
+
+                            expect(result).toBeDefined();
+                            expect(result).toBeInstanceOf(Array);
+                            expect(result.length).toBeGreaterThan(0);
+                            expect(result).toEqual(
+                              expect.arrayContaining([
+                                expect.objectContaining({
+                                  id: "buwai2zr4",
+                                  alias: "_DBID_ROOT",
+                                  name: expect.any(String), // Allow dynamic name due to updateTable
+                                  description: expect.any(String), // Allow dynamic description
+                                  created: expect.any(Date),
+                                  updated: expect.any(Date), // Allow varying timestamps
+                                  nextRecordId: expect.any(Number),
+                                  nextFieldId: expect.any(Number),
+                                  defaultSortFieldId: expect.any(Number),
+                                  defaultSortOrder: "DESC",
+                                  keyFieldId: expect.any(Number),
+                                  singleRecordName: "Root",
+                                  pluralRecordName: "Roots",
+                                  sizeLimit: "500 MB",
+                                  spaceUsed: expect.any(String),
+                                  spaceRemaining: "500 MB",
+                                }),
+                              ])
+                            );
+                          }
+                        );
                     - name: getRelationships.test.ts
                       type: file
+                      contents: |
+                        // tests/vitest/qb/tables/getRelationships.test.ts
+                        import { describe, test, expect } from "vitest";
+                        import { quickbase } from "/home/drew/Projects/quickbase-js/src/quickbaseClient.ts";
+                        import { QB_TABLE_ID_1 } from "/home/drew/Projects/quickbase-js/tests/setup.ts";
+                        import { GetRelationships200Response } from "/home/drew/Projects/quickbase-js/src/generated/models";
+
+                        describe("QuickbaseClient Integration - getRelationships", () => {
+                          const qb = quickbase({
+                            realm: process.env.QB_REALM || "builderprogram-dbradford6815",
+                            userToken: process.env.QB_USER_TOKEN || "",
+                            debug: true,
+                          });
+
+                          test("fetches real relationships from QuickBase", async () => {
+                            // Ensure environment variables are set
+                            if (!process.env.QB_REALM)
+                              throw new Error("QB_REALM is not defined in .env");
+                            if (!process.env.QB_USER_TOKEN)
+                              throw new Error("QB_USER_TOKEN is not defined in .env");
+
+                            console.log("Config used:", {
+                              realm: process.env.QB_REALM,
+                              userToken: process.env.QB_USER_TOKEN,
+                              tableId: QB_TABLE_ID_1,
+                            });
+
+                            const response: GetRelationships200Response = await qb.getRelationships({
+                              tableId: QB_TABLE_ID_1, // Query relationships for QB_TABLE_ID_1 (e.g., "buwai2zws")
+                              skip: 0,
+                            });
+
+                            console.log("Real API response:", JSON.stringify(response, null, 2));
+
+                            // Basic structure validation
+                            expect(response).toBeDefined();
+                            expect(response.metadata).toBeDefined();
+                            expect(response.metadata).toHaveProperty(
+                              "numRelationships",
+                              expect.any(Number)
+                            );
+                            expect(response.metadata).toHaveProperty("skip", 0);
+                            expect(response.metadata).toHaveProperty(
+                              "totalRelationships",
+                              expect.any(Number)
+                            );
+                            expect(response.relationships).toBeDefined();
+                            expect(Array.isArray(response.relationships)).toBe(true);
+
+                            // If relationships exist, validate the first one
+                            if (response.relationships.length > 0) {
+                              const relationship = response.relationships[0];
+                              expect(relationship).toHaveProperty("id", expect.any(Number));
+                              expect(relationship).toHaveProperty("parentTableId", expect.any(String));
+                              expect(relationship).toHaveProperty("childTableId", QB_TABLE_ID_1);
+                              expect(relationship).toHaveProperty("foreignKeyField");
+                              expect(relationship.foreignKeyField).toHaveProperty(
+                                "id",
+                                expect.any(Number)
+                              );
+                              expect(relationship.foreignKeyField).toHaveProperty(
+                                "label",
+                                expect.any(String)
+                              );
+                              expect(relationship.foreignKeyField).toHaveProperty(
+                                "type",
+                                expect.any(String)
+                              );
+                              expect(relationship).toHaveProperty("isCrossApp", expect.any(Boolean));
+                              expect(relationship).toHaveProperty("lookupFields", expect.any(Array));
+
+                              // summaryFields is optional; only validate if present
+                              if (
+                                "summaryFields" in relationship &&
+                                relationship.summaryFields !== undefined
+                              ) {
+                                expect(Array.isArray(relationship.summaryFields)).toBe(true);
+                              }
+                            }
+                          }, 10000); // Timeout as second argument
+                        });
                     - name: getTable.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - getTable > fetches real table data from QuickBase",
+                          { timeout: 10000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const tableId = "buwai2zr4";
+                            const appId = "buwai2zpe";
+
+                            console.log("Config used:", config);
+                            const response = await client.getTable({ tableId, appId });
+                            expect(response).toBeDefined();
+                            expect(response.id).toBe(tableId);
+                            expect(response.name).toBe("Root"); // Expect original name
+                            expect(response.alias).toBe("_DBID_ROOT");
+                            expect(response.created).toBeInstanceOf(Date);
+                            console.log("Real API response:", response);
+                          }
+                        );
                     - name: updateTable.test.ts
                       type: file
+                      contents: |
+                        import { test, expect } from "vitest";
+                        import { quickbase } from "../../../../src/quickbaseClient";
+
+                        test(
+                          "QuickbaseClient Integration - updateTable > updates real table data in QuickBase",
+                          { timeout: 10000 },
+                          async () => {
+                            const config = {
+                              realm: process.env.QB_REALM || "",
+                              userToken: process.env.QB_USER_TOKEN || "",
+                              debug: true,
+                            };
+                            const client = quickbase(config);
+                            const appId = "buwai2zpe";
+                            const tableId = "buwai2zr4";
+                            const updatedBody = {
+                              name: "Root Updated " + Date.now(),
+                              description: "Integration test update",
+                            };
+                            const originalBody = {
+                              name: "Root",
+                              description: "",
+                            };
+
+                            console.log("Config used:", config);
+                            // Update the table
+                            const response = await client.updateTable({
+                              tableId,
+                              appId,
+                              body: updatedBody,
+                            });
+                            expect(response).toBeDefined();
+                            expect(response.id).toBe(tableId);
+                            expect(response.name).toBe(updatedBody.name);
+                            expect(response.description).toBe(updatedBody.description);
+                            console.log("Real API response:", response);
+
+                            // Cleanup: Revert the table to original state
+                            const cleanupResponse = await client.updateTable({
+                              tableId,
+                              appId,
+                              body: originalBody,
+                            });
+                            expect(cleanupResponse.name).toBe(originalBody.name);
+                            expect(cleanupResponse.description).toBe(originalBody.description);
+                            console.log("Cleanup API response:", cleanupResponse);
+                          }
+                        );
             - name: unit
               type: directory
               children:
@@ -2114,6 +4749,198 @@ tree:
                             );
                           });
                         });
+                    - name: getField.test.ts
+                      type: file
+                      contents: |
+                        // tests/vitest/unit/fields/getField.test.ts
+                        import { describe, it, expect, beforeEach } from "vitest";
+                        import {
+                          createClient,
+                          mockFetch,
+                          QB_REALM,
+                          QB_USER_TOKEN,
+                          QB_TABLE_ID_1,
+                        } from "@tests/setup.ts";
+                        import { Field } from "@/generated/models";
+
+                        describe("QuickbaseClient Unit - getField", () => {
+                          let client: ReturnType<typeof createClient>;
+
+                          beforeEach(() => {
+                            mockFetch.mockClear();
+                            client = createClient(mockFetch, { debug: true });
+                          });
+
+                          it("initializes without errors and has getField method", () => {
+                            expect(client).toBeDefined();
+                            expect(typeof client.getField).toBe("function");
+                          });
+
+                          it("calls getField successfully with user token", async () => {
+                            const mockResponse: Field = {
+                              id: 123,
+                              label: "Field1",
+                              fieldType: "text",
+                              mode: "",
+                              noWrap: false,
+                              bold: false,
+                              required: false,
+                              appearsByDefault: false,
+                              findEnabled: false,
+                              unique: false,
+                              doesDataCopy: false,
+                              fieldHelp: "field help",
+                              audited: false,
+                              properties: {
+                                primaryKey: false,
+                                foreignKey: false,
+                                numLines: 1,
+                                maxLength: 0,
+                                appendOnly: false,
+                                allowHTML: false,
+                                allowMentions: false,
+                                sortAsGiven: false,
+                                carryChoices: true,
+                                allowNewChoices: false,
+                                formula: "",
+                                defaultValue: "",
+                              },
+                              permissions: [
+                                { permissionType: "View", role: "Viewer", roleId: 10 },
+                                { permissionType: "None", role: "Participant", roleId: 11 },
+                                { permissionType: "Modify", role: "Administrator", roleId: 12 },
+                              ],
+                            };
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.getField({
+                              fieldId: 123,
+                              tableId: QB_TABLE_ID_1,
+                              includeFieldPerms: true,
+                            });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields/123?tableId=${QB_TABLE_ID_1}&includeFieldPerms=true`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("calls getField successfully with temp token", async () => {
+                            client = createClient(mockFetch, { useTempTokens: true, debug: true });
+
+                            const mockResponse: Field = {
+                              id: 123,
+                              label: "Field1",
+                              fieldType: "text",
+                              mode: "",
+                              noWrap: false,
+                              bold: false,
+                              required: false,
+                              appearsByDefault: false,
+                              findEnabled: false,
+                              unique: false,
+                              doesDataCopy: false,
+                              fieldHelp: "field help",
+                              audited: false,
+                              properties: {
+                                primaryKey: false,
+                                foreignKey: false,
+                                numLines: 1,
+                                maxLength: 0,
+                                appendOnly: false,
+                                allowHTML: false,
+                                allowMentions: false,
+                                sortAsGiven: false,
+                                carryChoices: true,
+                                allowNewChoices: false,
+                                formula: "",
+                                defaultValue: "",
+                              },
+                              permissions: [],
+                            };
+
+                            mockFetch
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve({ temporaryAuthorization: "temp_token" }),
+                              })
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve(mockResponse),
+                              });
+
+                            const result = await client.getField({
+                              fieldId: 123,
+                              tableId: QB_TABLE_ID_1,
+                            });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledTimes(2);
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              1,
+                              `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  "Content-Type": "application/json",
+                                }),
+                                credentials: "include",
+                              })
+                            );
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              2,
+                              `https://api.quickbase.com/v1/fields/123?tableId=${QB_TABLE_ID_1}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: "QB-TEMP-TOKEN temp_token",
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("handles 404 error for non-existent field", async () => {
+                            mockFetch.mockResolvedValueOnce({
+                              ok: false,
+                              status: 404,
+                              json: () => Promise.resolve({ message: "Field not found" }),
+                            });
+
+                            await expect(
+                              client.getField({ fieldId: 999, tableId: QB_TABLE_ID_1 })
+                            ).rejects.toThrow("API Error: Field not found (Status: 404)");
+
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields/999?tableId=${QB_TABLE_ID_1}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+                        });
                     - name: getFields.test.ts
                       type: file
                       contents: |
@@ -2239,6 +5066,169 @@ tree:
                             );
                           });
                         });
+                    - name: getFieldsUsage.test.ts
+                      type: file
+                      contents: |
+                        // tests/vitest/unit/fields/getFieldsUsage.test.ts
+                        import { describe, it, expect, beforeEach } from "vitest";
+                        import {
+                          createClient,
+                          mockFetch,
+                          QB_REALM,
+                          QB_TABLE_ID_1,
+                          QB_USER_TOKEN,
+                        } from "@tests/setup.ts";
+                        import { FieldUsage } from "@/generated/models";
+
+                        describe("QuickbaseClient Unit - getFieldsUsage", () => {
+                          let client: ReturnType<typeof createClient>;
+
+                          beforeEach(() => {
+                            mockFetch.mockClear();
+                            client = createClient(mockFetch, { debug: true });
+                          });
+
+                          it("initializes without errors and has getFieldsUsage method", () => {
+                            expect(client).toBeDefined();
+                            expect(typeof client.getFieldsUsage).toBe("function");
+                          });
+
+                          it("calls getFieldsUsage successfully with user token", async () => {
+                            const mockResponse: FieldUsage[] = [
+                              {
+                                field: {
+                                  id: 6,
+                                  name: "name",
+                                  type: "Text",
+                                },
+                                usage: {
+                                  actions: { count: 0 },
+                                  appHomePages: { count: 0 },
+                                  dashboards: { count: 2 },
+                                  defaultReports: { count: 1 },
+                                  exactForms: { count: 0 },
+                                  fields: { count: 0 },
+                                  forms: { count: 1 },
+                                  notifications: { count: 0 },
+                                  personalReports: { count: 0 },
+                                  pipelines: { count: 1 },
+                                  relationships: { count: 0 },
+                                  reminders: { count: 0 },
+                                  reports: { count: 2 },
+                                  roles: { count: 2 },
+                                  tableImports: { count: 3 },
+                                  tableRules: { count: 1 },
+                                  webhooks: { count: 0 },
+                                },
+                              },
+                            ];
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.getFieldsUsage({
+                              tableId: QB_TABLE_ID_1,
+                            });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields/usage?tableId=${QB_TABLE_ID_1}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("calls getFieldsUsage with skip and top parameters", async () => {
+                            const mockResponse: FieldUsage[] = [
+                              {
+                                field: {
+                                  id: 7,
+                                  name: "priority",
+                                  type: "Text",
+                                },
+                                usage: {
+                                  actions: { count: 1 },
+                                  appHomePages: { count: 0 },
+                                  dashboards: { count: 0 },
+                                  defaultReports: { count: 0 },
+                                  exactForms: { count: 0 },
+                                  fields: { count: 1 },
+                                  forms: { count: 0 },
+                                  notifications: { count: 0 },
+                                  personalReports: { count: 0 },
+                                  pipelines: { count: 0 },
+                                  relationships: { count: 0 },
+                                  reminders: { count: 0 },
+                                  reports: { count: 1 },
+                                  roles: { count: 1 },
+                                  tableImports: { count: 0 },
+                                  tableRules: { count: 0 },
+                                  webhooks: { count: 0 },
+                                },
+                              },
+                            ];
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.getFieldsUsage({
+                              tableId: QB_TABLE_ID_1,
+                              skip: 1,
+                              top: 1,
+                            });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields/usage?tableId=${QB_TABLE_ID_1}&skip=1&top=1`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("handles 404 error for non-existent table", async () => {
+                            const nonExistentTableId = "nonexistent_dbid";
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: false,
+                              status: 404,
+                              json: () => Promise.resolve({ message: "Table not found" }),
+                            });
+
+                            await expect(
+                              client.getFieldsUsage({ tableId: nonExistentTableId })
+                            ).rejects.toThrow("API Error: Table not found (Status: 404)");
+
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/fields/usage?tableId=${nonExistentTableId}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                              })
+                            );
+                          });
+                        });
                 - name: index.ts
                   type: file
                   contents: |
@@ -2257,8 +5247,10 @@ tree:
 
                     // Fields
                     export * from "./fields/getFields.test.ts";
+                    export * from "./fields/getField.test.ts";
                     export * from "./fields/createField.test.ts";
                     export * from "./fields/deleteFields.test.ts";
+                    export * from "./fields/getFieldsUsage.test.ts";
 
                     // Records
                     export * from "./records/deleteRecords.test.ts";

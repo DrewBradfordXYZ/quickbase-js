@@ -1,4 +1,4 @@
-// Generated on 2025-03-12T03:47:41.160Z
+// Generated on 2025-03-12T04:46:29.945Z
 import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, FieldUsage, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -24,7 +24,7 @@ export interface QuickbaseClient {
   deleteFields: (params: { tableId: string; body: DeleteFieldsRequest }) => Promise<DeleteFields200Response>;
   getField: (params: { fieldId: number; tableId: string; includeFieldPerms?: boolean }) => Promise<Field>;
   getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<FieldUsage[]>;
-  getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<any[]>;
+  getFieldUsage: (params: { fieldId: number; tableId: string }) => Promise<FieldUsage>;
   runFormula: (params: { generated?: any }) => Promise<{ [key: string]: any }>;
   upsert: (params: { body: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;
   deleteRecords: (params: { body: DeleteRecordsRequest }) => Promise<DeleteRecords200Response>;
