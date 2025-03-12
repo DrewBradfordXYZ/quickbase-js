@@ -8,10 +8,7 @@ export const fieldsDefinitions = {
         type: "integer",
         description: "The id of the field, unique to this table.",
       },
-      label: {
-        type: "string",
-        description: "The label (name) of the field.",
-      },
+      label: { type: "string", description: "The label (name) of the field." },
       fieldType: {
         type: "string",
         description:
@@ -291,7 +288,7 @@ export const fieldsDefinitions = {
         description: "Whether to display time as relative.",
       },
       compositeFields: {
-        type: "men'sarray",
+        type: "array",
         items: { type: "object" },
         description:
           "An array of the fields that make up a composite field (e.g., address).",
@@ -597,6 +594,7 @@ export const fieldsDefinitions = {
   },
   DeleteFields200Response: {
     type: "object",
+    required: ["deletedFieldIds", "errors"],
     properties: {
       deletedFieldIds: {
         type: "array",

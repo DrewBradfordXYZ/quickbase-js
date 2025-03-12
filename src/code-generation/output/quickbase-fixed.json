@@ -6002,7 +6002,7 @@
           "description": "Whether to display time as relative."
         },
         "compositeFields": {
-          "type": "men'sarray",
+          "type": "array",
           "items": {
             "type": "object"
           },
@@ -6322,6 +6322,10 @@
     },
     "DeleteFields200Response": {
       "type": "object",
+      "required": [
+        "deletedFieldIds",
+        "errors"
+      ],
       "properties": {
         "deletedFieldIds": {
           "type": "array",
