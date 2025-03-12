@@ -1,4 +1,26 @@
-// Optional: Only add if you need to export tests
+// tests/vitest/qb/index.ts
+
+// Apps
+export * from "./apps/copyApp.test.ts";
+export * from "./apps/createApp.test.ts";
+export * from "./apps/deleteApp.test.ts";
 export * from "./apps/getApp.test.ts";
+
+// Fields
+export * from "./fields/createField.test.ts";
+export * from "./fields/deleteFields.test.ts";
 export * from "./fields/getFields.test.ts";
+export * from "./fields/getField.test.ts"; // Added new getField test
+
+// Records
+export * from "./records/deleteRecords.test.ts";
+export * from "./records/runQuery.test.ts";
+export * from "./records/upsert.test.ts";
+
+// Tables
+export * from "./tables/createTable.test.ts";
+export * from "./tables/deleteTable.test.ts";
 export * from "./tables/getAppTables.test.ts";
+export * from "./tables/getRelationships.test.ts";
+export * from "./tables/getTable.test.ts";
+export * from "./tables/updateTable.test.ts";

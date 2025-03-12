@@ -1,4 +1,4 @@
-// Generated on 2025-03-12T02:16:00.295Z
+// Generated on 2025-03-12T02:42:36.265Z
 import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -22,8 +22,7 @@ export interface QuickbaseClient {
   getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<Field[]>;
   createField: (params: { tableId: string; body: CreateFieldRequest }) => Promise<CreateField200Response>;
   deleteFields: (params: { tableId: string; body: DeleteFieldsRequest }) => Promise<DeleteFields200Response>;
-  getField: (params: { tableId: string; includeFieldPerms?: boolean; fieldId: number }) => Promise<{ [key: string]: any }>;
-  updateField: (params: { tableId: string; fieldId: number; generated?: any }) => Promise<{ [key: string]: any }>;
+  getField: (params: { fieldId: number; tableId: string; includeFieldPerms?: boolean }) => Promise<Field>;
   getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<any[]>;
   getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<any[]>;
   runFormula: (params: { generated?: any }) => Promise<{ [key: string]: any }>;

@@ -12,13 +12,15 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "src/code-generation",
+  // "src/code-generation",
+  // "src/code-generation/definitions",
+  // "src/code-generation/paths",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
   // "tests",
-  // "tests/vitest/unit",
+  "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 

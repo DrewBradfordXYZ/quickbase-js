@@ -13,6 +13,7 @@ export * from "./auth/two401s.test.ts";
 
 // Fields
 export * from "./fields/getFields.test.ts";
+export * from "./fields/getField.test.ts";
 export * from "./fields/createField.test.ts";
 export * from "./fields/deleteFields.test.ts";
 

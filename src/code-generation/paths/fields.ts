@@ -84,4 +84,41 @@ export const fieldsPaths = {
       },
     },
   },
+  "/fields/{fieldId}": {
+    get: {
+      operationId: "getField",
+      summary: "Get the properties of an individual field by ID",
+      tags: ["Fields"],
+      parameters: [
+        {
+          name: "fieldId",
+          in: "path",
+          required: true,
+          type: "integer",
+          description: "The unique identifier (fid) of the field.",
+        },
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier (dbid) of the table.",
+        },
+        {
+          name: "includeFieldPerms",
+          in: "query",
+          required: false,
+          type: "boolean",
+          description:
+            "Set to 'true' to include custom permissions for the field.",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - field properties retrieved",
+          schema: { $ref: "#/definitions/Field" },
+        },
+      },
+    },
+  },
 };

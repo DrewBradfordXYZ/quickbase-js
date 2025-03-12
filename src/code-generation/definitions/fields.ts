@@ -8,8 +8,15 @@ export const fieldsDefinitions = {
         type: "integer",
         description: "The id of the field, unique to this table.",
       },
-      label: { type: "string", description: "The label (name) of the field." },
-      fieldType: { type: "string", description: "The type of field." },
+      label: {
+        type: "string",
+        description: "The label (name) of the field.",
+      },
+      fieldType: {
+        type: "string",
+        description:
+          "The type of field, as described in the QuickBase Field Types documentation.",
+      },
       mode: {
         type: "string",
         description:
@@ -59,7 +66,8 @@ export const fieldsDefinitions = {
       },
       properties: {
         $ref: "#/definitions/FieldProperties",
-        description: "Additional properties for the field.",
+        description:
+          "Additional properties for the field. See Field type details for more information.",
       },
       permissions: {
         type: "array",
@@ -67,6 +75,8 @@ export const fieldsDefinitions = {
         description: "Field permissions for different roles.",
       },
     },
+    description:
+      "Represents the properties of an individual field in QuickBase.",
   },
   FieldProperties: {
     type: "object",
@@ -339,7 +349,7 @@ export const fieldsDefinitions = {
       summaryTargetFieldId: {
         type: "integer",
         description:
-          "The id of the field that is used to aggregate values from the child, when applicable.",
+          "The id of the field that is used to aggregate values from the child, when applicable. Displays 0 if not required.",
       },
       masterChoiceFieldId: {
         type: "integer",
@@ -390,15 +400,33 @@ export const fieldsDefinitions = {
       startField: { type: "integer", description: "The start field id." },
       durationField: { type: "integer", description: "The duration field id." },
       workWeek: { type: "integer", description: "The work week type." },
+      comments: {
+        type: "string",
+        description:
+          "The comments entered on the field properties by an administrator.",
+      },
+      sourceFieldId: {
+        type: "integer",
+        description: "The id of the source field.",
+      },
     },
+    description: "Additional properties specific to the field type.",
   },
   FieldPermissionsInner: {
     type: "object",
     properties: {
-      permissionType: { type: "string" },
-      role: { type: "string" },
-      roleId: { type: "integer" },
+      permissionType: {
+        type: "string",
+        description: "The permission given to the role for this field.",
+      },
+      role: {
+        type: "string",
+        description:
+          "The role associated with a given permission for the field.",
+      },
+      roleId: { type: "integer", description: "The Id of the given role." },
     },
+    description: "Defines a single permission entry for a field role.",
   },
   CreateFieldRequest: {
     type: "object",
