@@ -555,4 +555,33 @@ export const fieldsDefinitions = {
     },
     description: "Response body for successful field creation.",
   },
+  DeleteFieldsRequest: {
+    type: "object",
+    required: ["fieldIds"],
+    properties: {
+      fieldIds: {
+        type: "array",
+        items: { type: "integer" },
+        description: "List of field ids to be deleted.",
+      },
+    },
+    description: "Request body for deleting fields from a table.",
+  },
+  DeleteFields200Response: {
+    type: "object",
+    properties: {
+      deletedFieldIds: {
+        type: "array",
+        items: { type: "integer" },
+        description: "List of field ids that were deleted.",
+      },
+      errors: {
+        type: "array",
+        items: { type: "string" },
+        description: "List of errors found during the deletion process.",
+      },
+    },
+    description:
+      "Response body for successful field deletion, with possible errors.",
+  },
 };

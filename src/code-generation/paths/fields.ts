@@ -57,5 +57,31 @@ export const fieldsPaths = {
         },
       },
     },
+    delete: {
+      operationId: "deleteFields",
+      summary: "Delete fields from a table",
+      tags: ["Fields"],
+      parameters: [
+        {
+          name: "tableId",
+          in: "query",
+          required: true,
+          type: "string",
+          description: "The unique identifier of the table.",
+        },
+        {
+          name: "body",
+          in: "body",
+          required: true,
+          schema: { $ref: "#/definitions/DeleteFieldsRequest" },
+        },
+      ],
+      responses: {
+        200: {
+          description: "Success - fields deleted, with possible errors",
+          schema: { $ref: "#/definitions/DeleteFields200Response" },
+        },
+      },
+    },
   },
 };
