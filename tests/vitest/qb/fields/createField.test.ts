@@ -1,11 +1,10 @@
-// tests/vitest/qb/fields/createField.test.ts
+// tests/vitest/qb/fields/createField.test.ts (updated)
 import { describe, it, expect, afterAll } from "vitest";
 import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 
 describe("QuickbaseClient Integration - createField", () => {
   const client = createClient();
 
-  // Array to store field IDs for cleanup, explicitly initialized
   const createdFieldIds: number[] = [];
 
   afterAll(async () => {
@@ -13,9 +12,7 @@ describe("QuickbaseClient Integration - createField", () => {
       try {
         const response = await client.deleteFields({
           tableId: QB_TABLE_ID_1,
-          body: {
-            fieldIds: createdFieldIds,
-          },
+          body: { fieldIds: createdFieldIds },
         });
         console.log(
           `Cleaned up fields: ${JSON.stringify(response.deletedFieldIds)}`,
@@ -25,7 +22,6 @@ describe("QuickbaseClient Integration - createField", () => {
         );
       } catch (error) {
         console.error("Cleanup failed:", error);
-        // Log the fields that weren't cleaned up
         console.log(`Fields left in table: ${createdFieldIds}`);
       }
     } else {
@@ -50,7 +46,6 @@ describe("QuickbaseClient Integration - createField", () => {
     expect(response.fieldType).toBe("text");
     expect(response.fieldHelp).toBe("Created via integration test");
 
-    // Store the field ID for cleanup
     createdFieldIds.push(response.id);
     console.log(`Created field ${uniqueLabel} with ID ${response.id}`);
   });
@@ -62,7 +57,7 @@ describe("QuickbaseClient Integration - createField", () => {
         tableId: QB_TABLE_ID_1,
         body: {
           label: uniqueLabel,
-          fieldType: "invalid_type", // Should fail
+          fieldType: "invalid_type" as "text", // Type assertion to bypass compile-time check
           fieldHelp: "Should fail",
         },
       })
@@ -74,7 +69,7 @@ describe("QuickbaseClient Integration - createField", () => {
       client.createField({
         tableId: QB_TABLE_ID_1,
         body: {
-          label: "", // Invalid
+          label: "",
           fieldType: "text",
         },
       })
