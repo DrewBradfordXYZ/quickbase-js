@@ -9,20 +9,20 @@ const App = () => {
     // Initialize the QuickBase client
     const qb = quickbase({
       realm: "your-realm", // Replace with actual QuickBase realm
-      // ------------------------------
-      // Authentication Options
-      // ------------------------------
-      // OPTION 1: User Token Authentication
-      // - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
-      // - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase
-      // - Use the line below and replace with your token; comment out 'useTempTokens'
+      // ## ------------------------------
+      // ## Authentication Options
+      // ## ------------------------------
+      // ## OPTION 1: User Token Authentication
+      // ## - Use this if you have a QuickBase user token (get it from "My Profile" > "Manage User Tokens")
+      // ## - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase
+      // ## - Use the line below and replace with your token; comment out 'useTempTokens'
       // userToken: "your-user-token",
 
-      // ------------------------------
-      // OPTION 2: Temporary Token Authentication
-      // - Use this for QuickBase code pages, leveraging the browser’s authenticated session
-      // - No user token needed; requires running in a QuickBase browser context
-      // - Uncomment the line below and comment out 'userToken' if using this option
+      // ## ------------------------------
+      // ## OPTION 2: Temporary Token Authentication
+      // ## - Use this for QuickBase code pages, leveraging the browser’s authenticated session
+      // ## - No user token needed; requires running in a QuickBase browser context
+      // ## - Uncomment the line below and comment out 'userToken' if using this option
       // useTempTokens: true,
     });
 
