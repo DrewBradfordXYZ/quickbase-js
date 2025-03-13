@@ -1,5 +1,6 @@
+// tests/playwright/qb/auth/getAppWithTempToken.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbase, QuickbaseClient } from "../../../../src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/quickbaseClient.ts"; // Keep .ts for now
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,7 +11,6 @@ const loginToQuickbase = async (
   username: string,
   password: string
 ): Promise<boolean> => {
-  console.log("Logging in to QuickBase");
   let loginSuccess = false;
   const maxLoginAttempts = 3;
   let loginAttempt = 0;
@@ -52,21 +52,22 @@ const loginToQuickbase = async (
   return loginSuccess;
 };
 
-test.describe("QuickbaseClient Integration - getApp with User Token", () => {
-  test("uses user token for getApp in browser", async ({ page }) => {
-    const realm = process.env.QB_REALM ?? "";
-    const appId = process.env.QB_APP_ID ?? "";
-    const username = process.env.QB_USERNAME ?? "";
-    const password = process.env.QB_PASSWORD ?? "";
-    const userToken = process.env.QB_USER_TOKEN ?? "";
+test.describe("QuickbaseClient Integration - getApp with Temporary Token", () => {
+  test("uses temporary token with correct credentials settings in browser", async ({
+    page,
+  }) => {
+    const realm = process.env.QB_REALM;
+    const appId = process.env.QB_APP_ID;
+    const username = process.env.QB_USERNAME;
+    const password = process.env.QB_PASSWORD;
 
-    if (!realm || !appId || !username || !password || !userToken) {
-      throw new Error(
-        "Required QuickBase environment variables are not defined"
-      );
-    }
+    if (!realm) throw new Error("QB_REALM is not defined in .env");
+    if (!appId) throw new Error("QB_APP_ID is not defined in .env");
+    if (!username) throw new Error("QB_USERNAME is not defined in .env");
+    if (!password) throw new Error("QB_PASSWORD is not defined in .env");
 
-    // Login to Quickbase (optional, to mimic code page context)
+    const fetchInits: { url: string; init: RequestInit }[] = [];
+
     const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
     const loginSuccess = await loginToQuickbase(
       page,
@@ -78,27 +79,22 @@ test.describe("QuickbaseClient Integration - getApp with User Token", () => {
       throw new Error("Failed to log in to QuickBase after max attempts.");
     }
 
-    // Navigate to the app page to ensure session context (optional)
     await page.goto(`https://${realm}.quickbase.com/db/${appId}`, {
       waitUntil: "networkidle",
       timeout: 60000,
     });
 
-    const currentUrl = page.url();
-    console.log("Post-login URL after app navigation:", currentUrl);
-
-    // Create Quickbase client with user token
     const client = quickbase({
       realm,
-      userToken, // Use user token instead of temp tokens
-      debug: true,
-      fetchApi: async (input: RequestInfo | URL, init?: RequestInit) => {
-        const url = input.toString();
-        console.log(`Fetching ${url} with init:`, init);
+      useTempTokens: true,
+      fetchApi: async (url: RequestInfo | URL, init?: RequestInit) => {
+        // Use optional init and provide default empty object if undefined
         const effectiveInit = init || {};
+        fetchInits.push({ url: String(url), init: effectiveInit });
         const response = await page.evaluate(
-          async ([fetchUrl, fetchInit]: [string, RequestInit]) => {
-            const res = await fetch(fetchUrl, fetchInit); // Rely on quickbaseClient.ts for credentials
+          async (args: [string, RequestInit]) => {
+            const [fetchUrl, fetchInit] = args;
+            const res = await fetch(fetchUrl, fetchInit);
             const body = await res.text();
             const headersObj: Record<string, string> = {};
             res.headers.forEach((value, key) => {
@@ -112,14 +108,8 @@ test.describe("QuickbaseClient Integration - getApp with User Token", () => {
               body,
             };
           },
-          [url, effectiveInit] as [string, RequestInit]
+          [String(url), effectiveInit] as [string, RequestInit]
         );
-
-        console.log(`Raw response from ${url}:`, {
-          status: response.status,
-          statusText: response.statusText,
-          body: response.body,
-        });
 
         const fetchResponse = new Response(response.body || null, {
           status: response.status,
@@ -140,14 +130,33 @@ test.describe("QuickbaseClient Integration - getApp with User Token", () => {
 
         return fetchResponse;
       },
-    }) as QuickbaseClient;
+    });
 
-    // Call getApp directly
-    const appResult = await client.getApp({ appId });
-    console.log("App response using user token:", appResult);
+    const appPromise = client.getApp({ appId });
+    await page.waitForResponse(`https://api.quickbase.com/v1/apps/${appId}`, {
+      timeout: 30000,
+    });
+    const appResult = await appPromise;
 
-    // Validate the app response
     expect(appResult).toHaveProperty("id", appId);
     expect(appResult).toHaveProperty("name");
+
+    const tokenFetchInit = fetchInits.find((entry) =>
+      entry.url.includes(`/auth/temporary/${appId}`)
+    );
+    expect(
+      tokenFetchInit,
+      "No fetch init captured for token request"
+    ).toBeDefined();
+    expect(tokenFetchInit!.init.credentials).toBe("include");
+
+    const appFetchInit = fetchInits.find((entry) =>
+      entry.url.includes(`/apps/${appId}`)
+    );
+    expect(
+      appFetchInit,
+      "No fetch init captured for getApp request"
+    ).toBeDefined();
+    expect(appFetchInit!.init.credentials).toBe("omit");
   });
 });

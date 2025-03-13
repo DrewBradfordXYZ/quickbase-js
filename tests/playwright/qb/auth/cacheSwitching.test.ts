@@ -1,7 +1,5 @@
-// tests/playwright/qb/auth/cacheSwitching.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbase } from "../../../../src/quickbaseClient.ts";
-import fetch from "node-fetch";
+import { quickbase, QuickbaseClient } from "../../../../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -59,23 +57,21 @@ const loginToQuickbase = async (
 };
 
 test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", () => {
-  // Removed test.use({ context: ... })
-
   test("caches and switches tokens for different DBIDs with getApp → getFields → getApp sequence", async ({
     page,
   }) => {
     console.log("Starting cacheSwitching test");
-    const realm = process.env.QB_REALM;
-    const appId = process.env.QB_APP_ID;
-    const tableId = process.env.QB_TABLE_ID_1;
-    const username = process.env.QB_USERNAME;
-    const password = process.env.QB_PASSWORD;
+    const realm = process.env.QB_REALM ?? "";
+    const appId = process.env.QB_APP_ID ?? "";
+    const tableId = process.env.QB_TABLE_ID_1 ?? "";
+    const username = process.env.QB_USERNAME ?? "";
+    const password = process.env.QB_PASSWORD ?? "";
 
-    if (!realm) throw new Error("QB_REALM is not defined in .env");
-    if (!appId) throw new Error("QB_APP_ID is not defined in .env");
-    if (!tableId) throw new Error("QB_TABLE_ID_1 is not defined in .env");
-    if (!username) throw new Error("QB_USERNAME is not defined in .env");
-    if (!password) throw new Error("QB_PASSWORD is not defined in .env");
+    if (!realm || !appId || !tableId || !username || !password) {
+      throw new Error(
+        "Required QuickBase environment variables are not defined"
+      );
+    }
 
     const quickbaseUrl = `https://${realm}.quickbase.com/db/main?a=SignIn`;
     const loginSuccess = await loginToQuickbase(
@@ -94,89 +90,63 @@ test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", 
     });
     console.log("Post-login URL after app navigation:", page.url());
 
-    const browserFetch = async (url: string, init?: RequestInit) => {
-      const response = await page.evaluate(
-        async ([fetchUrl, fetchInit]) => {
-          const res = await fetch(fetchUrl, {
-            ...fetchInit,
-            credentials: "include",
-          });
-          const body = await res.text();
-          return {
-            ok: res.ok,
-            status: res.status,
-            statusText: res.statusText,
-            headers: Object.fromEntries(res.headers.entries()),
-            body,
-          };
-        },
-        [url, init] as [string, RequestInit]
-      );
-
-      console.log(`Raw response from ${url}:`, {
-        status: response.status,
-        statusText: response.statusText,
-        body: response.body,
-      });
-
-      const fetchResponse = new Response(response.body || null, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
-
-      fetchResponse.json = async () => {
-        if (!response.body) throw new Error("Empty response body from API");
-        try {
-          return JSON.parse(response.body);
-        } catch (e) {
-          throw new SyntaxError(`Invalid JSON response: ${response.body}`);
-        }
-      };
-
-      return fetchResponse;
-    };
-
     const client = quickbase({
       realm,
       useTempTokens: true,
       debug: true,
-      fetchApi: async (url, init) => {
-        if (url.includes("/auth/temporary/")) {
-          return browserFetch(url, init);
-        }
+      fetchApi: async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = input.toString();
         console.log(`Fetching ${url} with init:`, init);
-        const response = await fetch(url, init as RequestInit);
-        const body = await response.text();
+        const effectiveInit = init || {};
+        const response = await page.evaluate(
+          async ([fetchUrl, fetchInit]: [string, RequestInit]) => {
+            const res = await fetch(fetchUrl, fetchInit); // Rely on quickbaseClient.ts for credentials
+            const body = await res.text();
+            const headersObj: Record<string, string> = {};
+            res.headers.forEach((value, key) => {
+              headersObj[key] = value;
+            });
+            return {
+              ok: res.ok,
+              status: res.status,
+              statusText: res.statusText,
+              headers: headersObj,
+              body,
+            };
+          },
+          [url, effectiveInit] as [string, RequestInit]
+        );
 
         console.log(`Raw response from ${url}:`, {
           status: response.status,
           statusText: response.statusText,
-          body,
+          body: response.body,
         });
 
-        const fetchResponse = new Response(body || null, {
+        const fetchResponse = new Response(response.body || null, {
           status: response.status,
           statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
+          headers: new Headers(response.headers),
         });
 
         fetchResponse.json = async () => {
-          if (!body) throw new Error("Empty response body from API");
+          if (!response.body) {
+            throw new Error("Empty response body from API");
+          }
           try {
-            return JSON.parse(body);
+            return JSON.parse(response.body);
           } catch (e) {
-            throw new SyntaxError(`Invalid JSON response: ${body}`);
+            throw new SyntaxError(`Invalid JSON response: ${response.body}`);
           }
         };
 
         return fetchResponse;
       },
-    });
+    }) as QuickbaseClient;
 
     const appResult1 = await client.getApp({ appId });
     console.log("First getApp response:", appResult1);
-    expect(appResult1.id).toBe(appId);
+    expect(appResult1).toHaveProperty("id", appId);
 
     const fieldsResult = await client.getFields({ tableId });
     console.log("getFields response:", fieldsResult);
@@ -184,6 +154,6 @@ test.describe("QuickbaseClient Integration - Cache Switching with Temp Tokens", 
 
     const appResult2 = await client.getApp({ appId });
     console.log("Second getApp response:", appResult2);
-    expect(appResult2.id).toBe(appId);
+    expect(appResult2).toHaveProperty("id", appId);
   });
 });

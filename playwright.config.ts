@@ -29,7 +29,7 @@ const config = defineConfig({
 });
 
 console.log(
-  `Loading Playwright: Testing temp token authorization in browser. Be patient, this should take at least 5min. Workers: ${
+  `Loading Playwright: Testing temp token authorization in browser. Be patient, this could take at least 5min. Workers: ${
     config.workers || "default (half CPU cores)"
   }`
 );
