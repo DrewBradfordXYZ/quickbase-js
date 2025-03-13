@@ -164,7 +164,9 @@ function generateTreeSnapshot(): string {
 
 try {
   const output: string = generateTreeSnapshot();
-  fs.writeFileSync("log-gen.yaml", output, "utf8");
+  // Use __dirname to get the directory of the script
+  const outputPath: string = path.join(__dirname, "log-gen.yaml");
+  fs.writeFileSync(outputPath, output, "utf8");
   const lineCount: number = output.split("\n").length - 1;
   console.log("log-gen.yaml");
   console.log(`Lines: ${lineCount}`);

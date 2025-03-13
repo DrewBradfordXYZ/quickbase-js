@@ -56,195 +56,12 @@ tree:
       type: file
     - name: README.md
       type: file
-    - name: build.js
+    - name: build-common.js
       type: file
-      contents: |-
-        import { execSync } from 'child_process';
-        import { rollup } from 'rollup';
-        import terser from '@rollup/plugin-terser';
-        import nodeResolve from '@rollup/plugin-node-resolve';
-        import commonjs from '@rollup/plugin-commonjs';
-        import dts from 'rollup-plugin-dts';
-        import { rimrafSync } from 'rimraf';
-        import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'fs';
-        import { join } from 'path';
-
-        // Clean the dist folder
-        rimrafSync('dist');
-        rimrafSync('dist/temp-src');
-
-        // Step 1: Copy runtime-relevant files from src/ to dist/temp-src and remove .ts extensions
-        const srcDir = join(process.cwd(), 'src');
-        const tempSrcDir = join(process.cwd(), 'dist/temp-src');
-        const runtimeDirs = ['generated', 'generated-unified'];
-        const runtimeFiles = ['index.ts', 'quickbaseClient.ts', 'tokenCache.ts'];
-
-        function copyAndRewriteTsExtensions(src, dest) {
-          console.log(`Copying from ${src} to ${dest}`);
-          mkdirSync(dest, { recursive: true });
-          const files = readdirSync(src, { withFileTypes: true });
-          for (const file of files) {
-            const srcPath = join(src, file.name);
-            const destPath = join(dest, file.name);
-            if (file.isDirectory()) {
-              if (runtimeDirs.includes(file.name) || runtimeDirs.some(dir => src.includes(dir))) {
-                copyAndRewriteTsExtensions(srcPath, destPath);
-              } else {
-                console.log(`Skipping non-runtime directory ${srcPath}`);
-              }
-            } else if (file.name.endsWith('.ts')) {
-              if (runtimeFiles.includes(file.name) || src.includes('generated') || src.includes('generated-unified')) {
-                console.log(`Processing ${srcPath} -> ${destPath}`);
-                let content = readFileSync(srcPath, 'utf8');
-                content = content.replace(/(from\s+["']\.[\w\/-]+)\.ts(["'])/g, '$1$2');
-                content = content.replace(/(export\s+\*\s+from\s+["']\.[\w\/-]+)\.ts(["'])/g, '$1$2');
-                writeFileSync(destPath, content, 'utf8');
-              } else {
-                console.log(`Skipping non-runtime file ${srcPath}`);
-              }
-            } else {
-              console.log(`Skipping non-.ts file ${srcPath}`);
-            }
-          }
-        }
-        copyAndRewriteTsExtensions(srcDir, tempSrcDir);
-
-        // Step 2: Compile TypeScript to JavaScript with tsc
-        console.log('Running tsc...');
-        const tsFiles = readdirSync(tempSrcDir, { recursive: true })
-          .filter(file => file.endsWith('.ts'))
-          .map(file => join(tempSrcDir, file));
-        const tscCommand = `npx tsc ${tsFiles.join(' ')} --outDir ${join(process.cwd(), 'dist/temp')} --module ESNext --target ESNext --sourceMap --moduleResolution bundler --baseUrl ${process.cwd()}`;
-        console.log(`Command: ${tscCommand}`);
-        execSync(tscCommand, { stdio: 'inherit' });
-
-        // Step 3: Rollup configuration
-        const isProd = process.env.NODE_ENV === 'production';
-        const external = [
-          'node:http', 'node:https', 'node:zlib', 'node:stream', 'node:buffer',
-          'node:util', 'node:url', 'node:net', 'node:fs', 'node:path', 'node-fetch',
-        ];
-        const globals = { 'node-fetch': 'fetch' };
-
-        // Function to create Rollup bundle
-        async function createBundle(input, plugins, format, outputOptions) {
-          const bundle = await rollup({
-            input,
-            external,
-            plugins,
-          });
-          await bundle.write(outputOptions);
-          await bundle.close();
-        }
-
-        // ESM Builds
-        console.log('Building ESM bundles...');
-        // Unminified ESM build (always generated)
-        await createBundle(
-          'dist/temp/quickbaseClient.js',
-          [
-            nodeResolve({ preferBuiltins: true }),
-            commonjs(),
-          ],
-          'esm',
-          {
-            dir: 'dist/esm',
-            format: 'esm',
-            sourcemap: true,
-            entryFileNames: 'quickbase.js',
-          }
-        );
-
-        // Minified ESM build (only in production)
-        if (isProd) {
-          await createBundle(
-            'dist/temp/quickbaseClient.js',
-            [
-              nodeResolve({ preferBuiltins: true }),
-              commonjs(),
-              terser(),
-            ],
-            'esm',
-            {
-              dir: 'dist/esm',
-              format: 'esm',
-              sourcemap: true,
-              entryFileNames: 'quickbase.min.js',
-            }
-          );
-        }
-
-        // UMD Builds
-        console.log('Building UMD bundles...');
-        // Unminified UMD build (always generated)
-        await createBundle(
-          'dist/temp/quickbaseClient.js',
-          [
-            nodeResolve({ preferBuiltins: true, browser: true }),
-            commonjs(),
-          ],
-          'umd',
-          {
-            file: join(process.cwd(), 'dist/umd', 'quickbase.umd.js'),
-            format: 'umd',
-            name: 'QuickbaseJS',
-            sourcemap: true,
-            globals,
-          }
-        );
-
-        // Minified UMD build (only in production)
-        if (isProd) {
-          await createBundle(
-            'dist/temp/quickbaseClient.js',
-            [
-              nodeResolve({ preferBuiltins: true, browser: true }),
-              commonjs(),
-              terser(),
-            ],
-            'umd',
-            {
-              file: join(process.cwd(), 'dist/umd', 'quickbase.umd.min.js'),
-              format: 'umd',
-              name: 'QuickbaseJS',
-              sourcemap: true,
-              globals,
-            }
-          );
-        }
-
-        // Declarations
-        console.log('Generating declarations...');
-        const dtsBundle = await rollup({
-          input: 'src/quickbaseClient.ts',
-          plugins: [dts({ tsconfig: './tsconfig.json', respectExternal: true })],
-        });
-        await dtsBundle.write({ file: 'dist/esm/quickbase.d.ts', format: 'esm' });
-        await dtsBundle.write({ file: 'dist/umd/quickbase.umd.d.ts', format: 'umd' });
-        await dtsBundle.close();
-
-        // Clean up
-        rimrafSync('dist/temp');
-        rimrafSync('dist/temp-src');
-
-        // List generated files and their sizes
-        console.log('\nGenerated files:');
-        function listFilesWithSizes(dir, prefix = '') {
-          const files = readdirSync(dir, { withFileTypes: true });
-          for (const file of files) {
-            const filePath = join(dir, file.name);
-            if (file.isDirectory()) {
-              listFilesWithSizes(filePath, `${prefix}${file.name}/`);
-            } else {
-              const stats = statSync(filePath);
-              const sizeKB = (stats.size / 1024).toFixed(2);
-              console.log(`${prefix}${file.name} - ${sizeKB} KB`);
-            }
-          }
-        }
-        listFilesWithSizes(join(process.cwd(), 'dist'));
-
-        console.log('\nBuild completed successfully');
+    - name: build-esm.js
+      type: file
+    - name: build-umd.js
+      type: file
     - name: dist
       type: directory
       children:
@@ -264,8 +81,6 @@ tree:
         - name: umd
           type: directory
           children:
-            - name: quickbase.umd.d.ts
-              type: file
             - name: quickbase.umd.js
               type: file
             - name: quickbase.umd.js.map
@@ -283,8 +98,6 @@ tree:
           type: file
         - name: vanillajs.html
           type: file
-    - name: log-gen.yaml
-      type: file
     - name: open-api
       type: directory
       children:
@@ -312,23 +125,20 @@ tree:
         - name: generate-unified-interface.ts
           type: file
           contents: |
+            // open-api/generate-unified-interface.ts
             import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
             import { join, dirname } from "path";
             import { fileURLToPath } from "url";
             import { OpenAPIV2 } from "openapi-types";
+            import { simplifyName } from "../src/utils"; // Add this import
 
             const __dirname = dirname(fileURLToPath(import.meta.url));
             const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
             const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
             const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 
-            // Placeholder for simplifyName (since utils.ts is missing)
-            function simplifyName(name: string): string {
-              return name
-                .replace(/ById$/, "")
-                .replace(/Api$/, "")
-                .replace(/^(\w)/, (_, c) => c.toLowerCase());
-            }
+            // Remove the local simplifyName function
+            // (The rest of the file remains unchanged)
 
             function generateInterface() {
               if (!existsSync(SPEC_FILE)) {
@@ -555,6 +365,9 @@ tree:
             }
           },
           "scripts": {
+            "build": "npm run build:esm && npm run build:umd",
+            "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --loader ts-node/esm build-esm.js",
+            "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --loader ts-node/esm build-umd.js",
             "release": "standard-version",
             "release:beta": "standard-version --prerelease beta",
             "release:alpha": "standard-version --prerelease alpha",
@@ -566,8 +379,6 @@ tree:
             "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
             "regenerate:all": "npm run fix-spec && npm run regenerate:openapi && npm run regenerate:unified",
             "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
-            "build": "rimraf dist && node --loader ts-node/esm build.js",
-            "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
             "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
             "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
             "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
@@ -614,15 +425,125 @@ tree:
             "vitest": "^3.0.8"
           }
         }
-    - name: playwright-results.txt
-      type: directory
-      children:
-        - name: .last-run.json
-          type: file
     - name: playwright.config.ts
       type: file
-    - name: rollup.config.mjs
+    - name: rollup.config.js
       type: file
+      contents: |
+        import terser from "@rollup/plugin-terser";
+        import nodeResolve from "@rollup/plugin-node-resolve";
+        import commonjs from "@rollup/plugin-commonjs";
+        import dts from "rollup-plugin-dts";
+        import typescript from "@rollup/plugin-typescript";
+
+        const isProd = process.env.NODE_ENV === "production";
+
+        // External dependencies for both ESM and UMD builds
+        const external = [
+          "node:http",
+          "node:https",
+          "node:zlib",
+          "node:stream",
+          "node:buffer",
+          "node:util",
+          "node:url",
+          "node:net",
+          "node:fs",
+          "node:path",
+          "node-fetch",
+        ];
+
+        // Global mappings for UMD (browser) build
+        const globals = {
+          "node-fetch": "fetch", // Map node-fetch to window.fetch in browsers
+        };
+
+        export default [
+          // ESM Build
+          {
+            input: "src/quickbaseClient.ts",
+            output: {
+              dir: "dist/esm",
+              format: "esm",
+              sourcemap: true,
+              entryFileNames: "quickbase.js",
+            },
+            external,
+            plugins: [
+              nodeResolve({ preferBuiltins: true }), // Node.js resolution
+              commonjs(), // Convert CommonJS to ESM
+              typescript({
+                tsconfig: "./tsconfig.json",
+                noEmitOnError: true, // Fail on TypeScript errors
+                // Use Rollup to emit JavaScript, overriding noEmit for this build
+              }),
+              isProd && terser(), // Minification for production
+            ],
+          },
+          // UMD Build
+          {
+            input: "src/quickbaseClient.ts",
+            output: {
+              file: "dist/umd/quickbase.umd.js",
+              format: "umd",
+              name: "QuickbaseJS", // Global name for browser
+              sourcemap: true,
+              globals,
+            },
+            external,
+            plugins: [
+              nodeResolve({ preferBuiltins: true, browser: true }), // Browser-first resolution
+              commonjs(), // Convert CommonJS to UMD
+              typescript({
+                tsconfig: "./tsconfig.json",
+                noEmitOnError: true, // Fail on TypeScript errors
+                // Use Rollup to emit JavaScript, overriding noEmit for this build
+              }),
+              isProd && terser(), // Minification for production
+            ],
+          },
+          // ESM Declarations
+          {
+            input: "src/quickbaseClient.ts",
+            output: {
+              file: "dist/esm/quickbase.d.ts",
+              format: "esm",
+            },
+            plugins: [
+              dts({
+                tsconfig: "./tsconfig.json",
+                respectExternal: true, // Include external dependencies in declarations
+              }),
+            ],
+          },
+          // UMD Declarations
+          {
+            input: "src/quickbaseClient.ts",
+            output: {
+              file: "dist/umd/quickbase.umd.d.ts",
+              format: "umd",
+            },
+            plugins: [
+              dts({
+                tsconfig: "./tsconfig.json",
+                respectExternal: true, // Include external dependencies in declarations
+              }),
+            ],
+          },
+        ].map((config) => ({
+          ...config,
+          onwarn(warning, warn) {
+            // Suppress TypeScript plugin warnings
+            if (
+              warning.code === "PLUGIN_WARNING" &&
+              warning.plugin === "typescript" &&
+              warning.message.includes("TS5096")
+            ) {
+              return;
+            }
+            warn(warning);
+          },
+        }));
     - name: src
       type: directory
       children:
@@ -865,23 +786,17 @@ tree:
           type: file
           contents: |
             // src/quickbaseClient.ts
-            import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient.ts";
-            import {
-              Configuration,
-              HTTPHeaders,
-              ResponseError,
-            } from "./generated/runtime.ts";
-            import * as apis from "./generated/apis/index.ts";
-            import { TokenCache } from "./tokenCache.ts";
+            import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
+            import { Configuration, HTTPHeaders, ResponseError } from "./generated/runtime";
+            import * as apis from "./generated/apis";
+            import { TokenCache } from "./tokenCache";
+            import { simplifyName } from "./utils"; // Add this import
 
             // Re-export all model types from generated/models
             export * from "./generated/models";
 
-            const simplifyName = (name: string): string =>
-              name
-                .replace(/ById$/, "")
-                .replace(/Api$/, "")
-                .replace(/^(\w)/, (_, c) => c.toLowerCase());
+            // Remove the local simplifyName function
+            // (The rest of the file remains unchanged)
 
             export interface QuickbaseClient extends IQuickbaseClient {}
 
@@ -1231,6 +1146,8 @@ tree:
                 this.cache.clear();
               }
             }
+        - name: utils.ts
+          type: file
     - name: test-artifacts
       type: directory
       children:
@@ -1271,8 +1188,6 @@ tree:
                     - name: tokenPrefetch.test.ts
                       type: file
                     - name: tokenRenewal.test.ts
-                      type: file
-                    - name: umd.test.ts
                       type: file
         - name: setup.ts
           type: file
@@ -1436,7 +1351,7 @@ tree:
         }
     - name: tsconfig.json
       type: file
-      contents: |-
+      contents: |
         {
           "compilerOptions": {
             "target": "ESNext",
@@ -1460,7 +1375,7 @@ tree:
             }
           },
           "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
-          "exclude": ["node_modules", "dist", "specs"],
+          "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
           "ts-node": {
             "esm": true,
             "transpileOnly": true
