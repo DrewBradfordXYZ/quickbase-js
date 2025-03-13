@@ -4,8 +4,8 @@ import { fileURLToPath } from "url";
 import { OpenAPIV2 } from "openapi-types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json"); // Remains relative to open-api/
-const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified"); // Updated to src/generated-unified/
+const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
+const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 
 // Placeholder for simplifyName (since utils.ts is missing)
@@ -47,20 +47,24 @@ function generateInterface() {
       const opId = simplifyName(op.operationId);
       const params = (op.parameters || [])
         .filter((p) => {
-          const param = p as OpenAPIV2.ParameterObject;
+          const param = p as OpenAPIV2.Parameter;
           return !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
-            param.name
+            "name" in param ? param.name : ""
           );
         })
         .map((p) => {
-          const param = p as OpenAPIV2.ParameterObject;
-          const type = param.type
-            ? mapOpenApiTypeToTs(param.type)
-            : param.schema
-            ? mapRefToType(param.schema, modelImports)
-            : "any";
+          const param = p as OpenAPIV2.Parameter;
+          if (!("name" in param)) return "";
+
+          const type =
+            "type" in param && param.type
+              ? mapOpenApiTypeToTs(param.type)
+              : "schema" in param && param.schema
+              ? mapRefToType(param.schema, modelImports)
+              : "any";
           return `${param.name}${param.required ? "" : "?"}: ${type}`;
         })
+        .filter((param) => param !== "")
         .join("; ");
 
       const successResponses = ["200", "207"]
@@ -127,18 +131,26 @@ function mapRefToType(
 ): string {
   if (!schema) return "any";
 
+  // Handle ReferenceObject
   if ("$ref" in schema && schema.$ref) {
     const model = schema.$ref.split("/").pop()!;
     modelImports.add(model);
     return model;
   }
 
+  // At this point, we know it's a SchemaObject (not a ReferenceObject)
+  // But we still need to check for 'type' existence for TypeScript
+  if (!("type" in schema)) return "any";
+
   if (schema.type === "array" && schema.items) {
+    const items = schema.items as
+      | OpenAPIV2.SchemaObject
+      | OpenAPIV2.ReferenceObject;
     const itemType =
-      "$ref" in schema.items && schema.items.$ref
-        ? schema.items.$ref.split("/").pop()!
-        : mapOpenApiTypeToTs(schema.items.type);
-    if ("$ref" in schema.items && schema.items.$ref) modelImports.add(itemType);
+      "$ref" in items && items.$ref
+        ? items.$ref.split("/").pop()!
+        : mapOpenApiTypeToTs("type" in items ? items.type : undefined);
+    if ("$ref" in items && items.$ref) modelImports.add(itemType);
     return `${itemType}[]`;
   }
 
@@ -153,7 +165,9 @@ function mapRefToType(
     const valueType =
       "$ref" in additionalProps && additionalProps.$ref
         ? additionalProps.$ref.split("/").pop()!
-        : mapOpenApiTypeToTs(additionalProps.type);
+        : mapOpenApiTypeToTs(
+            "type" in additionalProps ? additionalProps.type : undefined
+          );
     if ("$ref" in additionalProps && additionalProps.$ref)
       modelImports.add(valueType);
     return `{ [key: string]: ${valueType} }`;
