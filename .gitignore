@@ -12,6 +12,9 @@ generated-old/
 # Environment variables
 .env
 
+# Test artifacts
+test-artifacts/
+
 # Temporary files
 *.log
 *.tmp
