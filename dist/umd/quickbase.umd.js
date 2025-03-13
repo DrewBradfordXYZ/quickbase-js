@@ -7093,7 +7093,7 @@
             basePath: baseUrl,
             headers: { ...baseHeaders },
             fetchApi: fetchApi || defaultFetch,
-            credentials: useTempTokens ? "include" : "omit",
+            credentials: "omit", // Default to "omit" for all requests
         });
         if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
             throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
@@ -7137,7 +7137,7 @@
             const response = await effectiveFetch(`https://api.quickbase.com/v1/auth/temporary/${dbid}`, {
                 method: "GET",
                 headers: { ...baseHeaders },
-                credentials: "include",
+                credentials: "include", // Explicitly include credentials for token fetch
             });
             if (!response.ok) {
                 const errorBody = await response.json();
@@ -7163,7 +7163,9 @@
                 methodInfo.paramMap[0] === "requestParameters"
                 ? { requestParameters: params }
                 : params;
-            let requestOptions = {};
+            let requestOptions = {
+                credentials: "omit", // Explicitly set to "omit" for API calls
+            };
             const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
             if (methodName === "getTempTokenDBID" && useTempTokens) {
                 const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");

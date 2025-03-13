@@ -98,7 +98,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     basePath: baseUrl,
     headers: { ...baseHeaders },
     fetchApi: fetchApi || defaultFetch,
-    credentials: useTempTokens ? "include" : "omit",
+    credentials: "omit", // Default to "omit" for all requests
   });
 
   if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
@@ -163,7 +163,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       {
         method: "GET",
         headers: { ...baseHeaders },
-        credentials: "include",
+        credentials: "include", // Explicitly include credentials for token fetch
       }
     );
 
@@ -209,7 +209,9 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       methodInfo.paramMap[0] === "requestParameters"
         ? { requestParameters: params }
         : params;
-    let requestOptions: RequestInit = {};
+    let requestOptions: RequestInit = {
+      credentials: "omit", // Explicitly set to "omit" for API calls
+    };
 
     const selectedToken =
       initialTempToken || (userToken && !useTempTokens ? userToken : undefined);

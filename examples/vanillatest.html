@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quickbase CDN Test</title>
+    <!-- Load Quickbase library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/quickbase-js@1.1.0-beta.5/dist/umd/quickbase.umd.min.js"></script>
+</head>
+
+<body>
+    <div>
+        <h1>Quickbase CDN Test</h1>
+        <p id="result">Loading...</p>
+    </div>
+    <script>
+        // Log the global object for debugging
+        console.log("Window object:", window);
+
+        // Log the QuickbaseJS variable for debugging
+        console.log("QuickbaseJS:", typeof QuickbaseJS);
+
+        // Ensure the QuickbaseJS library is loaded
+        if (typeof QuickbaseJS === "undefined") {
+            console.error("QuickbaseJS library not loaded.");
+            document.getElementById("result").textContent = "Error: Failed to load QuickbaseJS library.";
+        } else {
+            console.log("QuickbaseJS library loaded successfully.");
+
+            // Initialize the Quickbase client
+            var qbClient = QuickbaseJS.quickbase({
+                realm: "builderprogram-dbradford6815", // Replace with your realm (without .quickbase.com)
+                useTempTokens: true,
+            });
+
+            // Fetch the app using the getApp method
+            qbClient.getApp({ appId: "buwai2zpe" })
+                .then(function (app) {
+                    document.getElementById("result").textContent = "App Name: " + app.name;
+                })
+                .catch(function (err) {
+                    console.error("Error fetching app:", err);
+                    document.getElementById("result").textContent =
+                        "Error: " + (err.message || "Failed to load app");
+                });
+        }
+    </script>
+</body>
+
+</html>

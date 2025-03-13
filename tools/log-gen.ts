@@ -12,9 +12,9 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "open-api",
-  "open-api/definitions",
-  "open-api/paths",
+  // "open-api",
+  // "open-api/definitions",
+  // "open-api/paths",
 ];
 
 // prettier-ignore

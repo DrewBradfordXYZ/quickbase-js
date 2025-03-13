@@ -1,5 +1,5 @@
 project: quickbase-js
-date: 3/12/2025
+date: 3/13/2025
 root: /home/drew/Projects/quickbase-js
 goals:
   - A library for interacting with the QuickBase RESTful API.
@@ -66,7 +66,7 @@ tree:
         import commonjs from '@rollup/plugin-commonjs';
         import dts from 'rollup-plugin-dts';
         import { rimrafSync } from 'rimraf';
-        import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+        import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'fs';
         import { join } from 'path';
 
         // Clean the dist folder
@@ -126,44 +126,92 @@ tree:
         ];
         const globals = { 'node-fetch': 'fetch' };
 
-        // ESM Build
-        console.log(`Building ESM bundle (${isProd ? 'minified' : 'unminified'})...`);
-        const esmBundle = await rollup({
-          input: 'dist/temp/quickbaseClient.js',
-          external,
-          plugins: [
+        // Function to create Rollup bundle
+        async function createBundle(input, plugins, format, outputOptions) {
+          const bundle = await rollup({
+            input,
+            external,
+            plugins,
+          });
+          await bundle.write(outputOptions);
+          await bundle.close();
+        }
+
+        // ESM Builds
+        console.log('Building ESM bundles...');
+        // Unminified ESM build (always generated)
+        await createBundle(
+          'dist/temp/quickbaseClient.js',
+          [
             nodeResolve({ preferBuiltins: true }),
             commonjs(),
-            isProd && terser(), // Only minify in prod
           ],
-        });
-        await esmBundle.write({
-          dir: 'dist/esm',
-          format: 'esm',
-          sourcemap: true,
-          entryFileNames: isProd ? 'quickbase.min.js' : 'quickbase.js',
-        });
-        await esmBundle.close();
+          'esm',
+          {
+            dir: 'dist/esm',
+            format: 'esm',
+            sourcemap: true,
+            entryFileNames: 'quickbase.js',
+          }
+        );
 
-        // UMD Build
-        console.log(`Building UMD bundle (${isProd ? 'minified' : 'unminified'})...`);
-        const umdBundle = await rollup({
-          input: 'dist/temp/quickbaseClient.js',
-          external,
-          plugins: [
+        // Minified ESM build (only in production)
+        if (isProd) {
+          await createBundle(
+            'dist/temp/quickbaseClient.js',
+            [
+              nodeResolve({ preferBuiltins: true }),
+              commonjs(),
+              terser(),
+            ],
+            'esm',
+            {
+              dir: 'dist/esm',
+              format: 'esm',
+              sourcemap: true,
+              entryFileNames: 'quickbase.min.js',
+            }
+          );
+        }
+
+        // UMD Builds
+        console.log('Building UMD bundles...');
+        // Unminified UMD build (always generated)
+        await createBundle(
+          'dist/temp/quickbaseClient.js',
+          [
             nodeResolve({ preferBuiltins: true, browser: true }),
             commonjs(),
-            isProd && terser(), // Only minify in prod
           ],
-        });
-        await umdBundle.write({
-          file: join(process.cwd(), 'dist/umd', isProd ? 'quickbase.umd.min.js' : 'quickbase.umd.js'),
-          format: 'umd',
-          name: 'QuickbaseJS',
-          sourcemap: true,
-          globals,
-        });
-        await umdBundle.close();
+          'umd',
+          {
+            file: join(process.cwd(), 'dist/umd', 'quickbase.umd.js'),
+            format: 'umd',
+            name: 'QuickbaseJS',
+            sourcemap: true,
+            globals,
+          }
+        );
+
+        // Minified UMD build (only in production)
+        if (isProd) {
+          await createBundle(
+            'dist/temp/quickbaseClient.js',
+            [
+              nodeResolve({ preferBuiltins: true, browser: true }),
+              commonjs(),
+              terser(),
+            ],
+            'umd',
+            {
+              file: join(process.cwd(), 'dist/umd', 'quickbase.umd.min.js'),
+              format: 'umd',
+              name: 'QuickbaseJS',
+              sourcemap: true,
+              globals,
+            }
+          );
+        }
 
         // Declarations
         console.log('Generating declarations...');
@@ -178,7 +226,25 @@ tree:
         // Clean up
         rimrafSync('dist/temp');
         rimrafSync('dist/temp-src');
-        console.log('Build completed successfully');
+
+        // List generated files and their sizes
+        console.log('\nGenerated files:');
+        function listFilesWithSizes(dir, prefix = '') {
+          const files = readdirSync(dir, { withFileTypes: true });
+          for (const file of files) {
+            const filePath = join(dir, file.name);
+            if (file.isDirectory()) {
+              listFilesWithSizes(filePath, `${prefix}${file.name}/`);
+            } else {
+              const stats = statSync(filePath);
+              const sizeKB = (stats.size / 1024).toFixed(2);
+              console.log(`${prefix}${file.name} - ${sizeKB} KB`);
+            }
+          }
+        }
+        listFilesWithSizes(join(process.cwd(), 'dist'));
+
+        console.log('\nBuild completed successfully');
     - name: dist
       type: directory
       children:
@@ -186,6 +252,10 @@ tree:
           type: directory
           children:
             - name: quickbase.d.ts
+              type: file
+            - name: quickbase.js
+              type: file
+            - name: quickbase.js.map
               type: file
             - name: quickbase.min.js
               type: file
@@ -195,6 +265,10 @@ tree:
           type: directory
           children:
             - name: quickbase.umd.d.ts
+              type: file
+            - name: quickbase.umd.js
+              type: file
+            - name: quickbase.umd.js.map
               type: file
             - name: quickbase.umd.min.js
               type: file
@@ -206,6 +280,8 @@ tree:
         - name: react.js
           type: file
         - name: vanillajs.html
+          type: file
+        - name: vanillatest.html
           type: file
     - name: log-gen.yaml
       type: file
@@ -270,7 +346,7 @@ tree:
       contents: |
         {
           "name": "quickbase-js",
-          "version": "1.1.0-beta.4",
+          "version": "1.1.0-beta.5",
           "description": "QuickBase JavaScript client for frameworks and vanilla JS",
           "type": "module",
           "main": "dist/esm/quickbase.js",
@@ -299,8 +375,7 @@ tree:
             "release:alpha": "standard-version --prerelease alpha",
             "release:push": "npm run release:beta && git push --follow-tags origin main",
             "release:publish": "npm run release:push && npm publish --tag beta",
-          
-
+            "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
             "fix-spec": "node --loader ts-node/esm open-api/fix-spec-main.ts",
             "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm open-api/regenerate-client.ts",
             "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
@@ -308,10 +383,6 @@ tree:
             "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
             "build": "rimraf dist && node --loader ts-node/esm build.js",
             "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
-
-
-            "build-old": "rimraf dist && rollup -c",
-            "build:prod-old": "rimraf dist && NODE_ENV=production rollup -c",
             "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
             "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
             "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
