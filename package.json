@@ -1,6 +1,6 @@
 {
   "name": "quickbase-js",
-  "version": "1.1.0-beta.4",
+  "version": "1.1.0-beta.5",
   "description": "QuickBase JavaScript client for frameworks and vanilla JS",
   "type": "module",
   "main": "dist/esm/quickbase.js",
@@ -30,7 +30,6 @@
     "release:push": "npm run release:beta && git push --follow-tags origin main",
     "release:publish": "npm run release:push && npm publish --tag beta",
     "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
-
     "fix-spec": "node --loader ts-node/esm open-api/fix-spec-main.ts",
     "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm open-api/regenerate-client.ts",
     "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
@@ -38,7 +37,6 @@
     "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
     "build": "rimraf dist && node --loader ts-node/esm build.js",
     "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
-
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
     "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",

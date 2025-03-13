@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0-beta.5](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2025-03-13)
+
+
+### Features
+
+* ESM and UMD build prod ([49513e9](https://github.com/DrewBradfordXYZ/quickbase-js/commit/49513e902e7bf4dd35da3c6508242e96507a91bd))
+* ESM and UMD support and src folder reorganization ([dc0170b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/dc0170b547e6e9e57a117fbcccfdbeb86e48a8c7))
+
 ## [1.1.0-beta.4](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2025-03-12)
 
 
