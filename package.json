@@ -11,8 +11,14 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/esm/quickbase.js",
-      "require": "./dist/umd/quickbase.umd.js",
+      "import": {
+        "minified": "./dist/esm/quickbase.min.js",
+        "default": "./dist/esm/quickbase.js"
+      },
+      "require": {
+        "minified": "./dist/umd/quickbase.umd.min.js",
+        "default": "./dist/umd/quickbase.umd.js"
+      },
       "types": "./dist/esm/quickbase.d.ts",
       "umd:types": "./dist/umd/quickbase.umd.d.ts"
     }
@@ -23,7 +29,7 @@
     "release:alpha": "standard-version --prerelease alpha",
     "release:push": "npm run release:beta && git push --follow-tags origin main",
     "release:publish": "npm run release:push && npm publish --tag beta",
-  
+    "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
 
     "fix-spec": "node --loader ts-node/esm open-api/fix-spec-main.ts",
     "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm open-api/regenerate-client.ts",
@@ -33,9 +39,6 @@
     "build": "rimraf dist && node --loader ts-node/esm build.js",
     "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
 
-
-    "build-old": "rimraf dist && rollup -c",
-    "build:prod-old": "rimraf dist && NODE_ENV=production rollup -c",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
     "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",

@@ -58,15 +58,148 @@ tree:
       type: file
     - name: build.js
       type: file
+      contents: |-
+        import { execSync } from 'child_process';
+        import { rollup } from 'rollup';
+        import terser from '@rollup/plugin-terser';
+        import nodeResolve from '@rollup/plugin-node-resolve';
+        import commonjs from '@rollup/plugin-commonjs';
+        import dts from 'rollup-plugin-dts';
+        import { rimrafSync } from 'rimraf';
+        import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+        import { join } from 'path';
+
+        // Clean the dist folder
+        rimrafSync('dist');
+        rimrafSync('dist/temp-src');
+
+        // Step 1: Copy runtime-relevant files from src/ to dist/temp-src and remove .ts extensions
+        const srcDir = join(process.cwd(), 'src');
+        const tempSrcDir = join(process.cwd(), 'dist/temp-src');
+        const runtimeDirs = ['generated', 'generated-unified'];
+        const runtimeFiles = ['index.ts', 'quickbaseClient.ts', 'tokenCache.ts'];
+
+        function copyAndRewriteTsExtensions(src, dest) {
+          console.log(`Copying from ${src} to ${dest}`);
+          mkdirSync(dest, { recursive: true });
+          const files = readdirSync(src, { withFileTypes: true });
+          for (const file of files) {
+            const srcPath = join(src, file.name);
+            const destPath = join(dest, file.name);
+            if (file.isDirectory()) {
+              if (runtimeDirs.includes(file.name) || runtimeDirs.some(dir => src.includes(dir))) {
+                copyAndRewriteTsExtensions(srcPath, destPath);
+              } else {
+                console.log(`Skipping non-runtime directory ${srcPath}`);
+              }
+            } else if (file.name.endsWith('.ts')) {
+              if (runtimeFiles.includes(file.name) || src.includes('generated') || src.includes('generated-unified')) {
+                console.log(`Processing ${srcPath} -> ${destPath}`);
+                let content = readFileSync(srcPath, 'utf8');
+                content = content.replace(/(from\s+["']\.[\w\/-]+)\.ts(["'])/g, '$1$2');
+                content = content.replace(/(export\s+\*\s+from\s+["']\.[\w\/-]+)\.ts(["'])/g, '$1$2');
+                writeFileSync(destPath, content, 'utf8');
+              } else {
+                console.log(`Skipping non-runtime file ${srcPath}`);
+              }
+            } else {
+              console.log(`Skipping non-.ts file ${srcPath}`);
+            }
+          }
+        }
+        copyAndRewriteTsExtensions(srcDir, tempSrcDir);
+
+        // Step 2: Compile TypeScript to JavaScript with tsc
+        console.log('Running tsc...');
+        const tsFiles = readdirSync(tempSrcDir, { recursive: true })
+          .filter(file => file.endsWith('.ts'))
+          .map(file => join(tempSrcDir, file));
+        const tscCommand = `npx tsc ${tsFiles.join(' ')} --outDir ${join(process.cwd(), 'dist/temp')} --module ESNext --target ESNext --sourceMap --moduleResolution bundler --baseUrl ${process.cwd()}`;
+        console.log(`Command: ${tscCommand}`);
+        execSync(tscCommand, { stdio: 'inherit' });
+
+        // Step 3: Rollup configuration
+        const isProd = process.env.NODE_ENV === 'production';
+        const external = [
+          'node:http', 'node:https', 'node:zlib', 'node:stream', 'node:buffer',
+          'node:util', 'node:url', 'node:net', 'node:fs', 'node:path', 'node-fetch',
+        ];
+        const globals = { 'node-fetch': 'fetch' };
+
+        // ESM Build
+        console.log(`Building ESM bundle (${isProd ? 'minified' : 'unminified'})...`);
+        const esmBundle = await rollup({
+          input: 'dist/temp/quickbaseClient.js',
+          external,
+          plugins: [
+            nodeResolve({ preferBuiltins: true }),
+            commonjs(),
+            isProd && terser(), // Only minify in prod
+          ],
+        });
+        await esmBundle.write({
+          dir: 'dist/esm',
+          format: 'esm',
+          sourcemap: true,
+          entryFileNames: isProd ? 'quickbase.min.js' : 'quickbase.js',
+        });
+        await esmBundle.close();
+
+        // UMD Build
+        console.log(`Building UMD bundle (${isProd ? 'minified' : 'unminified'})...`);
+        const umdBundle = await rollup({
+          input: 'dist/temp/quickbaseClient.js',
+          external,
+          plugins: [
+            nodeResolve({ preferBuiltins: true, browser: true }),
+            commonjs(),
+            isProd && terser(), // Only minify in prod
+          ],
+        });
+        await umdBundle.write({
+          file: join(process.cwd(), 'dist/umd', isProd ? 'quickbase.umd.min.js' : 'quickbase.umd.js'),
+          format: 'umd',
+          name: 'QuickbaseJS',
+          sourcemap: true,
+          globals,
+        });
+        await umdBundle.close();
+
+        // Declarations
+        console.log('Generating declarations...');
+        const dtsBundle = await rollup({
+          input: 'src/quickbaseClient.ts',
+          plugins: [dts({ tsconfig: './tsconfig.json', respectExternal: true })],
+        });
+        await dtsBundle.write({ file: 'dist/esm/quickbase.d.ts', format: 'esm' });
+        await dtsBundle.write({ file: 'dist/umd/quickbase.umd.d.ts', format: 'umd' });
+        await dtsBundle.close();
+
+        // Clean up
+        rimrafSync('dist/temp');
+        rimrafSync('dist/temp-src');
+        console.log('Build completed successfully');
     - name: dist
       type: directory
       children:
-        - name: quickbase.d.ts
-          type: file
-        - name: quickbase.js
-          type: file
-        - name: quickbase.js.map
-          type: file
+        - name: esm
+          type: directory
+          children:
+            - name: quickbase.d.ts
+              type: file
+            - name: quickbase.min.js
+              type: file
+            - name: quickbase.min.js.map
+              type: file
+        - name: umd
+          type: directory
+          children:
+            - name: quickbase.umd.d.ts
+              type: file
+            - name: quickbase.umd.min.js
+              type: file
+            - name: quickbase.umd.min.js.map
+              type: file
     - name: examples
       type: directory
       children:
@@ -76,6 +209,58 @@ tree:
           type: file
     - name: log-gen.yaml
       type: file
+    - name: open-api
+      type: directory
+      children:
+        - name: definitions
+          type: directory
+          children:
+            - name: apps.ts
+              type: file
+            - name: auth.ts
+              type: file
+            - name: fields.ts
+              type: file
+            - name: index.ts
+              type: file
+            - name: records.ts
+              type: file
+            - name: relationships.ts
+              type: file
+            - name: reports.ts
+              type: file
+            - name: tables.ts
+              type: file
+        - name: fix-spec-main.ts
+          type: file
+        - name: generate-unified-interface.ts
+          type: file
+        - name: output
+          type: directory
+          children:
+            - name: quickbase-fixed.json
+              type: file
+        - name: paths
+          type: directory
+          children:
+            - name: apps.ts
+              type: file
+            - name: auth.ts
+              type: file
+            - name: fields.ts
+              type: file
+            - name: index.ts
+              type: file
+            - name: records.ts
+              type: file
+            - name: relationships.ts
+              type: file
+            - name: reports.ts
+              type: file
+            - name: tables.ts
+              type: file
+        - name: regenerate-client.ts
+          type: file
     - name: openapitools.json
       type: file
     - name: package-lock.json
@@ -85,19 +270,27 @@ tree:
       contents: |
         {
           "name": "quickbase-js",
-          "main": "dist/quickbase.js",
-          "types": "dist/quickbase.d.ts",
           "version": "1.1.0-beta.4",
+          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+          "type": "module",
+          "main": "dist/esm/quickbase.js",
+          "module": "dist/esm/quickbase.js",
+          "types": "dist/esm/quickbase.d.ts",
           "publishConfig": {
             "access": "public"
           },
-          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
-          "module": "dist/quickbase.js",
-          "type": "module",
           "exports": {
             ".": {
-              "import": "./dist/quickbase.js",
-              "types": "./dist/quickbase.d.ts"
+              "import": {
+                "minified": "./dist/esm/quickbase.min.js",
+                "default": "./dist/esm/quickbase.js"
+              },
+              "require": {
+                "minified": "./dist/umd/quickbase.umd.min.js",
+                "default": "./dist/umd/quickbase.umd.js"
+              },
+              "types": "./dist/esm/quickbase.d.ts",
+              "umd:types": "./dist/umd/quickbase.umd.d.ts"
             }
           },
           "scripts": {
@@ -106,13 +299,19 @@ tree:
             "release:alpha": "standard-version --prerelease alpha",
             "release:push": "npm run release:beta && git push --follow-tags origin main",
             "release:publish": "npm run release:push && npm publish --tag beta",
-            "fix-spec": "node --loader ts-node/esm src/code-generation/fix-spec-main.ts",
-            "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm src/code-generation/regenerate-client.ts",
-            "regenerate:unified": "node --loader ts-node/esm src/code-generation/generate-unified-interface.ts",
+          
+
+            "fix-spec": "node --loader ts-node/esm open-api/fix-spec-main.ts",
+            "regenerate:openapi": "rimraf src/generated && node --loader ts-node/esm open-api/regenerate-client.ts",
+            "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
             "regenerate:all": "npm run fix-spec && npm run regenerate:openapi && npm run regenerate:unified",
-            "log-gen": "node --loader ts-node/esm src/log-gen.ts",
-            "build": "rimraf dist && rollup -c",
-            "build:prod": "rm -rf dist/* && NODE_ENV=production rollup -c",
+            "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
+            "build": "rimraf dist && node --loader ts-node/esm build.js",
+            "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
+
+
+            "build-old": "rimraf dist && rollup -c",
+            "build:prod-old": "rimraf dist && NODE_ENV=production rollup -c",
             "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
             "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
             "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
@@ -140,6 +339,7 @@ tree:
             "@rollup/plugin-node-resolve": "^16.0.0",
             "@rollup/plugin-terser": "^0.4.4",
             "@rollup/plugin-typescript": "^12.1.2",
+            "@types/js-yaml": "^4.0.9",
             "@types/node": "^22.13.10",
             "dotenv": "^16.4.7",
             "glob": "^11.0.1",
@@ -154,6 +354,7 @@ tree:
             "ts-morph": "^25.0.1",
             "ts-node": "^10.9.2",
             "tslib": "^2.8.1",
+            "undici-types": "^7.5.0",
             "vitest": "^3.0.8"
           }
         }
@@ -164,134 +365,11 @@ tree:
           type: file
     - name: playwright.config.ts
       type: file
-    - name: rollup.config.js
+    - name: rollup.config.mjs
       type: file
-      contents: |
-        import typescript from "@rollup/plugin-typescript";
-        import terser from "@rollup/plugin-terser";
-        import nodeResolve from "@rollup/plugin-node-resolve";
-        import commonjs from "@rollup/plugin-commonjs";
-        import dts from "rollup-plugin-dts";
-
-        const isProd = process.env.NODE_ENV === "production";
-
-        export default [
-          {
-            input: "src/quickbaseClient.ts",
-            output: {
-              dir: "dist",
-              format: "esm",
-              sourcemap: true,
-              compact: isProd,
-              entryFileNames: "quickbase.js",
-            },
-            external: [
-              "node:http",
-              "node:https",
-              "node:zlib",
-              "node:stream",
-              "node:buffer",
-              "node:util",
-              "node:url",
-              "node:net",
-              "node:fs",
-              "node:path",
-              "node-fetch",
-            ],
-            plugins: [
-              nodeResolve({ preferBuiltins: true }),
-              commonjs(),
-              typescript({
-                tsconfig: "./tsconfig.json",
-                declaration: false, // No .d.ts here, handled by dts plugin
-              }),
-              isProd && terser(),
-            ],
-          },
-          {
-            input: "src/quickbaseClient.ts",
-            output: {
-              file: "dist/quickbase.d.ts",
-              format: "esm",
-              // Optional: sourcemap for .d.ts if needed for debugging
-              // sourcemap: true,
-            },
-            plugins: [
-              dts({
-                tsconfig: "./tsconfig.json",
-                // Ensure all referenced files are included
-                respectExternal: true,
-              }),
-            ],
-          },
-        ].map((config) => ({
-          ...config,
-          onwarn(warning, warn) {
-            if (
-              warning.code === "PLUGIN_WARNING" &&
-              warning.plugin === "typescript" &&
-              warning.message.includes("TS5096")
-            ) {
-              return;
-            }
-            warn(warning);
-          },
-        }));
     - name: src
       type: directory
       children:
-        - name: code-generation
-          type: directory
-          children:
-            - name: definitions
-              type: directory
-              children:
-                - name: apps.ts
-                  type: file
-                - name: auth.ts
-                  type: file
-                - name: fields.ts
-                  type: file
-                - name: index.ts
-                  type: file
-                - name: records.ts
-                  type: file
-                - name: relationships.ts
-                  type: file
-                - name: reports.ts
-                  type: file
-                - name: tables.ts
-                  type: file
-            - name: fix-spec-main.ts
-              type: file
-            - name: generate-unified-interface.ts
-              type: file
-            - name: output
-              type: directory
-              children:
-                - name: quickbase-fixed.json
-                  type: file
-            - name: paths
-              type: directory
-              children:
-                - name: apps.ts
-                  type: file
-                - name: auth.ts
-                  type: file
-                - name: fields.ts
-                  type: file
-                - name: index.ts
-                  type: file
-                - name: records.ts
-                  type: file
-                - name: relationships.ts
-                  type: file
-                - name: reports.ts
-                  type: file
-                - name: tables.ts
-                  type: file
-            - name: regenerate-client.ts
-              type: file
         - name: generated
           type: directory
           children:
@@ -526,7 +604,7 @@ tree:
             - name: QuickbaseClient.ts
               type: file
               contents: |
-                // Generated on 2025-03-12T04:58:24.127Z
+                // Generated on 2025-03-12T19:20:50.952Z
                 import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, FieldUsage, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
                 export interface QuickbaseClient {
@@ -590,13 +668,6 @@ tree:
                 }
         - name: index.ts
           type: file
-        - name: log-gen.ts
-          type: file
-        - name: openapi-jars
-          type: directory
-          children:
-            - name: openapi-generator-cli-7.12.0.jar
-              type: file
         - name: quickbaseClient.ts
           type: file
           contents: |
@@ -970,7 +1041,13 @@ tree:
       children:
         - name: .last-run.json
           type: file
+    - name: test-esm.js
+      type: file
     - name: test-results.json
+      type: file
+    - name: test-umd.js
+      type: file
+    - name: test.ts
       type: file
     - name: tests
       type: directory
@@ -995,6 +1072,8 @@ tree:
                     - name: tokenPrefetch.test.ts
                       type: file
                     - name: tokenRenewal.test.ts
+                      type: file
+                    - name: umd.test.ts
                       type: file
         - name: setup.ts
           type: file
@@ -1122,8 +1201,40 @@ tree:
                       type: file
                     - name: updateTable.test.ts
                       type: file
+                - name: umd.test.ts
+                  type: file
     - name: text.txt
       type: file
+    - name: tools
+      type: directory
+      children:
+        - name: log-gen.ts
+          type: file
+        - name: openapi-jars
+          type: directory
+          children:
+            - name: openapi-generator-cli-7.12.0.jar
+              type: file
+    - name: tsconfig.build.json
+      type: file
+      contents: |-
+        {
+          "extends": "./tsconfig.json",
+          "compilerOptions": {
+            "outDir": "dist/temp",
+            "noEmit": false,
+            "allowImportingTsExtensions": false,
+            "declaration": false,
+            "sourceMap": true
+          },
+          "include": ["dist/temp-src/**/*"],
+          "exclude": [
+            "node_modules",
+            "dist",
+            "tests/**/*",
+            "src/**/*" // Exclude original src/ to avoid confusion
+          ]
+        }
     - name: tsconfig.json
       type: file
       contents: |-
@@ -1134,7 +1245,7 @@ tree:
             "moduleResolution": "bundler",
             "strict": true,
             "lib": ["ES2015", "ESNext", "DOM"],
-            "types": ["node", "playwright/test"],
+            "types": ["node", "playwright/test", "undici-types"],
             "esModuleInterop": true,
             "resolveJsonModule": true,
             "allowImportingTsExtensions": true,
@@ -1145,12 +1256,12 @@ tree:
             "sourceMap": true,
             "baseUrl": ".",
             "paths": {
-              "@/*": ["src/*"],      // Matches Vite's @ -> src/
-              "@tests/*": ["tests/*"] // Matches Vite's @tests -> tests/
+              "@/*": ["src/*"],
+              "@tests/*": ["tests/*"]
             }
           },
-          "include": ["src/**/*", "tests/**/*"],
-          "exclude": ["node_modules", "dist", "src/generated-old"],
+          "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
+          "exclude": ["node_modules", "dist", "specs"],
           "ts-node": {
             "esm": true,
             "transpileOnly": true

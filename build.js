@@ -5,7 +5,7 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import dts from 'rollup-plugin-dts';
 import { rimrafSync } from 'rimraf';
-import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { copyFileSync, readdirSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 // Clean the dist folder
@@ -65,44 +65,92 @@ const external = [
 ];
 const globals = { 'node-fetch': 'fetch' };
 
-// ESM Build
-console.log('Building ESM bundle...');
-const esmBundle = await rollup({
-  input: 'dist/temp/quickbaseClient.js',
-  external,
-  plugins: [
+// Function to create Rollup bundle
+async function createBundle(input, plugins, format, outputOptions) {
+  const bundle = await rollup({
+    input,
+    external,
+    plugins,
+  });
+  await bundle.write(outputOptions);
+  await bundle.close();
+}
+
+// ESM Builds
+console.log('Building ESM bundles...');
+// Unminified ESM build (always generated)
+await createBundle(
+  'dist/temp/quickbaseClient.js',
+  [
     nodeResolve({ preferBuiltins: true }),
     commonjs(),
-    isProd && terser(),
   ],
-});
-await esmBundle.write({
-  dir: 'dist/esm',
-  format: 'esm',
-  sourcemap: true,
-  entryFileNames: 'quickbase.js',
-});
-await esmBundle.close();
+  'esm',
+  {
+    dir: 'dist/esm',
+    format: 'esm',
+    sourcemap: true,
+    entryFileNames: 'quickbase.js',
+  }
+);
 
-// UMD Build
-console.log('Building UMD bundle...');
-const umdBundle = await rollup({
-  input: 'dist/temp/quickbaseClient.js',
-  external,
-  plugins: [
+// Minified ESM build (only in production)
+if (isProd) {
+  await createBundle(
+    'dist/temp/quickbaseClient.js',
+    [
+      nodeResolve({ preferBuiltins: true }),
+      commonjs(),
+      terser(),
+    ],
+    'esm',
+    {
+      dir: 'dist/esm',
+      format: 'esm',
+      sourcemap: true,
+      entryFileNames: 'quickbase.min.js',
+    }
+  );
+}
+
+// UMD Builds
+console.log('Building UMD bundles...');
+// Unminified UMD build (always generated)
+await createBundle(
+  'dist/temp/quickbaseClient.js',
+  [
     nodeResolve({ preferBuiltins: true, browser: true }),
     commonjs(),
-    isProd && terser(),
   ],
-});
-await umdBundle.write({
-  file: 'dist/umd/quickbase.umd.js',
-  format: 'umd',
-  name: 'QuickbaseJS',
-  sourcemap: true,
-  globals,
-});
-await umdBundle.close();
+  'umd',
+  {
+    file: join(process.cwd(), 'dist/umd', 'quickbase.umd.js'),
+    format: 'umd',
+    name: 'QuickbaseJS',
+    sourcemap: true,
+    globals,
+  }
+);
+
+// Minified UMD build (only in production)
+if (isProd) {
+  await createBundle(
+    'dist/temp/quickbaseClient.js',
+    [
+      nodeResolve({ preferBuiltins: true, browser: true }),
+      commonjs(),
+      terser(),
+    ],
+    'umd',
+    {
+      file: join(process.cwd(), 'dist/umd', 'quickbase.umd.min.js'),
+      format: 'umd',
+      name: 'QuickbaseJS',
+      sourcemap: true,
+      globals,
+    }
+  );
+}
 
 // Declarations
 console.log('Generating declarations...');
@@ -117,4 +165,22 @@ await dtsBundle.close();
 // Clean up
 rimrafSync('dist/temp');
 rimrafSync('dist/temp-src');
-console.log('Build completed successfully');
+
+// List generated files and their sizes
+console.log('\nGenerated files:');
+function listFilesWithSizes(dir, prefix = '') {
+  const files = readdirSync(dir, { withFileTypes: true });
+  for (const file of files) {
+    const filePath = join(dir, file.name);
+    if (file.isDirectory()) {
+      listFilesWithSizes(filePath, `${prefix}${file.name}/`);
+    } else {
+      const stats = statSync(filePath);
+      const sizeKB = (stats.size / 1024).toFixed(2);
+      console.log(`${prefix}${file.name} - ${sizeKB} KB`);
+    }
+  }
+}
+listFilesWithSizes(join(process.cwd(), 'dist'));
+
+console.log('\nBuild completed successfully');

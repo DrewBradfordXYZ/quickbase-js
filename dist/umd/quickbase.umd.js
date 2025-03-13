@@ -1,2 +1,7696 @@
-!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n((e="undefined"!=typeof globalThis?globalThis:e||self).QuickbaseJS={})}(this,(function(e){"use strict";const n="https://api.quickbase.com/v1".replace(/\/+$/,"");class t{configuration;constructor(e={}){this.configuration=e}set config(e){this.configuration=e}get basePath(){return null!=this.configuration.basePath?this.configuration.basePath:n}get fetchApi(){return this.configuration.fetchApi}get middleware(){return this.configuration.middleware||[]}get queryParamsStringify(){return this.configuration.queryParamsStringify||l}get username(){return this.configuration.username}get password(){return this.configuration.password}get apiKey(){const e=this.configuration.apiKey;if(e)return"function"==typeof e?e:()=>e}get accessToken(){const e=this.configuration.accessToken;if(e)return"function"==typeof e?e:async()=>e}get headers(){return this.configuration.headers}get credentials(){return this.configuration.credentials}}const r=new t;class o{configuration;static jsonRegex=new RegExp("^(:?application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$","i");middleware;constructor(e=r){this.configuration=e,this.middleware=e.middleware}withMiddleware(...e){const n=this.clone();return n.middleware=n.middleware.concat(...e),n}withPreMiddleware(...e){const n=e.map((e=>({pre:e})));return this.withMiddleware(...n)}withPostMiddleware(...e){const n=e.map((e=>({post:e})));return this.withMiddleware(...n)}isJsonMime(e){return!!e&&o.jsonRegex.test(e)}async request(e,n){const{url:t,init:r}=await this.createFetchParams(e,n),o=await this.fetchApi(t,r);if(o&&o.status>=200&&o.status<300)return o;throw new i(o,"Response returned an error code")}async createFetchParams(e,n){let t=this.configuration.basePath+e.path;void 0!==e.query&&0!==Object.keys(e.query).length&&(t+="?"+this.configuration.queryParamsStringify(e.query));const r=Object.assign({},this.configuration.headers,e.headers);Object.keys(r).forEach((e=>void 0===r[e]?delete r[e]:{}));const o="function"==typeof n?n:async()=>n,i={method:e.method,headers:r,body:e.body,credentials:this.configuration.credentials},a={...i,...await o({init:i,context:e})};let s;var l;l=a.body,s="undefined"!=typeof FormData&&l instanceof FormData||a.body instanceof URLSearchParams||function(e){return"undefined"!=typeof Blob&&e instanceof Blob}(a.body)?a.body:this.isJsonMime(r["Content-Type"])?JSON.stringify(a.body):a.body;return{url:t,init:{...a,body:s}}}fetchApi=async(e,n)=>{let t,r={url:e,init:n};for(const e of this.middleware)e.pre&&(r=await e.pre({fetch:this.fetchApi,...r})||r);try{t=await(this.configuration.fetchApi||fetch)(r.url,r.init)}catch(e){for(const n of this.middleware)n.onError&&(t=await n.onError({fetch:this.fetchApi,url:r.url,init:r.init,error:e,response:t?t.clone():void 0})||t);if(void 0===t)throw e instanceof Error?new a(e,"The request failed and the interceptors did not return an alternative response"):e}for(const e of this.middleware)e.post&&(t=await e.post({fetch:this.fetchApi,url:r.url,init:r.init,response:t.clone()})||t);return t};clone(){const e=new(0,this.constructor)(this.configuration);return e.middleware=this.middleware.slice(),e}}class i extends Error{response;name="ResponseError";constructor(e,n){super(n),this.response=e}}class a extends Error{cause;name="FetchError";constructor(e,n){super(n),this.cause=e}}class s extends Error{field;name="RequiredError";constructor(e,n){super(n),this.field=e}}function l(e,n=""){return Object.keys(e).map((t=>u(t,e[t],n))).filter((e=>e.length>0)).join("&")}function u(e,n,t=""){const r=t+(t.length?`[${e}]`:e);if(n instanceof Array){const e=n.map((e=>encodeURIComponent(String(e)))).join(`&${encodeURIComponent(r)}=`);return`${encodeURIComponent(r)}=${e}`}if(n instanceof Set){return u(e,Array.from(n),t)}return n instanceof Date?`${encodeURIComponent(r)}=${encodeURIComponent(n.toISOString())}`:n instanceof Object?l(n,r):`${encodeURIComponent(r)}=${encodeURIComponent(String(n))}`}class d{raw;transformer;constructor(e,n=e=>e){this.raw=e,this.transformer=n}async value(){return this.transformer(await this.raw.json())}}function p(e){return c(e)}function c(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function m(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function f(e){return y(e)}function y(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function R(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function T(e){return h(e)}function h(e,n){return null==e?e:{estMemory:null==e.estMemory?void 0:e.estMemory,estMemoryInclDependentApps:null==e.estMemoryInclDependentApps?void 0:e.estMemoryInclDependentApps}}function w(e){return I(e,!1)}function I(e,n=!1){return null==e?e:{estMemory:e.estMemory,estMemoryInclDependentApps:e.estMemoryInclDependentApps}}function v(e){return S(e)}function S(e,n){return null==e?e:{allowClone:null==e.allowClone?void 0:e.allowClone,allowExport:null==e.allowExport?void 0:e.allowExport,enableAppTokens:null==e.enableAppTokens?void 0:e.enableAppTokens,hideFromPublic:null==e.hideFromPublic?void 0:e.hideFromPublic,mustBeRealmApproved:null==e.mustBeRealmApproved?void 0:e.mustBeRealmApproved,useIPFilter:null==e.useIPFilter?void 0:e.useIPFilter}}function g(e){return b(e,!1)}function b(e,n=!1){return null==e?e:{allowClone:e.allowClone,allowExport:e.allowExport,enableAppTokens:e.enableAppTokens,hideFromPublic:e.hideFromPublic,mustBeRealmApproved:e.mustBeRealmApproved,useIPFilter:e.useIPFilter}}function F(e){return O(e)}function O(e,n){return null==e?e:{id:e.id,name:e.name,created:null==e.created?void 0:new Date(e.created),updated:null==e.updated?void 0:new Date(e.updated),description:null==e.description?void 0:e.description,timeZone:null==e.timeZone?void 0:e.timeZone,dateFormat:null==e.dateFormat?void 0:e.dateFormat,hasEveryoneOnTheInternet:null==e.hasEveryoneOnTheInternet?void 0:e.hasEveryoneOnTheInternet,memoryInfo:null==e.memoryInfo?void 0:T(e.memoryInfo),securityProperties:null==e.securityProperties?void 0:v(e.securityProperties)}}function N(e,n=!1){return null==e?e:{id:e.id,name:e.name,created:null==e.created?void 0:e.created.toISOString(),updated:null==e.updated?void 0:e.updated.toISOString(),description:e.description,timeZone:e.timeZone,dateFormat:e.dateFormat,hasEveryoneOnTheInternet:e.hasEveryoneOnTheInternet,memoryInfo:w(e.memoryInfo),securityProperties:g(e.securityProperties)}}function q(e){return J(e)}function J(e,n){return null==e?e:{...e,queryId:e.queryId,events:null==e.events?void 0:e.events,nextToken:null==e.nextToken?void 0:e.nextToken}}function A(e,n=!1){return null==e?e:{...e,queryId:e.queryId,events:e.events,nextToken:e.nextToken}}function k(e,n){return null==e?e:{...e,queryId:e.queryId}}function E(e,n=!1){return null==e?e:{...e,queryId:e.queryId}}function C(e,n){return null==e?e:{nextToken:null==e.nextToken?void 0:e.nextToken,numRows:null==e.numRows?void 0:e.numRows,queryId:null==e.queryId?void 0:e.queryId,date:null==e.date?void 0:new Date(e.date),topics:null==e.topics?void 0:e.topics}}function U(e){return P(e,!1)}function P(e,n=!1){return null==e?e:{nextToken:e.nextToken,numRows:e.numRows,queryId:e.queryId,date:null==e.date?void 0:e.date.toISOString().substring(0,10),topics:e.topics}}function D(e){return x(e)}function x(e,n){return null==e?e:{...e,active:null==e.active?void 0:e.active,apps:null==e.apps?void 0:e.apps,lastUsed:null==e.lastUsed?void 0:e.lastUsed,description:null==e.description?void 0:e.description,id:null==e.id?void 0:e.id,name:null==e.name?void 0:e.name,token:null==e.token?void 0:e.token}}function G(e,n=!1){return null==e?e:{...e,active:e.active,apps:e.apps,lastUsed:e.lastUsed,description:e.description,id:e.id,name:e.name,token:e.token}}function M(e,n){return null==e?e:{name:null==e.name?void 0:e.name,description:null==e.description?void 0:e.description}}function B(e){return L(e,!1)}function L(e,n=!1){return null==e?e:{name:e.name,description:e.description}}function Q(e){return j(e)}function j(e,n){return null==e?e:{name:e.name,value:e.value}}function W(e){return V(e,!1)}function V(e,n=!1){return null==e?e:{name:e.name,value:e.value}}function K(e){return _(e)}function _(e,n){return null==e?e:{id:e.id,name:e.name,description:null==e.description?void 0:e.description,created:null==e.created?void 0:new Date(e.created),updated:null==e.updated?void 0:new Date(e.updated),dateFormat:null==e.dateFormat?void 0:e.dateFormat,timeZone:null==e.timeZone?void 0:e.timeZone,hasEveryoneOnTheInternet:null==e.hasEveryoneOnTheInternet?void 0:e.hasEveryoneOnTheInternet,variables:null==e.variables?void 0:e.variables.map(Q),ancestorId:null==e.ancestorId?void 0:e.ancestorId,dataClassification:null==e.dataClassification?void 0:e.dataClassification}}function z(e,n=!1){return null==e?e:{id:e.id,name:e.name,description:e.description,created:null==e.created?void 0:e.created.toISOString(),updated:null==e.updated?void 0:e.updated.toISOString(),dateFormat:e.dateFormat,timeZone:e.timeZone,hasEveryoneOnTheInternet:e.hasEveryoneOnTheInternet,variables:null==e.variables?void 0:e.variables.map(W),ancestorId:e.ancestorId,dataClassification:e.dataClassification}}function $(e){return H(e)}function H(e,n){return null==e?e:{keepData:null==e.keepData?void 0:e.keepData,excludeFiles:null==e.excludeFiles?void 0:e.excludeFiles,usersAndRoles:null==e.usersAndRoles?void 0:e.usersAndRoles,assignUserToken:null==e.assignUserToken?void 0:e.assignUserToken}}function Z(e){return X(e,!1)}function X(e,n=!1){return null==e?e:{keepData:e.keepData,excludeFiles:e.excludeFiles,usersAndRoles:e.usersAndRoles,assignUserToken:e.assignUserToken}}function Y(e,n){return null==e?e:{name:e.name,description:null==e.description?void 0:e.description,properties:null==e.properties?void 0:$(e.properties)}}function ee(e){return ne(e,!1)}function ne(e,n=!1){return null==e?e:{name:e.name,description:e.description,properties:Z(e.properties)}}function te(e){return re(e)}function re(e,n){return null==e?e:{id:e.id,name:e.name,description:null==e.description?void 0:e.description,created:null==e.created?void 0:new Date(e.created),updated:null==e.updated?void 0:new Date(e.updated),dateFormat:null==e.dateFormat?void 0:e.dateFormat,timeZone:null==e.timeZone?void 0:e.timeZone,memoryInfo:null==e.memoryInfo?void 0:T(e.memoryInfo),hasEveryoneOnTheInternet:null==e.hasEveryoneOnTheInternet?void 0:e.hasEveryoneOnTheInternet,variables:null==e.variables?void 0:e.variables.map(Q),dataClassification:null==e.dataClassification?void 0:e.dataClassification,securityProperties:null==e.securityProperties?void 0:v(e.securityProperties)}}function oe(e,n=!1){return null==e?e:{id:e.id,name:e.name,description:e.description,created:null==e.created?void 0:e.created.toISOString(),updated:null==e.updated?void 0:e.updated.toISOString(),dateFormat:e.dateFormat,timeZone:e.timeZone,memoryInfo:w(e.memoryInfo),hasEveryoneOnTheInternet:e.hasEveryoneOnTheInternet,variables:null==e.variables?void 0:e.variables.map(W),dataClassification:e.dataClassification,securityProperties:g(e.securityProperties)}}function ie(e,n){return null==e?e:{name:e.name,assignToken:null==e.assignToken?void 0:e.assignToken,description:null==e.description?void 0:e.description,securityProperties:null==e.securityProperties?void 0:v(e.securityProperties),variables:null==e.variables?void 0:e.variables.map(Q)}}function ae(e){return se(e,!1)}function se(e,n=!1){return null==e?e:{name:e.name,assignToken:e.assignToken,description:e.description,securityProperties:g(e.securityProperties),variables:null==e.variables?void 0:e.variables.map(W)}}function le(e){return ue(e)}function ue(e,n){return null==e?e:{primaryKey:null==e.primaryKey?void 0:e.primaryKey,foreignKey:null==e.foreignKey?void 0:e.foreignKey,numLines:null==e.numLines?void 0:e.numLines,maxLength:null==e.maxLength?void 0:e.maxLength,appendOnly:null==e.appendOnly?void 0:e.appendOnly,allowHTML:null==e.allowHTML?void 0:e.allowHTML,allowMentions:null==e.allowMentions?void 0:e.allowMentions,sortAsGiven:null==e.sortAsGiven?void 0:e.sortAsGiven,carryChoices:null==e.carryChoices?void 0:e.carryChoices,allowNewChoices:null==e.allowNewChoices?void 0:e.allowNewChoices,formula:null==e.formula?void 0:e.formula,defaultValue:null==e.defaultValue?void 0:e.defaultValue,doesTotal:null==e.doesTotal?void 0:e.doesTotal,autoSave:null==e.autoSave?void 0:e.autoSave,defaultValueLuid:null==e.defaultValueLuid?void 0:e.defaultValueLuid,useI18NFormat:null==e.useI18NFormat?void 0:e.useI18NFormat,maxVersions:null==e.maxVersions?void 0:e.maxVersions,format:null==e.format?void 0:e.format,linkText:null==e.linkText?void 0:e.linkText,parentFieldId:null==e.parentFieldId?void 0:e.parentFieldId,displayTimezone:null==e.displayTimezone?void 0:e.displayTimezone,defaultToday:null==e.defaultToday?void 0:e.defaultToday,units:null==e.units?void 0:e.units,openTargetIn:null==e.openTargetIn?void 0:e.openTargetIn,doesAverage:null==e.doesAverage?void 0:e.doesAverage,decimalPlaces:null==e.decimalPlaces?void 0:e.decimalPlaces,defaultCountryCode:null==e.defaultCountryCode?void 0:e.defaultCountryCode,seeVersions:null==e.seeVersions?void 0:e.seeVersions,displayMonth:null==e.displayMonth?void 0:e.displayMonth,displayEmail:null==e.displayEmail?void 0:e.displayEmail,defaultKind:null==e.defaultKind?void 0:e.defaultKind,coverText:null==e.coverText?void 0:e.coverText,currencySymbol:null==e.currencySymbol?void 0:e.currencySymbol,targetFieldId:null==e.targetFieldId?void 0:e.targetFieldId,displayUser:null==e.displayUser?void 0:e.displayUser,blankIsZero:null==e.blankIsZero?void 0:e.blankIsZero,exact:null==e.exact?void 0:e.exact,defaultDomain:null==e.defaultDomain?void 0:e.defaultDomain,abbreviate:null==e.abbreviate?void 0:e.abbreviate,numberFormat:null==e.numberFormat?void 0:e.numberFormat,targetTableName:null==e.targetTableName?void 0:e.targetTableName,appearsAs:null==e.appearsAs?void 0:e.appearsAs,width:null==e.width?void 0:e.width,currencyFormat:null==e.currencyFormat?void 0:e.currencyFormat,displayDayOfWeek:null==e.displayDayOfWeek?void 0:e.displayDayOfWeek,commaStart:null==e.commaStart?void 0:e.commaStart,choices:null==e.choices?void 0:e.choices,targetTableId:null==e.targetTableId?void 0:e.targetTableId,displayRelative:null==e.displayRelative?void 0:e.displayRelative,compositeFields:null==e.compositeFields?void 0:e.compositeFields,displayCheckboxAsText:null==e.displayCheckboxAsText?void 0:e.displayCheckboxAsText,displayTime:null==e.displayTime?void 0:e.displayTime,versionMode:null==e.versionMode?void 0:e.versionMode,snapFieldId:null==e.snapFieldId?void 0:e.snapFieldId,hours24:null==e.hours24?void 0:e.hours24,sortAlpha:null==e.sortAlpha?void 0:e.sortAlpha,hasExtension:null==e.hasExtension?void 0:e.hasExtension,useNewWindow:null==e.useNewWindow?void 0:e.useNewWindow,displayAsLink:null==e.displayAsLink?void 0:e.displayAsLink,lookupReferenceFieldId:null==e.lookupReferenceFieldId?void 0:e.lookupReferenceFieldId,summaryTargetFieldId:null==e.summaryTargetFieldId?void 0:e.summaryTargetFieldId,masterChoiceFieldId:null==e.masterChoiceFieldId?void 0:e.masterChoiceFieldId,lookupTargetFieldId:null==e.lookupTargetFieldId?void 0:e.lookupTargetFieldId,masterChoiceTableId:null==e.masterChoiceTableId?void 0:e.masterChoiceTableId,summaryReferenceFieldId:null==e.summaryReferenceFieldId?void 0:e.summaryReferenceFieldId,summaryFunction:null==e.summaryFunction?void 0:e.summaryFunction,masterTableTag:null==e.masterTableTag?void 0:e.masterTableTag,choicesLuid:null==e.choicesLuid?void 0:e.choicesLuid,xmlTag:null==e.xmlTag?void 0:e.xmlTag,startField:null==e.startField?void 0:e.startField,durationField:null==e.durationField?void 0:e.durationField,workWeek:null==e.workWeek?void 0:e.workWeek,comments:null==e.comments?void 0:e.comments,sourceFieldId:null==e.sourceFieldId?void 0:e.sourceFieldId}}function de(e){return pe(e,!1)}function pe(e,n=!1){return null==e?e:{primaryKey:e.primaryKey,foreignKey:e.foreignKey,numLines:e.numLines,maxLength:e.maxLength,appendOnly:e.appendOnly,allowHTML:e.allowHTML,allowMentions:e.allowMentions,sortAsGiven:e.sortAsGiven,carryChoices:e.carryChoices,allowNewChoices:e.allowNewChoices,formula:e.formula,defaultValue:e.defaultValue,doesTotal:e.doesTotal,autoSave:e.autoSave,defaultValueLuid:e.defaultValueLuid,useI18NFormat:e.useI18NFormat,maxVersions:e.maxVersions,format:e.format,linkText:e.linkText,parentFieldId:e.parentFieldId,displayTimezone:e.displayTimezone,defaultToday:e.defaultToday,units:e.units,openTargetIn:e.openTargetIn,doesAverage:e.doesAverage,decimalPlaces:e.decimalPlaces,defaultCountryCode:e.defaultCountryCode,seeVersions:e.seeVersions,displayMonth:e.displayMonth,displayEmail:e.displayEmail,defaultKind:e.defaultKind,coverText:e.coverText,currencySymbol:e.currencySymbol,targetFieldId:e.targetFieldId,displayUser:e.displayUser,blankIsZero:e.blankIsZero,exact:e.exact,defaultDomain:e.defaultDomain,abbreviate:e.abbreviate,numberFormat:e.numberFormat,targetTableName:e.targetTableName,appearsAs:e.appearsAs,width:e.width,currencyFormat:e.currencyFormat,displayDayOfWeek:e.displayDayOfWeek,commaStart:e.commaStart,choices:e.choices,targetTableId:e.targetTableId,displayRelative:e.displayRelative,compositeFields:e.compositeFields,displayCheckboxAsText:e.displayCheckboxAsText,displayTime:e.displayTime,versionMode:e.versionMode,snapFieldId:e.snapFieldId,hours24:e.hours24,sortAlpha:e.sortAlpha,hasExtension:e.hasExtension,useNewWindow:e.useNewWindow,displayAsLink:e.displayAsLink,lookupReferenceFieldId:e.lookupReferenceFieldId,summaryTargetFieldId:e.summaryTargetFieldId,masterChoiceFieldId:e.masterChoiceFieldId,lookupTargetFieldId:e.lookupTargetFieldId,masterChoiceTableId:e.masterChoiceTableId,summaryReferenceFieldId:e.summaryReferenceFieldId,summaryFunction:e.summaryFunction,masterTableTag:e.masterTableTag,choicesLuid:e.choicesLuid,xmlTag:e.xmlTag,startField:e.startField,durationField:e.durationField,workWeek:e.workWeek,comments:e.comments,sourceFieldId:e.sourceFieldId}}function ce(e){return me(e)}function me(e,n){return null==e?e:{permissionType:null==e.permissionType?void 0:e.permissionType,role:null==e.role?void 0:e.role,roleId:null==e.roleId?void 0:e.roleId}}function fe(e){return ye(e,!1)}function ye(e,n=!1){return null==e?e:{permissionType:e.permissionType,role:e.role,roleId:e.roleId}}function Re(e){return Te(e)}function Te(e,n){return null==e?e:{id:e.id,label:e.label,fieldType:e.fieldType,mode:null==e.mode?void 0:e.mode,noWrap:null==e.noWrap?void 0:e.noWrap,bold:null==e.bold?void 0:e.bold,required:null==e.required?void 0:e.required,appearsByDefault:null==e.appearsByDefault?void 0:e.appearsByDefault,findEnabled:null==e.findEnabled?void 0:e.findEnabled,unique:null==e.unique?void 0:e.unique,doesDataCopy:null==e.doesDataCopy?void 0:e.doesDataCopy,fieldHelp:null==e.fieldHelp?void 0:e.fieldHelp,audited:null==e.audited?void 0:e.audited,properties:null==e.properties?void 0:le(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(ce)}}function he(e,n=!1){return null==e?e:{id:e.id,label:e.label,fieldType:e.fieldType,mode:e.mode,noWrap:e.noWrap,bold:e.bold,required:e.required,appearsByDefault:e.appearsByDefault,findEnabled:e.findEnabled,unique:e.unique,doesDataCopy:e.doesDataCopy,fieldHelp:e.fieldHelp,audited:e.audited,properties:de(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(fe)}}function we(e,n){return null==e?e:{label:e.label,fieldType:e.fieldType,noWrap:null==e.noWrap?void 0:e.noWrap,bold:null==e.bold?void 0:e.bold,appearsByDefault:null==e.appearsByDefault?void 0:e.appearsByDefault,findEnabled:null==e.findEnabled?void 0:e.findEnabled,fieldHelp:null==e.fieldHelp?void 0:e.fieldHelp,addToForms:null==e.addToForms?void 0:e.addToForms,audited:null==e.audited?void 0:e.audited,properties:null==e.properties?void 0:le(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(ce)}}function Ie(e){return ve(e,!1)}function ve(e,n=!1){return null==e?e:{label:e.label,fieldType:e.fieldType,noWrap:e.noWrap,bold:e.bold,appearsByDefault:e.appearsByDefault,findEnabled:e.findEnabled,fieldHelp:e.fieldHelp,addToForms:e.addToForms,audited:e.audited,properties:de(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(fe)}}function Se(e){return ge(e)}function ge(e,n){return null==e?e:{...e,id:e.id,parentTableId:e.parentTableId,childTableId:e.childTableId,foreignKeyField:null==e.foreignKeyField?void 0:e.foreignKeyField,isCrossApp:e.isCrossApp,lookupFields:null==e.lookupFields?void 0:e.lookupFields,summaryFields:null==e.summaryFields?void 0:e.summaryFields}}function be(e,n=!1){return null==e?e:{...e,id:e.id,parentTableId:e.parentTableId,childTableId:e.childTableId,foreignKeyField:e.foreignKeyField,isCrossApp:e.isCrossApp,lookupFields:e.lookupFields,summaryFields:e.summaryFields}}function Fe(e,n){return null==e?e:{summaryFields:null==e.summaryFields?void 0:e.summaryFields,lookupFieldIds:null==e.lookupFieldIds?void 0:e.lookupFieldIds,parentTableId:e.parentTableId,foreignKeyField:null==e.foreignKeyField?void 0:e.foreignKeyField}}function Oe(e){return Ne(e,!1)}function Ne(e,n=!1){return null==e?e:{summaryFields:e.summaryFields,lookupFieldIds:e.lookupFieldIds,parentTableId:e.parentTableId,foreignKeyField:e.foreignKeyField}}function qe(e,n){return null==e?e:{name:e.name,description:null==e.description?void 0:e.description,singleRecordName:null==e.singleRecordName?void 0:e.singleRecordName,pluralRecordName:null==e.pluralRecordName?void 0:e.pluralRecordName}}function Je(e){return Ae(e,!1)}function Ae(e,n=!1){return null==e?e:{name:e.name,description:e.description,singleRecordName:e.singleRecordName,pluralRecordName:e.pluralRecordName}}function ke(e){return Ee(e)}function Ee(e,n){return null==e?e:{...e,id:null==e.id?void 0:e.id}}function Ce(e,n=!1){return null==e?e:{...e,id:e.id}}function Ue(e){return Pe(e)}function Pe(e,n){return null==e?e:{deletedAppId:e.deletedAppId}}function De(e,n=!1){return null==e?e:{deletedAppId:e.deletedAppId}}function xe(e,n){return null==e?e:{name:e.name}}function Ge(e){return Me(e,!1)}function Me(e,n=!1){return null==e?e:{name:e.name}}function Be(e){return Le(e)}function Le(e,n){return null==e?e:{deletedFieldIds:e.deletedFieldIds,errors:e.errors}}function Qe(e,n=!1){return null==e?e:{deletedFieldIds:e.deletedFieldIds,errors:e.errors}}function je(e,n){return null==e?e:{fieldIds:e.fieldIds}}function We(e){return Ve(e,!1)}function Ve(e,n=!1){return null==e?e:{fieldIds:e.fieldIds}}function Ke(e){return _e(e)}function _e(e,n){return null==e?e:{...e,versionNumber:null==e.versionNumber?void 0:e.versionNumber,fileName:null==e.fileName?void 0:e.fileName,uploaded:null==e.uploaded?void 0:e.uploaded,creator:null==e.creator?void 0:e.creator}}function ze(e,n=!1){return null==e?e:{...e,versionNumber:e.versionNumber,fileName:e.fileName,uploaded:e.uploaded,creator:e.creator}}function $e(e){return He(e)}function He(e,n){return null==e?e:{numberDeleted:e.numberDeleted}}function Ze(e,n=!1){return null==e?e:{numberDeleted:e.numberDeleted}}function Xe(e,n){return null==e?e:{from:e.from,where:e.where}}function Ye(e){return en(e,!1)}function en(e,n=!1){return null==e?e:{from:e.from,where:e.where}}function nn(e){return tn(e)}function tn(e,n){return null==e?e:{...e,relationshipId:e.relationshipId}}function rn(e,n=!1){return null==e?e:{...e,relationshipId:e.relationshipId}}function on(e){return an(e)}function an(e,n){return null==e?e:{deletedTableId:null==e.deletedTableId?void 0:e.deletedTableId}}function sn(e,n=!1){return null==e?e:{deletedTableId:e.deletedTableId}}function ln(e){return un(e)}function un(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function dn(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function pn(e){return cn(e)}function cn(e,n){return null==e?e:{...e,accessToken:null==e.access_token?void 0:e.access_token,issuedTokenType:null==e.issued_token_type?void 0:e.issued_token_type,tokenType:null==e.token_type?void 0:e.token_type}}function mn(e,n=!1){return null==e?e:{...e,access_token:e.accessToken,issued_token_type:e.issuedTokenType,token_type:e.tokenType}}function fn(e,n){return null==e?e:{grantType:e.grant_type,requestedTokenType:e.requested_token_type,subjectToken:e.subject_token,subjectTokenType:e.subject_token_type}}function yn(e){return Rn(e,!1)}function Rn(e,n=!1){return null==e?e:{grant_type:e.grantType,requested_token_type:e.requestedTokenType,subject_token:e.subjectToken,subject_token_type:e.subjectTokenType}}function Tn(e){return hn(e)}function hn(e,n){return null==e?e:{id:e.id,label:e.label,fieldType:e.fieldType,mode:null==e.mode?void 0:e.mode,noWrap:null==e.noWrap?void 0:e.noWrap,bold:null==e.bold?void 0:e.bold,required:null==e.required?void 0:e.required,appearsByDefault:null==e.appearsByDefault?void 0:e.appearsByDefault,findEnabled:null==e.findEnabled?void 0:e.findEnabled,unique:null==e.unique?void 0:e.unique,doesDataCopy:null==e.doesDataCopy?void 0:e.doesDataCopy,fieldHelp:null==e.fieldHelp?void 0:e.fieldHelp,audited:null==e.audited?void 0:e.audited,properties:null==e.properties?void 0:le(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(ce)}}function wn(e,n=!1){return null==e?e:{id:e.id,label:e.label,fieldType:e.fieldType,mode:e.mode,noWrap:e.noWrap,bold:e.bold,required:e.required,appearsByDefault:e.appearsByDefault,findEnabled:e.findEnabled,unique:e.unique,doesDataCopy:e.doesDataCopy,fieldHelp:e.fieldHelp,audited:e.audited,properties:de(e.properties),permissions:null==e.permissions?void 0:e.permissions.map(fe)}}function In(e){return vn(e)}function vn(e,n){return null==e?e:{id:e.id,name:e.name,type:e.type}}function Sn(e){return gn(e,!1)}function gn(e,n=!1){return null==e?e:{id:e.id,name:e.name,type:e.type}}function bn(e){return Fn(e)}function Fn(e,n){return null==e?e:{count:null==e.count?void 0:e.count}}function On(e){return Nn(e,!1)}function Nn(e,n=!1){return null==e?e:{count:e.count}}function qn(e){return Jn(e)}function Jn(e,n){return null==e?e:{actions:bn(e.actions),appHomePages:bn(e.appHomePages),dashboards:bn(e.dashboards),defaultReports:bn(e.defaultReports),exactForms:bn(e.exactForms),fields:bn(e.fields),forms:bn(e.forms),notifications:bn(e.notifications),personalReports:bn(e.personalReports),pipelines:bn(e.pipelines),relationships:bn(e.relationships),reminders:bn(e.reminders),reports:bn(e.reports),roles:bn(e.roles),tableImports:bn(e.tableImports),tableRules:bn(e.tableRules),webhooks:bn(e.webhooks)}}function An(e){return kn(e,!1)}function kn(e,n=!1){return null==e?e:{actions:On(e.actions),appHomePages:On(e.appHomePages),dashboards:On(e.dashboards),defaultReports:On(e.defaultReports),exactForms:On(e.exactForms),fields:On(e.fields),forms:On(e.forms),notifications:On(e.notifications),personalReports:On(e.personalReports),pipelines:On(e.pipelines),relationships:On(e.relationships),reminders:On(e.reminders),reports:On(e.reports),roles:On(e.roles),tableImports:On(e.tableImports),tableRules:On(e.tableRules),webhooks:On(e.webhooks)}}function En(e){return Cn(e)}function Cn(e,n){return null==e?e:{field:In(e.field),usage:qn(e.usage)}}function Un(e,n=!1){return null==e?e:{field:Sn(e.field),usage:An(e.usage)}}function Pn(e){return Dn(e)}function Dn(e,n){return null==e?e:{...e,fileName:null==e.fileName?void 0:e.fileName,data:null==e.data?void 0:e.data,contentType:null==e.contentType?void 0:e.contentType}}function xn(e,n=!1){return null==e?e:{...e,fileName:e.fileName,data:e.data,contentType:e.contentType}}function Gn(e){return Mn(e)}function Mn(e,n){return null==e?e:{numRelationships:e.numRelationships,skip:e.skip,totalRelationships:e.totalRelationships}}function Bn(e){return Ln(e,!1)}function Ln(e,n=!1){return null==e?e:{numRelationships:e.numRelationships,skip:e.skip,totalRelationships:e.totalRelationships}}function Qn(e){return jn(e)}function jn(e,n){return null==e?e:{id:e.id,label:e.label,type:e.type}}function Wn(e){return Vn(e,!1)}function Vn(e,n=!1){return null==e?e:{id:e.id,label:e.label,type:e.type}}function Kn(e){return _n(e)}function _n(e,n){return null==e?e:{id:e.id,parentTableId:e.parentTableId,childTableId:e.childTableId,foreignKeyField:Qn(e.foreignKeyField),isCrossApp:e.isCrossApp,lookupFields:null==e.lookupFields?void 0:e.lookupFields.map(Qn),summaryFields:null==e.summaryFields?void 0:e.summaryFields.map(Qn)}}function zn(e){return $n(e,!1)}function $n(e,n=!1){return null==e?e:{id:e.id,parentTableId:e.parentTableId,childTableId:e.childTableId,foreignKeyField:Wn(e.foreignKeyField),isCrossApp:e.isCrossApp,lookupFields:null==e.lookupFields?void 0:e.lookupFields.map(Wn),summaryFields:null==e.summaryFields?void 0:e.summaryFields.map(Wn)}}function Hn(e){return Zn(e)}function Zn(e,n){return null==e?e:{metadata:Gn(e.metadata),relationships:e.relationships.map(Kn)}}function Xn(e,n=!1){return null==e?e:{metadata:Bn(e.metadata),relationships:e.relationships.map(zn)}}function Yn(e){return et(e)}function et(e,n){return null==e?e:{...e,id:null==e.id?void 0:e.id,name:null==e.name?void 0:e.name,type:null==e.type?void 0:e.type,description:null==e.description?void 0:e.description,ownerId:null==e.ownerId?void 0:e.ownerId,query:null==e.query?void 0:e.query,properties:null==e.properties?void 0:e.properties,usedLast:null==e.usedLast?void 0:e.usedLast,usedCount:null==e.usedCount?void 0:e.usedCount}}function nt(e,n=!1){return null==e?e:{...e,id:e.id,name:e.name,type:e.type,description:e.description,ownerId:e.ownerId,query:e.query,properties:e.properties,usedLast:e.usedLast,usedCount:e.usedCount}}function tt(e){return rt(e)}function rt(e,n){return null==e?e:{temporaryAuthorization:e.temporaryAuthorization}}function ot(e,n=!1){return null==e?e:{temporaryAuthorization:e.temporaryAuthorization}}function it(e){return at(e)}function at(e,n){return null==e?e:{...e,users:e.users,metadata:e.metadata}}function st(e,n=!1){return null==e?e:{...e,users:e.users,metadata:e.metadata}}function lt(e,n){return null==e?e:{...e,emails:null==e.emails?void 0:new Set(e.emails),appIds:null==e.appIds?void 0:new Set(e.appIds),nextPageToken:null==e.nextPageToken?void 0:e.nextPageToken}}function ut(e){return dt(e,!1)}function dt(e,n=!1){return null==e?e:{...e,emails:null==e.emails?void 0:Array.from(e.emails),appIds:null==e.appIds?void 0:Array.from(e.appIds),nextPageToken:e.nextPageToken}}function pt(e){return ct(e)}function ct(e,n){return null==e?e:{billingCategory:null==e.billingCategory?void 0:e.billingCategory,count:null==e.count?void 0:e.count,eventType:null==e.eventType?void 0:e.eventType}}function mt(e){return ft(e,!1)}function ft(e,n=!1){return null==e?e:{billingCategory:e.billingCategory,count:e.count,eventType:e.eventType}}function yt(e){return Rt(e)}function Rt(e,n){return null==e?e:{all:null==e.all?void 0:e.all,integration:null==e.integration?void 0:e.integration,user:null==e.user?void 0:e.user}}function Tt(e){return ht(e,!1)}function ht(e,n=!1){return null==e?e:{all:e.all,integration:e.integration,user:e.user}}function wt(e){return It(e)}function It(e,n){return null==e?e:{eventTypes:e.eventTypes.map(pt),id:e.id,name:e.name,totals:yt(e.totals)}}function vt(e){return St(e,!1)}function St(e,n=!1){return null==e?e:{eventTypes:e.eventTypes.map(mt),id:e.id,name:e.name,totals:Tt(e.totals)}}function gt(e){return bt(e)}function bt(e,n){return null==e?e:{nextToken:e.nextToken}}function Ft(e){return Ot(e,!1)}function Ot(e,n=!1){return null==e?e:{nextToken:e.nextToken}}function Nt(e){return qt(e)}function qt(e,n){return null==e?e:{id:e.id,type:e.type}}function Jt(e){return At(e,!1)}function At(e,n=!1){return null==e?e:{id:e.id,type:e.type}}function kt(e){return Et(e)}function Et(e,n){return null==e?e:{all:null==e.all?void 0:e.all,integration:null==e.integration?void 0:e.integration,user:null==e.user?void 0:e.user}}function Ct(e){return Ut(e,!1)}function Ut(e,n=!1){return null==e?e:{all:e.all,integration:e.integration,user:e.user}}function Pt(e){return Dt(e)}function Dt(e,n){return null==e?e:{accountId:e.accountId,start:new Date(e.start),end:new Date(e.end),groupBy:e.groupBy,where:e.where.map(Nt),results:e.results.map(wt),metadata:null==e.metadata?void 0:gt(e.metadata),totals:null==e.totals?void 0:kt(e.totals)}}function xt(e,n=!1){return null==e?e:{accountId:e.accountId,start:e.start.toISOString(),end:e.end.toISOString(),groupBy:e.groupBy,where:e.where.map(Jt),results:e.results.map(vt),metadata:Ft(e.metadata),totals:Ct(e.totals)}}function Gt(e){return Mt(e)}function Mt(e,n){return null==e?e:{id:e.id,type:e.type}}function Bt(e){return Lt(e,!1)}function Lt(e,n=!1){return null==e?e:{id:e.id,type:e.type}}function Qt(e,n){return null==e?e:{start:new Date(e.start),end:new Date(e.end),groupBy:e.groupBy,nextToken:null==e.nextToken?void 0:e.nextToken,where:null==e.where?void 0:e.where.map(Gt)}}function jt(e){return Wt(e,!1)}function Wt(e,n=!1){return null==e?e:{start:e.start.toISOString(),end:e.end.toISOString(),groupBy:e.groupBy,nextToken:e.nextToken,where:null==e.where?void 0:e.where.map(Bt)}}function Vt(e){return Kt(e)}function Kt(e,n){return null==e?e:{...e,date:new Date(e.date),reads:e.reads}}function _t(e,n=!1){return null==e?e:{...e,date:e.date.toISOString().substring(0,10),reads:e.reads}}function zt(e){return $t(e)}function $t(e,n){return null==e?e:{...e,dummy:null==e._dummy?void 0:e._dummy}}function Ht(e){return Zt(e,!1)}function Zt(e,n=!1){return null==e?e:{...e,_dummy:e.dummy}}function Xt(e,n){return null==e?e:{value:e.value}}function Yt(e,n=!1){return null==e?e:{value:e.value}}function er(e){return nr(e)}function nr(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function tr(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function rr(e){return or(e)}function or(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function ir(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function ar(e){return sr(e)}function sr(e,n){return null==e?e:{id:null==e.id?void 0:e.id,data:null==e.data?void 0:e.data}}function lr(e,n=!1){return null==e?e:{id:e.id,data:e.data}}function ur(e){return dr(e)}function dr(e,n){return null==e?e:{...e,result:null==e.result?void 0:e.result}}function pr(e,n=!1){return null==e?e:{...e,result:e.result}}function cr(e,n){return null==e?e:{formula:e.formula,rid:null==e.rid?void 0:e.rid,from:e.from}}function mr(e){return fr(e,!1)}function fr(e,n=!1){return null==e?e:{formula:e.formula,rid:e.rid,from:e.from}}function yr(e){return Rr(e)}function Rr(e,n){return null==e?e:{fieldId:null==e.fieldId?void 0:e.fieldId,grouping:null==e.grouping?void 0:e.grouping}}function Tr(e){return hr(e,!1)}function hr(e,n=!1){return null==e?e:{fieldId:e.fieldId,grouping:e.grouping}}function wr(e){return Ir(e)}function Ir(e,n){return null==e?e:{skip:null==e.skip?void 0:e.skip,top:null==e.top?void 0:e.top,compareWithAppLocalTime:null==e.compareWithAppLocalTime?void 0:e.compareWithAppLocalTime}}function vr(e){return Sr(e,!1)}function Sr(e,n=!1){return null==e?e:{skip:e.skip,top:e.top,compareWithAppLocalTime:e.compareWithAppLocalTime}}function gr(e){return br(e)}function br(e,n){return null==e?e:{fieldId:null==e.fieldId?void 0:e.fieldId,order:null==e.order?void 0:e.order}}function Fr(e){return Or(e,!1)}function Or(e,n=!1){return null==e?e:{fieldId:e.fieldId,order:e.order}}function Nr(e,n){return null==e?e:{from:e.from,select:null==e.select?void 0:e.select,where:null==e.where?void 0:e.where,sortBy:null==e.sortBy?void 0:e.sortBy.map(gr),groupBy:null==e.groupBy?void 0:e.groupBy.map(yr),options:null==e.options?void 0:wr(e.options)}}function qr(e){return Jr(e,!1)}function Jr(e,n=!1){return null==e?e:{from:e.from,select:e.select,where:e.where,sortBy:null==e.sortBy?void 0:e.sortBy.map(Fr),groupBy:null==e.groupBy?void 0:e.groupBy.map(Tr),options:vr(e.options)}}function Ar(e){return kr(e)}function kr(e,n){return null==e?e:{numFields:null==e.numFields?void 0:e.numFields,numRecords:null==e.numRecords?void 0:e.numRecords,skip:null==e.skip?void 0:e.skip,top:null==e.top?void 0:e.top,totalRecords:null==e.totalRecords?void 0:e.totalRecords}}function Er(e){return Cr(e,!1)}function Cr(e,n=!1){return null==e?e:{numFields:e.numFields,numRecords:e.numRecords,skip:e.skip,top:e.top,totalRecords:e.totalRecords}}function Ur(e){return Pr(e)}function Pr(e,n){return null==e?e:{id:null==e.id?void 0:e.id,label:null==e.label?void 0:e.label,type:null==e.type?void 0:e.type}}function Dr(e){return xr(e,!1)}function xr(e,n=!1){return null==e?e:{id:e.id,label:e.label,type:e.type}}function Gr(e){return Mr(e)}function Mr(e,n){return null==e?e:{data:null==e.data?void 0:e.data,fields:null==e.fields?void 0:e.fields.map(Ur),metadata:null==e.metadata?void 0:Ar(e.metadata)}}function Br(e,n=!1){return null==e?e:{data:e.data,fields:null==e.fields?void 0:e.fields.map(Dr),metadata:Er(e.metadata)}}function Lr(e){return Qr(e)}function Qr(e,n){return null==e?e:{id:e.id,name:e.name,alias:null==e.alias?void 0:e.alias,description:null==e.description?void 0:e.description,created:null==e.created?void 0:new Date(e.created),updated:null==e.updated?void 0:new Date(e.updated),nextRecordId:null==e.nextRecordId?void 0:e.nextRecordId,nextFieldId:null==e.nextFieldId?void 0:e.nextFieldId,defaultSortFieldId:null==e.defaultSortFieldId?void 0:e.defaultSortFieldId,defaultSortOrder:null==e.defaultSortOrder?void 0:e.defaultSortOrder,keyFieldId:null==e.keyFieldId?void 0:e.keyFieldId,singleRecordName:null==e.singleRecordName?void 0:e.singleRecordName,pluralRecordName:null==e.pluralRecordName?void 0:e.pluralRecordName,sizeLimit:null==e.sizeLimit?void 0:e.sizeLimit,spaceUsed:null==e.spaceUsed?void 0:e.spaceUsed,spaceRemaining:null==e.spaceRemaining?void 0:e.spaceRemaining}}function jr(e,n=!1){return null==e?e:{id:e.id,name:e.name,alias:e.alias,description:e.description,created:null==e.created?void 0:e.created.toISOString(),updated:null==e.updated?void 0:e.updated.toISOString(),nextRecordId:e.nextRecordId,nextFieldId:e.nextFieldId,defaultSortFieldId:e.defaultSortFieldId,defaultSortOrder:e.defaultSortOrder,keyFieldId:e.keyFieldId,singleRecordName:e.singleRecordName,pluralRecordName:e.pluralRecordName,sizeLimit:e.sizeLimit,spaceUsed:e.spaceUsed,spaceRemaining:e.spaceRemaining}}function Wr(e){return Vr(e)}function Vr(e,n){return null==e?e:{...e,active:null==e.active?void 0:e.active,apps:null==e.apps?void 0:e.apps,lastUsed:null==e.lastUsed?void 0:e.lastUsed,description:null==e.description?void 0:e.description,id:null==e.id?void 0:e.id,name:null==e.name?void 0:e.name}}function Kr(e,n=!1){return null==e?e:{...e,active:e.active,apps:e.apps,lastUsed:e.lastUsed,description:e.description,id:e.id,name:e.name}}function _r(e,n){return null==e?e:{id:null==e.id?void 0:e.id,from:null==e.from?void 0:e.from,to:null==e.to?void 0:e.to}}function zr(e){return $r(e,!1)}function $r(e,n=!1){return null==e?e:{id:e.id,from:e.from,to:e.to}}function Hr(e){return Zr(e)}function Zr(e,n){return null==e?e:{...e,failure:e.failure,success:e.success}}function Xr(e,n=!1){return null==e?e:{...e,failure:e.failure,success:e.success}}function Yr(e,n){return null==e?e:{summaryFields:null==e.summaryFields?void 0:e.summaryFields,lookupFieldIds:null==e.lookupFieldIds?void 0:e.lookupFieldIds}}function eo(e){return no(e,!1)}function no(e,n=!1){return null==e?e:{summaryFields:e.summaryFields,lookupFieldIds:e.lookupFieldIds}}function to(e,n){return null==e?e:{name:null==e.name?void 0:e.name,singleRecordName:null==e.singleRecordName?void 0:e.singleRecordName,pluralRecordName:null==e.pluralRecordName?void 0:e.pluralRecordName,description:null==e.description?void 0:e.description}}function ro(e){return oo(e,!1)}function oo(e,n=!1){return null==e?e:{name:e.name,singleRecordName:e.singleRecordName,pluralRecordName:e.pluralRecordName,description:e.description}}function io(e){return ao(e)}function ao(e,n){return null==e?e:{createdRecordIds:null==e.createdRecordIds?void 0:e.createdRecordIds,updatedRecordIds:null==e.updatedRecordIds?void 0:e.updatedRecordIds,unchangedRecordIds:null==e.unchangedRecordIds?void 0:e.unchangedRecordIds,totalNumberOfRecordsProcessed:e.totalNumberOfRecordsProcessed}}function so(e){return lo(e,!1)}function lo(e,n=!1){return null==e?e:{createdRecordIds:e.createdRecordIds,updatedRecordIds:e.updatedRecordIds,unchangedRecordIds:e.unchangedRecordIds,totalNumberOfRecordsProcessed:e.totalNumberOfRecordsProcessed}}function uo(e){return po(e)}function po(e,n){return null==e?e:{data:null==e.data?void 0:e.data,metadata:null==e.metadata?void 0:io(e.metadata)}}function co(e,n=!1){return null==e?e:{data:e.data,metadata:so(e.metadata)}}function mo(e,n){return null==e?e:{value:e.value}}function fo(e,n=!1){return null==e?e:{value:e.value}}function yo(e){return Ro(e)}function Ro(e,n){return null==e?e:{createdRecordIds:null==e.createdRecordIds?void 0:e.createdRecordIds,updatedRecordIds:null==e.updatedRecordIds?void 0:e.updatedRecordIds,unchangedRecordIds:null==e.unchangedRecordIds?void 0:e.unchangedRecordIds,lineErrors:null==e.lineErrors?void 0:e.lineErrors,totalNumberOfRecordsProcessed:e.totalNumberOfRecordsProcessed}}function To(e){return ho(e,!1)}function ho(e,n=!1){return null==e?e:{createdRecordIds:e.createdRecordIds,updatedRecordIds:e.updatedRecordIds,unchangedRecordIds:e.unchangedRecordIds,lineErrors:e.lineErrors,totalNumberOfRecordsProcessed:e.totalNumberOfRecordsProcessed}}function wo(e,n){return null==e?e:{data:null==e.data?void 0:e.data,metadata:null==e.metadata?void 0:yo(e.metadata)}}function Io(e,n=!1){return null==e?e:{data:e.data,metadata:To(e.metadata)}}function vo(e,n){return null==e?e:{to:e.to,data:null==e.data?void 0:e.data.map(zt),mergeFieldId:null==e.mergeFieldId?void 0:e.mergeFieldId,fieldsToReturn:null==e.fieldsToReturn?void 0:e.fieldsToReturn}}function So(e){return go(e,!1)}function go(e,n=!1){return null==e?e:{to:e.to,data:null==e.data?void 0:e.data.map(Ht),mergeFieldId:e.mergeFieldId,fieldsToReturn:e.fieldsToReturn}}var bo=Object.freeze({__proto__:null,AppsApi:class extends o{async copyAppRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling copyApp().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling copyApp().');const t={"Content-Type":"application/json"},r=await this.request({path:"/apps/{appId}/copy".replace("{appId}",encodeURIComponent(String(e.appId))),method:"POST",headers:t,query:{},body:ee(e.body)},n);return new d(r,(e=>K(e)))}async copyApp(e,n){const t=await this.copyAppRaw(e,n);return await t.value()}async createAppRaw(e,n){if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling createApp().');const t={"Content-Type":"application/json"},r=await this.request({path:"/apps",method:"POST",headers:t,query:{},body:ae(e.body)},n);return new d(r,(e=>te(e)))}async createApp(e,n){const t=await this.createAppRaw(e,n);return await t.value()}async deleteAppRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling deleteApp().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling deleteApp().');const t={"Content-Type":"application/json"},r=await this.request({path:"/apps/{appId}".replace("{appId}",encodeURIComponent(String(e.appId))),method:"DELETE",headers:t,query:{},body:Ge(e.body)},n);return new d(r,(e=>Ue(e)))}async deleteApp(e,n){const t=await this.deleteAppRaw(e,n);return await t.value()}async getAppRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling getApp().');const t=await this.request({path:"/apps/{appId}".replace("{appId}",encodeURIComponent(String(e.appId))),method:"GET",headers:{},query:{}},n);return new d(t,(e=>F(e)))}async getApp(e,n){const t=await this.getAppRaw(e,n);return await t.value()}async getAppEventsRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling getAppEvents().');const t=await this.request({path:"/apps/{appId}/events".replace("{appId}",encodeURIComponent(String(e.appId))),method:"GET",headers:{},query:{}},n);return new d(t)}async getAppEvents(e,n){const t=await this.getAppEventsRaw(e,n);return await t.value()}},AuditApi:class extends o{async auditRaw(e,n){const t={"Content-Type":"application/json"},r=await this.request({path:"/audit",method:"POST",headers:t,query:{},body:U(e.generated)},n);return new d(r,(e=>q(e)))}async audit(e={},n){const t=await this.auditRaw(e,n);return await t.value()}},AuthApi:class extends o{async exchangeSsoTokenRaw(e,n){const t={"Content-Type":"application/json"},r=await this.request({path:"/auth/oauth/token",method:"POST",headers:t,query:{},body:yn(e.generated)},n);return new d(r,(e=>pn(e)))}async exchangeSsoToken(e={},n){const t=await this.exchangeSsoTokenRaw(e,n);return await t.value()}async getTempTokenDBIDRaw(e,n){if(null==e.dbid)throw new s("dbid",'Required parameter "dbid" was null or undefined when calling getTempTokenDBID().');const t=await this.request({path:"/auth/temporary/{dbid}".replace("{dbid}",encodeURIComponent(String(e.dbid))),method:"GET",headers:{},query:{}},n);return new d(t,(e=>tt(e)))}async getTempTokenDBID(e,n){const t=await this.getTempTokenDBIDRaw(e,n);return await t.value()}},DocumentTemplatesApi:class extends o{async generateDocumentRaw(e,n){if(null==e.templateId)throw new s("templateId",'Required parameter "templateId" was null or undefined when calling generateDocument().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling generateDocument().');if(null==e.filename)throw new s("filename",'Required parameter "filename" was null or undefined when calling generateDocument().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.recordId&&(t.recordId=e.recordId),null!=e.filename&&(t.filename=e.filename),null!=e.format&&(t.format=e.format),null!=e.margin&&(t.margin=e.margin),null!=e.unit&&(t.unit=e.unit),null!=e.pageSize&&(t.pageSize=e.pageSize),null!=e.orientation&&(t.orientation=e.orientation),null!=e.realm&&(t.realm=e.realm);const r={};null!=e.accept&&(r.accept=String(e.accept));const o=await this.request({path:"/docTemplates/{templateId}/generate".replace("{templateId}",encodeURIComponent(String(e.templateId))),method:"GET",headers:r,query:t},n);return new d(o,(e=>Pn(e)))}async generateDocument(e,n){const t=await this.generateDocumentRaw(e,n);return await t.value()}},FieldsApi:class extends o{async createFieldRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling createField().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling createField().');const t={};null!=e.tableId&&(t.tableId=e.tableId);const r={"Content-Type":"application/json"},o=await this.request({path:"/fields",method:"POST",headers:r,query:t,body:Ie(e.body)},n);return new d(o,(e=>Re(e)))}async createField(e,n){const t=await this.createFieldRaw(e,n);return await t.value()}async deleteFieldsRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling deleteFields().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling deleteFields().');const t={};null!=e.tableId&&(t.tableId=e.tableId);const r={"Content-Type":"application/json"},o=await this.request({path:"/fields",method:"DELETE",headers:r,query:t,body:We(e.body)},n);return new d(o,(e=>Be(e)))}async deleteFields(e,n){const t=await this.deleteFieldsRaw(e,n);return await t.value()}async getFieldRaw(e,n){if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling getField().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getField().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.includeFieldPerms&&(t.includeFieldPerms=e.includeFieldPerms);const r=await this.request({path:"/fields/{fieldId}".replace("{fieldId}",encodeURIComponent(String(e.fieldId))),method:"GET",headers:{},query:t},n);return new d(r,(e=>Tn(e)))}async getField(e,n){const t=await this.getFieldRaw(e,n);return await t.value()}async getFieldUsageRaw(e,n){if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling getFieldUsage().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getFieldUsage().');const t={};null!=e.tableId&&(t.tableId=e.tableId);const r={};null!=e.userAgent&&(r["User-Agent"]=String(e.userAgent));const o=await this.request({path:"/fields/usage/{fieldId}".replace("{fieldId}",encodeURIComponent(String(e.fieldId))),method:"GET",headers:r,query:t},n);return new d(o,(e=>e.map(En)))}async getFieldUsage(e,n){const t=await this.getFieldUsageRaw(e,n);return await t.value()}async getFieldsRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getFields().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.includeFieldPerms&&(t.includeFieldPerms=e.includeFieldPerms);const r=await this.request({path:"/fields",method:"GET",headers:{},query:t},n);return new d(r,(e=>e.map(Tn)))}async getFields(e,n){const t=await this.getFieldsRaw(e,n);return await t.value()}async getFieldsUsageRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getFieldsUsage().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.skip&&(t.skip=e.skip),null!=e.top&&(t.top=e.top);const r=await this.request({path:"/fields/usage",method:"GET",headers:{},query:t},n);return new d(r,(e=>e.map(En)))}async getFieldsUsage(e,n){const t=await this.getFieldsUsageRaw(e,n);return await t.value()}},FilesApi:class extends o{async deleteFileRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling deleteFile().');if(null==e.recordId)throw new s("recordId",'Required parameter "recordId" was null or undefined when calling deleteFile().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling deleteFile().');if(null==e.versionNumber)throw new s("versionNumber",'Required parameter "versionNumber" was null or undefined when calling deleteFile().');const t=await this.request({path:"/files/{tableId}/{recordId}/{fieldId}/{versionNumber}".replace("{tableId}",encodeURIComponent(String(e.tableId))).replace("{recordId}",encodeURIComponent(String(e.recordId))).replace("{fieldId}",encodeURIComponent(String(e.fieldId))).replace("{versionNumber}",encodeURIComponent(String(e.versionNumber))),method:"DELETE",headers:{},query:{}},n);return new d(t,(e=>Ke(e)))}async deleteFile(e,n){const t=await this.deleteFileRaw(e,n);return await t.value()}async downloadFileRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling downloadFile().');if(null==e.recordId)throw new s("recordId",'Required parameter "recordId" was null or undefined when calling downloadFile().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling downloadFile().');if(null==e.versionNumber)throw new s("versionNumber",'Required parameter "versionNumber" was null or undefined when calling downloadFile().');const t=await this.request({path:"/files/{tableId}/{recordId}/{fieldId}/{versionNumber}".replace("{tableId}",encodeURIComponent(String(e.tableId))).replace("{recordId}",encodeURIComponent(String(e.recordId))).replace("{fieldId}",encodeURIComponent(String(e.fieldId))).replace("{versionNumber}",encodeURIComponent(String(e.versionNumber))),method:"GET",headers:{},query:{}},n);return new d(t)}async downloadFile(e,n){const t=await this.downloadFileRaw(e,n);return await t.value()}},FormulasApi:class extends o{async runFormulaRaw(e,n){const t={"Content-Type":"application/json"},r=await this.request({path:"/formula/run",method:"POST",headers:t,query:{},body:mr(e.generated)},n);return new d(r,(e=>ur(e)))}async runFormula(e={},n){const t=await this.runFormulaRaw(e,n);return await t.value()}},PlatformAnalyticsApi:class extends o{async platformAnalyticEventSummariesRaw(e,n){const t={};null!=e.accountId&&(t.accountId=e.accountId);const r={"Content-Type":"application/json"},o=await this.request({path:"/analytics/events/summaries",method:"POST",headers:r,query:t,body:jt(e.generated)},n);return new d(o,(e=>Pt(e)))}async platformAnalyticEventSummaries(e={},n){const t=await this.platformAnalyticEventSummariesRaw(e,n);return await t.value()}async platformAnalyticReadsRaw(e,n){const t={};null!=e.day&&(t.day=e.day.toISOString().substring(0,10));const r=await this.request({path:"/analytics/reads",method:"GET",headers:{},query:t},n);return new d(r,(e=>Vt(e)))}async platformAnalyticReads(e={},n){const t=await this.platformAnalyticReadsRaw(e,n);return await t.value()}},RecordsApi:class extends o{async deleteRecordsRaw(e,n){if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling deleteRecords().');const t={"Content-Type":"application/json"},r=await this.request({path:"/records",method:"DELETE",headers:t,query:{},body:Ye(e.body)},n);return new d(r,(e=>$e(e)))}async deleteRecords(e,n){const t=await this.deleteRecordsRaw(e,n);return await t.value()}async runQueryRaw(e,n){if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling runQuery().');const t={"Content-Type":"application/json"},r=await this.request({path:"/records/query",method:"POST",headers:t,query:{},body:qr(e.body)},n);return new d(r,(e=>Gr(e)))}async runQuery(e,n){const t=await this.runQueryRaw(e,n);return await t.value()}async upsertRaw(e,n){if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling upsert().');const t={"Content-Type":"application/json"},r=await this.request({path:"/records",method:"POST",headers:t,query:{},body:So(e.body)},n);return new d(r,(e=>uo(e)))}async upsert(e,n){const t=await this.upsertRaw(e,n);return await t.value()}},RelationshipsApi:class extends o{async getRelationshipsRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getRelationships().');const t={};null!=e.skip&&(t.skip=e.skip);const r=await this.request({path:"/tables/{tableId}/relationships".replace("{tableId}",encodeURIComponent(String(e.tableId))),method:"GET",headers:{},query:t},n);return new d(r,(e=>Hn(e)))}async getRelationships(e,n){const t=await this.getRelationshipsRaw(e,n);return await t.value()}},ReportsApi:class extends o{async getReportRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getReport().');if(null==e.reportId)throw new s("reportId",'Required parameter "reportId" was null or undefined when calling getReport().');const t={};null!=e.tableId&&(t.tableId=e.tableId);const r=await this.request({path:"/reports/{reportId}".replace("{reportId}",encodeURIComponent(String(e.reportId))),method:"GET",headers:{},query:t},n);return new d(r,(e=>Yn(e)))}async getReport(e,n){const t=await this.getReportRaw(e,n);return await t.value()}async getTableReportsRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getTableReports().');const t={};null!=e.tableId&&(t.tableId=e.tableId);const r=await this.request({path:"/reports",method:"GET",headers:{},query:t},n);return new d(r)}async getTableReports(e,n){const t=await this.getTableReportsRaw(e,n);return await t.value()}async runReportRaw(e,n){if(null==e.reportId)throw new s("reportId",'Required parameter "reportId" was null or undefined when calling runReport().');if(null==e.generated)throw new s("generated",'Required parameter "generated" was null or undefined when calling runReport().');const t={"Content-Type":"application/json"},r=await this.request({path:"/reports/{reportId}/run".replace("{reportId}",encodeURIComponent(String(e.reportId))),method:"POST",headers:t,query:{},body:e.generated},n);return new d(r,(e=>e.map(ar)))}async runReport(e,n){const t=await this.runReportRaw(e,n);return await t.value()}},SolutionsApi:class extends o{async changesetSolutionRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling changesetSolution().');const t={"Content-Type":"application/x-yaml"};null!=e.xQBLErrorsAsSuccess&&(t.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const r=await this.request({path:"/solutions/{solutionId}/changeset".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"PUT",headers:t,query:{},body:e.generated},n);return new d(r)}async changesetSolution(e,n){const t=await this.changesetSolutionRaw(e,n);return await t.value()}async changesetSolutionFromRecordRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling changesetSolutionFromRecord().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling changesetSolutionFromRecord().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling changesetSolutionFromRecord().');if(null==e.recordId)throw new s("recordId",'Required parameter "recordId" was null or undefined when calling changesetSolutionFromRecord().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.fieldId&&(t.fieldId=e.fieldId),null!=e.recordId&&(t.recordId=e.recordId);const r={};null!=e.xQBLErrorsAsSuccess&&(r.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const o=await this.request({path:"/solutions/{solutionId}/changeset/fromrecord".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"GET",headers:r,query:t},n);return new d(o)}async changesetSolutionFromRecord(e,n){const t=await this.changesetSolutionFromRecordRaw(e,n);return await t.value()}async createSolutionRaw(e,n){const t={"Content-Type":"application/x-yaml"};null!=e.xQBLErrorsAsSuccess&&(t.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const r=await this.request({path:"/solutions",method:"POST",headers:t,query:{},body:e.generated},n);return new d(r)}async createSolution(e={},n){const t=await this.createSolutionRaw(e,n);return await t.value()}async createSolutionFromRecordRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling createSolutionFromRecord().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling createSolutionFromRecord().');if(null==e.recordId)throw new s("recordId",'Required parameter "recordId" was null or undefined when calling createSolutionFromRecord().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.fieldId&&(t.fieldId=e.fieldId),null!=e.recordId&&(t.recordId=e.recordId);const r={};null!=e.xQBLErrorsAsSuccess&&(r.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const o=await this.request({path:"/solutions/fromrecord",method:"GET",headers:r,query:t},n);return new d(o)}async createSolutionFromRecord(e,n){const t=await this.createSolutionFromRecordRaw(e,n);return await t.value()}async exportSolutionRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling exportSolution().');const t={};null!=e.qBLVersion&&(t.qBLVersion=String(e.qBLVersion));const r=await this.request({path:"/solutions/{solutionId}".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"GET",headers:t,query:{}},n);return new d(r)}async exportSolution(e,n){const t=await this.exportSolutionRaw(e,n);return await t.value()}async exportSolutionToRecordRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling exportSolutionToRecord().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling exportSolutionToRecord().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling exportSolutionToRecord().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.fieldId&&(t.fieldId=e.fieldId);const r={};null!=e.xQBLErrorsAsSuccess&&(r.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess)),null!=e.qBLVersion&&(r.qBLVersion=String(e.qBLVersion));const o=await this.request({path:"/solutions/{solutionId}/torecord".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"GET",headers:r,query:t},n);return new d(o)}async exportSolutionToRecord(e,n){const t=await this.exportSolutionToRecordRaw(e,n);return await t.value()}async updateSolutionRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling updateSolution().');const t={"Content-Type":"application/x-yaml"};null!=e.xQBLErrorsAsSuccess&&(t.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const r=await this.request({path:"/solutions/{solutionId}".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"PUT",headers:t,query:{},body:e.generated},n);return new d(r)}async updateSolution(e,n){const t=await this.updateSolutionRaw(e,n);return await t.value()}async updateSolutionToRecordRaw(e,n){if(null==e.solutionId)throw new s("solutionId",'Required parameter "solutionId" was null or undefined when calling updateSolutionToRecord().');if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling updateSolutionToRecord().');if(null==e.fieldId)throw new s("fieldId",'Required parameter "fieldId" was null or undefined when calling updateSolutionToRecord().');if(null==e.recordId)throw new s("recordId",'Required parameter "recordId" was null or undefined when calling updateSolutionToRecord().');const t={};null!=e.tableId&&(t.tableId=e.tableId),null!=e.fieldId&&(t.fieldId=e.fieldId),null!=e.recordId&&(t.recordId=e.recordId);const r={};null!=e.xQBLErrorsAsSuccess&&(r.xQBLErrorsAsSuccess=String(e.xQBLErrorsAsSuccess));const o=await this.request({path:"/solutions/{solutionId}/fromrecord".replace("{solutionId}",encodeURIComponent(String(e.solutionId))),method:"GET",headers:r,query:t},n);return new d(o)}async updateSolutionToRecord(e,n){const t=await this.updateSolutionToRecordRaw(e,n);return await t.value()}},TablesApi:class extends o{async createRelationshipRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling createRelationship().');const t={"Content-Type":"application/json"},r=await this.request({path:"/tables/{tableId}/relationship".replace("{tableId}",encodeURIComponent(String(e.tableId))),method:"POST",headers:t,query:{},body:Oe(e.generated)},n);return new d(r,(e=>Se(e)))}async createRelationship(e,n){const t=await this.createRelationshipRaw(e,n);return await t.value()}async createTableRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling createTable().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling createTable().');const t={};null!=e.appId&&(t.appId=e.appId);const r={"Content-Type":"application/json"},o=await this.request({path:"/tables",method:"POST",headers:r,query:t,body:Je(e.body)},n);return new d(o,(e=>Lr(e)))}async createTable(e,n){const t=await this.createTableRaw(e,n);return await t.value()}async deleteRelationshipRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling deleteRelationship().');if(null==e.relationshipId)throw new s("relationshipId",'Required parameter "relationshipId" was null or undefined when calling deleteRelationship().');const t=await this.request({path:"/tables/{tableId}/relationship/{relationshipId}".replace("{tableId}",encodeURIComponent(String(e.tableId))).replace("{relationshipId}",encodeURIComponent(String(e.relationshipId))),method:"DELETE",headers:{},query:{}},n);return new d(t,(e=>nn(e)))}async deleteRelationship(e,n){const t=await this.deleteRelationshipRaw(e,n);return await t.value()}async deleteTableRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling deleteTable().');if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling deleteTable().');const t={};null!=e.appId&&(t.appId=e.appId);const r=await this.request({path:"/tables/{tableId}".replace("{tableId}",encodeURIComponent(String(e.tableId))),method:"DELETE",headers:{},query:t},n);return new d(r,(e=>on(e)))}async deleteTable(e,n){const t=await this.deleteTableRaw(e,n);return await t.value()}async getAppTablesRaw(e,n){if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling getAppTables().');const t={};null!=e.appId&&(t.appId=e.appId);const r=await this.request({path:"/tables",method:"GET",headers:{},query:t},n);return new d(r,(e=>e.map(Lr)))}async getAppTables(e,n){const t=await this.getAppTablesRaw(e,n);return await t.value()}async getTableRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling getTable().');if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling getTable().');const t={};null!=e.appId&&(t.appId=e.appId);const r=await this.request({path:"/tables/{tableId}".replace("{tableId}",encodeURIComponent(String(e.tableId))),method:"GET",headers:{},query:t},n);return new d(r,(e=>Lr(e)))}async getTable(e,n){const t=await this.getTableRaw(e,n);return await t.value()}async updateRelationshipRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling updateRelationship().');if(null==e.relationshipId)throw new s("relationshipId",'Required parameter "relationshipId" was null or undefined when calling updateRelationship().');const t={"Content-Type":"application/json"},r=await this.request({path:"/tables/{tableId}/relationship/{relationshipId}".replace("{tableId}",encodeURIComponent(String(e.tableId))).replace("{relationshipId}",encodeURIComponent(String(e.relationshipId))),method:"POST",headers:t,query:{},body:eo(e.generated)},n);return new d(r,(e=>Se(e)))}async updateRelationship(e,n){const t=await this.updateRelationshipRaw(e,n);return await t.value()}async updateTableRaw(e,n){if(null==e.tableId)throw new s("tableId",'Required parameter "tableId" was null or undefined when calling updateTable().');if(null==e.appId)throw new s("appId",'Required parameter "appId" was null or undefined when calling updateTable().');if(null==e.body)throw new s("body",'Required parameter "body" was null or undefined when calling updateTable().');const t={};null!=e.appId&&(t.appId=e.appId);const r={"Content-Type":"application/json"},o=await this.request({path:"/tables/{tableId}".replace("{tableId}",encodeURIComponent(String(e.tableId))),method:"POST",headers:r,query:t,body:ro(e.body)},n);return new d(o,(e=>Lr(e)))}async updateTable(e,n){const t=await this.updateTableRaw(e,n);return await t.value()}},UserTokenApi:class extends o{async cloneUserTokenRaw(e,n){const t={"Content-Type":"application/json"},r=await this.request({path:"/usertoken/clone",method:"POST",headers:t,query:{},body:B(e.generated)},n);return new d(r,(e=>D(e)))}async cloneUserToken(e={},n){const t=await this.cloneUserTokenRaw(e,n);return await t.value()}async deactivateUserTokenRaw(e){const n=await this.request({path:"/usertoken/deactivate",method:"POST",headers:{},query:{}},e);return new d(n,(e=>ke(e)))}async deactivateUserToken(e){const n=await this.deactivateUserTokenRaw(e);return await n.value()}async deleteUserTokenRaw(e){const n=await this.request({path:"/usertoken",method:"DELETE",headers:{},query:{}},e);return new d(n,(e=>ke(e)))}async deleteUserToken(e){const n=await this.deleteUserTokenRaw(e);return await n.value()}async transferUserTokenRaw(e,n){const t={"Content-Type":"application/json"},r=await this.request({path:"/usertoken/transfer",method:"POST",headers:t,query:{},body:zr(e.generated)},n);return new d(r,(e=>Wr(e)))}async transferUserToken(e={},n){const t=await this.transferUserTokenRaw(e,n);return await t.value()}},UsersApi:class extends o{async addManagersToGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling addManagersToGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/managers".replace("{gid}",encodeURIComponent(String(e.gid))),method:"POST",headers:t,query:{},body:e.generated},n);return new d(r,(e=>p(e)))}async addManagersToGroup(e,n){const t=await this.addManagersToGroupRaw(e,n);return await t.value()}async addMembersToGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling addMembersToGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/members".replace("{gid}",encodeURIComponent(String(e.gid))),method:"POST",headers:t,query:{},body:e.generated},n);return new d(r,(e=>p(e)))}async addMembersToGroup(e,n){const t=await this.addMembersToGroupRaw(e,n);return await t.value()}async addSubgroupsToGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling addSubgroupsToGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/subgroups".replace("{gid}",encodeURIComponent(String(e.gid))),method:"POST",headers:t,query:{},body:e.generated},n);return new d(r,(e=>f(e)))}async addSubgroupsToGroup(e,n){const t=await this.addSubgroupsToGroupRaw(e,n);return await t.value()}async denyUsersRaw(e,n){const t={};null!=e.accountId&&(t.accountId=e.accountId);const r={"Content-Type":"application/json"},o=await this.request({path:"/users/deny",method:"PUT",headers:r,query:t,body:e.generated},n);return new d(o,(e=>ln(e)))}async denyUsers(e={},n){const t=await this.denyUsersRaw(e,n);return await t.value()}async denyUsersAndGroupsRaw(e,n){if(null==e.shouldDeleteFromGroups)throw new s("shouldDeleteFromGroups",'Required parameter "shouldDeleteFromGroups" was null or undefined when calling denyUsersAndGroups().');const t={};null!=e.accountId&&(t.accountId=e.accountId);const r={"Content-Type":"application/json"},o=await this.request({path:"/users/deny/{shouldDeleteFromGroups}".replace("{shouldDeleteFromGroups}",encodeURIComponent(String(e.shouldDeleteFromGroups))),method:"PUT",headers:r,query:t,body:e.generated},n);return new d(o,(e=>ln(e)))}async denyUsersAndGroups(e,n){const t=await this.denyUsersAndGroupsRaw(e,n);return await t.value()}async getUsersRaw(e,n){const t={};null!=e.accountId&&(t.accountId=e.accountId);const r={"Content-Type":"application/json"},o=await this.request({path:"/users",method:"POST",headers:r,query:t,body:ut(e.generated)},n);return new d(o,(e=>it(e)))}async getUsers(e={},n){const t=await this.getUsersRaw(e,n);return await t.value()}async removeManagersFromGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling removeManagersFromGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/managers".replace("{gid}",encodeURIComponent(String(e.gid))),method:"DELETE",headers:t,query:{},body:e.generated},n);return new d(r,(e=>er(e)))}async removeManagersFromGroup(e,n){const t=await this.removeManagersFromGroupRaw(e,n);return await t.value()}async removeMembersFromGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling removeMembersFromGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/members".replace("{gid}",encodeURIComponent(String(e.gid))),method:"DELETE",headers:t,query:{},body:e.generated},n);return new d(r,(e=>er(e)))}async removeMembersFromGroup(e,n){const t=await this.removeMembersFromGroupRaw(e,n);return await t.value()}async removeSubgroupsFromGroupRaw(e,n){if(null==e.gid)throw new s("gid",'Required parameter "gid" was null or undefined when calling removeSubgroupsFromGroup().');const t={"Content-Type":"application/json"},r=await this.request({path:"/groups/{gid}/subgroups".replace("{gid}",encodeURIComponent(String(e.gid))),method:"DELETE",headers:t,query:{},body:e.generated},n);return new d(r,(e=>rr(e)))}async removeSubgroupsFromGroup(e,n){const t=await this.removeSubgroupsFromGroupRaw(e,n);return await t.value()}async undenyUsersRaw(e,n){const t={};null!=e.accountId&&(t.accountId=e.accountId);const r={"Content-Type":"application/json"},o=await this.request({path:"/users/undeny",method:"PUT",headers:r,query:t,body:e.generated},n);return new d(o,(e=>Hr(e)))}async undenyUsers(e={},n){const t=await this.undenyUsersRaw(e,n);return await t.value()}}});class Fo{cache;lifespan;constructor(e=29e4){this.cache=new Map,this.lifespan=e}get(e){const n=this.cache.get(e),t=Date.now();if(n&&n.expiresAt>t)return n.token}getEntry(e){const n=this.cache.get(e),t=Date.now();if(n&&n.expiresAt>t)return n}set(e,n){const t=Date.now();this.cache.set(e,{token:n,expiresAt:t+this.lifespan})}dump(){return Array.from(this.cache.entries())}clear(){this.cache.clear()}}const Oo=(e,n)=>{const t=e.dbid||e.tableId||e.appId;if(!t)throw new Error(n);return t};e.AddMembersToGroup200ResponseFromJSON=p,e.AddMembersToGroup200ResponseFromJSONTyped=c,e.AddMembersToGroup200ResponseToJSON=function(e){return m(e,!1)},e.AddMembersToGroup200ResponseToJSONTyped=m,e.AddSubgroupsToGroup200ResponseFromJSON=f,e.AddSubgroupsToGroup200ResponseFromJSONTyped=y,e.AddSubgroupsToGroup200ResponseToJSON=function(e){return R(e,!1)},e.AddSubgroupsToGroup200ResponseToJSONTyped=R,e.AppFromJSON=F,e.AppFromJSONTyped=O,e.AppMemoryInfoFromJSON=T,e.AppMemoryInfoFromJSONTyped=h,e.AppMemoryInfoToJSON=w,e.AppMemoryInfoToJSONTyped=I,e.AppSecurityPropertiesFromJSON=v,e.AppSecurityPropertiesFromJSONTyped=S,e.AppSecurityPropertiesToJSON=g,e.AppSecurityPropertiesToJSONTyped=b,e.AppToJSON=function(e){return N(e,!1)},e.AppToJSONTyped=N,e.Audit200ResponseFromJSON=q,e.Audit200ResponseFromJSONTyped=J,e.Audit200ResponseToJSON=function(e){return A(e,!1)},e.Audit200ResponseToJSONTyped=A,e.Audit202ResponseFromJSON=function(e){return k(e)},e.Audit202ResponseFromJSONTyped=k,e.Audit202ResponseToJSON=function(e){return E(e,!1)},e.Audit202ResponseToJSONTyped=E,e.AuditRequestFromJSON=function(e){return C(e)},e.AuditRequestFromJSONTyped=C,e.AuditRequestToJSON=U,e.AuditRequestToJSONTyped=P,e.CloneUserToken200ResponseFromJSON=D,e.CloneUserToken200ResponseFromJSONTyped=x,e.CloneUserToken200ResponseToJSON=function(e){return G(e,!1)},e.CloneUserToken200ResponseToJSONTyped=G,e.CloneUserTokenRequestFromJSON=function(e){return M(e)},e.CloneUserTokenRequestFromJSONTyped=M,e.CloneUserTokenRequestToJSON=B,e.CloneUserTokenRequestToJSONTyped=L,e.CopyApp200ResponseFromJSON=K,e.CopyApp200ResponseFromJSONTyped=_,e.CopyApp200ResponseToJSON=function(e){return z(e,!1)},e.CopyApp200ResponseToJSONTyped=z,e.CopyAppRequestFromJSON=function(e){return Y(e)},e.CopyAppRequestFromJSONTyped=Y,e.CopyAppRequestPropertiesFromJSON=$,e.CopyAppRequestPropertiesFromJSONTyped=H,e.CopyAppRequestPropertiesToJSON=Z,e.CopyAppRequestPropertiesToJSONTyped=X,e.CopyAppRequestToJSON=ee,e.CopyAppRequestToJSONTyped=ne,e.CreateApp200ResponseFromJSON=te,e.CreateApp200ResponseFromJSONTyped=re,e.CreateApp200ResponseToJSON=function(e){return oe(e,!1)},e.CreateApp200ResponseToJSONTyped=oe,e.CreateAppRequestFromJSON=function(e){return ie(e)},e.CreateAppRequestFromJSONTyped=ie,e.CreateAppRequestToJSON=ae,e.CreateAppRequestToJSONTyped=se,e.CreateAppRequestVariablesInnerFromJSON=Q,e.CreateAppRequestVariablesInnerFromJSONTyped=j,e.CreateAppRequestVariablesInnerToJSON=W,e.CreateAppRequestVariablesInnerToJSONTyped=V,e.CreateField200ResponseFromJSON=Re,e.CreateField200ResponseFromJSONTyped=Te,e.CreateField200ResponseToJSON=function(e){return he(e,!1)},e.CreateField200ResponseToJSONTyped=he,e.CreateFieldRequestFieldTypeEnum={Text:"text",TextMultipleChoice:"text-multiple-choice",TextMultiLine:"text-multi-line",RichText:"rich-text",Numeric:"numeric",Currency:"currency",Rating:"rating",Percent:"percent",Multitext:"multitext",Email:"email",Url:"url",Duration:"duration",Date:"date",Datetime:"datetime",Timestamp:"timestamp",Timeofday:"timeofday",Checkbox:"checkbox",User:"user",Multiuser:"multiuser",Address:"address",Phone:"phone",File:"file"},e.CreateFieldRequestFromJSON=function(e){return we(e)},e.CreateFieldRequestFromJSONTyped=we,e.CreateFieldRequestToJSON=Ie,e.CreateFieldRequestToJSONTyped=ve,e.CreateRelationship200ResponseFromJSON=Se,e.CreateRelationship200ResponseFromJSONTyped=ge,e.CreateRelationship200ResponseToJSON=function(e){return be(e,!1)},e.CreateRelationship200ResponseToJSONTyped=be,e.CreateRelationshipRequestFromJSON=function(e){return Fe(e)},e.CreateRelationshipRequestFromJSONTyped=Fe,e.CreateRelationshipRequestToJSON=Oe,e.CreateRelationshipRequestToJSONTyped=Ne,e.CreateTableRequestFromJSON=function(e){return qe(e)},e.CreateTableRequestFromJSONTyped=qe,e.CreateTableRequestToJSON=Je,e.CreateTableRequestToJSONTyped=Ae,e.DeactivateUserToken200ResponseFromJSON=ke,e.DeactivateUserToken200ResponseFromJSONTyped=Ee,e.DeactivateUserToken200ResponseToJSON=function(e){return Ce(e,!1)},e.DeactivateUserToken200ResponseToJSONTyped=Ce,e.DeleteApp200ResponseFromJSON=Ue,e.DeleteApp200ResponseFromJSONTyped=Pe,e.DeleteApp200ResponseToJSON=function(e){return De(e,!1)},e.DeleteApp200ResponseToJSONTyped=De,e.DeleteAppRequestFromJSON=function(e){return xe(e)},e.DeleteAppRequestFromJSONTyped=xe,e.DeleteAppRequestToJSON=Ge,e.DeleteAppRequestToJSONTyped=Me,e.DeleteFields200ResponseFromJSON=Be,e.DeleteFields200ResponseFromJSONTyped=Le,e.DeleteFields200ResponseToJSON=function(e){return Qe(e,!1)},e.DeleteFields200ResponseToJSONTyped=Qe,e.DeleteFieldsRequestFromJSON=function(e){return je(e)},e.DeleteFieldsRequestFromJSONTyped=je,e.DeleteFieldsRequestToJSON=We,e.DeleteFieldsRequestToJSONTyped=Ve,e.DeleteFile200ResponseFromJSON=Ke,e.DeleteFile200ResponseFromJSONTyped=_e,e.DeleteFile200ResponseToJSON=function(e){return ze(e,!1)},e.DeleteFile200ResponseToJSONTyped=ze,e.DeleteRecords200ResponseFromJSON=$e,e.DeleteRecords200ResponseFromJSONTyped=He,e.DeleteRecords200ResponseToJSON=function(e){return Ze(e,!1)},e.DeleteRecords200ResponseToJSONTyped=Ze,e.DeleteRecordsRequestFromJSON=function(e){return Xe(e)},e.DeleteRecordsRequestFromJSONTyped=Xe,e.DeleteRecordsRequestToJSON=Ye,e.DeleteRecordsRequestToJSONTyped=en,e.DeleteRelationship200ResponseFromJSON=nn,e.DeleteRelationship200ResponseFromJSONTyped=tn,e.DeleteRelationship200ResponseToJSON=function(e){return rn(e,!1)},e.DeleteRelationship200ResponseToJSONTyped=rn,e.DeleteTableResponseFromJSON=on,e.DeleteTableResponseFromJSONTyped=an,e.DeleteTableResponseToJSON=function(e){return sn(e,!1)},e.DeleteTableResponseToJSONTyped=sn,e.DenyUsers200ResponseFromJSON=ln,e.DenyUsers200ResponseFromJSONTyped=un,e.DenyUsers200ResponseToJSON=function(e){return dn(e,!1)},e.DenyUsers200ResponseToJSONTyped=dn,e.ExchangeSsoToken200ResponseFromJSON=pn,e.ExchangeSsoToken200ResponseFromJSONTyped=cn,e.ExchangeSsoToken200ResponseIssuedTokenTypeEnum={UrnQuickbaseParamsOauthTokenTypeTempTicket:"urn:quickbase:params:oauth:token-type:temp_ticket",UrnQuickbaseParamsOauthTokenTypeTempToken:"urn:quickbase:params:oauth:token-type:temp_token"},e.ExchangeSsoToken200ResponseToJSON=function(e){return mn(e,!1)},e.ExchangeSsoToken200ResponseToJSONTyped=mn,e.ExchangeSsoToken200ResponseTokenTypeEnum={NA:"N_A"},e.ExchangeSsoTokenRequestFromJSON=function(e){return fn(e)},e.ExchangeSsoTokenRequestFromJSONTyped=fn,e.ExchangeSsoTokenRequestGrantTypeEnum={UrnIetfParamsOauthGrantTypeTokenExchange:"urn:ietf:params:oauth:grant-type:token-exchange"},e.ExchangeSsoTokenRequestRequestedTokenTypeEnum={UrnQuickbaseParamsOauthTokenTypeTempTicket:"urn:quickbase:params:oauth:token-type:temp_ticket",UrnQuickbaseParamsOauthTokenTypeTempToken:"urn:quickbase:params:oauth:token-type:temp_token"},e.ExchangeSsoTokenRequestSubjectTokenTypeEnum={UrnIetfParamsOauthTokenTypeSaml2:"urn:ietf:params:oauth:token-type:saml2"},e.ExchangeSsoTokenRequestToJSON=yn,e.ExchangeSsoTokenRequestToJSONTyped=Rn,e.FieldFromJSON=Tn,e.FieldFromJSONTyped=hn,e.FieldPermissionsInnerFromJSON=ce,e.FieldPermissionsInnerFromJSONTyped=me,e.FieldPermissionsInnerToJSON=fe,e.FieldPermissionsInnerToJSONTyped=ye,e.FieldPropertiesCurrencyFormatEnum={Left:"left",Right:"right",Middle:"middle"},e.FieldPropertiesFromJSON=le,e.FieldPropertiesFromJSONTyped=ue,e.FieldPropertiesOpenTargetInEnum={SameWindow:"sameWindow",NewWindow:"newWindow",Popup:"popup"},e.FieldPropertiesSummaryFunctionEnum={Avg:"AVG",Sum:"SUM",Max:"MAX",Min:"MIN",StdDev:"STD-DEV",Count:"COUNT",CombinedText:"COMBINED-TEXT",CombinedUser:"COMBINED-USER",DistinctCount:"DISTINCT-COUNT"},e.FieldPropertiesToJSON=de,e.FieldPropertiesToJSONTyped=pe,e.FieldPropertiesVersionModeEnum={Keepallversions:"keepallversions",Keeplastversions:"keeplastversions"},e.FieldToJSON=function(e){return wn(e,!1)},e.FieldToJSONTyped=wn,e.FieldUsageFieldFromJSON=In,e.FieldUsageFieldFromJSONTyped=vn,e.FieldUsageFieldToJSON=Sn,e.FieldUsageFieldToJSONTyped=gn,e.FieldUsageFromJSON=En,e.FieldUsageFromJSONTyped=Cn,e.FieldUsageToJSON=function(e){return Un(e,!1)},e.FieldUsageToJSONTyped=Un,e.FieldUsageUsageFromJSON=qn,e.FieldUsageUsageFromJSONTyped=Jn,e.FieldUsageUsageToJSON=An,e.FieldUsageUsageToJSONTyped=kn,e.GenerateDocument200ResponseFromJSON=Pn,e.GenerateDocument200ResponseFromJSONTyped=Dn,e.GenerateDocument200ResponseToJSON=function(e){return xn(e,!1)},e.GenerateDocument200ResponseToJSONTyped=xn,e.GetRelationships200ResponseFromJSON=Hn,e.GetRelationships200ResponseFromJSONTyped=Zn,e.GetRelationships200ResponseMetadataFromJSON=Gn,e.GetRelationships200ResponseMetadataFromJSONTyped=Mn,e.GetRelationships200ResponseMetadataToJSON=Bn,e.GetRelationships200ResponseMetadataToJSONTyped=Ln,e.GetRelationships200ResponseToJSON=function(e){return Xn(e,!1)},e.GetRelationships200ResponseToJSONTyped=Xn,e.GetReport200ResponseFromJSON=Yn,e.GetReport200ResponseFromJSONTyped=et,e.GetReport200ResponseToJSON=function(e){return nt(e,!1)},e.GetReport200ResponseToJSONTyped=nt,e.GetTempTokenDBID200ResponseFromJSON=tt,e.GetTempTokenDBID200ResponseFromJSONTyped=rt,e.GetTempTokenDBID200ResponseToJSON=function(e){return ot(e,!1)},e.GetTempTokenDBID200ResponseToJSONTyped=ot,e.GetUsers200ResponseFromJSON=it,e.GetUsers200ResponseFromJSONTyped=at,e.GetUsers200ResponseToJSON=function(e){return st(e,!1)},e.GetUsers200ResponseToJSONTyped=st,e.GetUsersRequestFromJSON=function(e){return lt(e)},e.GetUsersRequestFromJSONTyped=lt,e.GetUsersRequestToJSON=ut,e.GetUsersRequestToJSONTyped=dt,e.PlatformAnalyticEventSummaries200ResponseFromJSON=Pt,e.PlatformAnalyticEventSummaries200ResponseFromJSONTyped=Dt,e.PlatformAnalyticEventSummaries200ResponseGroupByEnum={App:"app",User:"user"},e.PlatformAnalyticEventSummaries200ResponseMetadataFromJSON=gt,e.PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped=bt,e.PlatformAnalyticEventSummaries200ResponseMetadataToJSON=Ft,e.PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped=Ot,e.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum={User:"user",Integration:"integration"},e.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON=pt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped=ct,e.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON=mt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped=ft,e.PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON=wt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped=It,e.PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON=vt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped=St,e.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON=yt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped=Rt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON=Tt,e.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped=ht,e.PlatformAnalyticEventSummaries200ResponseToJSON=function(e){return xt(e,!1)},e.PlatformAnalyticEventSummaries200ResponseToJSONTyped=xt,e.PlatformAnalyticEventSummaries200ResponseTotalsFromJSON=kt,e.PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped=Et,e.PlatformAnalyticEventSummaries200ResponseTotalsToJSON=Ct,e.PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped=Ut,e.PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON=Nt,e.PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped=qt,e.PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON=Jt,e.PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped=At,e.PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum={App:"app",User:"user"},e.PlatformAnalyticEventSummariesRequestFromJSON=function(e){return Qt(e)},e.PlatformAnalyticEventSummariesRequestFromJSONTyped=Qt,e.PlatformAnalyticEventSummariesRequestGroupByEnum={App:"app",User:"user"},e.PlatformAnalyticEventSummariesRequestToJSON=jt,e.PlatformAnalyticEventSummariesRequestToJSONTyped=Wt,e.PlatformAnalyticEventSummariesRequestWhereInnerFromJSON=Gt,e.PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped=Mt,e.PlatformAnalyticEventSummariesRequestWhereInnerToJSON=Bt,e.PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped=Lt,e.PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum={App:"app",User:"user"},e.PlatformAnalyticReads200ResponseFromJSON=Vt,e.PlatformAnalyticReads200ResponseFromJSONTyped=Kt,e.PlatformAnalyticReads200ResponseToJSON=function(e){return _t(e,!1)},e.PlatformAnalyticReads200ResponseToJSONTyped=_t,e.RecordFromJSON=zt,e.RecordFromJSONTyped=$t,e.RecordToJSON=Ht,e.RecordToJSONTyped=Zt,e.RecordValueFromJSON=function(e){return Xt(e)},e.RecordValueFromJSONTyped=Xt,e.RecordValueToJSON=function(e){return Yt(e,!1)},e.RecordValueToJSONTyped=Yt,e.RelationshipFieldFromJSON=Qn,e.RelationshipFieldFromJSONTyped=jn,e.RelationshipFieldToJSON=Wn,e.RelationshipFieldToJSONTyped=Vn,e.RelationshipFromJSON=Kn,e.RelationshipFromJSONTyped=_n,e.RelationshipToJSON=zn,e.RelationshipToJSONTyped=$n,e.RemoveMembersFromGroup200ResponseFromJSON=er,e.RemoveMembersFromGroup200ResponseFromJSONTyped=nr,e.RemoveMembersFromGroup200ResponseToJSON=function(e){return tr(e,!1)},e.RemoveMembersFromGroup200ResponseToJSONTyped=tr,e.RemoveSubgroupsFromGroup200ResponseFromJSON=rr,e.RemoveSubgroupsFromGroup200ResponseFromJSONTyped=or,e.RemoveSubgroupsFromGroup200ResponseToJSON=function(e){return ir(e,!1)},e.RemoveSubgroupsFromGroup200ResponseToJSONTyped=ir,e.ReportRunResponseFromJSON=ar,e.ReportRunResponseFromJSONTyped=sr,e.ReportRunResponseToJSON=function(e){return lr(e,!1)},e.ReportRunResponseToJSONTyped=lr,e.RunFormula200ResponseFromJSON=ur,e.RunFormula200ResponseFromJSONTyped=dr,e.RunFormula200ResponseToJSON=function(e){return pr(e,!1)},e.RunFormula200ResponseToJSONTyped=pr,e.RunFormulaRequestFromJSON=function(e){return cr(e)},e.RunFormulaRequestFromJSONTyped=cr,e.RunFormulaRequestToJSON=mr,e.RunFormulaRequestToJSONTyped=fr,e.RunQueryRequestFromJSON=function(e){return Nr(e)},e.RunQueryRequestFromJSONTyped=Nr,e.RunQueryRequestGroupByInnerFromJSON=yr,e.RunQueryRequestGroupByInnerFromJSONTyped=Rr,e.RunQueryRequestGroupByInnerGroupingEnum={EqualValues:"equal-values"},e.RunQueryRequestGroupByInnerToJSON=Tr,e.RunQueryRequestGroupByInnerToJSONTyped=hr,e.RunQueryRequestOptionsFromJSON=wr,e.RunQueryRequestOptionsFromJSONTyped=Ir,e.RunQueryRequestOptionsToJSON=vr,e.RunQueryRequestOptionsToJSONTyped=Sr,e.RunQueryRequestSortByInnerFromJSON=gr,e.RunQueryRequestSortByInnerFromJSONTyped=br,e.RunQueryRequestSortByInnerOrderEnum={Asc:"ASC",Desc:"DESC"},e.RunQueryRequestSortByInnerToJSON=Fr,e.RunQueryRequestSortByInnerToJSONTyped=Or,e.RunQueryRequestToJSON=qr,e.RunQueryRequestToJSONTyped=Jr,e.RunQueryResponseFieldsInnerFromJSON=Ur,e.RunQueryResponseFieldsInnerFromJSONTyped=Pr,e.RunQueryResponseFieldsInnerToJSON=Dr,e.RunQueryResponseFieldsInnerToJSONTyped=xr,e.RunQueryResponseFromJSON=Gr,e.RunQueryResponseFromJSONTyped=Mr,e.RunQueryResponseMetadataFromJSON=Ar,e.RunQueryResponseMetadataFromJSONTyped=kr,e.RunQueryResponseMetadataToJSON=Er,e.RunQueryResponseMetadataToJSONTyped=Cr,e.RunQueryResponseToJSON=function(e){return Br(e,!1)},e.RunQueryResponseToJSONTyped=Br,e.TableDefaultSortOrderEnum={Asc:"ASC",Desc:"DESC"},e.TableFromJSON=Lr,e.TableFromJSONTyped=Qr,e.TableToJSON=function(e){return jr(e,!1)},e.TableToJSONTyped=jr,e.TransferUserToken200ResponseFromJSON=Wr,e.TransferUserToken200ResponseFromJSONTyped=Vr,e.TransferUserToken200ResponseToJSON=function(e){return Kr(e,!1)},e.TransferUserToken200ResponseToJSONTyped=Kr,e.TransferUserTokenRequestFromJSON=function(e){return _r(e)},e.TransferUserTokenRequestFromJSONTyped=_r,e.TransferUserTokenRequestToJSON=zr,e.TransferUserTokenRequestToJSONTyped=$r,e.UndenyUsers200ResponseFromJSON=Hr,e.UndenyUsers200ResponseFromJSONTyped=Zr,e.UndenyUsers200ResponseToJSON=function(e){return Xr(e,!1)},e.UndenyUsers200ResponseToJSONTyped=Xr,e.UpdateRelationshipRequestFromJSON=function(e){return Yr(e)},e.UpdateRelationshipRequestFromJSONTyped=Yr,e.UpdateRelationshipRequestToJSON=eo,e.UpdateRelationshipRequestToJSONTyped=no,e.UpdateTableRequestFromJSON=function(e){return to(e)},e.UpdateTableRequestFromJSONTyped=to,e.UpdateTableRequestToJSON=ro,e.UpdateTableRequestToJSONTyped=oo,e.Upsert200ResponseDataInnerValueFromJSON=function(e){return mo(e)},e.Upsert200ResponseDataInnerValueFromJSONTyped=mo,e.Upsert200ResponseDataInnerValueToJSON=function(e){return fo(e,!1)},e.Upsert200ResponseDataInnerValueToJSONTyped=fo,e.Upsert200ResponseFromJSON=uo,e.Upsert200ResponseFromJSONTyped=po,e.Upsert200ResponseMetadataFromJSON=io,e.Upsert200ResponseMetadataFromJSONTyped=ao,e.Upsert200ResponseMetadataToJSON=so,e.Upsert200ResponseMetadataToJSONTyped=lo,e.Upsert200ResponseToJSON=function(e){return co(e,!1)},e.Upsert200ResponseToJSONTyped=co,e.Upsert207ResponseFromJSON=function(e){return wo(e)},e.Upsert207ResponseFromJSONTyped=wo,e.Upsert207ResponseMetadataFromJSON=yo,e.Upsert207ResponseMetadataFromJSONTyped=Ro,e.Upsert207ResponseMetadataToJSON=To,e.Upsert207ResponseMetadataToJSONTyped=ho,e.Upsert207ResponseToJSON=function(e){return Io(e,!1)},e.Upsert207ResponseToJSONTyped=Io,e.UpsertRequestFromJSON=function(e){return vo(e)},e.UpsertRequestFromJSONTyped=vo,e.UpsertRequestToJSON=So,e.UpsertRequestToJSONTyped=go,e.UsageCountFromJSON=bn,e.UsageCountFromJSONTyped=Fn,e.UsageCountToJSON=On,e.UsageCountToJSONTyped=Nn,e.instanceOfAddMembersToGroup200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfAddSubgroupsToGroup200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfApp=function(e){return"id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name)},e.instanceOfAppMemoryInfo=function(e){return!0},e.instanceOfAppSecurityProperties=function(e){return!0},e.instanceOfAudit200Response=function(e){return"queryId"in e&&void 0!==e.queryId},e.instanceOfAudit202Response=function(e){return"queryId"in e&&void 0!==e.queryId},e.instanceOfAuditRequest=function(e){return!0},e.instanceOfCloneUserToken200Response=function(e){return!0},e.instanceOfCloneUserTokenRequest=function(e){return!0},e.instanceOfCopyApp200Response=function(e){return"id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name)},e.instanceOfCopyAppRequest=function(e){return"name"in e&&void 0!==e.name},e.instanceOfCopyAppRequestProperties=function(e){return!0},e.instanceOfCreateApp200Response=function(e){return"id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name)},e.instanceOfCreateAppRequest=function(e){return"name"in e&&void 0!==e.name},e.instanceOfCreateAppRequestVariablesInner=function(e){return"name"in e&&void 0!==e.name&&("value"in e&&void 0!==e.value)},e.instanceOfCreateField200Response=function(e){return"id"in e&&void 0!==e.id&&("label"in e&&void 0!==e.label&&("fieldType"in e&&void 0!==e.fieldType))},e.instanceOfCreateFieldRequest=function(e){return"label"in e&&void 0!==e.label&&("fieldType"in e&&void 0!==e.fieldType)},e.instanceOfCreateRelationship200Response=function(e){return"id"in e&&void 0!==e.id&&("parentTableId"in e&&void 0!==e.parentTableId&&("childTableId"in e&&void 0!==e.childTableId&&("isCrossApp"in e&&void 0!==e.isCrossApp)))},e.instanceOfCreateRelationshipRequest=function(e){return"parentTableId"in e&&void 0!==e.parentTableId},e.instanceOfCreateTableRequest=function(e){return"name"in e&&void 0!==e.name},e.instanceOfDeactivateUserToken200Response=function(e){return!0},e.instanceOfDeleteApp200Response=function(e){return"deletedAppId"in e&&void 0!==e.deletedAppId},e.instanceOfDeleteAppRequest=function(e){return"name"in e&&void 0!==e.name},e.instanceOfDeleteFields200Response=function(e){return"deletedFieldIds"in e&&void 0!==e.deletedFieldIds&&("errors"in e&&void 0!==e.errors)},e.instanceOfDeleteFieldsRequest=function(e){return"fieldIds"in e&&void 0!==e.fieldIds},e.instanceOfDeleteFile200Response=function(e){return!0},e.instanceOfDeleteRecords200Response=function(e){return"numberDeleted"in e&&void 0!==e.numberDeleted},e.instanceOfDeleteRecordsRequest=function(e){return"from"in e&&void 0!==e.from&&("where"in e&&void 0!==e.where)},e.instanceOfDeleteRelationship200Response=function(e){return"relationshipId"in e&&void 0!==e.relationshipId},e.instanceOfDeleteTableResponse=function(e){return!0},e.instanceOfDenyUsers200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfExchangeSsoToken200Response=function(e){return!0},e.instanceOfExchangeSsoTokenRequest=function(e){return"grantType"in e&&void 0!==e.grantType&&("requestedTokenType"in e&&void 0!==e.requestedTokenType&&("subjectToken"in e&&void 0!==e.subjectToken&&("subjectTokenType"in e&&void 0!==e.subjectTokenType)))},e.instanceOfField=function(e){return"id"in e&&void 0!==e.id&&("label"in e&&void 0!==e.label&&("fieldType"in e&&void 0!==e.fieldType))},e.instanceOfFieldPermissionsInner=function(e){return!0},e.instanceOfFieldProperties=function(e){return!0},e.instanceOfFieldUsage=function(e){return"field"in e&&void 0!==e.field&&("usage"in e&&void 0!==e.usage)},e.instanceOfFieldUsageField=function(e){return"id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name&&("type"in e&&void 0!==e.type))},e.instanceOfFieldUsageUsage=function(e){return"actions"in e&&void 0!==e.actions&&("appHomePages"in e&&void 0!==e.appHomePages&&("dashboards"in e&&void 0!==e.dashboards&&("defaultReports"in e&&void 0!==e.defaultReports&&("exactForms"in e&&void 0!==e.exactForms&&("fields"in e&&void 0!==e.fields&&("forms"in e&&void 0!==e.forms&&("notifications"in e&&void 0!==e.notifications&&("personalReports"in e&&void 0!==e.personalReports&&("pipelines"in e&&void 0!==e.pipelines&&("relationships"in e&&void 0!==e.relationships&&("reminders"in e&&void 0!==e.reminders&&("reports"in e&&void 0!==e.reports&&("roles"in e&&void 0!==e.roles&&("tableImports"in e&&void 0!==e.tableImports&&("tableRules"in e&&void 0!==e.tableRules&&("webhooks"in e&&void 0!==e.webhooks))))))))))))))))},e.instanceOfGenerateDocument200Response=function(e){return!0},e.instanceOfGetRelationships200Response=function(e){return"metadata"in e&&void 0!==e.metadata&&("relationships"in e&&void 0!==e.relationships)},e.instanceOfGetRelationships200ResponseMetadata=function(e){return"numRelationships"in e&&void 0!==e.numRelationships&&("skip"in e&&void 0!==e.skip&&("totalRelationships"in e&&void 0!==e.totalRelationships))},e.instanceOfGetReport200Response=function(e){return!0},e.instanceOfGetTempTokenDBID200Response=function(e){return"temporaryAuthorization"in e&&void 0!==e.temporaryAuthorization},e.instanceOfGetUsers200Response=function(e){return"users"in e&&void 0!==e.users&&("metadata"in e&&void 0!==e.metadata)},e.instanceOfGetUsersRequest=function(e){return!0},e.instanceOfPlatformAnalyticEventSummaries200Response=function(e){return"accountId"in e&&void 0!==e.accountId&&("start"in e&&void 0!==e.start&&("end"in e&&void 0!==e.end&&("groupBy"in e&&void 0!==e.groupBy&&("where"in e&&void 0!==e.where&&("results"in e&&void 0!==e.results)))))},e.instanceOfPlatformAnalyticEventSummaries200ResponseMetadata=function(e){return"nextToken"in e&&void 0!==e.nextToken},e.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner=function(e){return"eventTypes"in e&&void 0!==e.eventTypes&&("id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name&&("totals"in e&&void 0!==e.totals)))},e.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner=function(e){return!0},e.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals=function(e){return!0},e.instanceOfPlatformAnalyticEventSummaries200ResponseTotals=function(e){return!0},e.instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner=function(e){return"id"in e&&void 0!==e.id&&("type"in e&&void 0!==e.type)},e.instanceOfPlatformAnalyticEventSummariesRequest=function(e){return"start"in e&&void 0!==e.start&&("end"in e&&void 0!==e.end&&("groupBy"in e&&void 0!==e.groupBy))},e.instanceOfPlatformAnalyticEventSummariesRequestWhereInner=function(e){return"id"in e&&void 0!==e.id&&("type"in e&&void 0!==e.type)},e.instanceOfPlatformAnalyticReads200Response=function(e){return"date"in e&&void 0!==e.date&&("reads"in e&&void 0!==e.reads)},e.instanceOfRecord=function(e){return!0},e.instanceOfRecordValue=function(e){return"value"in e&&void 0!==e.value},e.instanceOfRelationship=function(e){return"id"in e&&void 0!==e.id&&("parentTableId"in e&&void 0!==e.parentTableId&&("childTableId"in e&&void 0!==e.childTableId&&("foreignKeyField"in e&&void 0!==e.foreignKeyField&&("isCrossApp"in e&&void 0!==e.isCrossApp))))},e.instanceOfRelationshipField=function(e){return"id"in e&&void 0!==e.id&&("label"in e&&void 0!==e.label&&("type"in e&&void 0!==e.type))},e.instanceOfRemoveMembersFromGroup200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfRemoveSubgroupsFromGroup200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfReportRunResponse=function(e){return!0},e.instanceOfRunFormula200Response=function(e){return!0},e.instanceOfRunFormulaRequest=function(e){return"formula"in e&&void 0!==e.formula&&("from"in e&&void 0!==e.from)},e.instanceOfRunQueryRequest=function(e){return"from"in e&&void 0!==e.from},e.instanceOfRunQueryRequestGroupByInner=function(e){return!0},e.instanceOfRunQueryRequestOptions=function(e){return!0},e.instanceOfRunQueryRequestSortByInner=function(e){return!0},e.instanceOfRunQueryResponse=function(e){return!0},e.instanceOfRunQueryResponseFieldsInner=function(e){return!0},e.instanceOfRunQueryResponseMetadata=function(e){return!0},e.instanceOfTable=function(e){return"id"in e&&void 0!==e.id&&("name"in e&&void 0!==e.name)},e.instanceOfTransferUserToken200Response=function(e){return!0},e.instanceOfTransferUserTokenRequest=function(e){return!0},e.instanceOfUndenyUsers200Response=function(e){return"failure"in e&&void 0!==e.failure&&("success"in e&&void 0!==e.success)},e.instanceOfUpdateRelationshipRequest=function(e){return!0},e.instanceOfUpdateTableRequest=function(e){return!0},e.instanceOfUpsert200Response=function(e){return!0},e.instanceOfUpsert200ResponseDataInnerValue=function(e){return"value"in e&&void 0!==e.value},e.instanceOfUpsert200ResponseMetadata=function(e){return"totalNumberOfRecordsProcessed"in e&&void 0!==e.totalNumberOfRecordsProcessed},e.instanceOfUpsert207Response=function(e){return!0},e.instanceOfUpsert207ResponseMetadata=function(e){return"totalNumberOfRecordsProcessed"in e&&void 0!==e.totalNumberOfRecordsProcessed},e.instanceOfUpsertRequest=function(e){return"to"in e&&void 0!==e.to},e.instanceOfUsageCount=function(e){return!0},e.quickbase=function(e){const{realm:n,userToken:r,tempToken:o,useTempTokens:a,fetchApi:s,debug:l}=e,u=new Fo,d={"QB-Realm-Hostname":`${n}.quickbase.com`,"Content-Type":"application/json"};o?d.Authorization=`QB-TEMP-TOKEN ${o}`:r&&!a&&(d.Authorization=`QB-USER-TOKEN ${r}`);const p=void 0!==globalThis.window?globalThis.window.fetch.bind(globalThis.window):void 0,c=new t({basePath:"https://api.quickbase.com/v1",headers:{...d},fetchApi:s||p,credentials:a?"include":"omit"});if(!c.fetchApi&&void 0===globalThis.window)throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");const m=Object.fromEntries(Object.entries(bo).filter((([e])=>e.endsWith("Api"))).map((([e,n])=>[e.replace("Api","").toLowerCase(),new n(c)]))),f=function(){const e={},n=e=>!e.startsWith("_")&&"constructor"!==e&&!["Middleware","Pre","Post","Raw"].some((n=>e.includes(n)));for(const[t,r]of Object.entries(m))Object.getOwnPropertyNames(Object.getPrototypeOf(r)).filter((e=>n(e)&&"function"==typeof r[e])).forEach((n=>{const t=n.replace(/ById$/,"").replace(/Api$/,"").replace(/^(\w)/,((e,n)=>n.toLowerCase()));const o=r[n],i=o.bind(r);var a;"function"==typeof i&&i.length<=2&&(e[t]={api:r,method:i,paramMap:(a=o,a.toString().slice(a.toString().indexOf("(")+1,a.toString().indexOf(")")).split(",").map((e=>e.trim().split("=")[0].trim())).filter((e=>e&&!e.match(/^\{/)&&"options"!==e)))})}));return e}(),y=async e=>{const n=s||p;if(!n)throw new Error("No fetch implementation available for fetching temp token");const t=await n(`https://api.quickbase.com/v1/auth/temporary/${e}`,{method:"GET",headers:{...d},credentials:"include"});if(!t.ok){const e=await t.json();throw new Error(`API Error: ${e.message||"Unknown error"} (Status: ${t.status})`)}const r=(await t.json()).temporaryAuthorization;if(!r)throw new Error("No temporary token returned from API");return u.set(e,r),l&&console.log(`Fetched and cached new token for dbid: ${e}`,r,`Expires at: ${new Date(Date.now()+29e4).toISOString()}`),r};async function R(e,n,t=0){const s=f[e];if(!s)throw new Error(`Method ${e} not found`);const p=1===s.paramMap.length&&"requestParameters"===s.paramMap[0]?{requestParameters:n}:n;let c={};const m=o||(r&&!a?r:void 0);if("getTempTokenDBID"===e&&a){const e=Oo(n,"No dbid provided for getTempTokenDBID"),t=u.get(e);if(t)return{temporaryAuthorization:t}}let T=m;if(a&&!T){const t=Oo(n,`No dbid found in params for ${e} to fetch temp token`);if(T=u.get(t)||await y(t),"getTempTokenDBID"===e)return{temporaryAuthorization:T};c.headers={...d,Authorization:`QB-TEMP-TOKEN ${T}`}}else T&&(c.headers={...d,Authorization:`QB-USER-TOKEN ${T}`});try{return await s.method(p,c)}catch(r){if(r instanceof i&&401===r.response.status&&t<1&&a){l&&console.log(`Authorization error for ${e}, refreshing token:`,r.message);const o=Oo(n,"No dbid to refresh token after authorization error");return T=await y(o),c.headers={...d,Authorization:`QB-TEMP-TOKEN ${T}`},l&&console.log(`Retrying ${e} with new token`),R(e,n,t+1)}if(r instanceof i){let n=r.message;try{const t=await r.response.json();l&&console.log(`Error response body for ${e}:`,t),n=t.message||n}catch(e){}throw new Error(`API Error: ${n} (Status: ${r.response.status})`)}throw r}}return new Proxy({},{get:(e,n)=>{if(n in f){const e=n;return n=>R(e,n)}}})}}));
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.QuickbaseJS = {}));
+})(this, (function (exports) { 'use strict';
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    const BASE_PATH = "https://api.quickbase.com/v1".replace(/\/+$/, "");
+    class Configuration {
+        configuration;
+        constructor(configuration = {}) {
+            this.configuration = configuration;
+        }
+        set config(configuration) {
+            this.configuration = configuration;
+        }
+        get basePath() {
+            return this.configuration.basePath != null ? this.configuration.basePath : BASE_PATH;
+        }
+        get fetchApi() {
+            return this.configuration.fetchApi;
+        }
+        get middleware() {
+            return this.configuration.middleware || [];
+        }
+        get queryParamsStringify() {
+            return this.configuration.queryParamsStringify || querystring;
+        }
+        get username() {
+            return this.configuration.username;
+        }
+        get password() {
+            return this.configuration.password;
+        }
+        get apiKey() {
+            const apiKey = this.configuration.apiKey;
+            if (apiKey) {
+                return typeof apiKey === 'function' ? apiKey : () => apiKey;
+            }
+            return undefined;
+        }
+        get accessToken() {
+            const accessToken = this.configuration.accessToken;
+            if (accessToken) {
+                return typeof accessToken === 'function' ? accessToken : async () => accessToken;
+            }
+            return undefined;
+        }
+        get headers() {
+            return this.configuration.headers;
+        }
+        get credentials() {
+            return this.configuration.credentials;
+        }
+    }
+    const DefaultConfig = new Configuration();
+    /**
+     * This is the base class for all generated API classes.
+     */
+    class BaseAPI {
+        configuration;
+        static jsonRegex = new RegExp('^(:?application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$', 'i');
+        middleware;
+        constructor(configuration = DefaultConfig) {
+            this.configuration = configuration;
+            this.middleware = configuration.middleware;
+        }
+        withMiddleware(...middlewares) {
+            const next = this.clone();
+            next.middleware = next.middleware.concat(...middlewares);
+            return next;
+        }
+        withPreMiddleware(...preMiddlewares) {
+            const middlewares = preMiddlewares.map((pre) => ({ pre }));
+            return this.withMiddleware(...middlewares);
+        }
+        withPostMiddleware(...postMiddlewares) {
+            const middlewares = postMiddlewares.map((post) => ({ post }));
+            return this.withMiddleware(...middlewares);
+        }
+        /**
+         * Check if the given MIME is a JSON MIME.
+         * JSON MIME examples:
+         *   application/json
+         *   application/json; charset=UTF8
+         *   APPLICATION/JSON
+         *   application/vnd.company+json
+         * @param mime - MIME (Multipurpose Internet Mail Extensions)
+         * @return True if the given MIME is JSON, false otherwise.
+         */
+        isJsonMime(mime) {
+            if (!mime) {
+                return false;
+            }
+            return BaseAPI.jsonRegex.test(mime);
+        }
+        async request(context, initOverrides) {
+            const { url, init } = await this.createFetchParams(context, initOverrides);
+            const response = await this.fetchApi(url, init);
+            if (response && (response.status >= 200 && response.status < 300)) {
+                return response;
+            }
+            throw new ResponseError(response, 'Response returned an error code');
+        }
+        async createFetchParams(context, initOverrides) {
+            let url = this.configuration.basePath + context.path;
+            if (context.query !== undefined && Object.keys(context.query).length !== 0) {
+                // only add the querystring to the URL if there are query parameters.
+                // this is done to avoid urls ending with a "?" character which buggy webservers
+                // do not handle correctly sometimes.
+                url += '?' + this.configuration.queryParamsStringify(context.query);
+            }
+            const headers = Object.assign({}, this.configuration.headers, context.headers);
+            Object.keys(headers).forEach(key => headers[key] === undefined ? delete headers[key] : {});
+            const initOverrideFn = typeof initOverrides === "function"
+                ? initOverrides
+                : async () => initOverrides;
+            const initParams = {
+                method: context.method,
+                headers,
+                body: context.body,
+                credentials: this.configuration.credentials,
+            };
+            const overriddenInit = {
+                ...initParams,
+                ...(await initOverrideFn({
+                    init: initParams,
+                    context,
+                }))
+            };
+            let body;
+            if (isFormData(overriddenInit.body)
+                || (overriddenInit.body instanceof URLSearchParams)
+                || isBlob(overriddenInit.body)) {
+                body = overriddenInit.body;
+            }
+            else if (this.isJsonMime(headers['Content-Type'])) {
+                body = JSON.stringify(overriddenInit.body);
+            }
+            else {
+                body = overriddenInit.body;
+            }
+            const init = {
+                ...overriddenInit,
+                body
+            };
+            return { url, init };
+        }
+        fetchApi = async (url, init) => {
+            let fetchParams = { url, init };
+            for (const middleware of this.middleware) {
+                if (middleware.pre) {
+                    fetchParams = await middleware.pre({
+                        fetch: this.fetchApi,
+                        ...fetchParams,
+                    }) || fetchParams;
+                }
+            }
+            let response = undefined;
+            try {
+                response = await (this.configuration.fetchApi || fetch)(fetchParams.url, fetchParams.init);
+            }
+            catch (e) {
+                for (const middleware of this.middleware) {
+                    if (middleware.onError) {
+                        response = await middleware.onError({
+                            fetch: this.fetchApi,
+                            url: fetchParams.url,
+                            init: fetchParams.init,
+                            error: e,
+                            response: response ? response.clone() : undefined,
+                        }) || response;
+                    }
+                }
+                if (response === undefined) {
+                    if (e instanceof Error) {
+                        throw new FetchError(e, 'The request failed and the interceptors did not return an alternative response');
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+            }
+            for (const middleware of this.middleware) {
+                if (middleware.post) {
+                    response = await middleware.post({
+                        fetch: this.fetchApi,
+                        url: fetchParams.url,
+                        init: fetchParams.init,
+                        response: response.clone(),
+                    }) || response;
+                }
+            }
+            return response;
+        };
+        /**
+         * Create a shallow clone of `this` by constructing a new instance
+         * and then shallow cloning data members.
+         */
+        clone() {
+            const constructor = this.constructor;
+            const next = new constructor(this.configuration);
+            next.middleware = this.middleware.slice();
+            return next;
+        }
+    }
+    function isBlob(value) {
+        return typeof Blob !== 'undefined' && value instanceof Blob;
+    }
+    function isFormData(value) {
+        return typeof FormData !== "undefined" && value instanceof FormData;
+    }
+    class ResponseError extends Error {
+        response;
+        name = "ResponseError";
+        constructor(response, msg) {
+            super(msg);
+            this.response = response;
+        }
+    }
+    class FetchError extends Error {
+        cause;
+        name = "FetchError";
+        constructor(cause, msg) {
+            super(msg);
+            this.cause = cause;
+        }
+    }
+    class RequiredError extends Error {
+        field;
+        name = "RequiredError";
+        constructor(field, msg) {
+            super(msg);
+            this.field = field;
+        }
+    }
+    function querystring(params, prefix = '') {
+        return Object.keys(params)
+            .map(key => querystringSingleKey(key, params[key], prefix))
+            .filter(part => part.length > 0)
+            .join('&');
+    }
+    function querystringSingleKey(key, value, keyPrefix = '') {
+        const fullKey = keyPrefix + (keyPrefix.length ? `[${key}]` : key);
+        if (value instanceof Array) {
+            const multiValue = value.map(singleValue => encodeURIComponent(String(singleValue)))
+                .join(`&${encodeURIComponent(fullKey)}=`);
+            return `${encodeURIComponent(fullKey)}=${multiValue}`;
+        }
+        if (value instanceof Set) {
+            const valueAsArray = Array.from(value);
+            return querystringSingleKey(key, valueAsArray, keyPrefix);
+        }
+        if (value instanceof Date) {
+            return `${encodeURIComponent(fullKey)}=${encodeURIComponent(value.toISOString())}`;
+        }
+        if (value instanceof Object) {
+            return querystring(value, fullKey);
+        }
+        return `${encodeURIComponent(fullKey)}=${encodeURIComponent(String(value))}`;
+    }
+    class JSONApiResponse {
+        raw;
+        transformer;
+        constructor(raw, transformer = (jsonValue) => jsonValue) {
+            this.raw = raw;
+            this.transformer = transformer;
+        }
+        async value() {
+            return this.transformer(await this.raw.json());
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the AddMembersToGroup200Response interface.
+     */
+    function instanceOfAddMembersToGroup200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function AddMembersToGroup200ResponseFromJSON(json) {
+        return AddMembersToGroup200ResponseFromJSONTyped(json);
+    }
+    function AddMembersToGroup200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function AddMembersToGroup200ResponseToJSON(json) {
+        return AddMembersToGroup200ResponseToJSONTyped(json, false);
+    }
+    function AddMembersToGroup200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the AddSubgroupsToGroup200Response interface.
+     */
+    function instanceOfAddSubgroupsToGroup200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function AddSubgroupsToGroup200ResponseFromJSON(json) {
+        return AddSubgroupsToGroup200ResponseFromJSONTyped(json);
+    }
+    function AddSubgroupsToGroup200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function AddSubgroupsToGroup200ResponseToJSON(json) {
+        return AddSubgroupsToGroup200ResponseToJSONTyped(json, false);
+    }
+    function AddSubgroupsToGroup200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the AppMemoryInfo interface.
+     */
+    function instanceOfAppMemoryInfo(value) {
+        return true;
+    }
+    function AppMemoryInfoFromJSON(json) {
+        return AppMemoryInfoFromJSONTyped(json);
+    }
+    function AppMemoryInfoFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'estMemory': json['estMemory'] == null ? undefined : json['estMemory'],
+            'estMemoryInclDependentApps': json['estMemoryInclDependentApps'] == null ? undefined : json['estMemoryInclDependentApps'],
+        };
+    }
+    function AppMemoryInfoToJSON(json) {
+        return AppMemoryInfoToJSONTyped(json, false);
+    }
+    function AppMemoryInfoToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'estMemory': value['estMemory'],
+            'estMemoryInclDependentApps': value['estMemoryInclDependentApps'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the AppSecurityProperties interface.
+     */
+    function instanceOfAppSecurityProperties(value) {
+        return true;
+    }
+    function AppSecurityPropertiesFromJSON(json) {
+        return AppSecurityPropertiesFromJSONTyped(json);
+    }
+    function AppSecurityPropertiesFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'allowClone': json['allowClone'] == null ? undefined : json['allowClone'],
+            'allowExport': json['allowExport'] == null ? undefined : json['allowExport'],
+            'enableAppTokens': json['enableAppTokens'] == null ? undefined : json['enableAppTokens'],
+            'hideFromPublic': json['hideFromPublic'] == null ? undefined : json['hideFromPublic'],
+            'mustBeRealmApproved': json['mustBeRealmApproved'] == null ? undefined : json['mustBeRealmApproved'],
+            'useIPFilter': json['useIPFilter'] == null ? undefined : json['useIPFilter'],
+        };
+    }
+    function AppSecurityPropertiesToJSON(json) {
+        return AppSecurityPropertiesToJSONTyped(json, false);
+    }
+    function AppSecurityPropertiesToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'allowClone': value['allowClone'],
+            'allowExport': value['allowExport'],
+            'enableAppTokens': value['enableAppTokens'],
+            'hideFromPublic': value['hideFromPublic'],
+            'mustBeRealmApproved': value['mustBeRealmApproved'],
+            'useIPFilter': value['useIPFilter'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the App interface.
+     */
+    function instanceOfApp(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function AppFromJSON(json) {
+        return AppFromJSONTyped(json);
+    }
+    function AppFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'name': json['name'],
+            'created': json['created'] == null ? undefined : (new Date(json['created'])),
+            'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
+            'description': json['description'] == null ? undefined : json['description'],
+            'timeZone': json['timeZone'] == null ? undefined : json['timeZone'],
+            'dateFormat': json['dateFormat'] == null ? undefined : json['dateFormat'],
+            'hasEveryoneOnTheInternet': json['hasEveryoneOnTheInternet'] == null ? undefined : json['hasEveryoneOnTheInternet'],
+            'memoryInfo': json['memoryInfo'] == null ? undefined : AppMemoryInfoFromJSON(json['memoryInfo']),
+            'securityProperties': json['securityProperties'] == null ? undefined : AppSecurityPropertiesFromJSON(json['securityProperties']),
+        };
+    }
+    function AppToJSON(json) {
+        return AppToJSONTyped(json, false);
+    }
+    function AppToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
+            'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
+            'description': value['description'],
+            'timeZone': value['timeZone'],
+            'dateFormat': value['dateFormat'],
+            'hasEveryoneOnTheInternet': value['hasEveryoneOnTheInternet'],
+            'memoryInfo': AppMemoryInfoToJSON(value['memoryInfo']),
+            'securityProperties': AppSecurityPropertiesToJSON(value['securityProperties']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Audit200Response interface.
+     */
+    function instanceOfAudit200Response(value) {
+        if (!('queryId' in value) || value['queryId'] === undefined)
+            return false;
+        return true;
+    }
+    function Audit200ResponseFromJSON(json) {
+        return Audit200ResponseFromJSONTyped(json);
+    }
+    function Audit200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'queryId': json['queryId'],
+            'events': json['events'] == null ? undefined : json['events'],
+            'nextToken': json['nextToken'] == null ? undefined : json['nextToken'],
+        };
+    }
+    function Audit200ResponseToJSON(json) {
+        return Audit200ResponseToJSONTyped(json, false);
+    }
+    function Audit200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'queryId': value['queryId'],
+            'events': value['events'],
+            'nextToken': value['nextToken'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Audit202Response interface.
+     */
+    function instanceOfAudit202Response(value) {
+        if (!('queryId' in value) || value['queryId'] === undefined)
+            return false;
+        return true;
+    }
+    function Audit202ResponseFromJSON(json) {
+        return Audit202ResponseFromJSONTyped(json);
+    }
+    function Audit202ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'queryId': json['queryId'],
+        };
+    }
+    function Audit202ResponseToJSON(json) {
+        return Audit202ResponseToJSONTyped(json, false);
+    }
+    function Audit202ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'queryId': value['queryId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the AuditRequest interface.
+     */
+    function instanceOfAuditRequest(value) {
+        return true;
+    }
+    function AuditRequestFromJSON(json) {
+        return AuditRequestFromJSONTyped(json);
+    }
+    function AuditRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'nextToken': json['nextToken'] == null ? undefined : json['nextToken'],
+            'numRows': json['numRows'] == null ? undefined : json['numRows'],
+            'queryId': json['queryId'] == null ? undefined : json['queryId'],
+            'date': json['date'] == null ? undefined : (new Date(json['date'])),
+            'topics': json['topics'] == null ? undefined : json['topics'],
+        };
+    }
+    function AuditRequestToJSON(json) {
+        return AuditRequestToJSONTyped(json, false);
+    }
+    function AuditRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'nextToken': value['nextToken'],
+            'numRows': value['numRows'],
+            'queryId': value['queryId'],
+            'date': value['date'] == null ? undefined : ((value['date']).toISOString().substring(0, 10)),
+            'topics': value['topics'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CloneUserToken200Response interface.
+     */
+    function instanceOfCloneUserToken200Response(value) {
+        return true;
+    }
+    function CloneUserToken200ResponseFromJSON(json) {
+        return CloneUserToken200ResponseFromJSONTyped(json);
+    }
+    function CloneUserToken200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'active': json['active'] == null ? undefined : json['active'],
+            'apps': json['apps'] == null ? undefined : json['apps'],
+            'lastUsed': json['lastUsed'] == null ? undefined : json['lastUsed'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'id': json['id'] == null ? undefined : json['id'],
+            'name': json['name'] == null ? undefined : json['name'],
+            'token': json['token'] == null ? undefined : json['token'],
+        };
+    }
+    function CloneUserToken200ResponseToJSON(json) {
+        return CloneUserToken200ResponseToJSONTyped(json, false);
+    }
+    function CloneUserToken200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'active': value['active'],
+            'apps': value['apps'],
+            'lastUsed': value['lastUsed'],
+            'description': value['description'],
+            'id': value['id'],
+            'name': value['name'],
+            'token': value['token'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CloneUserTokenRequest interface.
+     */
+    function instanceOfCloneUserTokenRequest(value) {
+        return true;
+    }
+    function CloneUserTokenRequestFromJSON(json) {
+        return CloneUserTokenRequestFromJSONTyped(json);
+    }
+    function CloneUserTokenRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'] == null ? undefined : json['name'],
+            'description': json['description'] == null ? undefined : json['description'],
+        };
+    }
+    function CloneUserTokenRequestToJSON(json) {
+        return CloneUserTokenRequestToJSONTyped(json, false);
+    }
+    function CloneUserTokenRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'description': value['description'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateAppRequestVariablesInner interface.
+     */
+    function instanceOfCreateAppRequestVariablesInner(value) {
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        if (!('value' in value) || value['value'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateAppRequestVariablesInnerFromJSON(json) {
+        return CreateAppRequestVariablesInnerFromJSONTyped(json);
+    }
+    function CreateAppRequestVariablesInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'],
+            'value': json['value'],
+        };
+    }
+    function CreateAppRequestVariablesInnerToJSON(json) {
+        return CreateAppRequestVariablesInnerToJSONTyped(json, false);
+    }
+    function CreateAppRequestVariablesInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'value': value['value'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CopyApp200Response interface.
+     */
+    function instanceOfCopyApp200Response(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function CopyApp200ResponseFromJSON(json) {
+        return CopyApp200ResponseFromJSONTyped(json);
+    }
+    function CopyApp200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'name': json['name'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'created': json['created'] == null ? undefined : (new Date(json['created'])),
+            'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
+            'dateFormat': json['dateFormat'] == null ? undefined : json['dateFormat'],
+            'timeZone': json['timeZone'] == null ? undefined : json['timeZone'],
+            'hasEveryoneOnTheInternet': json['hasEveryoneOnTheInternet'] == null ? undefined : json['hasEveryoneOnTheInternet'],
+            'variables': json['variables'] == null ? undefined : (json['variables'].map(CreateAppRequestVariablesInnerFromJSON)),
+            'ancestorId': json['ancestorId'] == null ? undefined : json['ancestorId'],
+            'dataClassification': json['dataClassification'] == null ? undefined : json['dataClassification'],
+        };
+    }
+    function CopyApp200ResponseToJSON(json) {
+        return CopyApp200ResponseToJSONTyped(json, false);
+    }
+    function CopyApp200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'description': value['description'],
+            'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
+            'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
+            'dateFormat': value['dateFormat'],
+            'timeZone': value['timeZone'],
+            'hasEveryoneOnTheInternet': value['hasEveryoneOnTheInternet'],
+            'variables': value['variables'] == null ? undefined : (value['variables'].map(CreateAppRequestVariablesInnerToJSON)),
+            'ancestorId': value['ancestorId'],
+            'dataClassification': value['dataClassification'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CopyAppRequestProperties interface.
+     */
+    function instanceOfCopyAppRequestProperties(value) {
+        return true;
+    }
+    function CopyAppRequestPropertiesFromJSON(json) {
+        return CopyAppRequestPropertiesFromJSONTyped(json);
+    }
+    function CopyAppRequestPropertiesFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'keepData': json['keepData'] == null ? undefined : json['keepData'],
+            'excludeFiles': json['excludeFiles'] == null ? undefined : json['excludeFiles'],
+            'usersAndRoles': json['usersAndRoles'] == null ? undefined : json['usersAndRoles'],
+            'assignUserToken': json['assignUserToken'] == null ? undefined : json['assignUserToken'],
+        };
+    }
+    function CopyAppRequestPropertiesToJSON(json) {
+        return CopyAppRequestPropertiesToJSONTyped(json, false);
+    }
+    function CopyAppRequestPropertiesToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'keepData': value['keepData'],
+            'excludeFiles': value['excludeFiles'],
+            'usersAndRoles': value['usersAndRoles'],
+            'assignUserToken': value['assignUserToken'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CopyAppRequest interface.
+     */
+    function instanceOfCopyAppRequest(value) {
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function CopyAppRequestFromJSON(json) {
+        return CopyAppRequestFromJSONTyped(json);
+    }
+    function CopyAppRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'properties': json['properties'] == null ? undefined : CopyAppRequestPropertiesFromJSON(json['properties']),
+        };
+    }
+    function CopyAppRequestToJSON(json) {
+        return CopyAppRequestToJSONTyped(json, false);
+    }
+    function CopyAppRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'description': value['description'],
+            'properties': CopyAppRequestPropertiesToJSON(value['properties']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateApp200Response interface.
+     */
+    function instanceOfCreateApp200Response(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateApp200ResponseFromJSON(json) {
+        return CreateApp200ResponseFromJSONTyped(json);
+    }
+    function CreateApp200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'name': json['name'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'created': json['created'] == null ? undefined : (new Date(json['created'])),
+            'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
+            'dateFormat': json['dateFormat'] == null ? undefined : json['dateFormat'],
+            'timeZone': json['timeZone'] == null ? undefined : json['timeZone'],
+            'memoryInfo': json['memoryInfo'] == null ? undefined : AppMemoryInfoFromJSON(json['memoryInfo']),
+            'hasEveryoneOnTheInternet': json['hasEveryoneOnTheInternet'] == null ? undefined : json['hasEveryoneOnTheInternet'],
+            'variables': json['variables'] == null ? undefined : (json['variables'].map(CreateAppRequestVariablesInnerFromJSON)),
+            'dataClassification': json['dataClassification'] == null ? undefined : json['dataClassification'],
+            'securityProperties': json['securityProperties'] == null ? undefined : AppSecurityPropertiesFromJSON(json['securityProperties']),
+        };
+    }
+    function CreateApp200ResponseToJSON(json) {
+        return CreateApp200ResponseToJSONTyped(json, false);
+    }
+    function CreateApp200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'description': value['description'],
+            'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
+            'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
+            'dateFormat': value['dateFormat'],
+            'timeZone': value['timeZone'],
+            'memoryInfo': AppMemoryInfoToJSON(value['memoryInfo']),
+            'hasEveryoneOnTheInternet': value['hasEveryoneOnTheInternet'],
+            'variables': value['variables'] == null ? undefined : (value['variables'].map(CreateAppRequestVariablesInnerToJSON)),
+            'dataClassification': value['dataClassification'],
+            'securityProperties': AppSecurityPropertiesToJSON(value['securityProperties']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateAppRequest interface.
+     */
+    function instanceOfCreateAppRequest(value) {
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateAppRequestFromJSON(json) {
+        return CreateAppRequestFromJSONTyped(json);
+    }
+    function CreateAppRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'],
+            'assignToken': json['assignToken'] == null ? undefined : json['assignToken'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'securityProperties': json['securityProperties'] == null ? undefined : AppSecurityPropertiesFromJSON(json['securityProperties']),
+            'variables': json['variables'] == null ? undefined : (json['variables'].map(CreateAppRequestVariablesInnerFromJSON)),
+        };
+    }
+    function CreateAppRequestToJSON(json) {
+        return CreateAppRequestToJSONTyped(json, false);
+    }
+    function CreateAppRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'assignToken': value['assignToken'],
+            'description': value['description'],
+            'securityProperties': AppSecurityPropertiesToJSON(value['securityProperties']),
+            'variables': value['variables'] == null ? undefined : (value['variables'].map(CreateAppRequestVariablesInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const FieldPropertiesOpenTargetInEnum = {
+        SameWindow: 'sameWindow',
+        NewWindow: 'newWindow',
+        Popup: 'popup'
+    };
+    /**
+     * @export
+     */
+    const FieldPropertiesCurrencyFormatEnum = {
+        Left: 'left',
+        Right: 'right',
+        Middle: 'middle'
+    };
+    /**
+     * @export
+     */
+    const FieldPropertiesVersionModeEnum = {
+        Keepallversions: 'keepallversions',
+        Keeplastversions: 'keeplastversions'
+    };
+    /**
+     * @export
+     */
+    const FieldPropertiesSummaryFunctionEnum = {
+        Avg: 'AVG',
+        Sum: 'SUM',
+        Max: 'MAX',
+        Min: 'MIN',
+        StdDev: 'STD-DEV',
+        Count: 'COUNT',
+        CombinedText: 'COMBINED-TEXT',
+        CombinedUser: 'COMBINED-USER',
+        DistinctCount: 'DISTINCT-COUNT'
+    };
+    /**
+     * Check if a given object implements the FieldProperties interface.
+     */
+    function instanceOfFieldProperties(value) {
+        return true;
+    }
+    function FieldPropertiesFromJSON(json) {
+        return FieldPropertiesFromJSONTyped(json);
+    }
+    function FieldPropertiesFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'primaryKey': json['primaryKey'] == null ? undefined : json['primaryKey'],
+            'foreignKey': json['foreignKey'] == null ? undefined : json['foreignKey'],
+            'numLines': json['numLines'] == null ? undefined : json['numLines'],
+            'maxLength': json['maxLength'] == null ? undefined : json['maxLength'],
+            'appendOnly': json['appendOnly'] == null ? undefined : json['appendOnly'],
+            'allowHTML': json['allowHTML'] == null ? undefined : json['allowHTML'],
+            'allowMentions': json['allowMentions'] == null ? undefined : json['allowMentions'],
+            'sortAsGiven': json['sortAsGiven'] == null ? undefined : json['sortAsGiven'],
+            'carryChoices': json['carryChoices'] == null ? undefined : json['carryChoices'],
+            'allowNewChoices': json['allowNewChoices'] == null ? undefined : json['allowNewChoices'],
+            'formula': json['formula'] == null ? undefined : json['formula'],
+            'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
+            'doesTotal': json['doesTotal'] == null ? undefined : json['doesTotal'],
+            'autoSave': json['autoSave'] == null ? undefined : json['autoSave'],
+            'defaultValueLuid': json['defaultValueLuid'] == null ? undefined : json['defaultValueLuid'],
+            'useI18NFormat': json['useI18NFormat'] == null ? undefined : json['useI18NFormat'],
+            'maxVersions': json['maxVersions'] == null ? undefined : json['maxVersions'],
+            'format': json['format'] == null ? undefined : json['format'],
+            'linkText': json['linkText'] == null ? undefined : json['linkText'],
+            'parentFieldId': json['parentFieldId'] == null ? undefined : json['parentFieldId'],
+            'displayTimezone': json['displayTimezone'] == null ? undefined : json['displayTimezone'],
+            'defaultToday': json['defaultToday'] == null ? undefined : json['defaultToday'],
+            'units': json['units'] == null ? undefined : json['units'],
+            'openTargetIn': json['openTargetIn'] == null ? undefined : json['openTargetIn'],
+            'doesAverage': json['doesAverage'] == null ? undefined : json['doesAverage'],
+            'decimalPlaces': json['decimalPlaces'] == null ? undefined : json['decimalPlaces'],
+            'defaultCountryCode': json['defaultCountryCode'] == null ? undefined : json['defaultCountryCode'],
+            'seeVersions': json['seeVersions'] == null ? undefined : json['seeVersions'],
+            'displayMonth': json['displayMonth'] == null ? undefined : json['displayMonth'],
+            'displayEmail': json['displayEmail'] == null ? undefined : json['displayEmail'],
+            'defaultKind': json['defaultKind'] == null ? undefined : json['defaultKind'],
+            'coverText': json['coverText'] == null ? undefined : json['coverText'],
+            'currencySymbol': json['currencySymbol'] == null ? undefined : json['currencySymbol'],
+            'targetFieldId': json['targetFieldId'] == null ? undefined : json['targetFieldId'],
+            'displayUser': json['displayUser'] == null ? undefined : json['displayUser'],
+            'blankIsZero': json['blankIsZero'] == null ? undefined : json['blankIsZero'],
+            'exact': json['exact'] == null ? undefined : json['exact'],
+            'defaultDomain': json['defaultDomain'] == null ? undefined : json['defaultDomain'],
+            'abbreviate': json['abbreviate'] == null ? undefined : json['abbreviate'],
+            'numberFormat': json['numberFormat'] == null ? undefined : json['numberFormat'],
+            'targetTableName': json['targetTableName'] == null ? undefined : json['targetTableName'],
+            'appearsAs': json['appearsAs'] == null ? undefined : json['appearsAs'],
+            'width': json['width'] == null ? undefined : json['width'],
+            'currencyFormat': json['currencyFormat'] == null ? undefined : json['currencyFormat'],
+            'displayDayOfWeek': json['displayDayOfWeek'] == null ? undefined : json['displayDayOfWeek'],
+            'commaStart': json['commaStart'] == null ? undefined : json['commaStart'],
+            'choices': json['choices'] == null ? undefined : json['choices'],
+            'targetTableId': json['targetTableId'] == null ? undefined : json['targetTableId'],
+            'displayRelative': json['displayRelative'] == null ? undefined : json['displayRelative'],
+            'compositeFields': json['compositeFields'] == null ? undefined : json['compositeFields'],
+            'displayCheckboxAsText': json['displayCheckboxAsText'] == null ? undefined : json['displayCheckboxAsText'],
+            'displayTime': json['displayTime'] == null ? undefined : json['displayTime'],
+            'versionMode': json['versionMode'] == null ? undefined : json['versionMode'],
+            'snapFieldId': json['snapFieldId'] == null ? undefined : json['snapFieldId'],
+            'hours24': json['hours24'] == null ? undefined : json['hours24'],
+            'sortAlpha': json['sortAlpha'] == null ? undefined : json['sortAlpha'],
+            'hasExtension': json['hasExtension'] == null ? undefined : json['hasExtension'],
+            'useNewWindow': json['useNewWindow'] == null ? undefined : json['useNewWindow'],
+            'displayAsLink': json['displayAsLink'] == null ? undefined : json['displayAsLink'],
+            'lookupReferenceFieldId': json['lookupReferenceFieldId'] == null ? undefined : json['lookupReferenceFieldId'],
+            'summaryTargetFieldId': json['summaryTargetFieldId'] == null ? undefined : json['summaryTargetFieldId'],
+            'masterChoiceFieldId': json['masterChoiceFieldId'] == null ? undefined : json['masterChoiceFieldId'],
+            'lookupTargetFieldId': json['lookupTargetFieldId'] == null ? undefined : json['lookupTargetFieldId'],
+            'masterChoiceTableId': json['masterChoiceTableId'] == null ? undefined : json['masterChoiceTableId'],
+            'summaryReferenceFieldId': json['summaryReferenceFieldId'] == null ? undefined : json['summaryReferenceFieldId'],
+            'summaryFunction': json['summaryFunction'] == null ? undefined : json['summaryFunction'],
+            'masterTableTag': json['masterTableTag'] == null ? undefined : json['masterTableTag'],
+            'choicesLuid': json['choicesLuid'] == null ? undefined : json['choicesLuid'],
+            'xmlTag': json['xmlTag'] == null ? undefined : json['xmlTag'],
+            'startField': json['startField'] == null ? undefined : json['startField'],
+            'durationField': json['durationField'] == null ? undefined : json['durationField'],
+            'workWeek': json['workWeek'] == null ? undefined : json['workWeek'],
+            'comments': json['comments'] == null ? undefined : json['comments'],
+            'sourceFieldId': json['sourceFieldId'] == null ? undefined : json['sourceFieldId'],
+        };
+    }
+    function FieldPropertiesToJSON(json) {
+        return FieldPropertiesToJSONTyped(json, false);
+    }
+    function FieldPropertiesToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'primaryKey': value['primaryKey'],
+            'foreignKey': value['foreignKey'],
+            'numLines': value['numLines'],
+            'maxLength': value['maxLength'],
+            'appendOnly': value['appendOnly'],
+            'allowHTML': value['allowHTML'],
+            'allowMentions': value['allowMentions'],
+            'sortAsGiven': value['sortAsGiven'],
+            'carryChoices': value['carryChoices'],
+            'allowNewChoices': value['allowNewChoices'],
+            'formula': value['formula'],
+            'defaultValue': value['defaultValue'],
+            'doesTotal': value['doesTotal'],
+            'autoSave': value['autoSave'],
+            'defaultValueLuid': value['defaultValueLuid'],
+            'useI18NFormat': value['useI18NFormat'],
+            'maxVersions': value['maxVersions'],
+            'format': value['format'],
+            'linkText': value['linkText'],
+            'parentFieldId': value['parentFieldId'],
+            'displayTimezone': value['displayTimezone'],
+            'defaultToday': value['defaultToday'],
+            'units': value['units'],
+            'openTargetIn': value['openTargetIn'],
+            'doesAverage': value['doesAverage'],
+            'decimalPlaces': value['decimalPlaces'],
+            'defaultCountryCode': value['defaultCountryCode'],
+            'seeVersions': value['seeVersions'],
+            'displayMonth': value['displayMonth'],
+            'displayEmail': value['displayEmail'],
+            'defaultKind': value['defaultKind'],
+            'coverText': value['coverText'],
+            'currencySymbol': value['currencySymbol'],
+            'targetFieldId': value['targetFieldId'],
+            'displayUser': value['displayUser'],
+            'blankIsZero': value['blankIsZero'],
+            'exact': value['exact'],
+            'defaultDomain': value['defaultDomain'],
+            'abbreviate': value['abbreviate'],
+            'numberFormat': value['numberFormat'],
+            'targetTableName': value['targetTableName'],
+            'appearsAs': value['appearsAs'],
+            'width': value['width'],
+            'currencyFormat': value['currencyFormat'],
+            'displayDayOfWeek': value['displayDayOfWeek'],
+            'commaStart': value['commaStart'],
+            'choices': value['choices'],
+            'targetTableId': value['targetTableId'],
+            'displayRelative': value['displayRelative'],
+            'compositeFields': value['compositeFields'],
+            'displayCheckboxAsText': value['displayCheckboxAsText'],
+            'displayTime': value['displayTime'],
+            'versionMode': value['versionMode'],
+            'snapFieldId': value['snapFieldId'],
+            'hours24': value['hours24'],
+            'sortAlpha': value['sortAlpha'],
+            'hasExtension': value['hasExtension'],
+            'useNewWindow': value['useNewWindow'],
+            'displayAsLink': value['displayAsLink'],
+            'lookupReferenceFieldId': value['lookupReferenceFieldId'],
+            'summaryTargetFieldId': value['summaryTargetFieldId'],
+            'masterChoiceFieldId': value['masterChoiceFieldId'],
+            'lookupTargetFieldId': value['lookupTargetFieldId'],
+            'masterChoiceTableId': value['masterChoiceTableId'],
+            'summaryReferenceFieldId': value['summaryReferenceFieldId'],
+            'summaryFunction': value['summaryFunction'],
+            'masterTableTag': value['masterTableTag'],
+            'choicesLuid': value['choicesLuid'],
+            'xmlTag': value['xmlTag'],
+            'startField': value['startField'],
+            'durationField': value['durationField'],
+            'workWeek': value['workWeek'],
+            'comments': value['comments'],
+            'sourceFieldId': value['sourceFieldId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the FieldPermissionsInner interface.
+     */
+    function instanceOfFieldPermissionsInner(value) {
+        return true;
+    }
+    function FieldPermissionsInnerFromJSON(json) {
+        return FieldPermissionsInnerFromJSONTyped(json);
+    }
+    function FieldPermissionsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'permissionType': json['permissionType'] == null ? undefined : json['permissionType'],
+            'role': json['role'] == null ? undefined : json['role'],
+            'roleId': json['roleId'] == null ? undefined : json['roleId'],
+        };
+    }
+    function FieldPermissionsInnerToJSON(json) {
+        return FieldPermissionsInnerToJSONTyped(json, false);
+    }
+    function FieldPermissionsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'permissionType': value['permissionType'],
+            'role': value['role'],
+            'roleId': value['roleId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateField200Response interface.
+     */
+    function instanceOfCreateField200Response(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('label' in value) || value['label'] === undefined)
+            return false;
+        if (!('fieldType' in value) || value['fieldType'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateField200ResponseFromJSON(json) {
+        return CreateField200ResponseFromJSONTyped(json);
+    }
+    function CreateField200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'label': json['label'],
+            'fieldType': json['fieldType'],
+            'mode': json['mode'] == null ? undefined : json['mode'],
+            'noWrap': json['noWrap'] == null ? undefined : json['noWrap'],
+            'bold': json['bold'] == null ? undefined : json['bold'],
+            'required': json['required'] == null ? undefined : json['required'],
+            'appearsByDefault': json['appearsByDefault'] == null ? undefined : json['appearsByDefault'],
+            'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
+            'unique': json['unique'] == null ? undefined : json['unique'],
+            'doesDataCopy': json['doesDataCopy'] == null ? undefined : json['doesDataCopy'],
+            'fieldHelp': json['fieldHelp'] == null ? undefined : json['fieldHelp'],
+            'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : FieldPropertiesFromJSON(json['properties']),
+            'permissions': json['permissions'] == null ? undefined : (json['permissions'].map(FieldPermissionsInnerFromJSON)),
+        };
+    }
+    function CreateField200ResponseToJSON(json) {
+        return CreateField200ResponseToJSONTyped(json, false);
+    }
+    function CreateField200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'label': value['label'],
+            'fieldType': value['fieldType'],
+            'mode': value['mode'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'required': value['required'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'unique': value['unique'],
+            'doesDataCopy': value['doesDataCopy'],
+            'fieldHelp': value['fieldHelp'],
+            'audited': value['audited'],
+            'properties': FieldPropertiesToJSON(value['properties']),
+            'permissions': value['permissions'] == null ? undefined : (value['permissions'].map(FieldPermissionsInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const CreateFieldRequestFieldTypeEnum = {
+        Text: 'text',
+        TextMultipleChoice: 'text-multiple-choice',
+        TextMultiLine: 'text-multi-line',
+        RichText: 'rich-text',
+        Numeric: 'numeric',
+        Currency: 'currency',
+        Rating: 'rating',
+        Percent: 'percent',
+        Multitext: 'multitext',
+        Email: 'email',
+        Url: 'url',
+        Duration: 'duration',
+        Date: 'date',
+        Datetime: 'datetime',
+        Timestamp: 'timestamp',
+        Timeofday: 'timeofday',
+        Checkbox: 'checkbox',
+        User: 'user',
+        Multiuser: 'multiuser',
+        Address: 'address',
+        Phone: 'phone',
+        File: 'file'
+    };
+    /**
+     * Check if a given object implements the CreateFieldRequest interface.
+     */
+    function instanceOfCreateFieldRequest(value) {
+        if (!('label' in value) || value['label'] === undefined)
+            return false;
+        if (!('fieldType' in value) || value['fieldType'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateFieldRequestFromJSON(json) {
+        return CreateFieldRequestFromJSONTyped(json);
+    }
+    function CreateFieldRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'label': json['label'],
+            'fieldType': json['fieldType'],
+            'noWrap': json['noWrap'] == null ? undefined : json['noWrap'],
+            'bold': json['bold'] == null ? undefined : json['bold'],
+            'appearsByDefault': json['appearsByDefault'] == null ? undefined : json['appearsByDefault'],
+            'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
+            'fieldHelp': json['fieldHelp'] == null ? undefined : json['fieldHelp'],
+            'addToForms': json['addToForms'] == null ? undefined : json['addToForms'],
+            'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : FieldPropertiesFromJSON(json['properties']),
+            'permissions': json['permissions'] == null ? undefined : (json['permissions'].map(FieldPermissionsInnerFromJSON)),
+        };
+    }
+    function CreateFieldRequestToJSON(json) {
+        return CreateFieldRequestToJSONTyped(json, false);
+    }
+    function CreateFieldRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'label': value['label'],
+            'fieldType': value['fieldType'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'fieldHelp': value['fieldHelp'],
+            'addToForms': value['addToForms'],
+            'audited': value['audited'],
+            'properties': FieldPropertiesToJSON(value['properties']),
+            'permissions': value['permissions'] == null ? undefined : (value['permissions'].map(FieldPermissionsInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateRelationship200Response interface.
+     */
+    function instanceOfCreateRelationship200Response(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('parentTableId' in value) || value['parentTableId'] === undefined)
+            return false;
+        if (!('childTableId' in value) || value['childTableId'] === undefined)
+            return false;
+        if (!('isCrossApp' in value) || value['isCrossApp'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateRelationship200ResponseFromJSON(json) {
+        return CreateRelationship200ResponseFromJSONTyped(json);
+    }
+    function CreateRelationship200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'id': json['id'],
+            'parentTableId': json['parentTableId'],
+            'childTableId': json['childTableId'],
+            'foreignKeyField': json['foreignKeyField'] == null ? undefined : json['foreignKeyField'],
+            'isCrossApp': json['isCrossApp'],
+            'lookupFields': json['lookupFields'] == null ? undefined : json['lookupFields'],
+            'summaryFields': json['summaryFields'] == null ? undefined : json['summaryFields'],
+        };
+    }
+    function CreateRelationship200ResponseToJSON(json) {
+        return CreateRelationship200ResponseToJSONTyped(json, false);
+    }
+    function CreateRelationship200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'id': value['id'],
+            'parentTableId': value['parentTableId'],
+            'childTableId': value['childTableId'],
+            'foreignKeyField': value['foreignKeyField'],
+            'isCrossApp': value['isCrossApp'],
+            'lookupFields': value['lookupFields'],
+            'summaryFields': value['summaryFields'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateRelationshipRequest interface.
+     */
+    function instanceOfCreateRelationshipRequest(value) {
+        if (!('parentTableId' in value) || value['parentTableId'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateRelationshipRequestFromJSON(json) {
+        return CreateRelationshipRequestFromJSONTyped(json);
+    }
+    function CreateRelationshipRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'summaryFields': json['summaryFields'] == null ? undefined : json['summaryFields'],
+            'lookupFieldIds': json['lookupFieldIds'] == null ? undefined : json['lookupFieldIds'],
+            'parentTableId': json['parentTableId'],
+            'foreignKeyField': json['foreignKeyField'] == null ? undefined : json['foreignKeyField'],
+        };
+    }
+    function CreateRelationshipRequestToJSON(json) {
+        return CreateRelationshipRequestToJSONTyped(json, false);
+    }
+    function CreateRelationshipRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'summaryFields': value['summaryFields'],
+            'lookupFieldIds': value['lookupFieldIds'],
+            'parentTableId': value['parentTableId'],
+            'foreignKeyField': value['foreignKeyField'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the CreateTableRequest interface.
+     */
+    function instanceOfCreateTableRequest(value) {
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function CreateTableRequestFromJSON(json) {
+        return CreateTableRequestFromJSONTyped(json);
+    }
+    function CreateTableRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'singleRecordName': json['singleRecordName'] == null ? undefined : json['singleRecordName'],
+            'pluralRecordName': json['pluralRecordName'] == null ? undefined : json['pluralRecordName'],
+        };
+    }
+    function CreateTableRequestToJSON(json) {
+        return CreateTableRequestToJSONTyped(json, false);
+    }
+    function CreateTableRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'description': value['description'],
+            'singleRecordName': value['singleRecordName'],
+            'pluralRecordName': value['pluralRecordName'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeactivateUserToken200Response interface.
+     */
+    function instanceOfDeactivateUserToken200Response(value) {
+        return true;
+    }
+    function DeactivateUserToken200ResponseFromJSON(json) {
+        return DeactivateUserToken200ResponseFromJSONTyped(json);
+    }
+    function DeactivateUserToken200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'id': json['id'] == null ? undefined : json['id'],
+        };
+    }
+    function DeactivateUserToken200ResponseToJSON(json) {
+        return DeactivateUserToken200ResponseToJSONTyped(json, false);
+    }
+    function DeactivateUserToken200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'id': value['id'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteApp200Response interface.
+     */
+    function instanceOfDeleteApp200Response(value) {
+        if (!('deletedAppId' in value) || value['deletedAppId'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteApp200ResponseFromJSON(json) {
+        return DeleteApp200ResponseFromJSONTyped(json);
+    }
+    function DeleteApp200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'deletedAppId': json['deletedAppId'],
+        };
+    }
+    function DeleteApp200ResponseToJSON(json) {
+        return DeleteApp200ResponseToJSONTyped(json, false);
+    }
+    function DeleteApp200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'deletedAppId': value['deletedAppId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteAppRequest interface.
+     */
+    function instanceOfDeleteAppRequest(value) {
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteAppRequestFromJSON(json) {
+        return DeleteAppRequestFromJSONTyped(json);
+    }
+    function DeleteAppRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'],
+        };
+    }
+    function DeleteAppRequestToJSON(json) {
+        return DeleteAppRequestToJSONTyped(json, false);
+    }
+    function DeleteAppRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteFields200Response interface.
+     */
+    function instanceOfDeleteFields200Response(value) {
+        if (!('deletedFieldIds' in value) || value['deletedFieldIds'] === undefined)
+            return false;
+        if (!('errors' in value) || value['errors'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteFields200ResponseFromJSON(json) {
+        return DeleteFields200ResponseFromJSONTyped(json);
+    }
+    function DeleteFields200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'deletedFieldIds': json['deletedFieldIds'],
+            'errors': json['errors'],
+        };
+    }
+    function DeleteFields200ResponseToJSON(json) {
+        return DeleteFields200ResponseToJSONTyped(json, false);
+    }
+    function DeleteFields200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'deletedFieldIds': value['deletedFieldIds'],
+            'errors': value['errors'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteFieldsRequest interface.
+     */
+    function instanceOfDeleteFieldsRequest(value) {
+        if (!('fieldIds' in value) || value['fieldIds'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteFieldsRequestFromJSON(json) {
+        return DeleteFieldsRequestFromJSONTyped(json);
+    }
+    function DeleteFieldsRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'fieldIds': json['fieldIds'],
+        };
+    }
+    function DeleteFieldsRequestToJSON(json) {
+        return DeleteFieldsRequestToJSONTyped(json, false);
+    }
+    function DeleteFieldsRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'fieldIds': value['fieldIds'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteFile200Response interface.
+     */
+    function instanceOfDeleteFile200Response(value) {
+        return true;
+    }
+    function DeleteFile200ResponseFromJSON(json) {
+        return DeleteFile200ResponseFromJSONTyped(json);
+    }
+    function DeleteFile200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'versionNumber': json['versionNumber'] == null ? undefined : json['versionNumber'],
+            'fileName': json['fileName'] == null ? undefined : json['fileName'],
+            'uploaded': json['uploaded'] == null ? undefined : json['uploaded'],
+            'creator': json['creator'] == null ? undefined : json['creator'],
+        };
+    }
+    function DeleteFile200ResponseToJSON(json) {
+        return DeleteFile200ResponseToJSONTyped(json, false);
+    }
+    function DeleteFile200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'versionNumber': value['versionNumber'],
+            'fileName': value['fileName'],
+            'uploaded': value['uploaded'],
+            'creator': value['creator'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteRecords200Response interface.
+     */
+    function instanceOfDeleteRecords200Response(value) {
+        if (!('numberDeleted' in value) || value['numberDeleted'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteRecords200ResponseFromJSON(json) {
+        return DeleteRecords200ResponseFromJSONTyped(json);
+    }
+    function DeleteRecords200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'numberDeleted': json['numberDeleted'],
+        };
+    }
+    function DeleteRecords200ResponseToJSON(json) {
+        return DeleteRecords200ResponseToJSONTyped(json, false);
+    }
+    function DeleteRecords200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'numberDeleted': value['numberDeleted'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteRecordsRequest interface.
+     */
+    function instanceOfDeleteRecordsRequest(value) {
+        if (!('from' in value) || value['from'] === undefined)
+            return false;
+        if (!('where' in value) || value['where'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteRecordsRequestFromJSON(json) {
+        return DeleteRecordsRequestFromJSONTyped(json);
+    }
+    function DeleteRecordsRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'from': json['from'],
+            'where': json['where'],
+        };
+    }
+    function DeleteRecordsRequestToJSON(json) {
+        return DeleteRecordsRequestToJSONTyped(json, false);
+    }
+    function DeleteRecordsRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'from': value['from'],
+            'where': value['where'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteRelationship200Response interface.
+     */
+    function instanceOfDeleteRelationship200Response(value) {
+        if (!('relationshipId' in value) || value['relationshipId'] === undefined)
+            return false;
+        return true;
+    }
+    function DeleteRelationship200ResponseFromJSON(json) {
+        return DeleteRelationship200ResponseFromJSONTyped(json);
+    }
+    function DeleteRelationship200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'relationshipId': json['relationshipId'],
+        };
+    }
+    function DeleteRelationship200ResponseToJSON(json) {
+        return DeleteRelationship200ResponseToJSONTyped(json, false);
+    }
+    function DeleteRelationship200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'relationshipId': value['relationshipId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DeleteTableResponse interface.
+     */
+    function instanceOfDeleteTableResponse(value) {
+        return true;
+    }
+    function DeleteTableResponseFromJSON(json) {
+        return DeleteTableResponseFromJSONTyped(json);
+    }
+    function DeleteTableResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'deletedTableId': json['deletedTableId'] == null ? undefined : json['deletedTableId'],
+        };
+    }
+    function DeleteTableResponseToJSON(json) {
+        return DeleteTableResponseToJSONTyped(json, false);
+    }
+    function DeleteTableResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'deletedTableId': value['deletedTableId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the DenyUsers200Response interface.
+     */
+    function instanceOfDenyUsers200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function DenyUsers200ResponseFromJSON(json) {
+        return DenyUsers200ResponseFromJSONTyped(json);
+    }
+    function DenyUsers200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function DenyUsers200ResponseToJSON(json) {
+        return DenyUsers200ResponseToJSONTyped(json, false);
+    }
+    function DenyUsers200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const ExchangeSsoToken200ResponseIssuedTokenTypeEnum = {
+        UrnQuickbaseParamsOauthTokenTypeTempTicket: 'urn:quickbase:params:oauth:token-type:temp_ticket',
+        UrnQuickbaseParamsOauthTokenTypeTempToken: 'urn:quickbase:params:oauth:token-type:temp_token'
+    };
+    /**
+     * @export
+     */
+    const ExchangeSsoToken200ResponseTokenTypeEnum = {
+        NA: 'N_A'
+    };
+    /**
+     * Check if a given object implements the ExchangeSsoToken200Response interface.
+     */
+    function instanceOfExchangeSsoToken200Response(value) {
+        return true;
+    }
+    function ExchangeSsoToken200ResponseFromJSON(json) {
+        return ExchangeSsoToken200ResponseFromJSONTyped(json);
+    }
+    function ExchangeSsoToken200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'accessToken': json['access_token'] == null ? undefined : json['access_token'],
+            'issuedTokenType': json['issued_token_type'] == null ? undefined : json['issued_token_type'],
+            'tokenType': json['token_type'] == null ? undefined : json['token_type'],
+        };
+    }
+    function ExchangeSsoToken200ResponseToJSON(json) {
+        return ExchangeSsoToken200ResponseToJSONTyped(json, false);
+    }
+    function ExchangeSsoToken200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'access_token': value['accessToken'],
+            'issued_token_type': value['issuedTokenType'],
+            'token_type': value['tokenType'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const ExchangeSsoTokenRequestGrantTypeEnum = {
+        UrnIetfParamsOauthGrantTypeTokenExchange: 'urn:ietf:params:oauth:grant-type:token-exchange'
+    };
+    /**
+     * @export
+     */
+    const ExchangeSsoTokenRequestRequestedTokenTypeEnum = {
+        UrnQuickbaseParamsOauthTokenTypeTempTicket: 'urn:quickbase:params:oauth:token-type:temp_ticket',
+        UrnQuickbaseParamsOauthTokenTypeTempToken: 'urn:quickbase:params:oauth:token-type:temp_token'
+    };
+    /**
+     * @export
+     */
+    const ExchangeSsoTokenRequestSubjectTokenTypeEnum = {
+        UrnIetfParamsOauthTokenTypeSaml2: 'urn:ietf:params:oauth:token-type:saml2'
+    };
+    /**
+     * Check if a given object implements the ExchangeSsoTokenRequest interface.
+     */
+    function instanceOfExchangeSsoTokenRequest(value) {
+        if (!('grantType' in value) || value['grantType'] === undefined)
+            return false;
+        if (!('requestedTokenType' in value) || value['requestedTokenType'] === undefined)
+            return false;
+        if (!('subjectToken' in value) || value['subjectToken'] === undefined)
+            return false;
+        if (!('subjectTokenType' in value) || value['subjectTokenType'] === undefined)
+            return false;
+        return true;
+    }
+    function ExchangeSsoTokenRequestFromJSON(json) {
+        return ExchangeSsoTokenRequestFromJSONTyped(json);
+    }
+    function ExchangeSsoTokenRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'grantType': json['grant_type'],
+            'requestedTokenType': json['requested_token_type'],
+            'subjectToken': json['subject_token'],
+            'subjectTokenType': json['subject_token_type'],
+        };
+    }
+    function ExchangeSsoTokenRequestToJSON(json) {
+        return ExchangeSsoTokenRequestToJSONTyped(json, false);
+    }
+    function ExchangeSsoTokenRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'grant_type': value['grantType'],
+            'requested_token_type': value['requestedTokenType'],
+            'subject_token': value['subjectToken'],
+            'subject_token_type': value['subjectTokenType'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Field interface.
+     */
+    function instanceOfField(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('label' in value) || value['label'] === undefined)
+            return false;
+        if (!('fieldType' in value) || value['fieldType'] === undefined)
+            return false;
+        return true;
+    }
+    function FieldFromJSON(json) {
+        return FieldFromJSONTyped(json);
+    }
+    function FieldFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'label': json['label'],
+            'fieldType': json['fieldType'],
+            'mode': json['mode'] == null ? undefined : json['mode'],
+            'noWrap': json['noWrap'] == null ? undefined : json['noWrap'],
+            'bold': json['bold'] == null ? undefined : json['bold'],
+            'required': json['required'] == null ? undefined : json['required'],
+            'appearsByDefault': json['appearsByDefault'] == null ? undefined : json['appearsByDefault'],
+            'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
+            'unique': json['unique'] == null ? undefined : json['unique'],
+            'doesDataCopy': json['doesDataCopy'] == null ? undefined : json['doesDataCopy'],
+            'fieldHelp': json['fieldHelp'] == null ? undefined : json['fieldHelp'],
+            'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : FieldPropertiesFromJSON(json['properties']),
+            'permissions': json['permissions'] == null ? undefined : (json['permissions'].map(FieldPermissionsInnerFromJSON)),
+        };
+    }
+    function FieldToJSON(json) {
+        return FieldToJSONTyped(json, false);
+    }
+    function FieldToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'label': value['label'],
+            'fieldType': value['fieldType'],
+            'mode': value['mode'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'required': value['required'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'unique': value['unique'],
+            'doesDataCopy': value['doesDataCopy'],
+            'fieldHelp': value['fieldHelp'],
+            'audited': value['audited'],
+            'properties': FieldPropertiesToJSON(value['properties']),
+            'permissions': value['permissions'] == null ? undefined : (value['permissions'].map(FieldPermissionsInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the FieldUsageField interface.
+     */
+    function instanceOfFieldUsageField(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        if (!('type' in value) || value['type'] === undefined)
+            return false;
+        return true;
+    }
+    function FieldUsageFieldFromJSON(json) {
+        return FieldUsageFieldFromJSONTyped(json);
+    }
+    function FieldUsageFieldFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'name': json['name'],
+            'type': json['type'],
+        };
+    }
+    function FieldUsageFieldToJSON(json) {
+        return FieldUsageFieldToJSONTyped(json, false);
+    }
+    function FieldUsageFieldToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'type': value['type'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the UsageCount interface.
+     */
+    function instanceOfUsageCount(value) {
+        return true;
+    }
+    function UsageCountFromJSON(json) {
+        return UsageCountFromJSONTyped(json);
+    }
+    function UsageCountFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'count': json['count'] == null ? undefined : json['count'],
+        };
+    }
+    function UsageCountToJSON(json) {
+        return UsageCountToJSONTyped(json, false);
+    }
+    function UsageCountToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'count': value['count'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the FieldUsageUsage interface.
+     */
+    function instanceOfFieldUsageUsage(value) {
+        if (!('actions' in value) || value['actions'] === undefined)
+            return false;
+        if (!('appHomePages' in value) || value['appHomePages'] === undefined)
+            return false;
+        if (!('dashboards' in value) || value['dashboards'] === undefined)
+            return false;
+        if (!('defaultReports' in value) || value['defaultReports'] === undefined)
+            return false;
+        if (!('exactForms' in value) || value['exactForms'] === undefined)
+            return false;
+        if (!('fields' in value) || value['fields'] === undefined)
+            return false;
+        if (!('forms' in value) || value['forms'] === undefined)
+            return false;
+        if (!('notifications' in value) || value['notifications'] === undefined)
+            return false;
+        if (!('personalReports' in value) || value['personalReports'] === undefined)
+            return false;
+        if (!('pipelines' in value) || value['pipelines'] === undefined)
+            return false;
+        if (!('relationships' in value) || value['relationships'] === undefined)
+            return false;
+        if (!('reminders' in value) || value['reminders'] === undefined)
+            return false;
+        if (!('reports' in value) || value['reports'] === undefined)
+            return false;
+        if (!('roles' in value) || value['roles'] === undefined)
+            return false;
+        if (!('tableImports' in value) || value['tableImports'] === undefined)
+            return false;
+        if (!('tableRules' in value) || value['tableRules'] === undefined)
+            return false;
+        if (!('webhooks' in value) || value['webhooks'] === undefined)
+            return false;
+        return true;
+    }
+    function FieldUsageUsageFromJSON(json) {
+        return FieldUsageUsageFromJSONTyped(json);
+    }
+    function FieldUsageUsageFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'actions': UsageCountFromJSON(json['actions']),
+            'appHomePages': UsageCountFromJSON(json['appHomePages']),
+            'dashboards': UsageCountFromJSON(json['dashboards']),
+            'defaultReports': UsageCountFromJSON(json['defaultReports']),
+            'exactForms': UsageCountFromJSON(json['exactForms']),
+            'fields': UsageCountFromJSON(json['fields']),
+            'forms': UsageCountFromJSON(json['forms']),
+            'notifications': UsageCountFromJSON(json['notifications']),
+            'personalReports': UsageCountFromJSON(json['personalReports']),
+            'pipelines': UsageCountFromJSON(json['pipelines']),
+            'relationships': UsageCountFromJSON(json['relationships']),
+            'reminders': UsageCountFromJSON(json['reminders']),
+            'reports': UsageCountFromJSON(json['reports']),
+            'roles': UsageCountFromJSON(json['roles']),
+            'tableImports': UsageCountFromJSON(json['tableImports']),
+            'tableRules': UsageCountFromJSON(json['tableRules']),
+            'webhooks': UsageCountFromJSON(json['webhooks']),
+        };
+    }
+    function FieldUsageUsageToJSON(json) {
+        return FieldUsageUsageToJSONTyped(json, false);
+    }
+    function FieldUsageUsageToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'actions': UsageCountToJSON(value['actions']),
+            'appHomePages': UsageCountToJSON(value['appHomePages']),
+            'dashboards': UsageCountToJSON(value['dashboards']),
+            'defaultReports': UsageCountToJSON(value['defaultReports']),
+            'exactForms': UsageCountToJSON(value['exactForms']),
+            'fields': UsageCountToJSON(value['fields']),
+            'forms': UsageCountToJSON(value['forms']),
+            'notifications': UsageCountToJSON(value['notifications']),
+            'personalReports': UsageCountToJSON(value['personalReports']),
+            'pipelines': UsageCountToJSON(value['pipelines']),
+            'relationships': UsageCountToJSON(value['relationships']),
+            'reminders': UsageCountToJSON(value['reminders']),
+            'reports': UsageCountToJSON(value['reports']),
+            'roles': UsageCountToJSON(value['roles']),
+            'tableImports': UsageCountToJSON(value['tableImports']),
+            'tableRules': UsageCountToJSON(value['tableRules']),
+            'webhooks': UsageCountToJSON(value['webhooks']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the FieldUsage interface.
+     */
+    function instanceOfFieldUsage(value) {
+        if (!('field' in value) || value['field'] === undefined)
+            return false;
+        if (!('usage' in value) || value['usage'] === undefined)
+            return false;
+        return true;
+    }
+    function FieldUsageFromJSON(json) {
+        return FieldUsageFromJSONTyped(json);
+    }
+    function FieldUsageFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'field': FieldUsageFieldFromJSON(json['field']),
+            'usage': FieldUsageUsageFromJSON(json['usage']),
+        };
+    }
+    function FieldUsageToJSON(json) {
+        return FieldUsageToJSONTyped(json, false);
+    }
+    function FieldUsageToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'field': FieldUsageFieldToJSON(value['field']),
+            'usage': FieldUsageUsageToJSON(value['usage']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GenerateDocument200Response interface.
+     */
+    function instanceOfGenerateDocument200Response(value) {
+        return true;
+    }
+    function GenerateDocument200ResponseFromJSON(json) {
+        return GenerateDocument200ResponseFromJSONTyped(json);
+    }
+    function GenerateDocument200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'fileName': json['fileName'] == null ? undefined : json['fileName'],
+            'data': json['data'] == null ? undefined : json['data'],
+            'contentType': json['contentType'] == null ? undefined : json['contentType'],
+        };
+    }
+    function GenerateDocument200ResponseToJSON(json) {
+        return GenerateDocument200ResponseToJSONTyped(json, false);
+    }
+    function GenerateDocument200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'fileName': value['fileName'],
+            'data': value['data'],
+            'contentType': value['contentType'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetRelationships200ResponseMetadata interface.
+     */
+    function instanceOfGetRelationships200ResponseMetadata(value) {
+        if (!('numRelationships' in value) || value['numRelationships'] === undefined)
+            return false;
+        if (!('skip' in value) || value['skip'] === undefined)
+            return false;
+        if (!('totalRelationships' in value) || value['totalRelationships'] === undefined)
+            return false;
+        return true;
+    }
+    function GetRelationships200ResponseMetadataFromJSON(json) {
+        return GetRelationships200ResponseMetadataFromJSONTyped(json);
+    }
+    function GetRelationships200ResponseMetadataFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'numRelationships': json['numRelationships'],
+            'skip': json['skip'],
+            'totalRelationships': json['totalRelationships'],
+        };
+    }
+    function GetRelationships200ResponseMetadataToJSON(json) {
+        return GetRelationships200ResponseMetadataToJSONTyped(json, false);
+    }
+    function GetRelationships200ResponseMetadataToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'numRelationships': value['numRelationships'],
+            'skip': value['skip'],
+            'totalRelationships': value['totalRelationships'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RelationshipField interface.
+     */
+    function instanceOfRelationshipField(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('label' in value) || value['label'] === undefined)
+            return false;
+        if (!('type' in value) || value['type'] === undefined)
+            return false;
+        return true;
+    }
+    function RelationshipFieldFromJSON(json) {
+        return RelationshipFieldFromJSONTyped(json);
+    }
+    function RelationshipFieldFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'label': json['label'],
+            'type': json['type'],
+        };
+    }
+    function RelationshipFieldToJSON(json) {
+        return RelationshipFieldToJSONTyped(json, false);
+    }
+    function RelationshipFieldToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'label': value['label'],
+            'type': value['type'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Relationship interface.
+     */
+    function instanceOfRelationship(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('parentTableId' in value) || value['parentTableId'] === undefined)
+            return false;
+        if (!('childTableId' in value) || value['childTableId'] === undefined)
+            return false;
+        if (!('foreignKeyField' in value) || value['foreignKeyField'] === undefined)
+            return false;
+        if (!('isCrossApp' in value) || value['isCrossApp'] === undefined)
+            return false;
+        return true;
+    }
+    function RelationshipFromJSON(json) {
+        return RelationshipFromJSONTyped(json);
+    }
+    function RelationshipFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'parentTableId': json['parentTableId'],
+            'childTableId': json['childTableId'],
+            'foreignKeyField': RelationshipFieldFromJSON(json['foreignKeyField']),
+            'isCrossApp': json['isCrossApp'],
+            'lookupFields': json['lookupFields'] == null ? undefined : (json['lookupFields'].map(RelationshipFieldFromJSON)),
+            'summaryFields': json['summaryFields'] == null ? undefined : (json['summaryFields'].map(RelationshipFieldFromJSON)),
+        };
+    }
+    function RelationshipToJSON(json) {
+        return RelationshipToJSONTyped(json, false);
+    }
+    function RelationshipToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'parentTableId': value['parentTableId'],
+            'childTableId': value['childTableId'],
+            'foreignKeyField': RelationshipFieldToJSON(value['foreignKeyField']),
+            'isCrossApp': value['isCrossApp'],
+            'lookupFields': value['lookupFields'] == null ? undefined : (value['lookupFields'].map(RelationshipFieldToJSON)),
+            'summaryFields': value['summaryFields'] == null ? undefined : (value['summaryFields'].map(RelationshipFieldToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetRelationships200Response interface.
+     */
+    function instanceOfGetRelationships200Response(value) {
+        if (!('metadata' in value) || value['metadata'] === undefined)
+            return false;
+        if (!('relationships' in value) || value['relationships'] === undefined)
+            return false;
+        return true;
+    }
+    function GetRelationships200ResponseFromJSON(json) {
+        return GetRelationships200ResponseFromJSONTyped(json);
+    }
+    function GetRelationships200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'metadata': GetRelationships200ResponseMetadataFromJSON(json['metadata']),
+            'relationships': (json['relationships'].map(RelationshipFromJSON)),
+        };
+    }
+    function GetRelationships200ResponseToJSON(json) {
+        return GetRelationships200ResponseToJSONTyped(json, false);
+    }
+    function GetRelationships200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'metadata': GetRelationships200ResponseMetadataToJSON(value['metadata']),
+            'relationships': (value['relationships'].map(RelationshipToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetReport200Response interface.
+     */
+    function instanceOfGetReport200Response(value) {
+        return true;
+    }
+    function GetReport200ResponseFromJSON(json) {
+        return GetReport200ResponseFromJSONTyped(json);
+    }
+    function GetReport200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'id': json['id'] == null ? undefined : json['id'],
+            'name': json['name'] == null ? undefined : json['name'],
+            'type': json['type'] == null ? undefined : json['type'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'ownerId': json['ownerId'] == null ? undefined : json['ownerId'],
+            'query': json['query'] == null ? undefined : json['query'],
+            'properties': json['properties'] == null ? undefined : json['properties'],
+            'usedLast': json['usedLast'] == null ? undefined : json['usedLast'],
+            'usedCount': json['usedCount'] == null ? undefined : json['usedCount'],
+        };
+    }
+    function GetReport200ResponseToJSON(json) {
+        return GetReport200ResponseToJSONTyped(json, false);
+    }
+    function GetReport200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'id': value['id'],
+            'name': value['name'],
+            'type': value['type'],
+            'description': value['description'],
+            'ownerId': value['ownerId'],
+            'query': value['query'],
+            'properties': value['properties'],
+            'usedLast': value['usedLast'],
+            'usedCount': value['usedCount'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetTempTokenDBID200Response interface.
+     */
+    function instanceOfGetTempTokenDBID200Response(value) {
+        if (!('temporaryAuthorization' in value) || value['temporaryAuthorization'] === undefined)
+            return false;
+        return true;
+    }
+    function GetTempTokenDBID200ResponseFromJSON(json) {
+        return GetTempTokenDBID200ResponseFromJSONTyped(json);
+    }
+    function GetTempTokenDBID200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'temporaryAuthorization': json['temporaryAuthorization'],
+        };
+    }
+    function GetTempTokenDBID200ResponseToJSON(json) {
+        return GetTempTokenDBID200ResponseToJSONTyped(json, false);
+    }
+    function GetTempTokenDBID200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'temporaryAuthorization': value['temporaryAuthorization'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetUsers200Response interface.
+     */
+    function instanceOfGetUsers200Response(value) {
+        if (!('users' in value) || value['users'] === undefined)
+            return false;
+        if (!('metadata' in value) || value['metadata'] === undefined)
+            return false;
+        return true;
+    }
+    function GetUsers200ResponseFromJSON(json) {
+        return GetUsers200ResponseFromJSONTyped(json);
+    }
+    function GetUsers200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'users': json['users'],
+            'metadata': json['metadata'],
+        };
+    }
+    function GetUsers200ResponseToJSON(json) {
+        return GetUsers200ResponseToJSONTyped(json, false);
+    }
+    function GetUsers200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'users': value['users'],
+            'metadata': value['metadata'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetUsersRequest interface.
+     */
+    function instanceOfGetUsersRequest(value) {
+        return true;
+    }
+    function GetUsersRequestFromJSON(json) {
+        return GetUsersRequestFromJSONTyped(json);
+    }
+    function GetUsersRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'emails': json['emails'] == null ? undefined : new Set(json['emails']),
+            'appIds': json['appIds'] == null ? undefined : new Set(json['appIds']),
+            'nextPageToken': json['nextPageToken'] == null ? undefined : json['nextPageToken'],
+        };
+    }
+    function GetUsersRequestToJSON(json) {
+        return GetUsersRequestToJSONTyped(json, false);
+    }
+    function GetUsersRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'emails': value['emails'] == null ? undefined : Array.from(value['emails']),
+            'appIds': value['appIds'] == null ? undefined : Array.from(value['appIds']),
+            'nextPageToken': value['nextPageToken'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum = {
+        User: 'user',
+        Integration: 'integration'
+    };
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner(value) {
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'billingCategory': json['billingCategory'] == null ? undefined : json['billingCategory'],
+            'count': json['count'] == null ? undefined : json['count'],
+            'eventType': json['eventType'] == null ? undefined : json['eventType'],
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'billingCategory': value['billingCategory'],
+            'count': value['count'],
+            'eventType': value['eventType'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseResultsInnerTotals interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals(value) {
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'all': json['all'] == null ? undefined : json['all'],
+            'integration': json['integration'] == null ? undefined : json['integration'],
+            'user': json['user'] == null ? undefined : json['user'],
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'all': value['all'],
+            'integration': value['integration'],
+            'user': value['user'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseResultsInner interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner(value) {
+        if (!('eventTypes' in value) || value['eventTypes'] === undefined)
+            return false;
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        if (!('totals' in value) || value['totals'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'eventTypes': (json['eventTypes'].map(PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON)),
+            'id': json['id'],
+            'name': json['name'],
+            'totals': PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON(json['totals']),
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'eventTypes': (value['eventTypes'].map(PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON)),
+            'id': value['id'],
+            'name': value['name'],
+            'totals': PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON(value['totals']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseMetadata interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseMetadata(value) {
+        if (!('nextToken' in value) || value['nextToken'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseMetadataFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'nextToken': json['nextToken'],
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseMetadataToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'nextToken': value['nextToken'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum = {
+        App: 'app',
+        User: 'user'
+    };
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseWhereInner interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('type' in value) || value['type'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'type': json['type'],
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'type': value['type'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200ResponseTotals interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200ResponseTotals(value) {
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseTotalsFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'all': json['all'] == null ? undefined : json['all'],
+            'integration': json['integration'] == null ? undefined : json['integration'],
+            'user': json['user'] == null ? undefined : json['user'],
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseTotalsToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'all': value['all'],
+            'integration': value['integration'],
+            'user': value['user'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const PlatformAnalyticEventSummaries200ResponseGroupByEnum = {
+        App: 'app',
+        User: 'user'
+    };
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummaries200Response interface.
+     */
+    function instanceOfPlatformAnalyticEventSummaries200Response(value) {
+        if (!('accountId' in value) || value['accountId'] === undefined)
+            return false;
+        if (!('start' in value) || value['start'] === undefined)
+            return false;
+        if (!('end' in value) || value['end'] === undefined)
+            return false;
+        if (!('groupBy' in value) || value['groupBy'] === undefined)
+            return false;
+        if (!('where' in value) || value['where'] === undefined)
+            return false;
+        if (!('results' in value) || value['results'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummaries200ResponseFromJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummaries200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'accountId': json['accountId'],
+            'start': (new Date(json['start'])),
+            'end': (new Date(json['end'])),
+            'groupBy': json['groupBy'],
+            'where': (json['where'].map(PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON)),
+            'results': (json['results'].map(PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON)),
+            'metadata': json['metadata'] == null ? undefined : PlatformAnalyticEventSummaries200ResponseMetadataFromJSON(json['metadata']),
+            'totals': json['totals'] == null ? undefined : PlatformAnalyticEventSummaries200ResponseTotalsFromJSON(json['totals']),
+        };
+    }
+    function PlatformAnalyticEventSummaries200ResponseToJSON(json) {
+        return PlatformAnalyticEventSummaries200ResponseToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummaries200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'accountId': value['accountId'],
+            'start': ((value['start']).toISOString()),
+            'end': ((value['end']).toISOString()),
+            'groupBy': value['groupBy'],
+            'where': (value['where'].map(PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON)),
+            'results': (value['results'].map(PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON)),
+            'metadata': PlatformAnalyticEventSummaries200ResponseMetadataToJSON(value['metadata']),
+            'totals': PlatformAnalyticEventSummaries200ResponseTotalsToJSON(value['totals']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum = {
+        App: 'app',
+        User: 'user'
+    };
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummariesRequestWhereInner interface.
+     */
+    function instanceOfPlatformAnalyticEventSummariesRequestWhereInner(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('type' in value) || value['type'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummariesRequestWhereInnerFromJSON(json) {
+        return PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'type': json['type'],
+        };
+    }
+    function PlatformAnalyticEventSummariesRequestWhereInnerToJSON(json) {
+        return PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'type': value['type'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const PlatformAnalyticEventSummariesRequestGroupByEnum = {
+        App: 'app',
+        User: 'user'
+    };
+    /**
+     * Check if a given object implements the PlatformAnalyticEventSummariesRequest interface.
+     */
+    function instanceOfPlatformAnalyticEventSummariesRequest(value) {
+        if (!('start' in value) || value['start'] === undefined)
+            return false;
+        if (!('end' in value) || value['end'] === undefined)
+            return false;
+        if (!('groupBy' in value) || value['groupBy'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticEventSummariesRequestFromJSON(json) {
+        return PlatformAnalyticEventSummariesRequestFromJSONTyped(json);
+    }
+    function PlatformAnalyticEventSummariesRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'start': (new Date(json['start'])),
+            'end': (new Date(json['end'])),
+            'groupBy': json['groupBy'],
+            'nextToken': json['nextToken'] == null ? undefined : json['nextToken'],
+            'where': json['where'] == null ? undefined : (json['where'].map(PlatformAnalyticEventSummariesRequestWhereInnerFromJSON)),
+        };
+    }
+    function PlatformAnalyticEventSummariesRequestToJSON(json) {
+        return PlatformAnalyticEventSummariesRequestToJSONTyped(json, false);
+    }
+    function PlatformAnalyticEventSummariesRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'start': ((value['start']).toISOString()),
+            'end': ((value['end']).toISOString()),
+            'groupBy': value['groupBy'],
+            'nextToken': value['nextToken'],
+            'where': value['where'] == null ? undefined : (value['where'].map(PlatformAnalyticEventSummariesRequestWhereInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the PlatformAnalyticReads200Response interface.
+     */
+    function instanceOfPlatformAnalyticReads200Response(value) {
+        if (!('date' in value) || value['date'] === undefined)
+            return false;
+        if (!('reads' in value) || value['reads'] === undefined)
+            return false;
+        return true;
+    }
+    function PlatformAnalyticReads200ResponseFromJSON(json) {
+        return PlatformAnalyticReads200ResponseFromJSONTyped(json);
+    }
+    function PlatformAnalyticReads200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'date': (new Date(json['date'])),
+            'reads': json['reads'],
+        };
+    }
+    function PlatformAnalyticReads200ResponseToJSON(json) {
+        return PlatformAnalyticReads200ResponseToJSONTyped(json, false);
+    }
+    function PlatformAnalyticReads200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'date': ((value['date']).toISOString().substring(0, 10)),
+            'reads': value['reads'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Record interface.
+     */
+    function instanceOfRecord(value) {
+        return true;
+    }
+    function RecordFromJSON(json) {
+        return RecordFromJSONTyped(json);
+    }
+    function RecordFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'dummy': json['_dummy'] == null ? undefined : json['_dummy'],
+        };
+    }
+    function RecordToJSON(json) {
+        return RecordToJSONTyped(json, false);
+    }
+    function RecordToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            '_dummy': value['dummy'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RecordValue interface.
+     */
+    function instanceOfRecordValue(value) {
+        if (!('value' in value) || value['value'] === undefined)
+            return false;
+        return true;
+    }
+    function RecordValueFromJSON(json) {
+        return RecordValueFromJSONTyped(json);
+    }
+    function RecordValueFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'value': json['value'],
+        };
+    }
+    function RecordValueToJSON(json) {
+        return RecordValueToJSONTyped(json, false);
+    }
+    function RecordValueToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'value': value['value'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RemoveMembersFromGroup200Response interface.
+     */
+    function instanceOfRemoveMembersFromGroup200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function RemoveMembersFromGroup200ResponseFromJSON(json) {
+        return RemoveMembersFromGroup200ResponseFromJSONTyped(json);
+    }
+    function RemoveMembersFromGroup200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function RemoveMembersFromGroup200ResponseToJSON(json) {
+        return RemoveMembersFromGroup200ResponseToJSONTyped(json, false);
+    }
+    function RemoveMembersFromGroup200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RemoveSubgroupsFromGroup200Response interface.
+     */
+    function instanceOfRemoveSubgroupsFromGroup200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function RemoveSubgroupsFromGroup200ResponseFromJSON(json) {
+        return RemoveSubgroupsFromGroup200ResponseFromJSONTyped(json);
+    }
+    function RemoveSubgroupsFromGroup200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function RemoveSubgroupsFromGroup200ResponseToJSON(json) {
+        return RemoveSubgroupsFromGroup200ResponseToJSONTyped(json, false);
+    }
+    function RemoveSubgroupsFromGroup200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the ReportRunResponse interface.
+     */
+    function instanceOfReportRunResponse(value) {
+        return true;
+    }
+    function ReportRunResponseFromJSON(json) {
+        return ReportRunResponseFromJSONTyped(json);
+    }
+    function ReportRunResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'] == null ? undefined : json['id'],
+            'data': json['data'] == null ? undefined : json['data'],
+        };
+    }
+    function ReportRunResponseToJSON(json) {
+        return ReportRunResponseToJSONTyped(json, false);
+    }
+    function ReportRunResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'data': value['data'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunFormula200Response interface.
+     */
+    function instanceOfRunFormula200Response(value) {
+        return true;
+    }
+    function RunFormula200ResponseFromJSON(json) {
+        return RunFormula200ResponseFromJSONTyped(json);
+    }
+    function RunFormula200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'result': json['result'] == null ? undefined : json['result'],
+        };
+    }
+    function RunFormula200ResponseToJSON(json) {
+        return RunFormula200ResponseToJSONTyped(json, false);
+    }
+    function RunFormula200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'result': value['result'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunFormulaRequest interface.
+     */
+    function instanceOfRunFormulaRequest(value) {
+        if (!('formula' in value) || value['formula'] === undefined)
+            return false;
+        if (!('from' in value) || value['from'] === undefined)
+            return false;
+        return true;
+    }
+    function RunFormulaRequestFromJSON(json) {
+        return RunFormulaRequestFromJSONTyped(json);
+    }
+    function RunFormulaRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'formula': json['formula'],
+            'rid': json['rid'] == null ? undefined : json['rid'],
+            'from': json['from'],
+        };
+    }
+    function RunFormulaRequestToJSON(json) {
+        return RunFormulaRequestToJSONTyped(json, false);
+    }
+    function RunFormulaRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'formula': value['formula'],
+            'rid': value['rid'],
+            'from': value['from'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const RunQueryRequestGroupByInnerGroupingEnum = {
+        EqualValues: 'equal-values'
+    };
+    /**
+     * Check if a given object implements the RunQueryRequestGroupByInner interface.
+     */
+    function instanceOfRunQueryRequestGroupByInner(value) {
+        return true;
+    }
+    function RunQueryRequestGroupByInnerFromJSON(json) {
+        return RunQueryRequestGroupByInnerFromJSONTyped(json);
+    }
+    function RunQueryRequestGroupByInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'fieldId': json['fieldId'] == null ? undefined : json['fieldId'],
+            'grouping': json['grouping'] == null ? undefined : json['grouping'],
+        };
+    }
+    function RunQueryRequestGroupByInnerToJSON(json) {
+        return RunQueryRequestGroupByInnerToJSONTyped(json, false);
+    }
+    function RunQueryRequestGroupByInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'fieldId': value['fieldId'],
+            'grouping': value['grouping'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunQueryRequestOptions interface.
+     */
+    function instanceOfRunQueryRequestOptions(value) {
+        return true;
+    }
+    function RunQueryRequestOptionsFromJSON(json) {
+        return RunQueryRequestOptionsFromJSONTyped(json);
+    }
+    function RunQueryRequestOptionsFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'skip': json['skip'] == null ? undefined : json['skip'],
+            'top': json['top'] == null ? undefined : json['top'],
+            'compareWithAppLocalTime': json['compareWithAppLocalTime'] == null ? undefined : json['compareWithAppLocalTime'],
+        };
+    }
+    function RunQueryRequestOptionsToJSON(json) {
+        return RunQueryRequestOptionsToJSONTyped(json, false);
+    }
+    function RunQueryRequestOptionsToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'skip': value['skip'],
+            'top': value['top'],
+            'compareWithAppLocalTime': value['compareWithAppLocalTime'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const RunQueryRequestSortByInnerOrderEnum = {
+        Asc: 'ASC',
+        Desc: 'DESC'
+    };
+    /**
+     * Check if a given object implements the RunQueryRequestSortByInner interface.
+     */
+    function instanceOfRunQueryRequestSortByInner(value) {
+        return true;
+    }
+    function RunQueryRequestSortByInnerFromJSON(json) {
+        return RunQueryRequestSortByInnerFromJSONTyped(json);
+    }
+    function RunQueryRequestSortByInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'fieldId': json['fieldId'] == null ? undefined : json['fieldId'],
+            'order': json['order'] == null ? undefined : json['order'],
+        };
+    }
+    function RunQueryRequestSortByInnerToJSON(json) {
+        return RunQueryRequestSortByInnerToJSONTyped(json, false);
+    }
+    function RunQueryRequestSortByInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'fieldId': value['fieldId'],
+            'order': value['order'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunQueryRequest interface.
+     */
+    function instanceOfRunQueryRequest(value) {
+        if (!('from' in value) || value['from'] === undefined)
+            return false;
+        return true;
+    }
+    function RunQueryRequestFromJSON(json) {
+        return RunQueryRequestFromJSONTyped(json);
+    }
+    function RunQueryRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'from': json['from'],
+            'select': json['select'] == null ? undefined : json['select'],
+            'where': json['where'] == null ? undefined : json['where'],
+            'sortBy': json['sortBy'] == null ? undefined : (json['sortBy'].map(RunQueryRequestSortByInnerFromJSON)),
+            'groupBy': json['groupBy'] == null ? undefined : (json['groupBy'].map(RunQueryRequestGroupByInnerFromJSON)),
+            'options': json['options'] == null ? undefined : RunQueryRequestOptionsFromJSON(json['options']),
+        };
+    }
+    function RunQueryRequestToJSON(json) {
+        return RunQueryRequestToJSONTyped(json, false);
+    }
+    function RunQueryRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'from': value['from'],
+            'select': value['select'],
+            'where': value['where'],
+            'sortBy': value['sortBy'] == null ? undefined : (value['sortBy'].map(RunQueryRequestSortByInnerToJSON)),
+            'groupBy': value['groupBy'] == null ? undefined : (value['groupBy'].map(RunQueryRequestGroupByInnerToJSON)),
+            'options': RunQueryRequestOptionsToJSON(value['options']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunQueryResponseMetadata interface.
+     */
+    function instanceOfRunQueryResponseMetadata(value) {
+        return true;
+    }
+    function RunQueryResponseMetadataFromJSON(json) {
+        return RunQueryResponseMetadataFromJSONTyped(json);
+    }
+    function RunQueryResponseMetadataFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'numFields': json['numFields'] == null ? undefined : json['numFields'],
+            'numRecords': json['numRecords'] == null ? undefined : json['numRecords'],
+            'skip': json['skip'] == null ? undefined : json['skip'],
+            'top': json['top'] == null ? undefined : json['top'],
+            'totalRecords': json['totalRecords'] == null ? undefined : json['totalRecords'],
+        };
+    }
+    function RunQueryResponseMetadataToJSON(json) {
+        return RunQueryResponseMetadataToJSONTyped(json, false);
+    }
+    function RunQueryResponseMetadataToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'numFields': value['numFields'],
+            'numRecords': value['numRecords'],
+            'skip': value['skip'],
+            'top': value['top'],
+            'totalRecords': value['totalRecords'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunQueryResponseFieldsInner interface.
+     */
+    function instanceOfRunQueryResponseFieldsInner(value) {
+        return true;
+    }
+    function RunQueryResponseFieldsInnerFromJSON(json) {
+        return RunQueryResponseFieldsInnerFromJSONTyped(json);
+    }
+    function RunQueryResponseFieldsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'] == null ? undefined : json['id'],
+            'label': json['label'] == null ? undefined : json['label'],
+            'type': json['type'] == null ? undefined : json['type'],
+        };
+    }
+    function RunQueryResponseFieldsInnerToJSON(json) {
+        return RunQueryResponseFieldsInnerToJSONTyped(json, false);
+    }
+    function RunQueryResponseFieldsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'label': value['label'],
+            'type': value['type'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the RunQueryResponse interface.
+     */
+    function instanceOfRunQueryResponse(value) {
+        return true;
+    }
+    function RunQueryResponseFromJSON(json) {
+        return RunQueryResponseFromJSONTyped(json);
+    }
+    function RunQueryResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'data': json['data'] == null ? undefined : json['data'],
+            'fields': json['fields'] == null ? undefined : (json['fields'].map(RunQueryResponseFieldsInnerFromJSON)),
+            'metadata': json['metadata'] == null ? undefined : RunQueryResponseMetadataFromJSON(json['metadata']),
+        };
+    }
+    function RunQueryResponseToJSON(json) {
+        return RunQueryResponseToJSONTyped(json, false);
+    }
+    function RunQueryResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'data': value['data'],
+            'fields': value['fields'] == null ? undefined : (value['fields'].map(RunQueryResponseFieldsInnerToJSON)),
+            'metadata': RunQueryResponseMetadataToJSON(value['metadata']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const TableDefaultSortOrderEnum = {
+        Asc: 'ASC',
+        Desc: 'DESC'
+    };
+    /**
+     * Check if a given object implements the Table interface.
+     */
+    function instanceOfTable(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        if (!('name' in value) || value['name'] === undefined)
+            return false;
+        return true;
+    }
+    function TableFromJSON(json) {
+        return TableFromJSONTyped(json);
+    }
+    function TableFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'name': json['name'],
+            'alias': json['alias'] == null ? undefined : json['alias'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'created': json['created'] == null ? undefined : (new Date(json['created'])),
+            'updated': json['updated'] == null ? undefined : (new Date(json['updated'])),
+            'nextRecordId': json['nextRecordId'] == null ? undefined : json['nextRecordId'],
+            'nextFieldId': json['nextFieldId'] == null ? undefined : json['nextFieldId'],
+            'defaultSortFieldId': json['defaultSortFieldId'] == null ? undefined : json['defaultSortFieldId'],
+            'defaultSortOrder': json['defaultSortOrder'] == null ? undefined : json['defaultSortOrder'],
+            'keyFieldId': json['keyFieldId'] == null ? undefined : json['keyFieldId'],
+            'singleRecordName': json['singleRecordName'] == null ? undefined : json['singleRecordName'],
+            'pluralRecordName': json['pluralRecordName'] == null ? undefined : json['pluralRecordName'],
+            'sizeLimit': json['sizeLimit'] == null ? undefined : json['sizeLimit'],
+            'spaceUsed': json['spaceUsed'] == null ? undefined : json['spaceUsed'],
+            'spaceRemaining': json['spaceRemaining'] == null ? undefined : json['spaceRemaining'],
+        };
+    }
+    function TableToJSON(json) {
+        return TableToJSONTyped(json, false);
+    }
+    function TableToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'alias': value['alias'],
+            'description': value['description'],
+            'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
+            'updated': value['updated'] == null ? undefined : ((value['updated']).toISOString()),
+            'nextRecordId': value['nextRecordId'],
+            'nextFieldId': value['nextFieldId'],
+            'defaultSortFieldId': value['defaultSortFieldId'],
+            'defaultSortOrder': value['defaultSortOrder'],
+            'keyFieldId': value['keyFieldId'],
+            'singleRecordName': value['singleRecordName'],
+            'pluralRecordName': value['pluralRecordName'],
+            'sizeLimit': value['sizeLimit'],
+            'spaceUsed': value['spaceUsed'],
+            'spaceRemaining': value['spaceRemaining'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the TransferUserToken200Response interface.
+     */
+    function instanceOfTransferUserToken200Response(value) {
+        return true;
+    }
+    function TransferUserToken200ResponseFromJSON(json) {
+        return TransferUserToken200ResponseFromJSONTyped(json);
+    }
+    function TransferUserToken200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'active': json['active'] == null ? undefined : json['active'],
+            'apps': json['apps'] == null ? undefined : json['apps'],
+            'lastUsed': json['lastUsed'] == null ? undefined : json['lastUsed'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'id': json['id'] == null ? undefined : json['id'],
+            'name': json['name'] == null ? undefined : json['name'],
+        };
+    }
+    function TransferUserToken200ResponseToJSON(json) {
+        return TransferUserToken200ResponseToJSONTyped(json, false);
+    }
+    function TransferUserToken200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'active': value['active'],
+            'apps': value['apps'],
+            'lastUsed': value['lastUsed'],
+            'description': value['description'],
+            'id': value['id'],
+            'name': value['name'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the TransferUserTokenRequest interface.
+     */
+    function instanceOfTransferUserTokenRequest(value) {
+        return true;
+    }
+    function TransferUserTokenRequestFromJSON(json) {
+        return TransferUserTokenRequestFromJSONTyped(json);
+    }
+    function TransferUserTokenRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'] == null ? undefined : json['id'],
+            'from': json['from'] == null ? undefined : json['from'],
+            'to': json['to'] == null ? undefined : json['to'],
+        };
+    }
+    function TransferUserTokenRequestToJSON(json) {
+        return TransferUserTokenRequestToJSONTyped(json, false);
+    }
+    function TransferUserTokenRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'from': value['from'],
+            'to': value['to'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the UndenyUsers200Response interface.
+     */
+    function instanceOfUndenyUsers200Response(value) {
+        if (!('failure' in value) || value['failure'] === undefined)
+            return false;
+        if (!('success' in value) || value['success'] === undefined)
+            return false;
+        return true;
+    }
+    function UndenyUsers200ResponseFromJSON(json) {
+        return UndenyUsers200ResponseFromJSONTyped(json);
+    }
+    function UndenyUsers200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            ...json,
+            'failure': json['failure'],
+            'success': json['success'],
+        };
+    }
+    function UndenyUsers200ResponseToJSON(json) {
+        return UndenyUsers200ResponseToJSONTyped(json, false);
+    }
+    function UndenyUsers200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            ...value,
+            'failure': value['failure'],
+            'success': value['success'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the UpdateRelationshipRequest interface.
+     */
+    function instanceOfUpdateRelationshipRequest(value) {
+        return true;
+    }
+    function UpdateRelationshipRequestFromJSON(json) {
+        return UpdateRelationshipRequestFromJSONTyped(json);
+    }
+    function UpdateRelationshipRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'summaryFields': json['summaryFields'] == null ? undefined : json['summaryFields'],
+            'lookupFieldIds': json['lookupFieldIds'] == null ? undefined : json['lookupFieldIds'],
+        };
+    }
+    function UpdateRelationshipRequestToJSON(json) {
+        return UpdateRelationshipRequestToJSONTyped(json, false);
+    }
+    function UpdateRelationshipRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'summaryFields': value['summaryFields'],
+            'lookupFieldIds': value['lookupFieldIds'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the UpdateTableRequest interface.
+     */
+    function instanceOfUpdateTableRequest(value) {
+        return true;
+    }
+    function UpdateTableRequestFromJSON(json) {
+        return UpdateTableRequestFromJSONTyped(json);
+    }
+    function UpdateTableRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'] == null ? undefined : json['name'],
+            'singleRecordName': json['singleRecordName'] == null ? undefined : json['singleRecordName'],
+            'pluralRecordName': json['pluralRecordName'] == null ? undefined : json['pluralRecordName'],
+            'description': json['description'] == null ? undefined : json['description'],
+        };
+    }
+    function UpdateTableRequestToJSON(json) {
+        return UpdateTableRequestToJSONTyped(json, false);
+    }
+    function UpdateTableRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'singleRecordName': value['singleRecordName'],
+            'pluralRecordName': value['pluralRecordName'],
+            'description': value['description'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Upsert200ResponseMetadata interface.
+     */
+    function instanceOfUpsert200ResponseMetadata(value) {
+        if (!('totalNumberOfRecordsProcessed' in value) || value['totalNumberOfRecordsProcessed'] === undefined)
+            return false;
+        return true;
+    }
+    function Upsert200ResponseMetadataFromJSON(json) {
+        return Upsert200ResponseMetadataFromJSONTyped(json);
+    }
+    function Upsert200ResponseMetadataFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'createdRecordIds': json['createdRecordIds'] == null ? undefined : json['createdRecordIds'],
+            'updatedRecordIds': json['updatedRecordIds'] == null ? undefined : json['updatedRecordIds'],
+            'unchangedRecordIds': json['unchangedRecordIds'] == null ? undefined : json['unchangedRecordIds'],
+            'totalNumberOfRecordsProcessed': json['totalNumberOfRecordsProcessed'],
+        };
+    }
+    function Upsert200ResponseMetadataToJSON(json) {
+        return Upsert200ResponseMetadataToJSONTyped(json, false);
+    }
+    function Upsert200ResponseMetadataToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'createdRecordIds': value['createdRecordIds'],
+            'updatedRecordIds': value['updatedRecordIds'],
+            'unchangedRecordIds': value['unchangedRecordIds'],
+            'totalNumberOfRecordsProcessed': value['totalNumberOfRecordsProcessed'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Upsert200Response interface.
+     */
+    function instanceOfUpsert200Response(value) {
+        return true;
+    }
+    function Upsert200ResponseFromJSON(json) {
+        return Upsert200ResponseFromJSONTyped(json);
+    }
+    function Upsert200ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'data': json['data'] == null ? undefined : json['data'],
+            'metadata': json['metadata'] == null ? undefined : Upsert200ResponseMetadataFromJSON(json['metadata']),
+        };
+    }
+    function Upsert200ResponseToJSON(json) {
+        return Upsert200ResponseToJSONTyped(json, false);
+    }
+    function Upsert200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'data': value['data'],
+            'metadata': Upsert200ResponseMetadataToJSON(value['metadata']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Upsert200ResponseDataInnerValue interface.
+     */
+    function instanceOfUpsert200ResponseDataInnerValue(value) {
+        if (!('value' in value) || value['value'] === undefined)
+            return false;
+        return true;
+    }
+    function Upsert200ResponseDataInnerValueFromJSON(json) {
+        return Upsert200ResponseDataInnerValueFromJSONTyped(json);
+    }
+    function Upsert200ResponseDataInnerValueFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'value': json['value'],
+        };
+    }
+    function Upsert200ResponseDataInnerValueToJSON(json) {
+        return Upsert200ResponseDataInnerValueToJSONTyped(json, false);
+    }
+    function Upsert200ResponseDataInnerValueToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'value': value['value'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Upsert207ResponseMetadata interface.
+     */
+    function instanceOfUpsert207ResponseMetadata(value) {
+        if (!('totalNumberOfRecordsProcessed' in value) || value['totalNumberOfRecordsProcessed'] === undefined)
+            return false;
+        return true;
+    }
+    function Upsert207ResponseMetadataFromJSON(json) {
+        return Upsert207ResponseMetadataFromJSONTyped(json);
+    }
+    function Upsert207ResponseMetadataFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'createdRecordIds': json['createdRecordIds'] == null ? undefined : json['createdRecordIds'],
+            'updatedRecordIds': json['updatedRecordIds'] == null ? undefined : json['updatedRecordIds'],
+            'unchangedRecordIds': json['unchangedRecordIds'] == null ? undefined : json['unchangedRecordIds'],
+            'lineErrors': json['lineErrors'] == null ? undefined : json['lineErrors'],
+            'totalNumberOfRecordsProcessed': json['totalNumberOfRecordsProcessed'],
+        };
+    }
+    function Upsert207ResponseMetadataToJSON(json) {
+        return Upsert207ResponseMetadataToJSONTyped(json, false);
+    }
+    function Upsert207ResponseMetadataToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'createdRecordIds': value['createdRecordIds'],
+            'updatedRecordIds': value['updatedRecordIds'],
+            'unchangedRecordIds': value['unchangedRecordIds'],
+            'lineErrors': value['lineErrors'],
+            'totalNumberOfRecordsProcessed': value['totalNumberOfRecordsProcessed'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the Upsert207Response interface.
+     */
+    function instanceOfUpsert207Response(value) {
+        return true;
+    }
+    function Upsert207ResponseFromJSON(json) {
+        return Upsert207ResponseFromJSONTyped(json);
+    }
+    function Upsert207ResponseFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'data': json['data'] == null ? undefined : json['data'],
+            'metadata': json['metadata'] == null ? undefined : Upsert207ResponseMetadataFromJSON(json['metadata']),
+        };
+    }
+    function Upsert207ResponseToJSON(json) {
+        return Upsert207ResponseToJSONTyped(json, false);
+    }
+    function Upsert207ResponseToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'data': value['data'],
+            'metadata': Upsert207ResponseMetadataToJSON(value['metadata']),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the UpsertRequest interface.
+     */
+    function instanceOfUpsertRequest(value) {
+        if (!('to' in value) || value['to'] === undefined)
+            return false;
+        return true;
+    }
+    function UpsertRequestFromJSON(json) {
+        return UpsertRequestFromJSONTyped(json);
+    }
+    function UpsertRequestFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'to': json['to'],
+            'data': json['data'] == null ? undefined : (json['data'].map(RecordFromJSON)),
+            'mergeFieldId': json['mergeFieldId'] == null ? undefined : json['mergeFieldId'],
+            'fieldsToReturn': json['fieldsToReturn'] == null ? undefined : json['fieldsToReturn'],
+        };
+    }
+    function UpsertRequestToJSON(json) {
+        return UpsertRequestToJSONTyped(json, false);
+    }
+    function UpsertRequestToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'to': value['to'],
+            'data': value['data'] == null ? undefined : (value['data'].map(RecordToJSON)),
+            'mergeFieldId': value['mergeFieldId'],
+            'fieldsToReturn': value['fieldsToReturn'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class AppsApi extends BaseAPI {
+        /**
+         * Copy an existing application
+         */
+        async copyAppRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling copyApp().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling copyApp().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/apps/{appId}/copy`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CopyAppRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CopyApp200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Copy an existing application
+         */
+        async copyApp(requestParameters, initOverrides) {
+            const response = await this.copyAppRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Create a new application
+         */
+        async createAppRaw(requestParameters, initOverrides) {
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling createApp().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/apps`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CreateAppRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CreateApp200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Create a new application
+         */
+        async createApp(requestParameters, initOverrides) {
+            const response = await this.createAppRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Delete an application by ID
+         */
+        async deleteAppRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling deleteApp().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling deleteApp().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/apps/{appId}`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: DeleteAppRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteApp200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Delete an application by ID
+         */
+        async deleteApp(requestParameters, initOverrides) {
+            const response = await this.deleteAppRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get an app by ID
+         */
+        async getAppRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling getApp().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/apps/{appId}`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => AppFromJSON(jsonValue));
+        }
+        /**
+         * Get an app by ID
+         */
+        async getApp(requestParameters, initOverrides) {
+            const response = await this.getAppRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+         * Get app events
+         */
+        async getAppEventsRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling getAppEvents().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/apps/{appId}/events`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+         * Get app events
+         */
+        async getAppEvents(requestParameters, initOverrides) {
+            const response = await this.getAppEventsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class AuditApi extends BaseAPI {
+        /**
+         * Gathers the audit logs for a single day from a realm. By default, this API returns 10,000 entries. This can be changed with the numRows parameter. Integrators can iterate through batches to get an entire day\'s worth of logs. Each realm has a maximum entitlement of querying 1,000 days per year (allowing lookbacks for up to two years). Requests for paginated data do not count towards the annual limit. Transactional rate limits are 10 per 10 seconds.   **Note:** This API is available for enterprise users only.
+         * Get audit logs
+         */
+        async auditRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/audit`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: AuditRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => Audit200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Gathers the audit logs for a single day from a realm. By default, this API returns 10,000 entries. This can be changed with the numRows parameter. Integrators can iterate through batches to get an entire day\'s worth of logs. Each realm has a maximum entitlement of querying 1,000 days per year (allowing lookbacks for up to two years). Requests for paginated data do not count towards the annual limit. Transactional rate limits are 10 per 10 seconds.   **Note:** This API is available for enterprise users only.
+         * Get audit logs
+         */
+        async audit(requestParameters = {}, initOverrides) {
+            const response = await this.auditRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class AuthApi extends BaseAPI {
+        /**
+         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+         * Exchange an SSO token
+         */
+        async exchangeSsoTokenRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/auth/oauth/token`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: ExchangeSsoTokenRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => ExchangeSsoToken200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+         * Exchange an SSO token
+         */
+        async exchangeSsoToken(requestParameters = {}, initOverrides) {
+            const response = await this.exchangeSsoTokenRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get a temporary authorization token for a specific dbid
+         */
+        async getTempTokenDBIDRaw(requestParameters, initOverrides) {
+            if (requestParameters['dbid'] == null) {
+                throw new RequiredError('dbid', 'Required parameter "dbid" was null or undefined when calling getTempTokenDBID().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/auth/temporary/{dbid}`.replace(`{${"dbid"}}`, encodeURIComponent(String(requestParameters['dbid']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => GetTempTokenDBID200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get a temporary authorization token for a specific dbid
+         */
+        async getTempTokenDBID(requestParameters, initOverrides) {
+            const response = await this.getTempTokenDBIDRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class DocumentTemplatesApi extends BaseAPI {
+        /**
+         * Generates a document from a template. This feature is only available on business or enterprise plans.
+         * Generate a document
+         */
+        async generateDocumentRaw(requestParameters, initOverrides) {
+            if (requestParameters['templateId'] == null) {
+                throw new RequiredError('templateId', 'Required parameter "templateId" was null or undefined when calling generateDocument().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling generateDocument().');
+            }
+            if (requestParameters['filename'] == null) {
+                throw new RequiredError('filename', 'Required parameter "filename" was null or undefined when calling generateDocument().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['recordId'] != null) {
+                queryParameters['recordId'] = requestParameters['recordId'];
+            }
+            if (requestParameters['filename'] != null) {
+                queryParameters['filename'] = requestParameters['filename'];
+            }
+            if (requestParameters['format'] != null) {
+                queryParameters['format'] = requestParameters['format'];
+            }
+            if (requestParameters['margin'] != null) {
+                queryParameters['margin'] = requestParameters['margin'];
+            }
+            if (requestParameters['unit'] != null) {
+                queryParameters['unit'] = requestParameters['unit'];
+            }
+            if (requestParameters['pageSize'] != null) {
+                queryParameters['pageSize'] = requestParameters['pageSize'];
+            }
+            if (requestParameters['orientation'] != null) {
+                queryParameters['orientation'] = requestParameters['orientation'];
+            }
+            if (requestParameters['realm'] != null) {
+                queryParameters['realm'] = requestParameters['realm'];
+            }
+            const headerParameters = {};
+            if (requestParameters['accept'] != null) {
+                headerParameters['accept'] = String(requestParameters['accept']);
+            }
+            const response = await this.request({
+                path: `/docTemplates/{templateId}/generate`.replace(`{${"templateId"}}`, encodeURIComponent(String(requestParameters['templateId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => GenerateDocument200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Generates a document from a template. This feature is only available on business or enterprise plans.
+         * Generate a document
+         */
+        async generateDocument(requestParameters, initOverrides) {
+            const response = await this.generateDocumentRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class FieldsApi extends BaseAPI {
+        /**
+         * Create a new field in a table
+         */
+        async createFieldRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling createField().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling createField().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/fields`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CreateFieldRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CreateField200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Create a new field in a table
+         */
+        async createField(requestParameters, initOverrides) {
+            const response = await this.createFieldRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Delete fields from a table
+         */
+        async deleteFieldsRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling deleteFields().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling deleteFields().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/fields`,
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: DeleteFieldsRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteFields200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Delete fields from a table
+         */
+        async deleteFields(requestParameters, initOverrides) {
+            const response = await this.deleteFieldsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get the properties of an individual field by ID
+         */
+        async getFieldRaw(requestParameters, initOverrides) {
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling getField().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getField().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['includeFieldPerms'] != null) {
+                queryParameters['includeFieldPerms'] = requestParameters['includeFieldPerms'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/fields/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => FieldFromJSON(jsonValue));
+        }
+        /**
+         * Get the properties of an individual field by ID
+         */
+        async getField(requestParameters, initOverrides) {
+            const response = await this.getFieldRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Retrieve usage statistics for a specific field, summarizing where it is referenced across QuickBase features such as reports, forms, and pipelines.
+         * Get usage statistics for a single field
+         */
+        async getFieldUsageRaw(requestParameters, initOverrides) {
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling getFieldUsage().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getFieldUsage().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            const headerParameters = {};
+            if (requestParameters['userAgent'] != null) {
+                headerParameters['User-Agent'] = String(requestParameters['userAgent']);
+            }
+            const response = await this.request({
+                path: `/fields/usage/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => jsonValue.map(FieldUsageFromJSON));
+        }
+        /**
+         * Retrieve usage statistics for a specific field, summarizing where it is referenced across QuickBase features such as reports, forms, and pipelines.
+         * Get usage statistics for a single field
+         */
+        async getFieldUsage(requestParameters, initOverrides) {
+            const response = await this.getFieldUsageRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get all fields for a table
+         */
+        async getFieldsRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getFields().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['includeFieldPerms'] != null) {
+                queryParameters['includeFieldPerms'] = requestParameters['includeFieldPerms'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/fields`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => jsonValue.map(FieldFromJSON));
+        }
+        /**
+         * Get all fields for a table
+         */
+        async getFields(requestParameters, initOverrides) {
+            const response = await this.getFieldsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get usage statistics for all fields in a table
+         */
+        async getFieldsUsageRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getFieldsUsage().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['skip'] != null) {
+                queryParameters['skip'] = requestParameters['skip'];
+            }
+            if (requestParameters['top'] != null) {
+                queryParameters['top'] = requestParameters['top'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/fields/usage`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => jsonValue.map(FieldUsageFromJSON));
+        }
+        /**
+         * Get usage statistics for all fields in a table
+         */
+        async getFieldsUsage(requestParameters, initOverrides) {
+            const response = await this.getFieldsUsageRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class FilesApi extends BaseAPI {
+        /**
+         * Deletes one file attachment version. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to delete file versions.
+         * Delete file
+         */
+        async deleteFileRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling deleteFile().');
+            }
+            if (requestParameters['recordId'] == null) {
+                throw new RequiredError('recordId', 'Required parameter "recordId" was null or undefined when calling deleteFile().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling deleteFile().');
+            }
+            if (requestParameters['versionNumber'] == null) {
+                throw new RequiredError('versionNumber', 'Required parameter "versionNumber" was null or undefined when calling deleteFile().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/files/{tableId}/{recordId}/{fieldId}/{versionNumber}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))).replace(`{${"recordId"}}`, encodeURIComponent(String(requestParameters['recordId']))).replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))).replace(`{${"versionNumber"}}`, encodeURIComponent(String(requestParameters['versionNumber']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteFile200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Deletes one file attachment version. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to delete file versions.
+         * Delete file
+         */
+        async deleteFile(requestParameters, initOverrides) {
+            const response = await this.deleteFileRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Downloads the file attachment, with the file attachment content encoded in base64 format. The API response returns the file name in the `Content-Disposition` header. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to fetch files.
+         * Download file
+         */
+        async downloadFileRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling downloadFile().');
+            }
+            if (requestParameters['recordId'] == null) {
+                throw new RequiredError('recordId', 'Required parameter "recordId" was null or undefined when calling downloadFile().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling downloadFile().');
+            }
+            if (requestParameters['versionNumber'] == null) {
+                throw new RequiredError('versionNumber', 'Required parameter "versionNumber" was null or undefined when calling downloadFile().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/files/{tableId}/{recordId}/{fieldId}/{versionNumber}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))).replace(`{${"recordId"}}`, encodeURIComponent(String(requestParameters['recordId']))).replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))).replace(`{${"versionNumber"}}`, encodeURIComponent(String(requestParameters['versionNumber']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Downloads the file attachment, with the file attachment content encoded in base64 format. The API response returns the file name in the `Content-Disposition` header. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to fetch files.
+         * Download file
+         */
+        async downloadFile(requestParameters, initOverrides) {
+            const response = await this.downloadFileRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class FormulasApi extends BaseAPI {
+        /**
+         * Allows running a formula via an API call. Use this method in custom code to get the value back of a formula without a discrete field on a record.
+         * Run a formula
+         */
+        async runFormulaRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/formula/run`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: RunFormulaRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => RunFormula200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Allows running a formula via an API call. Use this method in custom code to get the value back of a formula without a discrete field on a record.
+         * Run a formula
+         */
+        async runFormula(requestParameters = {}, initOverrides) {
+            const response = await this.runFormulaRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class PlatformAnalyticsApi extends BaseAPI {
+        /**
+         * Get event summaries for any span of days up to one year and excluding future dates.   **Note:** This API is available for enterprise users only. Data is updated hourly; to ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
+         * Get event summaries
+         */
+        async platformAnalyticEventSummariesRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            if (requestParameters['accountId'] != null) {
+                queryParameters['accountId'] = requestParameters['accountId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/analytics/events/summaries`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: PlatformAnalyticEventSummariesRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => PlatformAnalyticEventSummaries200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get event summaries for any span of days up to one year and excluding future dates.   **Note:** This API is available for enterprise users only. Data is updated hourly; to ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
+         * Get event summaries
+         */
+        async platformAnalyticEventSummaries(requestParameters = {}, initOverrides) {
+            const response = await this.platformAnalyticEventSummariesRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get user read and integration read summaries for any day in the past.   **Note:** This API is available for enterprise users only.
+         * Get read summaries
+         */
+        async platformAnalyticReadsRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            if (requestParameters['day'] != null) {
+                queryParameters['day'] = requestParameters['day'].toISOString().substring(0, 10);
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/analytics/reads`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => PlatformAnalyticReads200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get user read and integration read summaries for any day in the past.   **Note:** This API is available for enterprise users only.
+         * Get read summaries
+         */
+        async platformAnalyticReads(requestParameters = {}, initOverrides) {
+            const response = await this.platformAnalyticReadsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class RecordsApi extends BaseAPI {
+        /**
+         * Delete records in a table
+         */
+        async deleteRecordsRaw(requestParameters, initOverrides) {
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling deleteRecords().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/records`,
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: DeleteRecordsRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteRecords200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Delete records in a table
+         */
+        async deleteRecords(requestParameters, initOverrides) {
+            const response = await this.deleteRecordsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Query records in a table
+         */
+        async runQueryRaw(requestParameters, initOverrides) {
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling runQuery().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/records/query`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: RunQueryRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => RunQueryResponseFromJSON(jsonValue));
+        }
+        /**
+         * Query records in a table
+         */
+        async runQuery(requestParameters, initOverrides) {
+            const response = await this.runQueryRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Upsert records in a table
+         */
+        async upsertRaw(requestParameters, initOverrides) {
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling upsert().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/records`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: UpsertRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => Upsert200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Upsert records in a table
+         */
+        async upsert(requestParameters, initOverrides) {
+            const response = await this.upsertRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class RelationshipsApi extends BaseAPI {
+        /**
+         * Get relationships for a table
+         */
+        async getRelationshipsRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getRelationships().');
+            }
+            const queryParameters = {};
+            if (requestParameters['skip'] != null) {
+                queryParameters['skip'] = requestParameters['skip'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/tables/{tableId}/relationships`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => GetRelationships200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get relationships for a table
+         */
+        async getRelationships(requestParameters, initOverrides) {
+            const response = await this.getRelationshipsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class ReportsApi extends BaseAPI {
+        /**
+         * Get the schema (properties) of an individual report.
+         * Get a report
+         */
+        async getReportRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getReport().');
+            }
+            if (requestParameters['reportId'] == null) {
+                throw new RequiredError('reportId', 'Required parameter "reportId" was null or undefined when calling getReport().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/reports/{reportId}`.replace(`{${"reportId"}}`, encodeURIComponent(String(requestParameters['reportId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => GetReport200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get the schema (properties) of an individual report.
+         * Get a report
+         */
+        async getReport(requestParameters, initOverrides) {
+            const response = await this.getReportRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get the schema (properties) of all reports for a table. If the user running the API is an application administrator, the API will also return all personal reports with owner\'s user id.
+         * Get reports for a table
+         */
+        async getTableReportsRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getTableReports().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/reports`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Get the schema (properties) of all reports for a table. If the user running the API is an application administrator, the API will also return all personal reports with owner\'s user id.
+         * Get reports for a table
+         */
+        async getTableReports(requestParameters, initOverrides) {
+            const response = await this.getTableReportsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Run a report
+         */
+        async runReportRaw(requestParameters, initOverrides) {
+            if (requestParameters['reportId'] == null) {
+                throw new RequiredError('reportId', 'Required parameter "reportId" was null or undefined when calling runReport().');
+            }
+            if (requestParameters['generated'] == null) {
+                throw new RequiredError('generated', 'Required parameter "generated" was null or undefined when calling runReport().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/reports/{reportId}/run`.replace(`{${"reportId"}}`, encodeURIComponent(String(requestParameters['reportId']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => jsonValue.map(ReportRunResponseFromJSON));
+        }
+        /**
+         * Run a report
+         */
+        async runReport(requestParameters, initOverrides) {
+            const response = await this.runReportRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class SolutionsApi extends BaseAPI {
+        /**
+         * Returns a list of changes that would occur if the provided QBL were to be applied. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * List solution changes
+         */
+        async changesetSolutionRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling changesetSolution().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/x-yaml';
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}/changeset`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'PUT',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Returns a list of changes that would occur if the provided QBL were to be applied. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * List solution changes
+         */
+        async changesetSolution(requestParameters, initOverrides) {
+            const response = await this.changesetSolutionRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Returns a list of changes that would occur if the QBL from the provided record were to be applied.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * List solution changes from record
+         */
+        async changesetSolutionFromRecordRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling changesetSolutionFromRecord().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling changesetSolutionFromRecord().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling changesetSolutionFromRecord().');
+            }
+            if (requestParameters['recordId'] == null) {
+                throw new RequiredError('recordId', 'Required parameter "recordId" was null or undefined when calling changesetSolutionFromRecord().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['fieldId'] != null) {
+                queryParameters['fieldId'] = requestParameters['fieldId'];
+            }
+            if (requestParameters['recordId'] != null) {
+                queryParameters['recordId'] = requestParameters['recordId'];
+            }
+            const headerParameters = {};
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}/changeset/fromrecord`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Returns a list of changes that would occur if the QBL from the provided record were to be applied.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * List solution changes from record
+         */
+        async changesetSolutionFromRecord(requestParameters, initOverrides) {
+            const response = await this.changesetSolutionFromRecordRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Create a solution
+         */
+        async createSolutionRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/x-yaml';
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Create a solution
+         */
+        async createSolution(requestParameters = {}, initOverrides) {
+            const response = await this.createSolutionRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Creates a solution using the QBL from the specified record.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Create solution from record
+         */
+        async createSolutionFromRecordRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling createSolutionFromRecord().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling createSolutionFromRecord().');
+            }
+            if (requestParameters['recordId'] == null) {
+                throw new RequiredError('recordId', 'Required parameter "recordId" was null or undefined when calling createSolutionFromRecord().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['fieldId'] != null) {
+                queryParameters['fieldId'] = requestParameters['fieldId'];
+            }
+            if (requestParameters['recordId'] != null) {
+                queryParameters['recordId'] = requestParameters['recordId'];
+            }
+            const headerParameters = {};
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions/fromrecord`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Creates a solution using the QBL from the specified record.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Create solution from record
+         */
+        async createSolutionFromRecord(requestParameters, initOverrides) {
+            const response = await this.createSolutionFromRecordRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Export a solution
+         */
+        async exportSolutionRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling exportSolution().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            if (requestParameters['qBLVersion'] != null) {
+                headerParameters['qBLVersion'] = String(requestParameters['qBLVersion']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Export a solution
+         */
+        async exportSolution(requestParameters, initOverrides) {
+            const response = await this.exportSolutionRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Exports the solution and outputs the resulting QBL in a new record in the specified table. The QBL will be saved to a file in the file attachment field that is specified. The table cannot have any required fields besides the file attachment field.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Export solution to record
+         */
+        async exportSolutionToRecordRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling exportSolutionToRecord().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling exportSolutionToRecord().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling exportSolutionToRecord().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['fieldId'] != null) {
+                queryParameters['fieldId'] = requestParameters['fieldId'];
+            }
+            const headerParameters = {};
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            if (requestParameters['qBLVersion'] != null) {
+                headerParameters['qBLVersion'] = String(requestParameters['qBLVersion']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}/torecord`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Exports the solution and outputs the resulting QBL in a new record in the specified table. The QBL will be saved to a file in the file attachment field that is specified. The table cannot have any required fields besides the file attachment field.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Export solution to record
+         */
+        async exportSolutionToRecord(requestParameters, initOverrides) {
+            const response = await this.exportSolutionToRecordRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Updates the solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Update a solution
+         */
+        async updateSolutionRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling updateSolution().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/x-yaml';
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'PUT',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Updates the solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Update a solution
+         */
+        async updateSolution(requestParameters, initOverrides) {
+            const response = await this.updateSolutionRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Updates a solution using the QBL from the specified record.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Update solution from record
+         */
+        async updateSolutionToRecordRaw(requestParameters, initOverrides) {
+            if (requestParameters['solutionId'] == null) {
+                throw new RequiredError('solutionId', 'Required parameter "solutionId" was null or undefined when calling updateSolutionToRecord().');
+            }
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling updateSolutionToRecord().');
+            }
+            if (requestParameters['fieldId'] == null) {
+                throw new RequiredError('fieldId', 'Required parameter "fieldId" was null or undefined when calling updateSolutionToRecord().');
+            }
+            if (requestParameters['recordId'] == null) {
+                throw new RequiredError('recordId', 'Required parameter "recordId" was null or undefined when calling updateSolutionToRecord().');
+            }
+            const queryParameters = {};
+            if (requestParameters['tableId'] != null) {
+                queryParameters['tableId'] = requestParameters['tableId'];
+            }
+            if (requestParameters['fieldId'] != null) {
+                queryParameters['fieldId'] = requestParameters['fieldId'];
+            }
+            if (requestParameters['recordId'] != null) {
+                queryParameters['recordId'] = requestParameters['recordId'];
+            }
+            const headerParameters = {};
+            if (requestParameters['xQBLErrorsAsSuccess'] != null) {
+                headerParameters['xQBLErrorsAsSuccess'] = String(requestParameters['xQBLErrorsAsSuccess']);
+            }
+            const response = await this.request({
+                path: `/solutions/{solutionId}/fromrecord`.replace(`{${"solutionId"}}`, encodeURIComponent(String(requestParameters['solutionId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response);
+        }
+        /**
+         * Updates a solution using the QBL from the specified record.    We are releasing schema coverage for QBL in stages. See [what\'s supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+         * Update solution from record
+         */
+        async updateSolutionToRecord(requestParameters, initOverrides) {
+            const response = await this.updateSolutionToRecordRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class TablesApi extends BaseAPI {
+        /**
+         * Creates a relationship in a table as well as lookup/summary fields. Relationships can only be created for tables within the same app.
+         * Create a relationship
+         */
+        async createRelationshipRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling createRelationship().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/tables/{tableId}/relationship`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CreateRelationshipRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CreateRelationship200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Creates a relationship in a table as well as lookup/summary fields. Relationships can only be created for tables within the same app.
+         * Create a relationship
+         */
+        async createRelationship(requestParameters, initOverrides) {
+            const response = await this.createRelationshipRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Create a new table in an app
+         */
+        async createTableRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling createTable().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling createTable().');
+            }
+            const queryParameters = {};
+            if (requestParameters['appId'] != null) {
+                queryParameters['appId'] = requestParameters['appId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/tables`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CreateTableRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => TableFromJSON(jsonValue));
+        }
+        /**
+         * Create a new table in an app
+         */
+        async createTable(requestParameters, initOverrides) {
+            const response = await this.createTableRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Use this endpoint to delete an entire relationship, including all lookup and summary fields. The reference field in the relationship will not be deleted.
+         * Delete a relationship
+         */
+        async deleteRelationshipRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling deleteRelationship().');
+            }
+            if (requestParameters['relationshipId'] == null) {
+                throw new RequiredError('relationshipId', 'Required parameter "relationshipId" was null or undefined when calling deleteRelationship().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/tables/{tableId}/relationship/{relationshipId}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))).replace(`{${"relationshipId"}}`, encodeURIComponent(String(requestParameters['relationshipId']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteRelationship200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Use this endpoint to delete an entire relationship, including all lookup and summary fields. The reference field in the relationship will not be deleted.
+         * Delete a relationship
+         */
+        async deleteRelationship(requestParameters, initOverrides) {
+            const response = await this.deleteRelationshipRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Delete a table by ID
+         */
+        async deleteTableRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling deleteTable().');
+            }
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling deleteTable().');
+            }
+            const queryParameters = {};
+            if (requestParameters['appId'] != null) {
+                queryParameters['appId'] = requestParameters['appId'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/tables/{tableId}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeleteTableResponseFromJSON(jsonValue));
+        }
+        /**
+         * Delete a table by ID
+         */
+        async deleteTable(requestParameters, initOverrides) {
+            const response = await this.deleteTableRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get all tables for an app
+         */
+        async getAppTablesRaw(requestParameters, initOverrides) {
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling getAppTables().');
+            }
+            const queryParameters = {};
+            if (requestParameters['appId'] != null) {
+                queryParameters['appId'] = requestParameters['appId'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/tables`,
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => jsonValue.map(TableFromJSON));
+        }
+        /**
+         * Get all tables for an app
+         */
+        async getAppTables(requestParameters, initOverrides) {
+            const response = await this.getAppTablesRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get a table by ID
+         */
+        async getTableRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling getTable().');
+            }
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling getTable().');
+            }
+            const queryParameters = {};
+            if (requestParameters['appId'] != null) {
+                queryParameters['appId'] = requestParameters['appId'];
+            }
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/tables/{tableId}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))),
+                method: 'GET',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => TableFromJSON(jsonValue));
+        }
+        /**
+         * Get a table by ID
+         */
+        async getTable(requestParameters, initOverrides) {
+            const response = await this.getTableRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Use this endpoint to add lookup fields and summary fields to an existing relationship. Updating a relationship will not delete existing lookup/summary fields.
+         * Update a relationship
+         */
+        async updateRelationshipRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling updateRelationship().');
+            }
+            if (requestParameters['relationshipId'] == null) {
+                throw new RequiredError('relationshipId', 'Required parameter "relationshipId" was null or undefined when calling updateRelationship().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/tables/{tableId}/relationship/{relationshipId}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))).replace(`{${"relationshipId"}}`, encodeURIComponent(String(requestParameters['relationshipId']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: UpdateRelationshipRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CreateRelationship200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Use this endpoint to add lookup fields and summary fields to an existing relationship. Updating a relationship will not delete existing lookup/summary fields.
+         * Update a relationship
+         */
+        async updateRelationship(requestParameters, initOverrides) {
+            const response = await this.updateRelationshipRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Update a table by ID
+         */
+        async updateTableRaw(requestParameters, initOverrides) {
+            if (requestParameters['tableId'] == null) {
+                throw new RequiredError('tableId', 'Required parameter "tableId" was null or undefined when calling updateTable().');
+            }
+            if (requestParameters['appId'] == null) {
+                throw new RequiredError('appId', 'Required parameter "appId" was null or undefined when calling updateTable().');
+            }
+            if (requestParameters['body'] == null) {
+                throw new RequiredError('body', 'Required parameter "body" was null or undefined when calling updateTable().');
+            }
+            const queryParameters = {};
+            if (requestParameters['appId'] != null) {
+                queryParameters['appId'] = requestParameters['appId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/tables/{tableId}`.replace(`{${"tableId"}}`, encodeURIComponent(String(requestParameters['tableId']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: UpdateTableRequestToJSON(requestParameters['body']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => TableFromJSON(jsonValue));
+        }
+        /**
+         * Update a table by ID
+         */
+        async updateTable(requestParameters, initOverrides) {
+            const response = await this.updateTableRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class UserTokenApi extends BaseAPI {
+        /**
+         * Clones the authenticated user token. All applications associated with that token are automatically associated with the new token.
+         * Clone a user token
+         */
+        async cloneUserTokenRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/usertoken/clone`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: CloneUserTokenRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => CloneUserToken200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Clones the authenticated user token. All applications associated with that token are automatically associated with the new token.
+         * Clone a user token
+         */
+        async cloneUserToken(requestParameters = {}, initOverrides) {
+            const response = await this.cloneUserTokenRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Deactivates the authenticated user token. Once this is done, the user token must be reactivated in the user interface.
+         * Deactivate a user token
+         */
+        async deactivateUserTokenRaw(initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/usertoken/deactivate`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeactivateUserToken200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Deactivates the authenticated user token. Once this is done, the user token must be reactivated in the user interface.
+         * Deactivate a user token
+         */
+        async deactivateUserToken(initOverrides) {
+            const response = await this.deactivateUserTokenRaw(initOverrides);
+            return await response.value();
+        }
+        /**
+         * Deletes the authenticated user token. This is not reversible.
+         * Delete a user token
+         */
+        async deleteUserTokenRaw(initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            const response = await this.request({
+                path: `/usertoken`,
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DeactivateUserToken200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Deletes the authenticated user token. This is not reversible.
+         * Delete a user token
+         */
+        async deleteUserToken(initOverrides) {
+            const response = await this.deleteUserTokenRaw(initOverrides);
+            return await response.value();
+        }
+        /**
+         * Transfers the specified user token. Application associations will remain intact. For security, permissions must manually be reconciled.
+         * Transfer a user token
+         */
+        async transferUserTokenRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/usertoken/transfer`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: TransferUserTokenRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => TransferUserToken200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Transfers the specified user token. Application associations will remain intact. For security, permissions must manually be reconciled.
+         * Transfer a user token
+         */
+        async transferUserToken(requestParameters = {}, initOverrides) {
+            const response = await this.transferUserTokenRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     *
+     */
+    class UsersApi extends BaseAPI {
+        /**
+         * Adds a list of users to a given group as managers.
+         * Add managers
+         */
+        async addManagersToGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling addManagersToGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/managers`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => AddMembersToGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Adds a list of users to a given group as managers.
+         * Add managers
+         */
+        async addManagersToGroup(requestParameters, initOverrides) {
+            const response = await this.addManagersToGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Adds a list of users to a given group as members.
+         * Add members
+         */
+        async addMembersToGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling addMembersToGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/members`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => AddMembersToGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Adds a list of users to a given group as members.
+         * Add members
+         */
+        async addMembersToGroup(requestParameters, initOverrides) {
+            const response = await this.addMembersToGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Adds a list of groups to a given group.
+         * Add child groups
+         */
+        async addSubgroupsToGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling addSubgroupsToGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/subgroups`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => AddSubgroupsToGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Adds a list of groups to a given group.
+         * Add child groups
+         */
+        async addSubgroupsToGroup(requestParameters, initOverrides) {
+            const response = await this.addSubgroupsToGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Denies users access to the realm but leaves them listed in groups they have been added to.
+         * Deny users
+         */
+        async denyUsersRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            if (requestParameters['accountId'] != null) {
+                queryParameters['accountId'] = requestParameters['accountId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/users/deny`,
+                method: 'PUT',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DenyUsers200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Denies users access to the realm but leaves them listed in groups they have been added to.
+         * Deny users
+         */
+        async denyUsers(requestParameters = {}, initOverrides) {
+            const response = await this.denyUsersRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Denies users access to the realm and allows you to remove them from groups.
+         * Deny and remove users from groups
+         */
+        async denyUsersAndGroupsRaw(requestParameters, initOverrides) {
+            if (requestParameters['shouldDeleteFromGroups'] == null) {
+                throw new RequiredError('shouldDeleteFromGroups', 'Required parameter "shouldDeleteFromGroups" was null or undefined when calling denyUsersAndGroups().');
+            }
+            const queryParameters = {};
+            if (requestParameters['accountId'] != null) {
+                queryParameters['accountId'] = requestParameters['accountId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/users/deny/{shouldDeleteFromGroups}`.replace(`{${"shouldDeleteFromGroups"}}`, encodeURIComponent(String(requestParameters['shouldDeleteFromGroups']))),
+                method: 'PUT',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => DenyUsers200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Denies users access to the realm and allows you to remove them from groups.
+         * Deny and remove users from groups
+         */
+        async denyUsersAndGroups(requestParameters, initOverrides) {
+            const response = await this.denyUsersAndGroupsRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Get all users in an account or narrowed down list of users filtered by email(s). The returned users may be paginated depending on the user count. The count of the returned users may vary. When `nextPageToken` value in the response is not empty, that indicates that there are more results to be returned, you can use this value to get the next result set (\'page\').
+         * Get users
+         */
+        async getUsersRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            if (requestParameters['accountId'] != null) {
+                queryParameters['accountId'] = requestParameters['accountId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/users`,
+                method: 'POST',
+                headers: headerParameters,
+                query: queryParameters,
+                body: GetUsersRequestToJSON(requestParameters['generated']),
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => GetUsers200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Get all users in an account or narrowed down list of users filtered by email(s). The returned users may be paginated depending on the user count. The count of the returned users may vary. When `nextPageToken` value in the response is not empty, that indicates that there are more results to be returned, you can use this value to get the next result set (\'page\').
+         * Get users
+         */
+        async getUsers(requestParameters = {}, initOverrides) {
+            const response = await this.getUsersRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Removes a list of managers from a given group.
+         * Remove managers
+         */
+        async removeManagersFromGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling removeManagersFromGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/managers`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => RemoveMembersFromGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Removes a list of managers from a given group.
+         * Remove managers
+         */
+        async removeManagersFromGroup(requestParameters, initOverrides) {
+            const response = await this.removeManagersFromGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Removes a list of members from a given group.
+         * Remove members
+         */
+        async removeMembersFromGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling removeMembersFromGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/members`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => RemoveMembersFromGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Removes a list of members from a given group.
+         * Remove members
+         */
+        async removeMembersFromGroup(requestParameters, initOverrides) {
+            const response = await this.removeMembersFromGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Removes a list of groups from a given group.
+         * Remove child groups
+         */
+        async removeSubgroupsFromGroupRaw(requestParameters, initOverrides) {
+            if (requestParameters['gid'] == null) {
+                throw new RequiredError('gid', 'Required parameter "gid" was null or undefined when calling removeSubgroupsFromGroup().');
+            }
+            const queryParameters = {};
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/groups/{gid}/subgroups`.replace(`{${"gid"}}`, encodeURIComponent(String(requestParameters['gid']))),
+                method: 'DELETE',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => RemoveSubgroupsFromGroup200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Removes a list of groups from a given group.
+         * Remove child groups
+         */
+        async removeSubgroupsFromGroup(requestParameters, initOverrides) {
+            const response = await this.removeSubgroupsFromGroupRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+        /**
+         * Grants users that have previously been denied access to the realm.
+         * Undeny users
+         */
+        async undenyUsersRaw(requestParameters, initOverrides) {
+            const queryParameters = {};
+            if (requestParameters['accountId'] != null) {
+                queryParameters['accountId'] = requestParameters['accountId'];
+            }
+            const headerParameters = {};
+            headerParameters['Content-Type'] = 'application/json';
+            const response = await this.request({
+                path: `/users/undeny`,
+                method: 'PUT',
+                headers: headerParameters,
+                query: queryParameters,
+                body: requestParameters['generated'],
+            }, initOverrides);
+            return new JSONApiResponse(response, (jsonValue) => UndenyUsers200ResponseFromJSON(jsonValue));
+        }
+        /**
+         * Grants users that have previously been denied access to the realm.
+         * Undeny users
+         */
+        async undenyUsers(requestParameters = {}, initOverrides) {
+            const response = await this.undenyUsersRaw(requestParameters, initOverrides);
+            return await response.value();
+        }
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+
+    var apis = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        AppsApi: AppsApi,
+        AuditApi: AuditApi,
+        AuthApi: AuthApi,
+        DocumentTemplatesApi: DocumentTemplatesApi,
+        FieldsApi: FieldsApi,
+        FilesApi: FilesApi,
+        FormulasApi: FormulasApi,
+        PlatformAnalyticsApi: PlatformAnalyticsApi,
+        RecordsApi: RecordsApi,
+        RelationshipsApi: RelationshipsApi,
+        ReportsApi: ReportsApi,
+        SolutionsApi: SolutionsApi,
+        TablesApi: TablesApi,
+        UserTokenApi: UserTokenApi,
+        UsersApi: UsersApi
+    });
+
+    class TokenCache {
+        cache;
+        lifespan; // Token lifespan in milliseconds
+        constructor(lifespan = 4 * 60 * 1000 + 50 * 1000) {
+            // Default 4:50
+            this.cache = new Map();
+            this.lifespan = lifespan;
+        }
+        get(dbid) {
+            const entry = this.cache.get(dbid);
+            const now = Date.now();
+            if (entry && entry.expiresAt > now) {
+                return entry.token;
+            }
+            return undefined; // Expired or not found
+        }
+        // New method to get full entry
+        getEntry(dbid) {
+            const entry = this.cache.get(dbid);
+            const now = Date.now();
+            if (entry && entry.expiresAt > now) {
+                return entry;
+            }
+            return undefined; // Expired or not found
+        }
+        set(dbid, token) {
+            const now = Date.now();
+            this.cache.set(dbid, {
+                token,
+                expiresAt: now + this.lifespan,
+            });
+        }
+        dump() {
+            return Array.from(this.cache.entries());
+        }
+        // New method to clear the cache
+        clear() {
+            this.cache.clear();
+        }
+    }
+
+    const simplifyName = (name) => name
+        .replace(/ById$/, "")
+        .replace(/Api$/, "")
+        .replace(/^(\w)/, (_, c) => c.toLowerCase());
+    const getParamNames = (fn) => fn
+        .toString()
+        .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
+        .split(",")
+        .map((p) => p.trim().split("=")[0].trim())
+        .filter((p) => p && !p.match(/^\{/) && p !== "options");
+    const extractDbid = (params, errorMessage) => {
+        const dbid = params.dbid || params.tableId || params.appId;
+        if (!dbid) {
+            throw new Error(errorMessage);
+        }
+        return dbid;
+    };
+    function quickbase(config) {
+        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, } = config;
+        const baseUrl = `https://api.quickbase.com/v1`;
+        const tokenCache = new TokenCache();
+        const baseHeaders = {
+            "QB-Realm-Hostname": `${realm}.quickbase.com`,
+            "Content-Type": "application/json",
+        };
+        if (initialTempToken) {
+            baseHeaders["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
+        }
+        else if (userToken && !useTempTokens) {
+            baseHeaders["Authorization"] = `QB-USER-TOKEN ${userToken}`;
+        }
+        const defaultFetch = typeof globalThis.window !== "undefined"
+            ? globalThis.window.fetch.bind(globalThis.window)
+            : undefined;
+        const configuration = new Configuration({
+            basePath: baseUrl,
+            headers: { ...baseHeaders },
+            fetchApi: fetchApi || defaultFetch,
+            credentials: useTempTokens ? "include" : "omit",
+        });
+        if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
+            throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
+        }
+        const apiInstances = Object.fromEntries(Object.entries(apis)
+            .filter(([name]) => name.endsWith("Api"))
+            .map(([name, ApiClass]) => [
+            name.replace("Api", "").toLowerCase(),
+            new ApiClass(configuration),
+        ]));
+        const methodMap = buildMethodMap();
+        function buildMethodMap() {
+            const methodMap = {};
+            const isValidMethod = (name) => !name.startsWith("_") &&
+                name !== "constructor" &&
+                !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
+            for (const [apiName, api] of Object.entries(apiInstances)) {
+                Object.getOwnPropertyNames(Object.getPrototypeOf(api))
+                    .filter((name) => isValidMethod(name) &&
+                    typeof api[name] === "function")
+                    .forEach((rawMethodName) => {
+                    const simplifiedName = simplifyName(rawMethodName);
+                    const method = api[rawMethodName];
+                    const boundMethod = method.bind(api);
+                    if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+                        methodMap[simplifiedName] = {
+                            api,
+                            method: boundMethod,
+                            paramMap: getParamNames(method),
+                        };
+                    }
+                });
+            }
+            return methodMap;
+        }
+        const fetchTempToken = async (dbid) => {
+            const effectiveFetch = fetchApi || defaultFetch;
+            if (!effectiveFetch) {
+                throw new Error("No fetch implementation available for fetching temp token");
+            }
+            const response = await effectiveFetch(`https://api.quickbase.com/v1/auth/temporary/${dbid}`, {
+                method: "GET",
+                headers: { ...baseHeaders },
+                credentials: "include",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(`API Error: ${errorBody.message || "Unknown error"} (Status: ${response.status})`);
+            }
+            const tokenResult = await response.json();
+            const token = tokenResult.temporaryAuthorization;
+            if (!token) {
+                throw new Error("No temporary token returned from API");
+            }
+            tokenCache.set(dbid, token);
+            if (debug) {
+                console.log(`Fetched and cached new token for dbid: ${dbid}`, token, `Expires at: ${new Date(Date.now() + (4 * 60 + 50) * 1000).toISOString()}`);
+            }
+            return token;
+        };
+        async function invokeMethod(methodName, params, retryCount = 0) {
+            const methodInfo = methodMap[methodName];
+            if (!methodInfo) {
+                throw new Error(`Method ${methodName} not found`);
+            }
+            const requestParameters = methodInfo.paramMap.length === 1 &&
+                methodInfo.paramMap[0] === "requestParameters"
+                ? { requestParameters: params }
+                : params;
+            let requestOptions = {};
+            const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
+            if (methodName === "getTempTokenDBID" && useTempTokens) {
+                const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
+                const cachedToken = tokenCache.get(dbid);
+                if (cachedToken) {
+                    return { temporaryAuthorization: cachedToken };
+                }
+            }
+            let authorizationToken = selectedToken;
+            if (useTempTokens && !authorizationToken) {
+                const dbid = extractDbid(params, `No dbid found in params for ${methodName} to fetch temp token`);
+                const cachedToken = tokenCache.get(dbid);
+                authorizationToken = cachedToken || (await fetchTempToken(dbid));
+                if (methodName === "getTempTokenDBID") {
+                    return { temporaryAuthorization: authorizationToken };
+                }
+                requestOptions.headers = {
+                    ...baseHeaders,
+                    Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+                };
+            }
+            else if (authorizationToken) {
+                requestOptions.headers = {
+                    ...baseHeaders,
+                    Authorization: `QB-USER-TOKEN ${authorizationToken}`,
+                };
+            }
+            try {
+                return await methodInfo.method(requestParameters, requestOptions);
+            }
+            catch (error) {
+                if (error instanceof ResponseError &&
+                    error.response.status === 401 &&
+                    retryCount < 1 &&
+                    useTempTokens) {
+                    if (debug) {
+                        console.log(`Authorization error for ${methodName}, refreshing token:`, error.message);
+                    }
+                    const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
+                    authorizationToken = await fetchTempToken(dbid);
+                    requestOptions.headers = {
+                        ...baseHeaders,
+                        Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+                    };
+                    if (debug) {
+                        console.log(`Retrying ${methodName} with new token`);
+                    }
+                    return invokeMethod(methodName, params, retryCount + 1);
+                }
+                if (error instanceof ResponseError) {
+                    let errorMessage = error.message;
+                    try {
+                        const errorBody = await error.response.json();
+                        if (debug) {
+                            console.log(`Error response body for ${methodName}:`, errorBody);
+                        }
+                        errorMessage = errorBody.message || errorMessage;
+                    }
+                    catch (e) {
+                        // Silent fail on parse error
+                    }
+                    throw new Error(`API Error: ${errorMessage} (Status: ${error.response.status})`);
+                }
+                throw error;
+            }
+        }
+        const proxy = new Proxy({}, {
+            get: (_, prop) => {
+                if (prop in methodMap) {
+                    const methodName = prop;
+                    return (params) => invokeMethod(methodName, params);
+                }
+                return undefined;
+            },
+        });
+        return proxy;
+    }
+
+    exports.AddMembersToGroup200ResponseFromJSON = AddMembersToGroup200ResponseFromJSON;
+    exports.AddMembersToGroup200ResponseFromJSONTyped = AddMembersToGroup200ResponseFromJSONTyped;
+    exports.AddMembersToGroup200ResponseToJSON = AddMembersToGroup200ResponseToJSON;
+    exports.AddMembersToGroup200ResponseToJSONTyped = AddMembersToGroup200ResponseToJSONTyped;
+    exports.AddSubgroupsToGroup200ResponseFromJSON = AddSubgroupsToGroup200ResponseFromJSON;
+    exports.AddSubgroupsToGroup200ResponseFromJSONTyped = AddSubgroupsToGroup200ResponseFromJSONTyped;
+    exports.AddSubgroupsToGroup200ResponseToJSON = AddSubgroupsToGroup200ResponseToJSON;
+    exports.AddSubgroupsToGroup200ResponseToJSONTyped = AddSubgroupsToGroup200ResponseToJSONTyped;
+    exports.AppFromJSON = AppFromJSON;
+    exports.AppFromJSONTyped = AppFromJSONTyped;
+    exports.AppMemoryInfoFromJSON = AppMemoryInfoFromJSON;
+    exports.AppMemoryInfoFromJSONTyped = AppMemoryInfoFromJSONTyped;
+    exports.AppMemoryInfoToJSON = AppMemoryInfoToJSON;
+    exports.AppMemoryInfoToJSONTyped = AppMemoryInfoToJSONTyped;
+    exports.AppSecurityPropertiesFromJSON = AppSecurityPropertiesFromJSON;
+    exports.AppSecurityPropertiesFromJSONTyped = AppSecurityPropertiesFromJSONTyped;
+    exports.AppSecurityPropertiesToJSON = AppSecurityPropertiesToJSON;
+    exports.AppSecurityPropertiesToJSONTyped = AppSecurityPropertiesToJSONTyped;
+    exports.AppToJSON = AppToJSON;
+    exports.AppToJSONTyped = AppToJSONTyped;
+    exports.Audit200ResponseFromJSON = Audit200ResponseFromJSON;
+    exports.Audit200ResponseFromJSONTyped = Audit200ResponseFromJSONTyped;
+    exports.Audit200ResponseToJSON = Audit200ResponseToJSON;
+    exports.Audit200ResponseToJSONTyped = Audit200ResponseToJSONTyped;
+    exports.Audit202ResponseFromJSON = Audit202ResponseFromJSON;
+    exports.Audit202ResponseFromJSONTyped = Audit202ResponseFromJSONTyped;
+    exports.Audit202ResponseToJSON = Audit202ResponseToJSON;
+    exports.Audit202ResponseToJSONTyped = Audit202ResponseToJSONTyped;
+    exports.AuditRequestFromJSON = AuditRequestFromJSON;
+    exports.AuditRequestFromJSONTyped = AuditRequestFromJSONTyped;
+    exports.AuditRequestToJSON = AuditRequestToJSON;
+    exports.AuditRequestToJSONTyped = AuditRequestToJSONTyped;
+    exports.CloneUserToken200ResponseFromJSON = CloneUserToken200ResponseFromJSON;
+    exports.CloneUserToken200ResponseFromJSONTyped = CloneUserToken200ResponseFromJSONTyped;
+    exports.CloneUserToken200ResponseToJSON = CloneUserToken200ResponseToJSON;
+    exports.CloneUserToken200ResponseToJSONTyped = CloneUserToken200ResponseToJSONTyped;
+    exports.CloneUserTokenRequestFromJSON = CloneUserTokenRequestFromJSON;
+    exports.CloneUserTokenRequestFromJSONTyped = CloneUserTokenRequestFromJSONTyped;
+    exports.CloneUserTokenRequestToJSON = CloneUserTokenRequestToJSON;
+    exports.CloneUserTokenRequestToJSONTyped = CloneUserTokenRequestToJSONTyped;
+    exports.CopyApp200ResponseFromJSON = CopyApp200ResponseFromJSON;
+    exports.CopyApp200ResponseFromJSONTyped = CopyApp200ResponseFromJSONTyped;
+    exports.CopyApp200ResponseToJSON = CopyApp200ResponseToJSON;
+    exports.CopyApp200ResponseToJSONTyped = CopyApp200ResponseToJSONTyped;
+    exports.CopyAppRequestFromJSON = CopyAppRequestFromJSON;
+    exports.CopyAppRequestFromJSONTyped = CopyAppRequestFromJSONTyped;
+    exports.CopyAppRequestPropertiesFromJSON = CopyAppRequestPropertiesFromJSON;
+    exports.CopyAppRequestPropertiesFromJSONTyped = CopyAppRequestPropertiesFromJSONTyped;
+    exports.CopyAppRequestPropertiesToJSON = CopyAppRequestPropertiesToJSON;
+    exports.CopyAppRequestPropertiesToJSONTyped = CopyAppRequestPropertiesToJSONTyped;
+    exports.CopyAppRequestToJSON = CopyAppRequestToJSON;
+    exports.CopyAppRequestToJSONTyped = CopyAppRequestToJSONTyped;
+    exports.CreateApp200ResponseFromJSON = CreateApp200ResponseFromJSON;
+    exports.CreateApp200ResponseFromJSONTyped = CreateApp200ResponseFromJSONTyped;
+    exports.CreateApp200ResponseToJSON = CreateApp200ResponseToJSON;
+    exports.CreateApp200ResponseToJSONTyped = CreateApp200ResponseToJSONTyped;
+    exports.CreateAppRequestFromJSON = CreateAppRequestFromJSON;
+    exports.CreateAppRequestFromJSONTyped = CreateAppRequestFromJSONTyped;
+    exports.CreateAppRequestToJSON = CreateAppRequestToJSON;
+    exports.CreateAppRequestToJSONTyped = CreateAppRequestToJSONTyped;
+    exports.CreateAppRequestVariablesInnerFromJSON = CreateAppRequestVariablesInnerFromJSON;
+    exports.CreateAppRequestVariablesInnerFromJSONTyped = CreateAppRequestVariablesInnerFromJSONTyped;
+    exports.CreateAppRequestVariablesInnerToJSON = CreateAppRequestVariablesInnerToJSON;
+    exports.CreateAppRequestVariablesInnerToJSONTyped = CreateAppRequestVariablesInnerToJSONTyped;
+    exports.CreateField200ResponseFromJSON = CreateField200ResponseFromJSON;
+    exports.CreateField200ResponseFromJSONTyped = CreateField200ResponseFromJSONTyped;
+    exports.CreateField200ResponseToJSON = CreateField200ResponseToJSON;
+    exports.CreateField200ResponseToJSONTyped = CreateField200ResponseToJSONTyped;
+    exports.CreateFieldRequestFieldTypeEnum = CreateFieldRequestFieldTypeEnum;
+    exports.CreateFieldRequestFromJSON = CreateFieldRequestFromJSON;
+    exports.CreateFieldRequestFromJSONTyped = CreateFieldRequestFromJSONTyped;
+    exports.CreateFieldRequestToJSON = CreateFieldRequestToJSON;
+    exports.CreateFieldRequestToJSONTyped = CreateFieldRequestToJSONTyped;
+    exports.CreateRelationship200ResponseFromJSON = CreateRelationship200ResponseFromJSON;
+    exports.CreateRelationship200ResponseFromJSONTyped = CreateRelationship200ResponseFromJSONTyped;
+    exports.CreateRelationship200ResponseToJSON = CreateRelationship200ResponseToJSON;
+    exports.CreateRelationship200ResponseToJSONTyped = CreateRelationship200ResponseToJSONTyped;
+    exports.CreateRelationshipRequestFromJSON = CreateRelationshipRequestFromJSON;
+    exports.CreateRelationshipRequestFromJSONTyped = CreateRelationshipRequestFromJSONTyped;
+    exports.CreateRelationshipRequestToJSON = CreateRelationshipRequestToJSON;
+    exports.CreateRelationshipRequestToJSONTyped = CreateRelationshipRequestToJSONTyped;
+    exports.CreateTableRequestFromJSON = CreateTableRequestFromJSON;
+    exports.CreateTableRequestFromJSONTyped = CreateTableRequestFromJSONTyped;
+    exports.CreateTableRequestToJSON = CreateTableRequestToJSON;
+    exports.CreateTableRequestToJSONTyped = CreateTableRequestToJSONTyped;
+    exports.DeactivateUserToken200ResponseFromJSON = DeactivateUserToken200ResponseFromJSON;
+    exports.DeactivateUserToken200ResponseFromJSONTyped = DeactivateUserToken200ResponseFromJSONTyped;
+    exports.DeactivateUserToken200ResponseToJSON = DeactivateUserToken200ResponseToJSON;
+    exports.DeactivateUserToken200ResponseToJSONTyped = DeactivateUserToken200ResponseToJSONTyped;
+    exports.DeleteApp200ResponseFromJSON = DeleteApp200ResponseFromJSON;
+    exports.DeleteApp200ResponseFromJSONTyped = DeleteApp200ResponseFromJSONTyped;
+    exports.DeleteApp200ResponseToJSON = DeleteApp200ResponseToJSON;
+    exports.DeleteApp200ResponseToJSONTyped = DeleteApp200ResponseToJSONTyped;
+    exports.DeleteAppRequestFromJSON = DeleteAppRequestFromJSON;
+    exports.DeleteAppRequestFromJSONTyped = DeleteAppRequestFromJSONTyped;
+    exports.DeleteAppRequestToJSON = DeleteAppRequestToJSON;
+    exports.DeleteAppRequestToJSONTyped = DeleteAppRequestToJSONTyped;
+    exports.DeleteFields200ResponseFromJSON = DeleteFields200ResponseFromJSON;
+    exports.DeleteFields200ResponseFromJSONTyped = DeleteFields200ResponseFromJSONTyped;
+    exports.DeleteFields200ResponseToJSON = DeleteFields200ResponseToJSON;
+    exports.DeleteFields200ResponseToJSONTyped = DeleteFields200ResponseToJSONTyped;
+    exports.DeleteFieldsRequestFromJSON = DeleteFieldsRequestFromJSON;
+    exports.DeleteFieldsRequestFromJSONTyped = DeleteFieldsRequestFromJSONTyped;
+    exports.DeleteFieldsRequestToJSON = DeleteFieldsRequestToJSON;
+    exports.DeleteFieldsRequestToJSONTyped = DeleteFieldsRequestToJSONTyped;
+    exports.DeleteFile200ResponseFromJSON = DeleteFile200ResponseFromJSON;
+    exports.DeleteFile200ResponseFromJSONTyped = DeleteFile200ResponseFromJSONTyped;
+    exports.DeleteFile200ResponseToJSON = DeleteFile200ResponseToJSON;
+    exports.DeleteFile200ResponseToJSONTyped = DeleteFile200ResponseToJSONTyped;
+    exports.DeleteRecords200ResponseFromJSON = DeleteRecords200ResponseFromJSON;
+    exports.DeleteRecords200ResponseFromJSONTyped = DeleteRecords200ResponseFromJSONTyped;
+    exports.DeleteRecords200ResponseToJSON = DeleteRecords200ResponseToJSON;
+    exports.DeleteRecords200ResponseToJSONTyped = DeleteRecords200ResponseToJSONTyped;
+    exports.DeleteRecordsRequestFromJSON = DeleteRecordsRequestFromJSON;
+    exports.DeleteRecordsRequestFromJSONTyped = DeleteRecordsRequestFromJSONTyped;
+    exports.DeleteRecordsRequestToJSON = DeleteRecordsRequestToJSON;
+    exports.DeleteRecordsRequestToJSONTyped = DeleteRecordsRequestToJSONTyped;
+    exports.DeleteRelationship200ResponseFromJSON = DeleteRelationship200ResponseFromJSON;
+    exports.DeleteRelationship200ResponseFromJSONTyped = DeleteRelationship200ResponseFromJSONTyped;
+    exports.DeleteRelationship200ResponseToJSON = DeleteRelationship200ResponseToJSON;
+    exports.DeleteRelationship200ResponseToJSONTyped = DeleteRelationship200ResponseToJSONTyped;
+    exports.DeleteTableResponseFromJSON = DeleteTableResponseFromJSON;
+    exports.DeleteTableResponseFromJSONTyped = DeleteTableResponseFromJSONTyped;
+    exports.DeleteTableResponseToJSON = DeleteTableResponseToJSON;
+    exports.DeleteTableResponseToJSONTyped = DeleteTableResponseToJSONTyped;
+    exports.DenyUsers200ResponseFromJSON = DenyUsers200ResponseFromJSON;
+    exports.DenyUsers200ResponseFromJSONTyped = DenyUsers200ResponseFromJSONTyped;
+    exports.DenyUsers200ResponseToJSON = DenyUsers200ResponseToJSON;
+    exports.DenyUsers200ResponseToJSONTyped = DenyUsers200ResponseToJSONTyped;
+    exports.ExchangeSsoToken200ResponseFromJSON = ExchangeSsoToken200ResponseFromJSON;
+    exports.ExchangeSsoToken200ResponseFromJSONTyped = ExchangeSsoToken200ResponseFromJSONTyped;
+    exports.ExchangeSsoToken200ResponseIssuedTokenTypeEnum = ExchangeSsoToken200ResponseIssuedTokenTypeEnum;
+    exports.ExchangeSsoToken200ResponseToJSON = ExchangeSsoToken200ResponseToJSON;
+    exports.ExchangeSsoToken200ResponseToJSONTyped = ExchangeSsoToken200ResponseToJSONTyped;
+    exports.ExchangeSsoToken200ResponseTokenTypeEnum = ExchangeSsoToken200ResponseTokenTypeEnum;
+    exports.ExchangeSsoTokenRequestFromJSON = ExchangeSsoTokenRequestFromJSON;
+    exports.ExchangeSsoTokenRequestFromJSONTyped = ExchangeSsoTokenRequestFromJSONTyped;
+    exports.ExchangeSsoTokenRequestGrantTypeEnum = ExchangeSsoTokenRequestGrantTypeEnum;
+    exports.ExchangeSsoTokenRequestRequestedTokenTypeEnum = ExchangeSsoTokenRequestRequestedTokenTypeEnum;
+    exports.ExchangeSsoTokenRequestSubjectTokenTypeEnum = ExchangeSsoTokenRequestSubjectTokenTypeEnum;
+    exports.ExchangeSsoTokenRequestToJSON = ExchangeSsoTokenRequestToJSON;
+    exports.ExchangeSsoTokenRequestToJSONTyped = ExchangeSsoTokenRequestToJSONTyped;
+    exports.FieldFromJSON = FieldFromJSON;
+    exports.FieldFromJSONTyped = FieldFromJSONTyped;
+    exports.FieldPermissionsInnerFromJSON = FieldPermissionsInnerFromJSON;
+    exports.FieldPermissionsInnerFromJSONTyped = FieldPermissionsInnerFromJSONTyped;
+    exports.FieldPermissionsInnerToJSON = FieldPermissionsInnerToJSON;
+    exports.FieldPermissionsInnerToJSONTyped = FieldPermissionsInnerToJSONTyped;
+    exports.FieldPropertiesCurrencyFormatEnum = FieldPropertiesCurrencyFormatEnum;
+    exports.FieldPropertiesFromJSON = FieldPropertiesFromJSON;
+    exports.FieldPropertiesFromJSONTyped = FieldPropertiesFromJSONTyped;
+    exports.FieldPropertiesOpenTargetInEnum = FieldPropertiesOpenTargetInEnum;
+    exports.FieldPropertiesSummaryFunctionEnum = FieldPropertiesSummaryFunctionEnum;
+    exports.FieldPropertiesToJSON = FieldPropertiesToJSON;
+    exports.FieldPropertiesToJSONTyped = FieldPropertiesToJSONTyped;
+    exports.FieldPropertiesVersionModeEnum = FieldPropertiesVersionModeEnum;
+    exports.FieldToJSON = FieldToJSON;
+    exports.FieldToJSONTyped = FieldToJSONTyped;
+    exports.FieldUsageFieldFromJSON = FieldUsageFieldFromJSON;
+    exports.FieldUsageFieldFromJSONTyped = FieldUsageFieldFromJSONTyped;
+    exports.FieldUsageFieldToJSON = FieldUsageFieldToJSON;
+    exports.FieldUsageFieldToJSONTyped = FieldUsageFieldToJSONTyped;
+    exports.FieldUsageFromJSON = FieldUsageFromJSON;
+    exports.FieldUsageFromJSONTyped = FieldUsageFromJSONTyped;
+    exports.FieldUsageToJSON = FieldUsageToJSON;
+    exports.FieldUsageToJSONTyped = FieldUsageToJSONTyped;
+    exports.FieldUsageUsageFromJSON = FieldUsageUsageFromJSON;
+    exports.FieldUsageUsageFromJSONTyped = FieldUsageUsageFromJSONTyped;
+    exports.FieldUsageUsageToJSON = FieldUsageUsageToJSON;
+    exports.FieldUsageUsageToJSONTyped = FieldUsageUsageToJSONTyped;
+    exports.GenerateDocument200ResponseFromJSON = GenerateDocument200ResponseFromJSON;
+    exports.GenerateDocument200ResponseFromJSONTyped = GenerateDocument200ResponseFromJSONTyped;
+    exports.GenerateDocument200ResponseToJSON = GenerateDocument200ResponseToJSON;
+    exports.GenerateDocument200ResponseToJSONTyped = GenerateDocument200ResponseToJSONTyped;
+    exports.GetRelationships200ResponseFromJSON = GetRelationships200ResponseFromJSON;
+    exports.GetRelationships200ResponseFromJSONTyped = GetRelationships200ResponseFromJSONTyped;
+    exports.GetRelationships200ResponseMetadataFromJSON = GetRelationships200ResponseMetadataFromJSON;
+    exports.GetRelationships200ResponseMetadataFromJSONTyped = GetRelationships200ResponseMetadataFromJSONTyped;
+    exports.GetRelationships200ResponseMetadataToJSON = GetRelationships200ResponseMetadataToJSON;
+    exports.GetRelationships200ResponseMetadataToJSONTyped = GetRelationships200ResponseMetadataToJSONTyped;
+    exports.GetRelationships200ResponseToJSON = GetRelationships200ResponseToJSON;
+    exports.GetRelationships200ResponseToJSONTyped = GetRelationships200ResponseToJSONTyped;
+    exports.GetReport200ResponseFromJSON = GetReport200ResponseFromJSON;
+    exports.GetReport200ResponseFromJSONTyped = GetReport200ResponseFromJSONTyped;
+    exports.GetReport200ResponseToJSON = GetReport200ResponseToJSON;
+    exports.GetReport200ResponseToJSONTyped = GetReport200ResponseToJSONTyped;
+    exports.GetTempTokenDBID200ResponseFromJSON = GetTempTokenDBID200ResponseFromJSON;
+    exports.GetTempTokenDBID200ResponseFromJSONTyped = GetTempTokenDBID200ResponseFromJSONTyped;
+    exports.GetTempTokenDBID200ResponseToJSON = GetTempTokenDBID200ResponseToJSON;
+    exports.GetTempTokenDBID200ResponseToJSONTyped = GetTempTokenDBID200ResponseToJSONTyped;
+    exports.GetUsers200ResponseFromJSON = GetUsers200ResponseFromJSON;
+    exports.GetUsers200ResponseFromJSONTyped = GetUsers200ResponseFromJSONTyped;
+    exports.GetUsers200ResponseToJSON = GetUsers200ResponseToJSON;
+    exports.GetUsers200ResponseToJSONTyped = GetUsers200ResponseToJSONTyped;
+    exports.GetUsersRequestFromJSON = GetUsersRequestFromJSON;
+    exports.GetUsersRequestFromJSONTyped = GetUsersRequestFromJSONTyped;
+    exports.GetUsersRequestToJSON = GetUsersRequestToJSON;
+    exports.GetUsersRequestToJSONTyped = GetUsersRequestToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseFromJSON = PlatformAnalyticEventSummaries200ResponseFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseFromJSONTyped = PlatformAnalyticEventSummaries200ResponseFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseGroupByEnum = PlatformAnalyticEventSummaries200ResponseGroupByEnum;
+    exports.PlatformAnalyticEventSummaries200ResponseMetadataFromJSON = PlatformAnalyticEventSummaries200ResponseMetadataFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped = PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseMetadataToJSON = PlatformAnalyticEventSummaries200ResponseMetadataToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped = PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum = PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON = PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped = PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseToJSON = PlatformAnalyticEventSummaries200ResponseToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseToJSONTyped = PlatformAnalyticEventSummaries200ResponseToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseTotalsFromJSON = PlatformAnalyticEventSummaries200ResponseTotalsFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped = PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseTotalsToJSON = PlatformAnalyticEventSummaries200ResponseTotalsToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped = PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON = PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped = PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON = PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON;
+    exports.PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped = PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped;
+    exports.PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum = PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum;
+    exports.PlatformAnalyticEventSummariesRequestFromJSON = PlatformAnalyticEventSummariesRequestFromJSON;
+    exports.PlatformAnalyticEventSummariesRequestFromJSONTyped = PlatformAnalyticEventSummariesRequestFromJSONTyped;
+    exports.PlatformAnalyticEventSummariesRequestGroupByEnum = PlatformAnalyticEventSummariesRequestGroupByEnum;
+    exports.PlatformAnalyticEventSummariesRequestToJSON = PlatformAnalyticEventSummariesRequestToJSON;
+    exports.PlatformAnalyticEventSummariesRequestToJSONTyped = PlatformAnalyticEventSummariesRequestToJSONTyped;
+    exports.PlatformAnalyticEventSummariesRequestWhereInnerFromJSON = PlatformAnalyticEventSummariesRequestWhereInnerFromJSON;
+    exports.PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped = PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped;
+    exports.PlatformAnalyticEventSummariesRequestWhereInnerToJSON = PlatformAnalyticEventSummariesRequestWhereInnerToJSON;
+    exports.PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped = PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped;
+    exports.PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum = PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum;
+    exports.PlatformAnalyticReads200ResponseFromJSON = PlatformAnalyticReads200ResponseFromJSON;
+    exports.PlatformAnalyticReads200ResponseFromJSONTyped = PlatformAnalyticReads200ResponseFromJSONTyped;
+    exports.PlatformAnalyticReads200ResponseToJSON = PlatformAnalyticReads200ResponseToJSON;
+    exports.PlatformAnalyticReads200ResponseToJSONTyped = PlatformAnalyticReads200ResponseToJSONTyped;
+    exports.RecordFromJSON = RecordFromJSON;
+    exports.RecordFromJSONTyped = RecordFromJSONTyped;
+    exports.RecordToJSON = RecordToJSON;
+    exports.RecordToJSONTyped = RecordToJSONTyped;
+    exports.RecordValueFromJSON = RecordValueFromJSON;
+    exports.RecordValueFromJSONTyped = RecordValueFromJSONTyped;
+    exports.RecordValueToJSON = RecordValueToJSON;
+    exports.RecordValueToJSONTyped = RecordValueToJSONTyped;
+    exports.RelationshipFieldFromJSON = RelationshipFieldFromJSON;
+    exports.RelationshipFieldFromJSONTyped = RelationshipFieldFromJSONTyped;
+    exports.RelationshipFieldToJSON = RelationshipFieldToJSON;
+    exports.RelationshipFieldToJSONTyped = RelationshipFieldToJSONTyped;
+    exports.RelationshipFromJSON = RelationshipFromJSON;
+    exports.RelationshipFromJSONTyped = RelationshipFromJSONTyped;
+    exports.RelationshipToJSON = RelationshipToJSON;
+    exports.RelationshipToJSONTyped = RelationshipToJSONTyped;
+    exports.RemoveMembersFromGroup200ResponseFromJSON = RemoveMembersFromGroup200ResponseFromJSON;
+    exports.RemoveMembersFromGroup200ResponseFromJSONTyped = RemoveMembersFromGroup200ResponseFromJSONTyped;
+    exports.RemoveMembersFromGroup200ResponseToJSON = RemoveMembersFromGroup200ResponseToJSON;
+    exports.RemoveMembersFromGroup200ResponseToJSONTyped = RemoveMembersFromGroup200ResponseToJSONTyped;
+    exports.RemoveSubgroupsFromGroup200ResponseFromJSON = RemoveSubgroupsFromGroup200ResponseFromJSON;
+    exports.RemoveSubgroupsFromGroup200ResponseFromJSONTyped = RemoveSubgroupsFromGroup200ResponseFromJSONTyped;
+    exports.RemoveSubgroupsFromGroup200ResponseToJSON = RemoveSubgroupsFromGroup200ResponseToJSON;
+    exports.RemoveSubgroupsFromGroup200ResponseToJSONTyped = RemoveSubgroupsFromGroup200ResponseToJSONTyped;
+    exports.ReportRunResponseFromJSON = ReportRunResponseFromJSON;
+    exports.ReportRunResponseFromJSONTyped = ReportRunResponseFromJSONTyped;
+    exports.ReportRunResponseToJSON = ReportRunResponseToJSON;
+    exports.ReportRunResponseToJSONTyped = ReportRunResponseToJSONTyped;
+    exports.RunFormula200ResponseFromJSON = RunFormula200ResponseFromJSON;
+    exports.RunFormula200ResponseFromJSONTyped = RunFormula200ResponseFromJSONTyped;
+    exports.RunFormula200ResponseToJSON = RunFormula200ResponseToJSON;
+    exports.RunFormula200ResponseToJSONTyped = RunFormula200ResponseToJSONTyped;
+    exports.RunFormulaRequestFromJSON = RunFormulaRequestFromJSON;
+    exports.RunFormulaRequestFromJSONTyped = RunFormulaRequestFromJSONTyped;
+    exports.RunFormulaRequestToJSON = RunFormulaRequestToJSON;
+    exports.RunFormulaRequestToJSONTyped = RunFormulaRequestToJSONTyped;
+    exports.RunQueryRequestFromJSON = RunQueryRequestFromJSON;
+    exports.RunQueryRequestFromJSONTyped = RunQueryRequestFromJSONTyped;
+    exports.RunQueryRequestGroupByInnerFromJSON = RunQueryRequestGroupByInnerFromJSON;
+    exports.RunQueryRequestGroupByInnerFromJSONTyped = RunQueryRequestGroupByInnerFromJSONTyped;
+    exports.RunQueryRequestGroupByInnerGroupingEnum = RunQueryRequestGroupByInnerGroupingEnum;
+    exports.RunQueryRequestGroupByInnerToJSON = RunQueryRequestGroupByInnerToJSON;
+    exports.RunQueryRequestGroupByInnerToJSONTyped = RunQueryRequestGroupByInnerToJSONTyped;
+    exports.RunQueryRequestOptionsFromJSON = RunQueryRequestOptionsFromJSON;
+    exports.RunQueryRequestOptionsFromJSONTyped = RunQueryRequestOptionsFromJSONTyped;
+    exports.RunQueryRequestOptionsToJSON = RunQueryRequestOptionsToJSON;
+    exports.RunQueryRequestOptionsToJSONTyped = RunQueryRequestOptionsToJSONTyped;
+    exports.RunQueryRequestSortByInnerFromJSON = RunQueryRequestSortByInnerFromJSON;
+    exports.RunQueryRequestSortByInnerFromJSONTyped = RunQueryRequestSortByInnerFromJSONTyped;
+    exports.RunQueryRequestSortByInnerOrderEnum = RunQueryRequestSortByInnerOrderEnum;
+    exports.RunQueryRequestSortByInnerToJSON = RunQueryRequestSortByInnerToJSON;
+    exports.RunQueryRequestSortByInnerToJSONTyped = RunQueryRequestSortByInnerToJSONTyped;
+    exports.RunQueryRequestToJSON = RunQueryRequestToJSON;
+    exports.RunQueryRequestToJSONTyped = RunQueryRequestToJSONTyped;
+    exports.RunQueryResponseFieldsInnerFromJSON = RunQueryResponseFieldsInnerFromJSON;
+    exports.RunQueryResponseFieldsInnerFromJSONTyped = RunQueryResponseFieldsInnerFromJSONTyped;
+    exports.RunQueryResponseFieldsInnerToJSON = RunQueryResponseFieldsInnerToJSON;
+    exports.RunQueryResponseFieldsInnerToJSONTyped = RunQueryResponseFieldsInnerToJSONTyped;
+    exports.RunQueryResponseFromJSON = RunQueryResponseFromJSON;
+    exports.RunQueryResponseFromJSONTyped = RunQueryResponseFromJSONTyped;
+    exports.RunQueryResponseMetadataFromJSON = RunQueryResponseMetadataFromJSON;
+    exports.RunQueryResponseMetadataFromJSONTyped = RunQueryResponseMetadataFromJSONTyped;
+    exports.RunQueryResponseMetadataToJSON = RunQueryResponseMetadataToJSON;
+    exports.RunQueryResponseMetadataToJSONTyped = RunQueryResponseMetadataToJSONTyped;
+    exports.RunQueryResponseToJSON = RunQueryResponseToJSON;
+    exports.RunQueryResponseToJSONTyped = RunQueryResponseToJSONTyped;
+    exports.TableDefaultSortOrderEnum = TableDefaultSortOrderEnum;
+    exports.TableFromJSON = TableFromJSON;
+    exports.TableFromJSONTyped = TableFromJSONTyped;
+    exports.TableToJSON = TableToJSON;
+    exports.TableToJSONTyped = TableToJSONTyped;
+    exports.TransferUserToken200ResponseFromJSON = TransferUserToken200ResponseFromJSON;
+    exports.TransferUserToken200ResponseFromJSONTyped = TransferUserToken200ResponseFromJSONTyped;
+    exports.TransferUserToken200ResponseToJSON = TransferUserToken200ResponseToJSON;
+    exports.TransferUserToken200ResponseToJSONTyped = TransferUserToken200ResponseToJSONTyped;
+    exports.TransferUserTokenRequestFromJSON = TransferUserTokenRequestFromJSON;
+    exports.TransferUserTokenRequestFromJSONTyped = TransferUserTokenRequestFromJSONTyped;
+    exports.TransferUserTokenRequestToJSON = TransferUserTokenRequestToJSON;
+    exports.TransferUserTokenRequestToJSONTyped = TransferUserTokenRequestToJSONTyped;
+    exports.UndenyUsers200ResponseFromJSON = UndenyUsers200ResponseFromJSON;
+    exports.UndenyUsers200ResponseFromJSONTyped = UndenyUsers200ResponseFromJSONTyped;
+    exports.UndenyUsers200ResponseToJSON = UndenyUsers200ResponseToJSON;
+    exports.UndenyUsers200ResponseToJSONTyped = UndenyUsers200ResponseToJSONTyped;
+    exports.UpdateRelationshipRequestFromJSON = UpdateRelationshipRequestFromJSON;
+    exports.UpdateRelationshipRequestFromJSONTyped = UpdateRelationshipRequestFromJSONTyped;
+    exports.UpdateRelationshipRequestToJSON = UpdateRelationshipRequestToJSON;
+    exports.UpdateRelationshipRequestToJSONTyped = UpdateRelationshipRequestToJSONTyped;
+    exports.UpdateTableRequestFromJSON = UpdateTableRequestFromJSON;
+    exports.UpdateTableRequestFromJSONTyped = UpdateTableRequestFromJSONTyped;
+    exports.UpdateTableRequestToJSON = UpdateTableRequestToJSON;
+    exports.UpdateTableRequestToJSONTyped = UpdateTableRequestToJSONTyped;
+    exports.Upsert200ResponseDataInnerValueFromJSON = Upsert200ResponseDataInnerValueFromJSON;
+    exports.Upsert200ResponseDataInnerValueFromJSONTyped = Upsert200ResponseDataInnerValueFromJSONTyped;
+    exports.Upsert200ResponseDataInnerValueToJSON = Upsert200ResponseDataInnerValueToJSON;
+    exports.Upsert200ResponseDataInnerValueToJSONTyped = Upsert200ResponseDataInnerValueToJSONTyped;
+    exports.Upsert200ResponseFromJSON = Upsert200ResponseFromJSON;
+    exports.Upsert200ResponseFromJSONTyped = Upsert200ResponseFromJSONTyped;
+    exports.Upsert200ResponseMetadataFromJSON = Upsert200ResponseMetadataFromJSON;
+    exports.Upsert200ResponseMetadataFromJSONTyped = Upsert200ResponseMetadataFromJSONTyped;
+    exports.Upsert200ResponseMetadataToJSON = Upsert200ResponseMetadataToJSON;
+    exports.Upsert200ResponseMetadataToJSONTyped = Upsert200ResponseMetadataToJSONTyped;
+    exports.Upsert200ResponseToJSON = Upsert200ResponseToJSON;
+    exports.Upsert200ResponseToJSONTyped = Upsert200ResponseToJSONTyped;
+    exports.Upsert207ResponseFromJSON = Upsert207ResponseFromJSON;
+    exports.Upsert207ResponseFromJSONTyped = Upsert207ResponseFromJSONTyped;
+    exports.Upsert207ResponseMetadataFromJSON = Upsert207ResponseMetadataFromJSON;
+    exports.Upsert207ResponseMetadataFromJSONTyped = Upsert207ResponseMetadataFromJSONTyped;
+    exports.Upsert207ResponseMetadataToJSON = Upsert207ResponseMetadataToJSON;
+    exports.Upsert207ResponseMetadataToJSONTyped = Upsert207ResponseMetadataToJSONTyped;
+    exports.Upsert207ResponseToJSON = Upsert207ResponseToJSON;
+    exports.Upsert207ResponseToJSONTyped = Upsert207ResponseToJSONTyped;
+    exports.UpsertRequestFromJSON = UpsertRequestFromJSON;
+    exports.UpsertRequestFromJSONTyped = UpsertRequestFromJSONTyped;
+    exports.UpsertRequestToJSON = UpsertRequestToJSON;
+    exports.UpsertRequestToJSONTyped = UpsertRequestToJSONTyped;
+    exports.UsageCountFromJSON = UsageCountFromJSON;
+    exports.UsageCountFromJSONTyped = UsageCountFromJSONTyped;
+    exports.UsageCountToJSON = UsageCountToJSON;
+    exports.UsageCountToJSONTyped = UsageCountToJSONTyped;
+    exports.instanceOfAddMembersToGroup200Response = instanceOfAddMembersToGroup200Response;
+    exports.instanceOfAddSubgroupsToGroup200Response = instanceOfAddSubgroupsToGroup200Response;
+    exports.instanceOfApp = instanceOfApp;
+    exports.instanceOfAppMemoryInfo = instanceOfAppMemoryInfo;
+    exports.instanceOfAppSecurityProperties = instanceOfAppSecurityProperties;
+    exports.instanceOfAudit200Response = instanceOfAudit200Response;
+    exports.instanceOfAudit202Response = instanceOfAudit202Response;
+    exports.instanceOfAuditRequest = instanceOfAuditRequest;
+    exports.instanceOfCloneUserToken200Response = instanceOfCloneUserToken200Response;
+    exports.instanceOfCloneUserTokenRequest = instanceOfCloneUserTokenRequest;
+    exports.instanceOfCopyApp200Response = instanceOfCopyApp200Response;
+    exports.instanceOfCopyAppRequest = instanceOfCopyAppRequest;
+    exports.instanceOfCopyAppRequestProperties = instanceOfCopyAppRequestProperties;
+    exports.instanceOfCreateApp200Response = instanceOfCreateApp200Response;
+    exports.instanceOfCreateAppRequest = instanceOfCreateAppRequest;
+    exports.instanceOfCreateAppRequestVariablesInner = instanceOfCreateAppRequestVariablesInner;
+    exports.instanceOfCreateField200Response = instanceOfCreateField200Response;
+    exports.instanceOfCreateFieldRequest = instanceOfCreateFieldRequest;
+    exports.instanceOfCreateRelationship200Response = instanceOfCreateRelationship200Response;
+    exports.instanceOfCreateRelationshipRequest = instanceOfCreateRelationshipRequest;
+    exports.instanceOfCreateTableRequest = instanceOfCreateTableRequest;
+    exports.instanceOfDeactivateUserToken200Response = instanceOfDeactivateUserToken200Response;
+    exports.instanceOfDeleteApp200Response = instanceOfDeleteApp200Response;
+    exports.instanceOfDeleteAppRequest = instanceOfDeleteAppRequest;
+    exports.instanceOfDeleteFields200Response = instanceOfDeleteFields200Response;
+    exports.instanceOfDeleteFieldsRequest = instanceOfDeleteFieldsRequest;
+    exports.instanceOfDeleteFile200Response = instanceOfDeleteFile200Response;
+    exports.instanceOfDeleteRecords200Response = instanceOfDeleteRecords200Response;
+    exports.instanceOfDeleteRecordsRequest = instanceOfDeleteRecordsRequest;
+    exports.instanceOfDeleteRelationship200Response = instanceOfDeleteRelationship200Response;
+    exports.instanceOfDeleteTableResponse = instanceOfDeleteTableResponse;
+    exports.instanceOfDenyUsers200Response = instanceOfDenyUsers200Response;
+    exports.instanceOfExchangeSsoToken200Response = instanceOfExchangeSsoToken200Response;
+    exports.instanceOfExchangeSsoTokenRequest = instanceOfExchangeSsoTokenRequest;
+    exports.instanceOfField = instanceOfField;
+    exports.instanceOfFieldPermissionsInner = instanceOfFieldPermissionsInner;
+    exports.instanceOfFieldProperties = instanceOfFieldProperties;
+    exports.instanceOfFieldUsage = instanceOfFieldUsage;
+    exports.instanceOfFieldUsageField = instanceOfFieldUsageField;
+    exports.instanceOfFieldUsageUsage = instanceOfFieldUsageUsage;
+    exports.instanceOfGenerateDocument200Response = instanceOfGenerateDocument200Response;
+    exports.instanceOfGetRelationships200Response = instanceOfGetRelationships200Response;
+    exports.instanceOfGetRelationships200ResponseMetadata = instanceOfGetRelationships200ResponseMetadata;
+    exports.instanceOfGetReport200Response = instanceOfGetReport200Response;
+    exports.instanceOfGetTempTokenDBID200Response = instanceOfGetTempTokenDBID200Response;
+    exports.instanceOfGetUsers200Response = instanceOfGetUsers200Response;
+    exports.instanceOfGetUsersRequest = instanceOfGetUsersRequest;
+    exports.instanceOfPlatformAnalyticEventSummaries200Response = instanceOfPlatformAnalyticEventSummaries200Response;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseMetadata = instanceOfPlatformAnalyticEventSummaries200ResponseMetadata;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner = instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner = instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals = instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseTotals = instanceOfPlatformAnalyticEventSummaries200ResponseTotals;
+    exports.instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner = instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner;
+    exports.instanceOfPlatformAnalyticEventSummariesRequest = instanceOfPlatformAnalyticEventSummariesRequest;
+    exports.instanceOfPlatformAnalyticEventSummariesRequestWhereInner = instanceOfPlatformAnalyticEventSummariesRequestWhereInner;
+    exports.instanceOfPlatformAnalyticReads200Response = instanceOfPlatformAnalyticReads200Response;
+    exports.instanceOfRecord = instanceOfRecord;
+    exports.instanceOfRecordValue = instanceOfRecordValue;
+    exports.instanceOfRelationship = instanceOfRelationship;
+    exports.instanceOfRelationshipField = instanceOfRelationshipField;
+    exports.instanceOfRemoveMembersFromGroup200Response = instanceOfRemoveMembersFromGroup200Response;
+    exports.instanceOfRemoveSubgroupsFromGroup200Response = instanceOfRemoveSubgroupsFromGroup200Response;
+    exports.instanceOfReportRunResponse = instanceOfReportRunResponse;
+    exports.instanceOfRunFormula200Response = instanceOfRunFormula200Response;
+    exports.instanceOfRunFormulaRequest = instanceOfRunFormulaRequest;
+    exports.instanceOfRunQueryRequest = instanceOfRunQueryRequest;
+    exports.instanceOfRunQueryRequestGroupByInner = instanceOfRunQueryRequestGroupByInner;
+    exports.instanceOfRunQueryRequestOptions = instanceOfRunQueryRequestOptions;
+    exports.instanceOfRunQueryRequestSortByInner = instanceOfRunQueryRequestSortByInner;
+    exports.instanceOfRunQueryResponse = instanceOfRunQueryResponse;
+    exports.instanceOfRunQueryResponseFieldsInner = instanceOfRunQueryResponseFieldsInner;
+    exports.instanceOfRunQueryResponseMetadata = instanceOfRunQueryResponseMetadata;
+    exports.instanceOfTable = instanceOfTable;
+    exports.instanceOfTransferUserToken200Response = instanceOfTransferUserToken200Response;
+    exports.instanceOfTransferUserTokenRequest = instanceOfTransferUserTokenRequest;
+    exports.instanceOfUndenyUsers200Response = instanceOfUndenyUsers200Response;
+    exports.instanceOfUpdateRelationshipRequest = instanceOfUpdateRelationshipRequest;
+    exports.instanceOfUpdateTableRequest = instanceOfUpdateTableRequest;
+    exports.instanceOfUpsert200Response = instanceOfUpsert200Response;
+    exports.instanceOfUpsert200ResponseDataInnerValue = instanceOfUpsert200ResponseDataInnerValue;
+    exports.instanceOfUpsert200ResponseMetadata = instanceOfUpsert200ResponseMetadata;
+    exports.instanceOfUpsert207Response = instanceOfUpsert207Response;
+    exports.instanceOfUpsert207ResponseMetadata = instanceOfUpsert207ResponseMetadata;
+    exports.instanceOfUpsertRequest = instanceOfUpsertRequest;
+    exports.instanceOfUsageCount = instanceOfUsageCount;
+    exports.quickbase = quickbase;
+
+}));
 //# sourceMappingURL=quickbase.umd.js.map

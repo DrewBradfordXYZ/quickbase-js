@@ -12,9 +12,9 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "src/code-generation",
-  // "src/code-generation/definitions",
-  // "src/code-generation/paths",
+  "open-api",
+  "open-api/definitions",
+  "open-api/paths",
 ];
 
 // prettier-ignore
@@ -28,8 +28,10 @@ const includeRecursiveFolders: string[] = [
 const includeFiles: string[] = [
   "package.json",
   "tsconfig.json",
+  "tsconfig.build.json",
   "rollup.config.js",
   "vitest.config.ts",
+  "build.js",
   "src/utils.ts",
   "src/tokenCache.ts",
   "src/generated-unified/QuickbaseClient.ts",
