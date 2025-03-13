@@ -24,6 +24,9 @@
     }
   },
   "scripts": {
+    "build": "npm run build:esm && npm run build:umd",
+    "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --loader ts-node/esm build-esm.js",
+    "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --loader ts-node/esm build-umd.js",
     "release": "standard-version",
     "release:beta": "standard-version --prerelease beta",
     "release:alpha": "standard-version --prerelease alpha",
@@ -35,8 +38,6 @@
     "regenerate:unified": "node --loader ts-node/esm open-api/generate-unified-interface.ts",
     "regenerate:all": "npm run fix-spec && npm run regenerate:openapi && npm run regenerate:unified",
     "log-gen": "node --loader ts-node/esm tools/log-gen.ts",
-    "build": "rimraf dist && node --loader ts-node/esm build.js",
-    "build:prod": "rimraf dist && NODE_ENV=production node --loader ts-node/esm build.js",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
     "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",

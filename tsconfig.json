@@ -21,7 +21,7 @@
     }
   },
   "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
-  "exclude": ["node_modules", "dist", "specs"],
+  "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
   "ts-node": {
     "esm": true,
     "transpileOnly": true
