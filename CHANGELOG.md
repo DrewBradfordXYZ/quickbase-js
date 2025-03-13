@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0-beta.6](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2025-03-13)
+
+
+### Features
+
+* omit credientials for all api calls that are not fetching a temp token ([b1b4aae](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b1b4aae02aaa655e6eaab2fe0d532d526e6dc69f))
+
 ## [1.1.0-beta.5](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2025-03-13)
 
 
