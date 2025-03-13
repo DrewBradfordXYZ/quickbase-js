@@ -1,11 +1,11 @@
-// Generated on 2025-03-13T16:13:05.461Z
-import { App, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, FieldUsage, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-13T18:17:45.434Z
+import { App, AppEvent, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteRecords200Response, DeleteRecordsRequest, DeleteTableResponse, Field, FieldUsage, GetRelationships200Response, GetTempTokenDBID200Response, ReportRunResponse, RunQueryRequest, RunQueryResponse, Table, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   createApp: (params: { body: CreateAppRequest }) => Promise<CreateApp200Response>;
   getApp: (params: { appId: string }) => Promise<App>;
   deleteApp: (params: { appId: string; body: DeleteAppRequest }) => Promise<DeleteApp200Response>;
-  getAppEvents: (params: { appId: string }) => Promise<any[]>;
+  getAppEvents: (params: { appId: string }) => Promise<AppEvent[]>;
   copyApp: (params: { appId: string; body: CopyAppRequest }) => Promise<CopyApp200Response>;
   getAppTables: (params: { appId: string }) => Promise<Table[]>;
   createTable: (params: { appId: string; body: any }) => Promise<Table>;

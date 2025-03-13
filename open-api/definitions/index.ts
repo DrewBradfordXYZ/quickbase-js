@@ -6,6 +6,7 @@ import { recordsDefinitions } from "./records.ts";
 import { relationshipsDefinitions } from "./relationships.ts";
 import { reportsDefinitions } from "./reports.ts";
 import { tablesDefinitions } from "./tables.ts";
+import { eventsDefinitions } from "./events.ts";
 
 export const definitions = {
   ...appsDefinitions,
@@ -15,4 +16,5 @@ export const definitions = {
   ...relationshipsDefinitions,
   ...reportsDefinitions,
   ...tablesDefinitions,
+  ...eventsDefinitions,
 };

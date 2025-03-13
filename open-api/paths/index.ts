@@ -5,6 +5,7 @@ import { recordsPaths } from "./records.ts";
 import { relationshipsPaths } from "./relationships.ts";
 import { reportsPaths } from "./reports.ts";
 import { tablesPaths } from "./tables.ts";
+import { eventsPaths } from "./events.ts";
 
 export const paths = {
   ...appsPaths,
@@ -14,4 +15,5 @@ export const paths = {
   ...relationshipsPaths,
   ...reportsPaths,
   ...tablesPaths,
+  ...eventsPaths,
 };
