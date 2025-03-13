@@ -1,20 +1,17 @@
+// open-api/generate-unified-interface.ts
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { OpenAPIV2 } from "openapi-types";
+import { simplifyName } from "../src/utils"; // Add this import
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 
-// Placeholder for simplifyName (since utils.ts is missing)
-function simplifyName(name: string): string {
-  return name
-    .replace(/ById$/, "")
-    .replace(/Api$/, "")
-    .replace(/^(\w)/, (_, c) => c.toLowerCase());
-}
+// Remove the local simplifyName function
+// (The rest of the file remains unchanged)
 
 function generateInterface() {
   if (!existsSync(SPEC_FILE)) {

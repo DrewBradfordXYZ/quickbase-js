@@ -32,10 +32,9 @@ const includeFiles: string[] = [
   "rollup.config.js",
   "vitest.config.ts",
   "build.js",
-  "src/utils.ts",
   "src/tokenCache.ts",
-  "src/generated-unified/QuickbaseClient.ts",
   "src/quickbaseClient.ts",
+  "open-api/generate-unified-interface.ts",
 ];
 
 const projectGoals: string[] = [
