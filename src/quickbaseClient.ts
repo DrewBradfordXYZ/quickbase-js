@@ -3,7 +3,7 @@ import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/Quickba
 import { Configuration, HTTPHeaders, ResponseError } from "./generated/runtime";
 import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
-import { simplifyName } from "./utils"; // Add this import
+import { simplifyName } from "./utils.ts"; // Add this import
 
 // Re-export all model types from generated/models
 export * from "./generated/models";

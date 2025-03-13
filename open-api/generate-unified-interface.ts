@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { OpenAPIV2 } from "openapi-types";
-import { simplifyName } from "../src/utils"; // Add this import
+import { simplifyName } from "../src/utils.ts"; // Add this import
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
