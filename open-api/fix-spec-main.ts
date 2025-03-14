@@ -156,7 +156,7 @@ function enhanceRawSpec(spec: Spec) {
       if (operation.responses) {
         for (const status in operation.responses) {
           const response = operation.responses[status];
-          if (response.schema && response.schema.type === "object") {
+          if (response.schema) {
             const responseName = `${opId}${status}Response`;
             spec.definitions[responseName] = response.schema;
             response.schema = { $ref: `#/definitions/${responseName}` };

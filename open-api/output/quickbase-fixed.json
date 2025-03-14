@@ -184,138 +184,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "type": "qb-action",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Quick Base Action"
-                },
-                {
-                  "type": "webhook",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": false,
-                  "tableId": "bqwriv8bw",
-                  "name": "Webhook"
-                },
-                {
-                  "type": "email-notification",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": false,
-                  "tableId": "bqwriv8bw",
-                  "name": "Notification"
-                },
-                {
-                  "type": "subscription",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Subscription"
-                },
-                {
-                  "type": "reminder",
-                  "owner": {
-                    "email": "jsmith@quickbase.com",
-                    "id": "123456.ab1s",
-                    "name": "Juliet Smith",
-                    "userName": "jsmith"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "name": "Reminder"
-                },
-                {
-                  "type": "automation",
-                  "owner": {
-                    "email": "tanderson@quickbase.com",
-                    "id": "654321.ab1s",
-                    "name": "Thomas A. Anderson",
-                    "userName": "tanderson"
-                  },
-                  "isActive": true,
-                  "tableId": "bqwriv8bw",
-                  "url": "https://realm.quickbase.com/ui/automation/qb/db/bqwria893/automations/70eecab9-634f-42d9-9037-9340a1a9e8ce"
-                }
-              ],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "isActive": {
-                    "description": "Indication of whether current event is active.",
-                    "type": "boolean"
-                  },
-                  "type": {
-                    "description": "Type of an event.",
-                    "enum": [
-                      "webhook",
-                      "qb-action",
-                      "email-notification",
-                      "subscription",
-                      "reminder",
-                      "automation"
-                    ],
-                    "type": "string"
-                  },
-                  "name": {
-                    "description": "The name of the event. This property is not returned for automations.",
-                    "type": "string"
-                  },
-                  "url": {
-                    "description": "The url to automation that can be accessed from the browser. Only returned for automations.",
-                    "type": "string"
-                  },
-                  "owner": {
-                    "description": "The user that owns the event.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "name": {
-                        "description": "User full name.",
-                        "type": "string"
-                      },
-                      "id": {
-                        "description": "User Id.",
-                        "type": "string"
-                      },
-                      "email": {
-                        "description": "User email.",
-                        "type": "string"
-                      },
-                      "userName": {
-                        "description": "User Name as updated in user properties. Optional, appears if not the same as user email.",
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "tableId": {
-                    "description": "The unique identifier of the table to which event belongs to.",
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/getAppEvents200Response"
             }
           }
         },
@@ -431,137 +300,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "name": "Example Table #0",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table_#0",
-                  "description": "Table zero as an example.",
-                  "id": "bpqe82s1",
-                  "nextRecordId": 1,
-                  "nextFieldId": 1,
-                  "defaultSortFieldId": 2,
-                  "defaultSortOrder": "ASC",
-                  "keyFieldId": 3,
-                  "singleRecordName": "Example Record",
-                  "pluralRecordName": "Example Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "17 MB",
-                  "spaceRemaining": "133 MB"
-                },
-                {
-                  "name": "Example Table #2",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table_#2",
-                  "description": "Table two as an example.",
-                  "id": "bpqe82z1",
-                  "nextRecordId": 10,
-                  "nextFieldId": 111,
-                  "defaultSortFieldId": 12,
-                  "defaultSortOrder": "DESC",
-                  "keyFieldId": 33,
-                  "singleRecordName": "Another Record",
-                  "pluralRecordName": "More Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "22 MB",
-                  "spaceRemaining": "128 MB"
-                }
-              ],
-              "type": "array",
-              "items": {
-                "example": {
-                  "name": "Example Table",
-                  "created": "2020-03-27T18:34:40Z",
-                  "updated": "2020-04-03T19:12:40Z",
-                  "alias": "_dbid_example_table",
-                  "description": "Table as an example.",
-                  "id": "bpqe82s0",
-                  "nextRecordId": 1,
-                  "nextFieldId": 1,
-                  "defaultSortFieldId": 2,
-                  "defaultSortOrder": "ASC",
-                  "keyFieldId": 3,
-                  "singleRecordName": "Example Record",
-                  "pluralRecordName": "Example Records",
-                  "sizeLimit": "150 MB",
-                  "spaceUsed": "17 MB",
-                  "spaceRemaining": "133 MB"
-                },
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "name": {
-                    "description": "The name of the table.",
-                    "type": "string"
-                  },
-                  "id": {
-                    "description": "The unique identifier (dbid) of the table.",
-                    "type": "string"
-                  },
-                  "alias": {
-                    "description": "The automatically-created table alias for the table.",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "The description of the table, as configured by an application administrator.",
-                    "type": "string"
-                  },
-                  "created": {
-                    "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                    "type": "string"
-                  },
-                  "updated": {
-                    "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
-                    "type": "string"
-                  },
-                  "nextRecordId": {
-                    "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
-                    "type": "integer"
-                  },
-                  "nextFieldId": {
-                    "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
-                    "type": "integer"
-                  },
-                  "defaultSortFieldId": {
-                    "description": "The id of the field that is configured for default sorting.",
-                    "type": "integer"
-                  },
-                  "defaultSortOrder": {
-                    "description": "The configuration of the default sort order on the table.",
-                    "enum": [
-                      "ASC",
-                      "DESC"
-                    ],
-                    "type": "string"
-                  },
-                  "keyFieldId": {
-                    "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
-                    "type": "integer"
-                  },
-                  "singleRecordName": {
-                    "description": "The builder-configured singular noun of the table.",
-                    "type": "string"
-                  },
-                  "pluralRecordName": {
-                    "description": "The builder-configured plural noun of the table.",
-                    "type": "string"
-                  },
-                  "sizeLimit": {
-                    "description": "The size limit for the table.",
-                    "type": "string"
-                  },
-                  "spaceUsed": {
-                    "description": "The amount of space currently being used by the table.",
-                    "type": "string"
-                  },
-                  "spaceRemaining": {
-                    "description": "The amount of space remaining for use by the table.",
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/getAppTables200Response"
             }
           }
         },
@@ -893,161 +632,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "description": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)",
-              "type": "array",
-              "items": {
-                "example": {
-                  "value": {
-                    "id": "5",
-                    "name": "table-report",
-                    "type": "table",
-                    "description": "This is Table report.",
-                    "query": {
-                      "tableId": "bpweef42b",
-                      "filter": "{6.CT.'FilterByThisValue'}",
-                      "formulaFields": [
-                        {
-                          "id": -100,
-                          "label": "NumericField",
-                          "fieldType": "numeric",
-                          "formula": "1+1",
-                          "decimalPrecision": 4
-                        }
-                      ],
-                      "fields": [
-                        7
-                      ],
-                      "sortBy": [
-                        {
-                          "fieldId": 28,
-                          "order": "ASC"
-                        },
-                        {
-                          "fieldId": 3,
-                          "order": "ASC"
-                        }
-                      ],
-                      "groupBy": [
-                        {
-                          "fieldId": 3,
-                          "grouping": "equal-values"
-                        }
-                      ]
-                    },
-                    "properties": {
-                      "displayOnlyNewOrChangedRecords": true,
-                      "columnProperties": [
-                        {
-                          "fieldId": -100,
-                          "labelOverride": "Numeric Field Label"
-                        }
-                      ]
-                    },
-                    "usedLast": "2020-09-20T20:23:00Z",
-                    "usedCount": 7
-                  }
-                },
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "id": {
-                    "description": "The identifier of the report, unique to the table.",
-                    "type": "string"
-                  },
-                  "name": {
-                    "description": "The configured name of the report.",
-                    "type": "string"
-                  },
-                  "type": {
-                    "description": "The type of report in Quickbase (e.g., chart).",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "The configured description of a report.",
-                    "type": "string"
-                  },
-                  "ownerId": {
-                    "description": "Optional, showed only for personal reports. The user ID of report owner.",
-                    "type": "integer"
-                  },
-                  "query": {
-                    "description": "The query definition as configured in Quickbase that gets executed when the report is run.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "tableId": {
-                        "description": "The table identifier for the report.",
-                        "type": "string"
-                      },
-                      "filter": {
-                        "description": "Filter used to query for data.",
-                        "type": "string"
-                      },
-                      "formulaFields": {
-                        "description": "Calculated formula fields.",
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "additionalProperties": true,
-                          "properties": {
-                            "id": {
-                              "description": "Formula field identifier.",
-                              "type": "integer"
-                            },
-                            "label": {
-                              "description": "Formula field label.",
-                              "type": "string"
-                            },
-                            "fieldType": {
-                              "description": "Resulting formula value type.",
-                              "enum": [
-                                "rich-text",
-                                "text",
-                                "numeric",
-                                "currency",
-                                "percent",
-                                "rating",
-                                "date",
-                                "timestamp",
-                                "timeofday",
-                                "duration",
-                                "checkbox",
-                                "phone",
-                                "email",
-                                "user",
-                                "multiuser",
-                                "url"
-                              ],
-                              "type": "string"
-                            },
-                            "formula": {
-                              "description": "Formula text.",
-                              "type": "string"
-                            },
-                            "decimalPrecision": {
-                              "description": "For numeric formula the number precision.",
-                              "type": "integer"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "properties": {
-                    "description": "A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)",
-                    "type": "object",
-                    "additionalProperties": true
-                  },
-                  "usedLast": {
-                    "description": "The instant at which a report was last used.",
-                    "type": "string"
-                  },
-                  "usedCount": {
-                    "description": "The number of times a report has been used.",
-                    "type": "integer"
-                  }
-                }
-              }
+              "$ref": "#/definitions/getTableReports200Response"
             }
           }
         },
@@ -1191,538 +776,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "id": 1,
-                  "label": "Field1",
-                  "fieldType": "text",
-                  "noWrap": false,
-                  "bold": false,
-                  "required": false,
-                  "appearsByDefault": false,
-                  "findEnabled": false,
-                  "unique": false,
-                  "doesDataCopy": false,
-                  "fieldHelp": "field help",
-                  "audited": false,
-                  "properties": {
-                    "primaryKey": false,
-                    "foreignKey": false,
-                    "numLines": 1,
-                    "maxLength": 0,
-                    "appendOnly": false,
-                    "allowHTML": false,
-                    "allowMentions": false,
-                    "sortAsGiven": false,
-                    "carryChoices": true,
-                    "allowNewChoices": false,
-                    "formula": "",
-                    "defaultValue": ""
-                  },
-                  "permissions": [
-                    {
-                      "permissionType": "View",
-                      "role": "Viewer",
-                      "roleId": 10
-                    },
-                    {
-                      "permissionType": "None",
-                      "role": "Participant",
-                      "roleId": 11
-                    },
-                    {
-                      "permissionType": "Modify",
-                      "role": "Administrator",
-                      "roleId": 12
-                    }
-                  ]
-                },
-                {
-                  "id": 2,
-                  "label": "Numeric Field",
-                  "fieldType": "numeric",
-                  "appearsByDefault": true,
-                  "audited": false,
-                  "bold": false,
-                  "fieldHelp": "This is a numeric field",
-                  "findEnabled": false,
-                  "addToForms": true,
-                  "properties": {
-                    "numberFormat": 3,
-                    "decimalPlaces": 2,
-                    "doesAverage": true,
-                    "doesTotal": true,
-                    "blankIsZero": true
-                  },
-                  "permissions": [
-                    {
-                      "role": "Viewer",
-                      "permissionType": "View",
-                      "roleId": 10
-                    },
-                    {
-                      "role": "Participant",
-                      "permissionType": "Modify",
-                      "roleId": 11
-                    },
-                    {
-                      "role": "Administrator",
-                      "permissionType": "Modify",
-                      "roleId": 12
-                    }
-                  ]
-                }
-              ],
-              "type": "array",
-              "items": {
-                "example": {
-                  "id": 123,
-                  "label": "Field1",
-                  "fieldType": "text",
-                  "mode": "",
-                  "noWrap": false,
-                  "bold": false,
-                  "required": false,
-                  "appearsByDefault": false,
-                  "findEnabled": false,
-                  "unique": false,
-                  "doesDataCopy": false,
-                  "fieldHelp": "field help",
-                  "audited": false,
-                  "properties": {
-                    "primaryKey": false,
-                    "foreignKey": false,
-                    "numLines": 1,
-                    "maxLength": 0,
-                    "appendOnly": false,
-                    "allowHTML": false,
-                    "allowMentions": false,
-                    "sortAsGiven": false,
-                    "carryChoices": true,
-                    "allowNewChoices": false,
-                    "formula": "",
-                    "defaultValue": ""
-                  },
-                  "permissions": [
-                    {
-                      "permissionType": "View",
-                      "role": "Viewer",
-                      "roleId": 10
-                    },
-                    {
-                      "permissionType": "None",
-                      "role": "Participant",
-                      "roleId": 11
-                    },
-                    {
-                      "permissionType": "Modify",
-                      "role": "Administrator",
-                      "roleId": 12
-                    }
-                  ]
-                },
-                "type": "object",
-                "additionalProperties": true,
-                "required": [
-                  "id"
-                ],
-                "properties": {
-                  "id": {
-                    "description": "The id of the field, unique to this table.",
-                    "type": "integer",
-                    "format": "int64"
-                  },
-                  "fieldType": {
-                    "description": "The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html).",
-                    "type": "string"
-                  },
-                  "mode": {
-                    "description": "For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank.",
-                    "type": "string"
-                  },
-                  "label": {
-                    "description": "The label (name) of the field.",
-                    "type": "string"
-                  },
-                  "noWrap": {
-                    "description": "Indicates if the field is configured to not wrap when displayed in the product.",
-                    "type": "boolean"
-                  },
-                  "bold": {
-                    "description": "Indicates if the field is configured to display in bold in the product.",
-                    "type": "boolean"
-                  },
-                  "required": {
-                    "description": "Indicates if the field is marked required.",
-                    "type": "boolean"
-                  },
-                  "appearsByDefault": {
-                    "description": "Indicates if the field is marked as a default in reports.",
-                    "type": "boolean"
-                  },
-                  "findEnabled": {
-                    "description": "Indicates if the field is marked as searchable.",
-                    "type": "boolean"
-                  },
-                  "unique": {
-                    "description": "Indicates if the field is marked unique.",
-                    "type": "boolean"
-                  },
-                  "doesDataCopy": {
-                    "description": "Indicates if the field data will copy when a user copies the record.",
-                    "type": "boolean"
-                  },
-                  "fieldHelp": {
-                    "description": "The configured help text shown to users within the product.",
-                    "type": "string"
-                  },
-                  "audited": {
-                    "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs.",
-                    "type": "boolean"
-                  },
-                  "properties": {
-                    "description": "Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "properties": {
-                      "allowMentions": {
-                        "description": "If someone can @mention users in the rich text field to generate an email notification.",
-                        "type": "boolean"
-                      },
-                      "comments": {
-                        "description": "The comments entered on the field properties by an administrator.",
-                        "type": "string"
-                      },
-                      "doesTotal": {
-                        "description": "Whether this field totals in reports within the product.",
-                        "type": "boolean"
-                      },
-                      "autoSave": {
-                        "description": "Whether the link field will auto save.",
-                        "type": "boolean"
-                      },
-                      "defaultValueLuid": {
-                        "description": "Default user id value.",
-                        "type": "integer"
-                      },
-                      "useI18NFormat": {
-                        "description": "Whether phone numbers should be in E.164 standard international format.",
-                        "type": "boolean"
-                      },
-                      "maxVersions": {
-                        "description": "The maximum number of versions configured for a file attachment.",
-                        "type": "integer"
-                      },
-                      "carryChoices": {
-                        "description": "Whether the field should carry its multiple choice fields when copied.",
-                        "type": "boolean"
-                      },
-                      "format": {
-                        "description": "The format to display time.",
-                        "type": "integer"
-                      },
-                      "maxLength": {
-                        "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
-                        "type": "integer"
-                      },
-                      "linkText": {
-                        "description": "The configured text value that replaces the URL that users see within the product.",
-                        "type": "string"
-                      },
-                      "parentFieldId": {
-                        "description": "The id of the parent composite field, when applicable.",
-                        "type": "integer"
-                      },
-                      "displayTimezone": {
-                        "description": "Indicates whether to display the timezone within the product.",
-                        "type": "boolean"
-                      },
-                      "summaryTargetFieldId": {
-                        "description": "The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count).",
-                        "type": "integer"
-                      },
-                      "allowNewChoices": {
-                        "description": "Indicates if users can add new choices to a selection list.",
-                        "type": "boolean"
-                      },
-                      "masterChoiceFieldId": {
-                        "description": "The id of the field that is the reference in the relationship.",
-                        "type": "integer"
-                      },
-                      "defaultToday": {
-                        "description": "Indicates if the field value is defaulted today for new records.",
-                        "type": "boolean"
-                      },
-                      "units": {
-                        "description": "The units label.",
-                        "type": "string"
-                      },
-                      "lookupTargetFieldId": {
-                        "description": "The id of the field that is the target on the master table for this lookup.",
-                        "type": "integer"
-                      },
-                      "summaryFunction": {
-                        "description": "The summary accumulation function type.",
-                        "enum": [
-                          "AVG",
-                          "SUM",
-                          "MAX",
-                          "MIN",
-                          "STD-DEV",
-                          "COUNT",
-                          "COMBINED-TEXT",
-                          "COMBINED-USER",
-                          "DISTINCT-COUNT"
-                        ],
-                        "type": "string"
-                      },
-                      "sourceFieldId": {
-                        "description": "The id of the source field.",
-                        "type": "integer"
-                      },
-                      "masterTableTag": {
-                        "description": "The table alias for the master table in the relationship this field is part of.",
-                        "type": "string"
-                      },
-                      "doesAverage": {
-                        "description": "Whether this field averages in reports within the product.",
-                        "type": "boolean"
-                      },
-                      "formula": {
-                        "description": "The formula of the field as configured in Quickbase.",
-                        "type": "string"
-                      },
-                      "decimalPlaces": {
-                        "description": "The number of decimal places displayed in the product for this field.",
-                        "type": "integer"
-                      },
-                      "defaultCountryCode": {
-                        "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
-                        "type": "string"
-                      },
-                      "seeVersions": {
-                        "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
-                        "type": "boolean"
-                      },
-                      "displayMonth": {
-                        "description": "How to display months.",
-                        "type": "string"
-                      },
-                      "numLines": {
-                        "description": "The number of lines shown in Quickbase for this text field.",
-                        "type": "integer"
-                      },
-                      "displayEmail": {
-                        "description": "How the email is displayed.",
-                        "type": "string"
-                      },
-                      "defaultKind": {
-                        "description": "The user default type.",
-                        "type": "string"
-                      },
-                      "coverText": {
-                        "description": "An alternate user friendly text that can be used to display a link in the browser.",
-                        "type": "string"
-                      },
-                      "currencySymbol": {
-                        "description": "The current symbol used when displaying field values within the product.",
-                        "type": "string"
-                      },
-                      "masterChoiceTableId": {
-                        "description": "The id of the table that is the master in this relationship.",
-                        "type": "string"
-                      },
-                      "targetFieldId": {
-                        "description": "The id of the target field.",
-                        "type": "integer"
-                      },
-                      "displayUser": {
-                        "description": "The configured option for how users display within the product.",
-                        "type": "string"
-                      },
-                      "blankIsZero": {
-                        "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
-                        "type": "boolean"
-                      },
-                      "exact": {
-                        "description": "Whether an exact match is required for a report link.",
-                        "type": "boolean"
-                      },
-                      "startField": {
-                        "description": "The start field id.",
-                        "type": "integer"
-                      },
-                      "defaultDomain": {
-                        "description": "Default email domain.",
-                        "type": "string"
-                      },
-                      "defaultValue": {
-                        "description": "The default value configured for a field when a new record is added.",
-                        "type": "string"
-                      },
-                      "choicesLuid": {
-                        "description": "List of user choices.",
-                        "type": "array"
-                      },
-                      "abbreviate": {
-                        "description": "Don't show the URL protocol when showing the URL.",
-                        "type": "boolean"
-                      },
-                      "xmlTag": {
-                        "description": "The field's xml tag.",
-                        "type": "string"
-                      },
-                      "targetTableName": {
-                        "description": "The field's target table name.",
-                        "type": "string"
-                      },
-                      "numberFormat": {
-                        "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
-                        "type": "integer"
-                      },
-                      "appearsAs": {
-                        "description": "The link text, if empty, the url will be used as link text.",
-                        "type": "string"
-                      },
-                      "width": {
-                        "description": "The field's html input width in the product.",
-                        "type": "integer"
-                      },
-                      "currencyFormat": {
-                        "description": "The currency format used when displaying field values within the product.",
-                        "enum": [
-                          "left",
-                          "right",
-                          "middle"
-                        ],
-                        "type": "string"
-                      },
-                      "foreignKey": {
-                        "description": "Indicates if the field is a foreign key (or reference field) in a relationship.",
-                        "type": "boolean"
-                      },
-                      "displayDayOfWeek": {
-                        "description": "Indicates whether to display the day of the week within the product.",
-                        "type": "boolean"
-                      },
-                      "summaryReferenceFieldId": {
-                        "description": "The id of the field that is the reference in the relationship for this summary.",
-                        "type": "integer",
-                        "format": "int64"
-                      },
-                      "commaStart": {
-                        "description": "The number of digits before commas display in the product, when applicable.",
-                        "type": "integer"
-                      },
-                      "choices": {
-                        "description": "An array of entries that exist for a field that offers choices to the user.",
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "targetTableId": {
-                        "description": "The id of the target table.",
-                        "type": "string"
-                      },
-                      "displayRelative": {
-                        "description": "Whether to display time as relative.",
-                        "type": "boolean"
-                      },
-                      "compositeFields": {
-                        "description": "An array of the fields that make up a composite field (e.g., address).",
-                        "type": "array"
-                      },
-                      "displayCheckboxAsText": {
-                        "description": "Indicates whether the checkbox values will be shown as text in reports.",
-                        "type": "boolean"
-                      },
-                      "versionMode": {
-                        "description": "Version modes for files. Keep all versions vs keep last version.",
-                        "enum": [
-                          "keepallversions",
-                          "keeplastversions"
-                        ],
-                        "type": "string"
-                      },
-                      "displayTime": {
-                        "description": "Indicates whether to display the time, in addition to the date.",
-                        "type": "boolean"
-                      },
-                      "durationField": {
-                        "description": "The duration field id.",
-                        "type": "integer"
-                      },
-                      "snapFieldId": {
-                        "description": "The id of the field that is used to snapshot values from, when applicable.",
-                        "type": "integer"
-                      },
-                      "hours24": {
-                        "description": "Indicates whether or not to display time in the 24-hour format within the product.",
-                        "type": "boolean"
-                      },
-                      "sortAlpha": {
-                        "description": "Whether to sort alphabetically, default sort is by record ID.",
-                        "type": "boolean"
-                      },
-                      "sortAsGiven": {
-                        "description": "Indicates if the listed entries sort as entered vs alphabetically.",
-                        "type": "boolean"
-                      },
-                      "hasExtension": {
-                        "description": "Whether this field has a phone extension.",
-                        "type": "boolean"
-                      },
-                      "workWeek": {
-                        "description": "The work week type.",
-                        "type": "integer"
-                      },
-                      "useNewWindow": {
-                        "description": "Indicates if the URL should open a new window when a user clicks it within the product.",
-                        "type": "boolean"
-                      },
-                      "appendOnly": {
-                        "description": "Whether this field is append only.",
-                        "type": "boolean"
-                      },
-                      "displayAsLink": {
-                        "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
-                        "type": "boolean"
-                      },
-                      "allowHTML": {
-                        "description": "Whether this field allows html.",
-                        "type": "boolean"
-                      },
-                      "lookupReferenceFieldId": {
-                        "description": "The id of the field that is the reference in the relationship for this lookup.",
-                        "type": "integer"
-                      }
-                    }
-                  },
-                  "permissions": {
-                    "description": "Field Permissions for different roles.",
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "role": {
-                          "description": "The role associated with a given permission for the field",
-                          "type": "string"
-                        },
-                        "permissionType": {
-                          "description": "The permission given to the role for this field",
-                          "type": "string"
-                        },
-                        "roleId": {
-                          "description": "The Id of the given role",
-                          "type": "integer"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/getFields200Response"
             }
           }
         },
@@ -1946,364 +1000,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "field": {
-                    "id": 6,
-                    "name": "name",
-                    "type": "Text"
-                  },
-                  "usage": {
-                    "actions": {
-                      "count": 0
-                    },
-                    "appHomePages": {
-                      "count": 0
-                    },
-                    "dashboards": {
-                      "count": 2
-                    },
-                    "defaultReports": {
-                      "count": 1
-                    },
-                    "exactForms": {
-                      "count": 0
-                    },
-                    "fields": {
-                      "count": 0
-                    },
-                    "forms": {
-                      "count": 1
-                    },
-                    "notifications": {
-                      "count": 0
-                    },
-                    "personalReports": {
-                      "count": 0
-                    },
-                    "pipelines": {
-                      "count": 1
-                    },
-                    "relationships": {
-                      "count": 0
-                    },
-                    "reminders": {
-                      "count": 0
-                    },
-                    "reports": {
-                      "count": 2
-                    },
-                    "roles": {
-                      "count": 2
-                    },
-                    "tableImports": {
-                      "count": 3
-                    },
-                    "tableRules": {
-                      "count": 1
-                    },
-                    "webhooks": {
-                      "count": 0
-                    }
-                  }
-                }
-              ],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": true,
-                "required": [
-                  "field",
-                  "usage"
-                ],
-                "properties": {
-                  "field": {
-                    "description": "Basic information about the field.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "required": [
-                      "name",
-                      "id",
-                      "type"
-                    ],
-                    "properties": {
-                      "name": {
-                        "description": "Field name.",
-                        "type": "string"
-                      },
-                      "id": {
-                        "description": "Field id.",
-                        "type": "integer"
-                      },
-                      "type": {
-                        "description": "Field type.",
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "usage": {
-                    "description": "Usage Information about the field.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "required": [
-                      "actions",
-                      "appHomePages",
-                      "dashboards",
-                      "defaultReports",
-                      "exactForms",
-                      "fields",
-                      "forms",
-                      "notifications",
-                      "personalReports",
-                      "pipelines",
-                      "relationships",
-                      "reminders",
-                      "reports",
-                      "roles",
-                      "tableImports",
-                      "tableRules",
-                      "webhooks"
-                    ],
-                    "properties": {
-                      "actions": {
-                        "description": "The number of quickbase actions where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "appHomePages": {
-                        "description": "The number of app home pages where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "dashboards": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of dashboards where the given field is referenced."
-                      },
-                      "defaultReports": {
-                        "description": "The number of default reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "exactForms": {
-                        "description": "The number of exact forms where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "fields": {
-                        "description": "The number of fields where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "forms": {
-                        "description": "The number of forms where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "notifications": {
-                        "description": "The number of notifications where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "personalReports": {
-                        "description": "The number of personal reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "pipelines": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "additionalProperties": true,
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of pipelines where the given field is referenced."
-                      },
-                      "relationships": {
-                        "description": "The number of relationships where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "reminders": {
-                        "description": "The number of reminders where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "reports": {
-                        "description": "The number of reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "roles": {
-                        "description": "The number of roles where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "tableImports": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of table imports where the given field is referenced."
-                      },
-                      "tableRules": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of table rules where the given field is referenced."
-                      },
-                      "webhooks": {
-                        "description": "The number of webhooks where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/getFieldsUsage200Response"
             }
           }
         },
@@ -2344,364 +1041,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": [
-                {
-                  "field": {
-                    "id": 6,
-                    "name": "name",
-                    "type": "Text"
-                  },
-                  "usage": {
-                    "actions": {
-                      "count": 0
-                    },
-                    "appHomePages": {
-                      "count": 0
-                    },
-                    "dashboards": {
-                      "count": 2
-                    },
-                    "defaultReports": {
-                      "count": 1
-                    },
-                    "exactForms": {
-                      "count": 0
-                    },
-                    "fields": {
-                      "count": 0
-                    },
-                    "forms": {
-                      "count": 1
-                    },
-                    "notifications": {
-                      "count": 0
-                    },
-                    "personalReports": {
-                      "count": 0
-                    },
-                    "pipelines": {
-                      "count": 1
-                    },
-                    "relationships": {
-                      "count": 0
-                    },
-                    "reminders": {
-                      "count": 0
-                    },
-                    "reports": {
-                      "count": 2
-                    },
-                    "roles": {
-                      "count": 2
-                    },
-                    "tableImports": {
-                      "count": 2
-                    },
-                    "tableRules": {
-                      "count": 1
-                    },
-                    "webhooks": {
-                      "count": 0
-                    }
-                  }
-                }
-              ],
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": true,
-                "required": [
-                  "field",
-                  "usage"
-                ],
-                "properties": {
-                  "field": {
-                    "description": "Basic information about the field.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "required": [
-                      "name",
-                      "id",
-                      "type"
-                    ],
-                    "properties": {
-                      "name": {
-                        "description": "Field name.",
-                        "type": "string"
-                      },
-                      "id": {
-                        "description": "Field id.",
-                        "type": "integer"
-                      },
-                      "type": {
-                        "description": "Field type.",
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "usage": {
-                    "description": "Usage Information about the field.",
-                    "type": "object",
-                    "additionalProperties": true,
-                    "required": [
-                      "actions",
-                      "appHomePages",
-                      "dashboards",
-                      "defaultReports",
-                      "exactForms",
-                      "fields",
-                      "forms",
-                      "notifications",
-                      "personalReports",
-                      "pipelines",
-                      "relationships",
-                      "reminders",
-                      "reports",
-                      "roles",
-                      "tableImports",
-                      "tableRules",
-                      "webhooks"
-                    ],
-                    "properties": {
-                      "actions": {
-                        "description": "The number of quickbase actions where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "appHomePages": {
-                        "description": "The number of app home pages where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "dashboards": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of dashboards where the given field is referenced."
-                      },
-                      "defaultReports": {
-                        "description": "The number of default reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "exactForms": {
-                        "description": "The number of exact forms where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "fields": {
-                        "description": "The number of fields where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "forms": {
-                        "description": "The number of forms where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "notifications": {
-                        "description": "The number of notifications where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "personalReports": {
-                        "description": "The number of personal reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "pipelines": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "additionalProperties": true,
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of pipelines where the given field is referenced."
-                      },
-                      "relationships": {
-                        "description": "The number of relationships where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "reminders": {
-                        "description": "The number of reminders where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "reports": {
-                        "description": "The number of reports where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "roles": {
-                        "description": "The number of roles where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      },
-                      "tableImports": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of table imports where the given field is referenced."
-                      },
-                      "tableRules": {
-                        "required": [
-                          "count"
-                        ],
-                        "type": "object",
-                        "properties": {
-                          "count": {
-                            "type": "integer",
-                            "description": "the number of times a field has been used for the given item."
-                          }
-                        },
-                        "description": "The number of table rules where the given field is referenced."
-                      },
-                      "webhooks": {
-                        "description": "The number of webhooks where the given field is referenced.",
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                          "count"
-                        ],
-                        "properties": {
-                          "count": {
-                            "description": "the number of times a field has been used for the given item.",
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              "$ref": "#/definitions/getFieldUsage200Response"
             }
           }
         },
@@ -3106,8 +1446,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/octet-stream",
             "schema": {
-              "description": "Base64 encoded file content.",
-              "example": "UXVpY2sgQmFzZSBJbmMu"
+              "$ref": "#/definitions/downloadFile200Response"
             }
           }
         },
@@ -3851,47 +2190,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/x-yaml",
             "schema": {
-              "example": "Solution:\n  Id: 8d2c3333-7d32-4ece-8073-57106c465384\n  Name: Example solution\n  Owner: manager@yourrealm.com\n  ExportDate: 2024-03-25 12:04:05\nVersion: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+              "$ref": "#/definitions/exportSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolution401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolution4xx/5xxResponse"
             }
           }
         },
@@ -3939,44 +2266,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
-                "alias": null,
-                "createdResources": {
-                  "apps": {}
-                },
-                "warnings": []
-              }
+              "$ref": "#/definitions/updateSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolution401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolution4xx/5xxResponse"
             }
           }
         },
@@ -4019,44 +2330,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
-                "alias": null,
-                "createdResources": {
-                  "apps": {}
-                },
-                "warnings": []
-              }
+              "$ref": "#/definitions/createSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolution401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolution4xx/5xxResponse"
             }
           }
         },
@@ -4115,50 +2410,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "record_id": 1,
-                "filename": "QBL-0.4-30d92a39-5940-49b6-9eb1-c2966f85a7c0.yaml"
-              }
+              "$ref": "#/definitions/exportSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution or field does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolutionToRecord401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/exportSolutionToRecord4xx/5xxResponse"
             }
           }
         },
@@ -4210,57 +2490,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "solutionId": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-                "alias": null,
-                "createdResources": {
-                  "apps": {
-                    "$App_IT_Total_Management": "bt6i6jc39"
-                  },
-                  "pipelines": {}
-                },
-                "warnings": []
-              }
+              "$ref": "#/definitions/createSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolutionFromRecord401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/createSolutionFromRecord4xx/5xxResponse"
             }
           }
         },
@@ -4319,57 +2577,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "solutionId": "acfa89a2-5ec0-4552-ba69-1372e41288ea",
-                "alias": null,
-                "resources": {
-                  "apps": {
-                    "$App_IT_Total_Management": "bt6i6jc39"
-                  },
-                  "pipelines": {}
-                },
-                "warnings": []
-              }
+              "$ref": "#/definitions/updateSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolutionToRecord401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/updateSolutionToRecord4xx/5xxResponse"
             }
           }
         },
@@ -4419,67 +2655,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-                "changes": [
-                  {
-                    "logicalType": "App",
-                    "logicalId": "$App_Example_app",
-                    "action": "Add",
-                    "path": [
-                      "$App_Example_app"
-                    ]
-                  },
-                  {
-                    "logicalType": "App",
-                    "logicalId": "$App_Simple_Project_Manager",
-                    "action": "Remove",
-                    "path": [
-                      "$App_Simple_Project_Manager"
-                    ]
-                  }
-                ]
-              }
+              "$ref": "#/definitions/changesetSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolution401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolution4xx/5xxResponse"
             }
           }
         },
@@ -4538,78 +2742,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-                "changes": [
-                  {
-                    "logicalType": "Property",
-                    "logicalId": "App::$App_MVP_App_234::Property::Name",
-                    "action": "Update",
-                    "path": [
-                      "$App_MVP_App_234",
-                      "Name"
-                    ]
-                  },
-                  {
-                    "logicalType": "Table",
-                    "logicalId": "$Table_Parents",
-                    "action": "Remove",
-                    "path": [
-                      "$App_MVP_App_234",
-                      "$Table_Parents"
-                    ]
-                  },
-                  {
-                    "logicalType": "Table",
-                    "logicalId": "$Table_Children",
-                    "action": "Remove",
-                    "path": [
-                      "$App_MVP_App_234",
-                      "$Table_Children"
-                    ]
-                  }
-                ]
-              }
+              "$ref": "#/definitions/changesetSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Bad request.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Not found.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Forbidden.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolutionFromRecord401/403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "example": {
-                "message": "Internal server error.",
-                "description": ""
-              }
+              "$ref": "#/definitions/changesetSolutionFromRecord4xx/5xxResponse"
             }
           }
         },
@@ -5480,6 +3641,140 @@
         }
       }
     },
+    "getAppEvents200Response": {
+      "example": [
+        {
+          "type": "qb-action",
+          "owner": {
+            "email": "jsmith@quickbase.com",
+            "id": "123456.ab1s",
+            "name": "Juliet Smith",
+            "userName": "jsmith"
+          },
+          "isActive": true,
+          "tableId": "bqwriv8bw",
+          "name": "Quick Base Action"
+        },
+        {
+          "type": "webhook",
+          "owner": {
+            "email": "tanderson@quickbase.com",
+            "id": "654321.ab1s",
+            "name": "Thomas A. Anderson",
+            "userName": "tanderson"
+          },
+          "isActive": false,
+          "tableId": "bqwriv8bw",
+          "name": "Webhook"
+        },
+        {
+          "type": "email-notification",
+          "owner": {
+            "email": "jsmith@quickbase.com",
+            "id": "123456.ab1s",
+            "name": "Juliet Smith",
+            "userName": "jsmith"
+          },
+          "isActive": false,
+          "tableId": "bqwriv8bw",
+          "name": "Notification"
+        },
+        {
+          "type": "subscription",
+          "owner": {
+            "email": "tanderson@quickbase.com",
+            "id": "654321.ab1s",
+            "name": "Thomas A. Anderson",
+            "userName": "tanderson"
+          },
+          "isActive": true,
+          "tableId": "bqwriv8bw",
+          "name": "Subscription"
+        },
+        {
+          "type": "reminder",
+          "owner": {
+            "email": "jsmith@quickbase.com",
+            "id": "123456.ab1s",
+            "name": "Juliet Smith",
+            "userName": "jsmith"
+          },
+          "isActive": true,
+          "tableId": "bqwriv8bw",
+          "name": "Reminder"
+        },
+        {
+          "type": "automation",
+          "owner": {
+            "email": "tanderson@quickbase.com",
+            "id": "654321.ab1s",
+            "name": "Thomas A. Anderson",
+            "userName": "tanderson"
+          },
+          "isActive": true,
+          "tableId": "bqwriv8bw",
+          "url": "https://realm.quickbase.com/ui/automation/qb/db/bqwria893/automations/70eecab9-634f-42d9-9037-9340a1a9e8ce"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "isActive": {
+            "description": "Indication of whether current event is active.",
+            "type": "boolean"
+          },
+          "type": {
+            "description": "Type of an event.",
+            "enum": [
+              "webhook",
+              "qb-action",
+              "email-notification",
+              "subscription",
+              "reminder",
+              "automation"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "The name of the event. This property is not returned for automations.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The url to automation that can be accessed from the browser. Only returned for automations.",
+            "type": "string"
+          },
+          "owner": {
+            "description": "The user that owns the event.",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "name": {
+                "description": "User full name.",
+                "type": "string"
+              },
+              "id": {
+                "description": "User Id.",
+                "type": "string"
+              },
+              "email": {
+                "description": "User email.",
+                "type": "string"
+              },
+              "userName": {
+                "description": "User Name as updated in user properties. Optional, appears if not the same as user email.",
+                "type": "string"
+              }
+            }
+          },
+          "tableId": {
+            "description": "The unique identifier of the table to which event belongs to.",
+            "type": "string"
+          }
+        }
+      }
+    },
     "copyAppRequest": {
       "example": {
         "name": "my copied app",
@@ -5731,6 +4026,139 @@
         "spaceRemaining": {
           "description": "The amount of space remaining for use by the table.",
           "type": "string"
+        }
+      }
+    },
+    "getAppTables200Response": {
+      "example": [
+        {
+          "name": "Example Table #0",
+          "created": "2020-03-27T18:34:40Z",
+          "updated": "2020-04-03T19:12:40Z",
+          "alias": "_dbid_example_table_#0",
+          "description": "Table zero as an example.",
+          "id": "bpqe82s1",
+          "nextRecordId": 1,
+          "nextFieldId": 1,
+          "defaultSortFieldId": 2,
+          "defaultSortOrder": "ASC",
+          "keyFieldId": 3,
+          "singleRecordName": "Example Record",
+          "pluralRecordName": "Example Records",
+          "sizeLimit": "150 MB",
+          "spaceUsed": "17 MB",
+          "spaceRemaining": "133 MB"
+        },
+        {
+          "name": "Example Table #2",
+          "created": "2020-03-27T18:34:40Z",
+          "updated": "2020-04-03T19:12:40Z",
+          "alias": "_dbid_example_table_#2",
+          "description": "Table two as an example.",
+          "id": "bpqe82z1",
+          "nextRecordId": 10,
+          "nextFieldId": 111,
+          "defaultSortFieldId": 12,
+          "defaultSortOrder": "DESC",
+          "keyFieldId": 33,
+          "singleRecordName": "Another Record",
+          "pluralRecordName": "More Records",
+          "sizeLimit": "150 MB",
+          "spaceUsed": "22 MB",
+          "spaceRemaining": "128 MB"
+        }
+      ],
+      "type": "array",
+      "items": {
+        "example": {
+          "name": "Example Table",
+          "created": "2020-03-27T18:34:40Z",
+          "updated": "2020-04-03T19:12:40Z",
+          "alias": "_dbid_example_table",
+          "description": "Table as an example.",
+          "id": "bpqe82s0",
+          "nextRecordId": 1,
+          "nextFieldId": 1,
+          "defaultSortFieldId": 2,
+          "defaultSortOrder": "ASC",
+          "keyFieldId": 3,
+          "singleRecordName": "Example Record",
+          "pluralRecordName": "Example Records",
+          "sizeLimit": "150 MB",
+          "spaceUsed": "17 MB",
+          "spaceRemaining": "133 MB"
+        },
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "description": "The name of the table.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier (dbid) of the table.",
+            "type": "string"
+          },
+          "alias": {
+            "description": "The automatically-created table alias for the table.",
+            "type": "string"
+          },
+          "description": {
+            "description": "The description of the table, as configured by an application administrator.",
+            "type": "string"
+          },
+          "created": {
+            "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+            "type": "string"
+          },
+          "updated": {
+            "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+            "type": "string"
+          },
+          "nextRecordId": {
+            "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
+            "type": "integer"
+          },
+          "nextFieldId": {
+            "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
+            "type": "integer"
+          },
+          "defaultSortFieldId": {
+            "description": "The id of the field that is configured for default sorting.",
+            "type": "integer"
+          },
+          "defaultSortOrder": {
+            "description": "The configuration of the default sort order on the table.",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "type": "string"
+          },
+          "keyFieldId": {
+            "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
+            "type": "integer"
+          },
+          "singleRecordName": {
+            "description": "The builder-configured singular noun of the table.",
+            "type": "string"
+          },
+          "pluralRecordName": {
+            "description": "The builder-configured plural noun of the table.",
+            "type": "string"
+          },
+          "sizeLimit": {
+            "description": "The size limit for the table.",
+            "type": "string"
+          },
+          "spaceUsed": {
+            "description": "The amount of space currently being used by the table.",
+            "type": "string"
+          },
+          "spaceRemaining": {
+            "description": "The amount of space remaining for use by the table.",
+            "type": "string"
+          }
         }
       }
     },
@@ -6553,6 +4981,163 @@
         }
       }
     },
+    "getTableReports200Response": {
+      "description": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)",
+      "type": "array",
+      "items": {
+        "example": {
+          "value": {
+            "id": "5",
+            "name": "table-report",
+            "type": "table",
+            "description": "This is Table report.",
+            "query": {
+              "tableId": "bpweef42b",
+              "filter": "{6.CT.'FilterByThisValue'}",
+              "formulaFields": [
+                {
+                  "id": -100,
+                  "label": "NumericField",
+                  "fieldType": "numeric",
+                  "formula": "1+1",
+                  "decimalPrecision": 4
+                }
+              ],
+              "fields": [
+                7
+              ],
+              "sortBy": [
+                {
+                  "fieldId": 28,
+                  "order": "ASC"
+                },
+                {
+                  "fieldId": 3,
+                  "order": "ASC"
+                }
+              ],
+              "groupBy": [
+                {
+                  "fieldId": 3,
+                  "grouping": "equal-values"
+                }
+              ]
+            },
+            "properties": {
+              "displayOnlyNewOrChangedRecords": true,
+              "columnProperties": [
+                {
+                  "fieldId": -100,
+                  "labelOverride": "Numeric Field Label"
+                }
+              ]
+            },
+            "usedLast": "2020-09-20T20:23:00Z",
+            "usedCount": 7
+          }
+        },
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "description": "The identifier of the report, unique to the table.",
+            "type": "string"
+          },
+          "name": {
+            "description": "The configured name of the report.",
+            "type": "string"
+          },
+          "type": {
+            "description": "The type of report in Quickbase (e.g., chart).",
+            "type": "string"
+          },
+          "description": {
+            "description": "The configured description of a report.",
+            "type": "string"
+          },
+          "ownerId": {
+            "description": "Optional, showed only for personal reports. The user ID of report owner.",
+            "type": "integer"
+          },
+          "query": {
+            "description": "The query definition as configured in Quickbase that gets executed when the report is run.",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "tableId": {
+                "description": "The table identifier for the report.",
+                "type": "string"
+              },
+              "filter": {
+                "description": "Filter used to query for data.",
+                "type": "string"
+              },
+              "formulaFields": {
+                "description": "Calculated formula fields.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "id": {
+                      "description": "Formula field identifier.",
+                      "type": "integer"
+                    },
+                    "label": {
+                      "description": "Formula field label.",
+                      "type": "string"
+                    },
+                    "fieldType": {
+                      "description": "Resulting formula value type.",
+                      "enum": [
+                        "rich-text",
+                        "text",
+                        "numeric",
+                        "currency",
+                        "percent",
+                        "rating",
+                        "date",
+                        "timestamp",
+                        "timeofday",
+                        "duration",
+                        "checkbox",
+                        "phone",
+                        "email",
+                        "user",
+                        "multiuser",
+                        "url"
+                      ],
+                      "type": "string"
+                    },
+                    "formula": {
+                      "description": "Formula text.",
+                      "type": "string"
+                    },
+                    "decimalPrecision": {
+                      "description": "For numeric formula the number precision.",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "properties": {
+            "description": "A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)",
+            "type": "object",
+            "additionalProperties": true
+          },
+          "usedLast": {
+            "description": "The instant at which a report was last used.",
+            "type": "string"
+          },
+          "usedCount": {
+            "description": "The number of times a report has been used.",
+            "type": "integer"
+          }
+        }
+      }
+    },
     "getReport200Response": {
       "example": {
         "value": {
@@ -6811,6 +5396,540 @@
             "numRecords": {
               "description": "The number of records in the current response object",
               "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "getFields200Response": {
+      "example": [
+        {
+          "id": 1,
+          "label": "Field1",
+          "fieldType": "text",
+          "noWrap": false,
+          "bold": false,
+          "required": false,
+          "appearsByDefault": false,
+          "findEnabled": false,
+          "unique": false,
+          "doesDataCopy": false,
+          "fieldHelp": "field help",
+          "audited": false,
+          "properties": {
+            "primaryKey": false,
+            "foreignKey": false,
+            "numLines": 1,
+            "maxLength": 0,
+            "appendOnly": false,
+            "allowHTML": false,
+            "allowMentions": false,
+            "sortAsGiven": false,
+            "carryChoices": true,
+            "allowNewChoices": false,
+            "formula": "",
+            "defaultValue": ""
+          },
+          "permissions": [
+            {
+              "permissionType": "View",
+              "role": "Viewer",
+              "roleId": 10
+            },
+            {
+              "permissionType": "None",
+              "role": "Participant",
+              "roleId": 11
+            },
+            {
+              "permissionType": "Modify",
+              "role": "Administrator",
+              "roleId": 12
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "label": "Numeric Field",
+          "fieldType": "numeric",
+          "appearsByDefault": true,
+          "audited": false,
+          "bold": false,
+          "fieldHelp": "This is a numeric field",
+          "findEnabled": false,
+          "addToForms": true,
+          "properties": {
+            "numberFormat": 3,
+            "decimalPlaces": 2,
+            "doesAverage": true,
+            "doesTotal": true,
+            "blankIsZero": true
+          },
+          "permissions": [
+            {
+              "role": "Viewer",
+              "permissionType": "View",
+              "roleId": 10
+            },
+            {
+              "role": "Participant",
+              "permissionType": "Modify",
+              "roleId": 11
+            },
+            {
+              "role": "Administrator",
+              "permissionType": "Modify",
+              "roleId": 12
+            }
+          ]
+        }
+      ],
+      "type": "array",
+      "items": {
+        "example": {
+          "id": 123,
+          "label": "Field1",
+          "fieldType": "text",
+          "mode": "",
+          "noWrap": false,
+          "bold": false,
+          "required": false,
+          "appearsByDefault": false,
+          "findEnabled": false,
+          "unique": false,
+          "doesDataCopy": false,
+          "fieldHelp": "field help",
+          "audited": false,
+          "properties": {
+            "primaryKey": false,
+            "foreignKey": false,
+            "numLines": 1,
+            "maxLength": 0,
+            "appendOnly": false,
+            "allowHTML": false,
+            "allowMentions": false,
+            "sortAsGiven": false,
+            "carryChoices": true,
+            "allowNewChoices": false,
+            "formula": "",
+            "defaultValue": ""
+          },
+          "permissions": [
+            {
+              "permissionType": "View",
+              "role": "Viewer",
+              "roleId": 10
+            },
+            {
+              "permissionType": "None",
+              "role": "Participant",
+              "roleId": 11
+            },
+            {
+              "permissionType": "Modify",
+              "role": "Administrator",
+              "roleId": 12
+            }
+          ]
+        },
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "description": "The id of the field, unique to this table.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "fieldType": {
+            "description": "The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html).",
+            "type": "string"
+          },
+          "mode": {
+            "description": "For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank.",
+            "type": "string"
+          },
+          "label": {
+            "description": "The label (name) of the field.",
+            "type": "string"
+          },
+          "noWrap": {
+            "description": "Indicates if the field is configured to not wrap when displayed in the product.",
+            "type": "boolean"
+          },
+          "bold": {
+            "description": "Indicates if the field is configured to display in bold in the product.",
+            "type": "boolean"
+          },
+          "required": {
+            "description": "Indicates if the field is marked required.",
+            "type": "boolean"
+          },
+          "appearsByDefault": {
+            "description": "Indicates if the field is marked as a default in reports.",
+            "type": "boolean"
+          },
+          "findEnabled": {
+            "description": "Indicates if the field is marked as searchable.",
+            "type": "boolean"
+          },
+          "unique": {
+            "description": "Indicates if the field is marked unique.",
+            "type": "boolean"
+          },
+          "doesDataCopy": {
+            "description": "Indicates if the field data will copy when a user copies the record.",
+            "type": "boolean"
+          },
+          "fieldHelp": {
+            "description": "The configured help text shown to users within the product.",
+            "type": "string"
+          },
+          "audited": {
+            "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs.",
+            "type": "boolean"
+          },
+          "properties": {
+            "description": "Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type.",
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "allowMentions": {
+                "description": "If someone can @mention users in the rich text field to generate an email notification.",
+                "type": "boolean"
+              },
+              "comments": {
+                "description": "The comments entered on the field properties by an administrator.",
+                "type": "string"
+              },
+              "doesTotal": {
+                "description": "Whether this field totals in reports within the product.",
+                "type": "boolean"
+              },
+              "autoSave": {
+                "description": "Whether the link field will auto save.",
+                "type": "boolean"
+              },
+              "defaultValueLuid": {
+                "description": "Default user id value.",
+                "type": "integer"
+              },
+              "useI18NFormat": {
+                "description": "Whether phone numbers should be in E.164 standard international format.",
+                "type": "boolean"
+              },
+              "maxVersions": {
+                "description": "The maximum number of versions configured for a file attachment.",
+                "type": "integer"
+              },
+              "carryChoices": {
+                "description": "Whether the field should carry its multiple choice fields when copied.",
+                "type": "boolean"
+              },
+              "format": {
+                "description": "The format to display time.",
+                "type": "integer"
+              },
+              "maxLength": {
+                "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
+                "type": "integer"
+              },
+              "linkText": {
+                "description": "The configured text value that replaces the URL that users see within the product.",
+                "type": "string"
+              },
+              "parentFieldId": {
+                "description": "The id of the parent composite field, when applicable.",
+                "type": "integer"
+              },
+              "displayTimezone": {
+                "description": "Indicates whether to display the timezone within the product.",
+                "type": "boolean"
+              },
+              "summaryTargetFieldId": {
+                "description": "The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count).",
+                "type": "integer"
+              },
+              "allowNewChoices": {
+                "description": "Indicates if users can add new choices to a selection list.",
+                "type": "boolean"
+              },
+              "masterChoiceFieldId": {
+                "description": "The id of the field that is the reference in the relationship.",
+                "type": "integer"
+              },
+              "defaultToday": {
+                "description": "Indicates if the field value is defaulted today for new records.",
+                "type": "boolean"
+              },
+              "units": {
+                "description": "The units label.",
+                "type": "string"
+              },
+              "lookupTargetFieldId": {
+                "description": "The id of the field that is the target on the master table for this lookup.",
+                "type": "integer"
+              },
+              "summaryFunction": {
+                "description": "The summary accumulation function type.",
+                "enum": [
+                  "AVG",
+                  "SUM",
+                  "MAX",
+                  "MIN",
+                  "STD-DEV",
+                  "COUNT",
+                  "COMBINED-TEXT",
+                  "COMBINED-USER",
+                  "DISTINCT-COUNT"
+                ],
+                "type": "string"
+              },
+              "sourceFieldId": {
+                "description": "The id of the source field.",
+                "type": "integer"
+              },
+              "masterTableTag": {
+                "description": "The table alias for the master table in the relationship this field is part of.",
+                "type": "string"
+              },
+              "doesAverage": {
+                "description": "Whether this field averages in reports within the product.",
+                "type": "boolean"
+              },
+              "formula": {
+                "description": "The formula of the field as configured in Quickbase.",
+                "type": "string"
+              },
+              "decimalPlaces": {
+                "description": "The number of decimal places displayed in the product for this field.",
+                "type": "integer"
+              },
+              "defaultCountryCode": {
+                "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
+                "type": "string"
+              },
+              "seeVersions": {
+                "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
+                "type": "boolean"
+              },
+              "displayMonth": {
+                "description": "How to display months.",
+                "type": "string"
+              },
+              "numLines": {
+                "description": "The number of lines shown in Quickbase for this text field.",
+                "type": "integer"
+              },
+              "displayEmail": {
+                "description": "How the email is displayed.",
+                "type": "string"
+              },
+              "defaultKind": {
+                "description": "The user default type.",
+                "type": "string"
+              },
+              "coverText": {
+                "description": "An alternate user friendly text that can be used to display a link in the browser.",
+                "type": "string"
+              },
+              "currencySymbol": {
+                "description": "The current symbol used when displaying field values within the product.",
+                "type": "string"
+              },
+              "masterChoiceTableId": {
+                "description": "The id of the table that is the master in this relationship.",
+                "type": "string"
+              },
+              "targetFieldId": {
+                "description": "The id of the target field.",
+                "type": "integer"
+              },
+              "displayUser": {
+                "description": "The configured option for how users display within the product.",
+                "type": "string"
+              },
+              "blankIsZero": {
+                "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
+                "type": "boolean"
+              },
+              "exact": {
+                "description": "Whether an exact match is required for a report link.",
+                "type": "boolean"
+              },
+              "startField": {
+                "description": "The start field id.",
+                "type": "integer"
+              },
+              "defaultDomain": {
+                "description": "Default email domain.",
+                "type": "string"
+              },
+              "defaultValue": {
+                "description": "The default value configured for a field when a new record is added.",
+                "type": "string"
+              },
+              "choicesLuid": {
+                "description": "List of user choices.",
+                "type": "array"
+              },
+              "abbreviate": {
+                "description": "Don't show the URL protocol when showing the URL.",
+                "type": "boolean"
+              },
+              "xmlTag": {
+                "description": "The field's xml tag.",
+                "type": "string"
+              },
+              "targetTableName": {
+                "description": "The field's target table name.",
+                "type": "string"
+              },
+              "numberFormat": {
+                "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
+                "type": "integer"
+              },
+              "appearsAs": {
+                "description": "The link text, if empty, the url will be used as link text.",
+                "type": "string"
+              },
+              "width": {
+                "description": "The field's html input width in the product.",
+                "type": "integer"
+              },
+              "currencyFormat": {
+                "description": "The currency format used when displaying field values within the product.",
+                "enum": [
+                  "left",
+                  "right",
+                  "middle"
+                ],
+                "type": "string"
+              },
+              "foreignKey": {
+                "description": "Indicates if the field is a foreign key (or reference field) in a relationship.",
+                "type": "boolean"
+              },
+              "displayDayOfWeek": {
+                "description": "Indicates whether to display the day of the week within the product.",
+                "type": "boolean"
+              },
+              "summaryReferenceFieldId": {
+                "description": "The id of the field that is the reference in the relationship for this summary.",
+                "type": "integer",
+                "format": "int64"
+              },
+              "commaStart": {
+                "description": "The number of digits before commas display in the product, when applicable.",
+                "type": "integer"
+              },
+              "choices": {
+                "description": "An array of entries that exist for a field that offers choices to the user.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "targetTableId": {
+                "description": "The id of the target table.",
+                "type": "string"
+              },
+              "displayRelative": {
+                "description": "Whether to display time as relative.",
+                "type": "boolean"
+              },
+              "compositeFields": {
+                "description": "An array of the fields that make up a composite field (e.g., address).",
+                "type": "array"
+              },
+              "displayCheckboxAsText": {
+                "description": "Indicates whether the checkbox values will be shown as text in reports.",
+                "type": "boolean"
+              },
+              "versionMode": {
+                "description": "Version modes for files. Keep all versions vs keep last version.",
+                "enum": [
+                  "keepallversions",
+                  "keeplastversions"
+                ],
+                "type": "string"
+              },
+              "displayTime": {
+                "description": "Indicates whether to display the time, in addition to the date.",
+                "type": "boolean"
+              },
+              "durationField": {
+                "description": "The duration field id.",
+                "type": "integer"
+              },
+              "snapFieldId": {
+                "description": "The id of the field that is used to snapshot values from, when applicable.",
+                "type": "integer"
+              },
+              "hours24": {
+                "description": "Indicates whether or not to display time in the 24-hour format within the product.",
+                "type": "boolean"
+              },
+              "sortAlpha": {
+                "description": "Whether to sort alphabetically, default sort is by record ID.",
+                "type": "boolean"
+              },
+              "sortAsGiven": {
+                "description": "Indicates if the listed entries sort as entered vs alphabetically.",
+                "type": "boolean"
+              },
+              "hasExtension": {
+                "description": "Whether this field has a phone extension.",
+                "type": "boolean"
+              },
+              "workWeek": {
+                "description": "The work week type.",
+                "type": "integer"
+              },
+              "useNewWindow": {
+                "description": "Indicates if the URL should open a new window when a user clicks it within the product.",
+                "type": "boolean"
+              },
+              "appendOnly": {
+                "description": "Whether this field is append only.",
+                "type": "boolean"
+              },
+              "displayAsLink": {
+                "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
+                "type": "boolean"
+              },
+              "allowHTML": {
+                "description": "Whether this field allows html.",
+                "type": "boolean"
+              },
+              "lookupReferenceFieldId": {
+                "description": "The id of the field that is the reference in the relationship for this lookup.",
+                "type": "integer"
+              }
+            }
+          },
+          "permissions": {
+            "description": "Field Permissions for different roles.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "role": {
+                  "description": "The role associated with a given permission for the field",
+                  "type": "string"
+                },
+                "permissionType": {
+                  "description": "The permission given to the role for this field",
+                  "type": "string"
+                },
+                "roleId": {
+                  "description": "The Id of the given role",
+                  "type": "integer"
+                }
+              }
             }
           }
         }
@@ -9002,6 +8121,726 @@
         }
       }
     },
+    "getFieldsUsage200Response": {
+      "example": [
+        {
+          "field": {
+            "id": 6,
+            "name": "name",
+            "type": "Text"
+          },
+          "usage": {
+            "actions": {
+              "count": 0
+            },
+            "appHomePages": {
+              "count": 0
+            },
+            "dashboards": {
+              "count": 2
+            },
+            "defaultReports": {
+              "count": 1
+            },
+            "exactForms": {
+              "count": 0
+            },
+            "fields": {
+              "count": 0
+            },
+            "forms": {
+              "count": 1
+            },
+            "notifications": {
+              "count": 0
+            },
+            "personalReports": {
+              "count": 0
+            },
+            "pipelines": {
+              "count": 1
+            },
+            "relationships": {
+              "count": 0
+            },
+            "reminders": {
+              "count": 0
+            },
+            "reports": {
+              "count": 2
+            },
+            "roles": {
+              "count": 2
+            },
+            "tableImports": {
+              "count": 3
+            },
+            "tableRules": {
+              "count": 1
+            },
+            "webhooks": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "field",
+          "usage"
+        ],
+        "properties": {
+          "field": {
+            "description": "Basic information about the field.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "name",
+              "id",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "description": "Field name.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Field id.",
+                "type": "integer"
+              },
+              "type": {
+                "description": "Field type.",
+                "type": "string"
+              }
+            }
+          },
+          "usage": {
+            "description": "Usage Information about the field.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "actions",
+              "appHomePages",
+              "dashboards",
+              "defaultReports",
+              "exactForms",
+              "fields",
+              "forms",
+              "notifications",
+              "personalReports",
+              "pipelines",
+              "relationships",
+              "reminders",
+              "reports",
+              "roles",
+              "tableImports",
+              "tableRules",
+              "webhooks"
+            ],
+            "properties": {
+              "actions": {
+                "description": "The number of quickbase actions where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "appHomePages": {
+                "description": "The number of app home pages where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "dashboards": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of dashboards where the given field is referenced."
+              },
+              "defaultReports": {
+                "description": "The number of default reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "exactForms": {
+                "description": "The number of exact forms where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "fields": {
+                "description": "The number of fields where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "forms": {
+                "description": "The number of forms where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "notifications": {
+                "description": "The number of notifications where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "personalReports": {
+                "description": "The number of personal reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "pipelines": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of pipelines where the given field is referenced."
+              },
+              "relationships": {
+                "description": "The number of relationships where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "reminders": {
+                "description": "The number of reminders where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "reports": {
+                "description": "The number of reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "roles": {
+                "description": "The number of roles where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "tableImports": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of table imports where the given field is referenced."
+              },
+              "tableRules": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of table rules where the given field is referenced."
+              },
+              "webhooks": {
+                "description": "The number of webhooks where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getFieldUsage200Response": {
+      "example": [
+        {
+          "field": {
+            "id": 6,
+            "name": "name",
+            "type": "Text"
+          },
+          "usage": {
+            "actions": {
+              "count": 0
+            },
+            "appHomePages": {
+              "count": 0
+            },
+            "dashboards": {
+              "count": 2
+            },
+            "defaultReports": {
+              "count": 1
+            },
+            "exactForms": {
+              "count": 0
+            },
+            "fields": {
+              "count": 0
+            },
+            "forms": {
+              "count": 1
+            },
+            "notifications": {
+              "count": 0
+            },
+            "personalReports": {
+              "count": 0
+            },
+            "pipelines": {
+              "count": 1
+            },
+            "relationships": {
+              "count": 0
+            },
+            "reminders": {
+              "count": 0
+            },
+            "reports": {
+              "count": 2
+            },
+            "roles": {
+              "count": 2
+            },
+            "tableImports": {
+              "count": 2
+            },
+            "tableRules": {
+              "count": 1
+            },
+            "webhooks": {
+              "count": 0
+            }
+          }
+        }
+      ],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "field",
+          "usage"
+        ],
+        "properties": {
+          "field": {
+            "description": "Basic information about the field.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "name",
+              "id",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "description": "Field name.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Field id.",
+                "type": "integer"
+              },
+              "type": {
+                "description": "Field type.",
+                "type": "string"
+              }
+            }
+          },
+          "usage": {
+            "description": "Usage Information about the field.",
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "actions",
+              "appHomePages",
+              "dashboards",
+              "defaultReports",
+              "exactForms",
+              "fields",
+              "forms",
+              "notifications",
+              "personalReports",
+              "pipelines",
+              "relationships",
+              "reminders",
+              "reports",
+              "roles",
+              "tableImports",
+              "tableRules",
+              "webhooks"
+            ],
+            "properties": {
+              "actions": {
+                "description": "The number of quickbase actions where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "appHomePages": {
+                "description": "The number of app home pages where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "dashboards": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of dashboards where the given field is referenced."
+              },
+              "defaultReports": {
+                "description": "The number of default reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "exactForms": {
+                "description": "The number of exact forms where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "fields": {
+                "description": "The number of fields where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "forms": {
+                "description": "The number of forms where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "notifications": {
+                "description": "The number of notifications where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "personalReports": {
+                "description": "The number of personal reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "pipelines": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of pipelines where the given field is referenced."
+              },
+              "relationships": {
+                "description": "The number of relationships where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "reminders": {
+                "description": "The number of reminders where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "reports": {
+                "description": "The number of reports where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "roles": {
+                "description": "The number of roles where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "tableImports": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of table imports where the given field is referenced."
+              },
+              "tableRules": {
+                "required": [
+                  "count"
+                ],
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "description": "the number of times a field has been used for the given item."
+                  }
+                },
+                "description": "The number of table rules where the given field is referenced."
+              },
+              "webhooks": {
+                "description": "The number of webhooks where the given field is referenced.",
+                "type": "object",
+                "additionalProperties": true,
+                "required": [
+                  "count"
+                ],
+                "properties": {
+                  "count": {
+                    "description": "the number of times a field has been used for the given item.",
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "runFormulaRequest": {
       "description": "The following example will execute a Sum() for '20' and the value in a record with id 1 for the field with label 'NumericField'. Since this API is able to run any type of formula, all results will be returned as a string.",
       "example": {
@@ -9915,6 +9754,10 @@
           "type": "integer"
         }
       }
+    },
+    "downloadFile200Response": {
+      "description": "Base64 encoded file content.",
+      "example": "UXVpY2sgQmFzZSBJbmMu"
     },
     "deleteFile200Response": {
       "example": {
@@ -11051,6 +10894,298 @@
         "results"
       ],
       "type": "object"
+    },
+    "exportSolution200Response": {
+      "example": "Solution:\n  Id: 8d2c3333-7d32-4ece-8073-57106c465384\n  Name: Example solution\n  Owner: manager@yourrealm.com\n  ExportDate: 2024-03-25 12:04:05\nVersion: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+    },
+    "exportSolution400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "exportSolution404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "exportSolution401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "exportSolution4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "updateSolution200Response": {
+      "example": {
+        "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
+        "alias": null,
+        "createdResources": {
+          "apps": {}
+        },
+        "warnings": []
+      }
+    },
+    "updateSolution400Response": {
+      "example": {
+        "message": "Bad request",
+        "description": ""
+      }
+    },
+    "updateSolution401/403Response": {
+      "example": {
+        "message": "Forbidden",
+        "description": ""
+      }
+    },
+    "updateSolution4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "createSolution200Response": {
+      "example": {
+        "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
+        "alias": null,
+        "createdResources": {
+          "apps": {}
+        },
+        "warnings": []
+      }
+    },
+    "createSolution400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "createSolution401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "createSolution4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "exportSolutionToRecord200Response": {
+      "example": {
+        "record_id": 1,
+        "filename": "QBL-0.4-30d92a39-5940-49b6-9eb1-c2966f85a7c0.yaml"
+      }
+    },
+    "exportSolutionToRecord400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "exportSolutionToRecord404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "exportSolutionToRecord401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "exportSolutionToRecord4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "createSolutionFromRecord200Response": {
+      "example": {
+        "solutionId": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
+        "alias": null,
+        "createdResources": {
+          "apps": {
+            "$App_IT_Total_Management": "bt6i6jc39"
+          },
+          "pipelines": {}
+        },
+        "warnings": []
+      }
+    },
+    "createSolutionFromRecord400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "createSolutionFromRecord404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "createSolutionFromRecord401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "createSolutionFromRecord4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "updateSolutionToRecord200Response": {
+      "example": {
+        "solutionId": "acfa89a2-5ec0-4552-ba69-1372e41288ea",
+        "alias": null,
+        "resources": {
+          "apps": {
+            "$App_IT_Total_Management": "bt6i6jc39"
+          },
+          "pipelines": {}
+        },
+        "warnings": []
+      }
+    },
+    "updateSolutionToRecord400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "updateSolutionToRecord404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "updateSolutionToRecord401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "updateSolutionToRecord4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "changesetSolution200Response": {
+      "example": {
+        "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
+        "changes": [
+          {
+            "logicalType": "App",
+            "logicalId": "$App_Example_app",
+            "action": "Add",
+            "path": [
+              "$App_Example_app"
+            ]
+          },
+          {
+            "logicalType": "App",
+            "logicalId": "$App_Simple_Project_Manager",
+            "action": "Remove",
+            "path": [
+              "$App_Simple_Project_Manager"
+            ]
+          }
+        ]
+      }
+    },
+    "changesetSolution400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "changesetSolution404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "changesetSolution401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "changesetSolution4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
+    },
+    "changesetSolutionFromRecord200Response": {
+      "example": {
+        "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
+        "changes": [
+          {
+            "logicalType": "Property",
+            "logicalId": "App::$App_MVP_App_234::Property::Name",
+            "action": "Update",
+            "path": [
+              "$App_MVP_App_234",
+              "Name"
+            ]
+          },
+          {
+            "logicalType": "Table",
+            "logicalId": "$Table_Parents",
+            "action": "Remove",
+            "path": [
+              "$App_MVP_App_234",
+              "$Table_Parents"
+            ]
+          },
+          {
+            "logicalType": "Table",
+            "logicalId": "$Table_Children",
+            "action": "Remove",
+            "path": [
+              "$App_MVP_App_234",
+              "$Table_Children"
+            ]
+          }
+        ]
+      }
+    },
+    "changesetSolutionFromRecord400Response": {
+      "example": {
+        "message": "Bad request.",
+        "description": ""
+      }
+    },
+    "changesetSolutionFromRecord404Response": {
+      "example": {
+        "message": "Not found.",
+        "description": ""
+      }
+    },
+    "changesetSolutionFromRecord401/403Response": {
+      "example": {
+        "message": "Forbidden.",
+        "description": ""
+      }
+    },
+    "changesetSolutionFromRecord4xx/5xxResponse": {
+      "example": {
+        "message": "Internal server error.",
+        "description": ""
+      }
     },
     "generateDocument200Response": {
       "example": {

@@ -80,7 +80,7 @@ async function ensureJarExists(
 
 function regenerateClient(jarPath: string, messages: string[]) {
   messages.push("Regenerating client from spec...");
-  const command = `java -jar ${jarPath} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR}`;
+  const command = `java -jar ${jarPath} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR} --additional-properties=generateAliasAsModel=true`;
   try {
     execSync(command, { stdio: "inherit" });
     messages.push("Client regeneration complete.");
@@ -93,6 +93,12 @@ function regenerateClient(jarPath: string, messages: string[]) {
 async function main() {
   const messages: string[] = [];
   try {
+    if (!existsSync(SPEC_INPUT)) {
+      console.error(
+        `Spec file ${SPEC_INPUT} does not exist. Run 'npm run fix-spec' first.`
+      );
+      process.exit(1);
+    }
     const versionToUse = await checkAndPromptForUpdate(messages);
     const jarPath = await ensureJarExists(versionToUse, messages);
     regenerateClient(jarPath, messages);

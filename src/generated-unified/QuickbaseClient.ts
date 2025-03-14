@@ -1,15 +1,15 @@
-// Generated on 2025-03-14T18:31:18.122Z
-import { AddManagersToGroup200Response, AddMembersToGroup200Response, AddSubgroupsToGroup200Response, Audit200Response, AuditRequest, CloneUserToken200Response, CloneUserTokenRequest, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, ExchangeSsoToken200Response, ExchangeSsoTokenRequest, GenerateDocument200Response, GetApp200Response, GetField200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummariesRequest, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveMembersFromGroup200Response, RemoveSubgroupsFromGroup200Response, RunFormula200Response, RunFormulaRequest, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, TransferUserTokenRequest, UndenyUsers200Response, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-14T18:37:49.734Z
+import { AddManagersToGroup200Response, AddMembersToGroup200Response, AddSubgroupsToGroup200Response, Audit200Response, AuditRequest, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CloneUserTokenRequest, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DownloadFile200Response, ExchangeSsoToken200Response, ExchangeSsoTokenRequest, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummariesRequest, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveMembersFromGroup200Response, RemoveSubgroupsFromGroup200Response, RunFormula200Response, RunFormulaRequest, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, TransferUserTokenRequest, UndenyUsers200Response, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   createApp: (params: { body?: CreateAppRequest }) => Promise<CreateApp200Response>;
   getApp: (params: { appId: string }) => Promise<GetApp200Response>;
   updateApp: (params: { appId: string; body?: UpdateAppRequest }) => Promise<UpdateApp200Response>;
   deleteApp: (params: { appId: string; body?: DeleteAppRequest }) => Promise<DeleteApp200Response>;
-  getAppEvents: (params: { appId: string }) => Promise<{ [key: string]: any }[]>;
+  getAppEvents: (params: { appId: string }) => Promise<GetAppEvents200Response>;
   copyApp: (params: { appId: string; body?: CopyAppRequest }) => Promise<CopyApp200Response>;
   createTable: (params: { appId: string; body?: CreateTableRequest }) => Promise<CreateTable200Response>;
-  getAppTables: (params: { appId: string }) => Promise<{ [key: string]: any }[]>;
+  getAppTables: (params: { appId: string }) => Promise<GetAppTables200Response>;
   getTable: (params: { appId: string; tableId: string }) => Promise<GetTable200Response>;
   updateTable: (params: { appId: string; tableId: string; body?: UpdateTableRequest }) => Promise<UpdateTable200Response>;
   deleteTable: (params: { appId: string; tableId: string }) => Promise<DeleteTable200Response>;
@@ -17,16 +17,16 @@ export interface QuickbaseClient {
   createRelationship: (params: { tableId: string; body?: CreateRelationshipRequest }) => Promise<CreateRelationship200Response>;
   updateRelationship: (params: { tableId: string; relationshipId: any; body?: UpdateRelationshipRequest }) => Promise<UpdateRelationship200Response>;
   deleteRelationship: (params: { tableId: string; relationshipId: any }) => Promise<DeleteRelationship200Response>;
-  getTableReports: (params: { tableId: string }) => Promise<{ [key: string]: any }[]>;
+  getTableReports: (params: { tableId: string }) => Promise<GetTableReports200Response>;
   getReport: (params: { tableId: string; reportId: string }) => Promise<GetReport200Response>;
   runReport: (params: { tableId: string; skip?: number; top?: number; reportId: string; body?: any }) => Promise<RunReport200Response>;
-  getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<{ [key: string]: any }[]>;
+  getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<GetFields200Response>;
   createField: (params: { tableId: string; body?: CreateFieldRequest }) => Promise<CreateField200Response>;
   deleteFields: (params: { tableId: string; body?: DeleteFieldsRequest }) => Promise<DeleteFields200Response>;
   getField: (params: { tableId: string; includeFieldPerms?: boolean; fieldId: number }) => Promise<GetField200Response>;
   updateField: (params: { tableId: string; fieldId: number; body?: UpdateFieldRequest }) => Promise<UpdateField200Response>;
-  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<{ [key: string]: any }[]>;
-  getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<{ [key: string]: any }[]>;
+  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<GetFieldsUsage200Response>;
+  getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<GetFieldUsage200Response>;
   runFormula: (params: { body?: RunFormulaRequest }) => Promise<RunFormula200Response>;
   upsert: (params: { body?: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;
   deleteRecords: (params: { body?: DeleteRecordsRequest }) => Promise<DeleteRecords200Response>;
@@ -37,7 +37,7 @@ export interface QuickbaseClient {
   transferUserToken: (params: { body?: TransferUserTokenRequest }) => Promise<TransferUserToken200Response>;
   deactivateUserToken: (params: {  }) => Promise<DeactivateUserToken200Response>;
   deleteUserToken: (params: {  }) => Promise<DeleteUserToken200Response>;
-  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<any>;
+  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DownloadFile200Response>;
   deleteFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DeleteFile200Response>;
   getUsers: (params: { accountId?: any; body?: GetUsersRequest }) => Promise<GetUsers200Response>;
   denyUsers: (params: { accountId?: any; body?: string[] }) => Promise<DenyUsers200Response>;
@@ -52,13 +52,13 @@ export interface QuickbaseClient {
   audit: (params: { body?: AuditRequest }) => Promise<Audit200Response>;
   platformAnalyticReads: (params: { day?: string }) => Promise<PlatformAnalyticReads200Response>;
   platformAnalyticEventSummaries: (params: { accountId?: any; body?: PlatformAnalyticEventSummariesRequest }) => Promise<PlatformAnalyticEventSummaries200Response>;
-  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<any>;
-  updateSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
-  createSolution: (params: { body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
-  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<any>;
-  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
-  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
-  changesetSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
-  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
+  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<ExportSolution200Response>;
+  updateSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
+  createSolution: (params: { body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
+  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<ExportSolutionToRecord200Response>;
+  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolutionFromRecord200Response>;
+  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolutionToRecord200Response>;
+  changesetSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
+  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolutionFromRecord200Response>;
   generateDocument: (params: { templateId: any; tableId: string; recordId?: any; filename: string; accept?: string; format?: string; margin?: string; unit?: string; pageSize?: string; orientation?: string; realm?: string }) => Promise<GenerateDocument200Response>;
 }
