@@ -726,7 +726,9 @@
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
-            "schema": {}
+            "schema": {
+              "$ref": "#/definitions/runReportRequest"
+            }
           }
         ],
         "responses": {
@@ -1574,19 +1576,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that need to be denied.",
-              "example": [
-                "123456.ab1s",
-                "423123.vc2d",
-                "78910.ba1s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              }
+              "$ref": "#/definitions/denyUsersRequest"
             }
           }
         ],
@@ -1635,19 +1625,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that need to be denied.",
-              "example": [
-                "123456.ab1s",
-                "423123.vc2d",
-                "78910.ba1s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              }
+              "$ref": "#/definitions/denyUsersAndGroupsRequest"
             }
           }
         ],
@@ -1689,19 +1667,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that need to be undenied.",
-              "example": [
-                "123456.ab1s",
-                "423123.vc2d",
-                "78910.ba1s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "type": "string"
-              }
+              "$ref": "#/definitions/undenyUsersRequest"
             }
           }
         ],
@@ -1743,20 +1709,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that will be added to a group.",
-              "example": [
-                "123456.ryyw",
-                "423123.b3x5",
-                "100000.be8s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the user to be added to a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/addMembersToGroupRequest"
             }
           }
         ],
@@ -1796,20 +1749,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that will be removed from a group.",
-              "example": [
-                "123456.ryyw",
-                "423123.b3x5",
-                "100000.be8s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the user to be removed from a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/removeMembersFromGroupRequest"
             }
           }
         ],
@@ -1851,20 +1791,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that will be added to a group.",
-              "example": [
-                "123456.ryyw",
-                "423123.b3x5",
-                "100000.be8s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the user to be added to a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/addManagersToGroupRequest"
             }
           }
         ],
@@ -1904,20 +1831,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of user IDs that will be removed from a group.",
-              "example": [
-                "123456.ryyw",
-                "423123.b3x5",
-                "100000.be8s"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the user to be removed from a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/removeManagersFromGroupRequest"
             }
           }
         ],
@@ -1959,19 +1873,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of group IDs that will be added to a group.",
-              "example": [
-                "1002.czm8",
-                "1003.bar3"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the child group to be added to a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/addSubgroupsToGroupRequest"
             }
           }
         ],
@@ -2011,19 +1913,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "description": "A list of group IDs that will be removed from a group.",
-              "example": [
-                "1002.czm8",
-                "1003.bar3"
-              ],
-              "type": "array",
-              "maxItems": 1000,
-              "minItems": 1,
-              "uniqueItems": true,
-              "items": {
-                "description": "The Id and its hash value of the child group to be removed from a group.",
-                "type": "string"
-              }
+              "$ref": "#/definitions/removeSubgroupsFromGroupRequest"
             }
           }
         ],
@@ -2250,7 +2140,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+              "$ref": "#/definitions/updateSolutionRequest"
             }
           },
           {
@@ -2314,7 +2204,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+              "$ref": "#/definitions/createSolutionRequest"
             }
           },
           {
@@ -2639,7 +2529,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "example": "Version: 0.4\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+              "$ref": "#/definitions/changesetSolutionRequest"
             }
           },
           {
@@ -5291,6 +5181,9 @@
         }
       }
     },
+    "runReportRequest": {
+      "type": "string"
+    },
     "runReport200Response": {
       "example": {
         "value": {
@@ -5365,7 +5258,10 @@
         },
         "data": {
           "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
         },
         "metadata": {
           "description": "Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed.",
@@ -8994,7 +8890,10 @@
         },
         "data": {
           "description": "Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
         },
         "mergeFieldId": {
           "description": "The merge field id.",
@@ -9113,7 +9012,10 @@
         },
         "data": {
           "description": "The data that is expected to be returned.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
         }
       }
     },
@@ -9180,7 +9082,10 @@
         },
         "data": {
           "description": "The data that is expected to be returned.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
         }
       }
     },
@@ -9360,7 +9265,10 @@
         },
         "select": {
           "description": "An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         },
         "from": {
           "description": "The table identifier.",
@@ -9438,7 +9346,10 @@
         },
         "data": {
           "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
-          "type": "array"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
         },
         "metadata": {
           "description": "Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed.",
@@ -9972,6 +9883,21 @@
         }
       }
     },
+    "denyUsersRequest": {
+      "description": "A list of user IDs that need to be denied.",
+      "example": [
+        "123456.ab1s",
+        "423123.vc2d",
+        "78910.ba1s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
     "denyUsers200Response": {
       "example": {
         "failure": [
@@ -10010,6 +9936,21 @@
             "type": "string"
           }
         }
+      }
+    },
+    "denyUsersAndGroupsRequest": {
+      "description": "A list of user IDs that need to be denied.",
+      "example": [
+        "123456.ab1s",
+        "423123.vc2d",
+        "78910.ba1s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
       }
     },
     "denyUsersAndGroups200Response": {
@@ -10052,6 +9993,21 @@
         }
       }
     },
+    "undenyUsersRequest": {
+      "description": "A list of user IDs that need to be undenied.",
+      "example": [
+        "123456.ab1s",
+        "423123.vc2d",
+        "78910.ba1s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
     "undenyUsers200Response": {
       "example": {
         "failure": [
@@ -10090,6 +10046,22 @@
             "type": "string"
           }
         }
+      }
+    },
+    "addMembersToGroupRequest": {
+      "description": "A list of user IDs that will be added to a group.",
+      "example": [
+        "123456.ryyw",
+        "423123.b3x5",
+        "100000.be8s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the user to be added to a group.",
+        "type": "string"
       }
     },
     "addMembersToGroup200Response": {
@@ -10132,6 +10104,22 @@
         }
       }
     },
+    "removeMembersFromGroupRequest": {
+      "description": "A list of user IDs that will be removed from a group.",
+      "example": [
+        "123456.ryyw",
+        "423123.b3x5",
+        "100000.be8s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the user to be removed from a group.",
+        "type": "string"
+      }
+    },
     "removeMembersFromGroup200Response": {
       "example": {
         "failure": [
@@ -10170,6 +10158,22 @@
             "type": "string"
           }
         }
+      }
+    },
+    "addManagersToGroupRequest": {
+      "description": "A list of user IDs that will be added to a group.",
+      "example": [
+        "123456.ryyw",
+        "423123.b3x5",
+        "100000.be8s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the user to be added to a group.",
+        "type": "string"
       }
     },
     "addManagersToGroup200Response": {
@@ -10212,6 +10216,22 @@
         }
       }
     },
+    "removeManagersFromGroupRequest": {
+      "description": "A list of user IDs that will be removed from a group.",
+      "example": [
+        "123456.ryyw",
+        "423123.b3x5",
+        "100000.be8s"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the user to be removed from a group.",
+        "type": "string"
+      }
+    },
     "removeManagersFromGroup200Response": {
       "example": {
         "failure": [
@@ -10252,6 +10272,21 @@
         }
       }
     },
+    "addSubgroupsToGroupRequest": {
+      "description": "A list of group IDs that will be added to a group.",
+      "example": [
+        "1002.czm8",
+        "1003.bar3"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the child group to be added to a group.",
+        "type": "string"
+      }
+    },
     "addSubgroupsToGroup200Response": {
       "example": {
         "failure": [
@@ -10288,6 +10323,21 @@
             "type": "string"
           }
         }
+      }
+    },
+    "removeSubgroupsFromGroupRequest": {
+      "description": "A list of group IDs that will be removed from a group.",
+      "example": [
+        "1002.czm8",
+        "1003.bar3"
+      ],
+      "type": "array",
+      "maxItems": 1000,
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "description": "The Id and its hash value of the child group to be removed from a group.",
+        "type": "string"
       }
     },
     "removeSubgroupsFromGroup200Response": {
@@ -10922,6 +10972,10 @@
         "description": ""
       }
     },
+    "updateSolutionRequest": {
+      "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
+      "type": "string"
+    },
     "updateSolution200Response": {
       "example": {
         "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
@@ -10949,6 +11003,10 @@
         "message": "Internal server error.",
         "description": ""
       }
+    },
+    "createSolutionRequest": {
+      "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
+      "type": "string"
     },
     "createSolution200Response": {
       "example": {
@@ -11081,6 +11139,10 @@
         "message": "Internal server error.",
         "description": ""
       }
+    },
+    "changesetSolutionRequest": {
+      "example": "Version: 0.4\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
+      "type": "string"
     },
     "changesetSolution200Response": {
       "example": {

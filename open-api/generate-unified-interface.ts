@@ -19,6 +19,7 @@ function mapOpenApiTypeToTs(
   switch (type.toLowerCase()) {
     case "integer":
     case "int":
+    case "number":
       return "number";
     case "string":
       return "string";
@@ -35,28 +36,18 @@ function mapRefToType(
   spec: OpenAPIV2.Document,
   depth: number = 0
 ): string {
-  const indent = "  ".repeat(depth);
-  console.log(`${indent}Processing schema:`, JSON.stringify(schema, null, 2));
-
-  if (!schema) {
-    console.log(`${indent}No schema, returning 'any'`);
-    return "any";
-  }
+  if (!schema) return "any";
 
   if ("$ref" in schema && schema.$ref) {
     const refParts = schema.$ref.split("/");
     const model = refParts[refParts.length - 1];
     const camelModel = model.charAt(0).toUpperCase() + model.slice(1);
-    console.log(
-      `${indent}Found $ref: ${schema.$ref}, adding ${camelModel} to imports`
-    );
     modelImports.add(camelModel);
     return camelModel;
   }
 
   if ("type" in schema) {
     if (schema.type === "array" && schema.items) {
-      console.log(`${indent}Array type, traversing items`);
       const items = schema.items as
         | OpenAPIV2.SchemaObject
         | OpenAPIV2.ReferenceObject;
@@ -65,19 +56,14 @@ function mapRefToType(
     }
 
     if (schema.type === "object") {
-      console.log(`${indent}Object type`);
       if (schema.additionalProperties) {
         const additionalProps = schema.additionalProperties as
           | OpenAPIV2.SchemaObject
           | OpenAPIV2.ReferenceObject
           | boolean;
         if (typeof additionalProps === "boolean") {
-          console.log(
-            `${indent}Additional properties boolean, returning generic object`
-          );
           return "{ [key: string]: any }";
         }
-        console.log(`${indent}Traversing additional properties`);
         const valueType = mapRefToType(
           additionalProps,
           modelImports,
@@ -87,7 +73,6 @@ function mapRefToType(
         return `{ [key: string]: ${valueType} }`;
       }
       if (schema.properties) {
-        console.log(`${indent}Traversing object properties`);
         const props = Object.entries(schema.properties).map(([key, prop]) => {
           const propSchema = prop as OpenAPIV2.SchemaObject;
           const propType = mapRefToType(
@@ -100,18 +85,12 @@ function mapRefToType(
         });
         return `{ ${props.join("; ")} }`;
       }
-      console.log(
-        `${indent}No properties or additionalProperties, returning generic object`
-      );
       return "{ [key: string]: any }";
     }
 
-    const basicType = mapOpenApiTypeToTs(schema.type);
-    console.log(`${indent}Basic type: ${basicType}`);
-    return basicType;
+    return mapOpenApiTypeToTs(schema.type);
   }
 
-  console.log(`${indent}Unknown schema, returning 'any'`);
   return "any";
 }
 
@@ -144,8 +123,7 @@ function generateInterface() {
       if (!op || !op.operationId) continue;
 
       const opId = simplifyName(op.operationId);
-      console.log(`Processing operation: ${opId}`);
-
+      const summary = op.summary || "No description available.";
       const params = (op.parameters || [])
         .filter((p) => {
           const param = p as OpenAPIV2.Parameter;
@@ -153,20 +131,17 @@ function generateInterface() {
             "name" in param ? param.name : ""
           );
         })
-        .map((p) => {
-          const param = p as OpenAPIV2.Parameter;
+        .map((param: OpenAPIV2.Parameter) => {
           if (!("name" in param)) return "";
 
           let type: string;
           if ("schema" in param && param.schema) {
-            console.log(`Mapping schema for parameter: ${param.name}`);
             type = mapRefToType(param.schema, modelImports, spec, 1);
           } else if ("type" in param && param.type) {
-            console.log(`Mapping basic type for parameter: ${param.name}`);
             type = mapOpenApiTypeToTs(param.type);
           } else {
-            console.log(
-              `No schema or type for parameter: ${param.name}, using 'any'`
+            console.warn(
+              `Parameter ${param.name} in ${opId} has no type or schema, defaulting to 'any'`
             );
             type = "any";
           }
@@ -185,7 +160,6 @@ function generateInterface() {
         }))
         .filter(({ response }) => response?.schema);
       const returnTypes = successResponses.map(({ response }) => {
-        console.log(`Mapping response schema for code: ${response!.code}`);
         return mapRefToType(response!.schema, modelImports, spec, 1);
       });
       const uniqueReturnTypes = [...new Set(returnTypes)];
@@ -194,8 +168,17 @@ function generateInterface() {
           ? uniqueReturnTypes.join(" | ")
           : uniqueReturnTypes[0] || "void";
 
+      // Generate JSDoc
+      const jsDoc = [
+        `  /**`,
+        `   * ${summary}`,
+        `   * @param params - Parameters for the ${opId} operation`,
+        `   * @returns A promise resolving to the ${opId} response`,
+        `   */`,
+      ].join("\n");
+
       methods.push(
-        `  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
+        `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
       );
     }
   }

@@ -9,7 +9,13 @@ interface Parameter {
   in: string;
   required?: boolean;
   type?: string;
-  schema?: { type?: string; items?: any; $ref?: string; properties?: any };
+  schema?: {
+    type?: string;
+    items?: any;
+    $ref?: string;
+    properties?: any;
+    example?: any;
+  };
   example?: any;
 }
 
@@ -44,6 +50,7 @@ function toCamelCase(str: string): string {
 }
 
 function fixArraySchemas(spec: Spec) {
+  // Fix arrays in paths
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
@@ -53,7 +60,10 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing array schema for ${pathKey}(${method}).${param.name}`
             );
-            param.schema.items = { $ref: "#/definitions/FieldMap" };
+            param.schema.items =
+              pathKey === "/records" && param.name === "generated"
+                ? { $ref: "#/definitions/Record" }
+                : { type: "string" };
           }
           if (param.schema?.properties) {
             for (const propKey in param.schema.properties) {
@@ -63,8 +73,8 @@ function fixArraySchemas(spec: Spec) {
                   `Fixing nested array for ${pathKey}(${method}).${param.name}.${propKey}`
                 );
                 prop.items =
-                  propKey === "data"
-                    ? { $ref: "#/definitions/FieldMap" }
+                  propKey === "data" && pathKey === "/records"
+                    ? { $ref: "#/definitions/Record" }
                     : { type: "string" };
               }
             }
@@ -78,7 +88,10 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing array schema for ${pathKey}(${method}).responses.${status}`
             );
-            response.schema.items = { $ref: "#/definitions/FieldMap" };
+            response.schema.items =
+              pathKey === "/records"
+                ? { $ref: "#/definitions/Upsert200Response" }
+                : { type: "string" };
           }
           if (response.schema?.properties) {
             for (const propKey in response.schema.properties) {
@@ -88,8 +101,8 @@ function fixArraySchemas(spec: Spec) {
                   `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`
                 );
                 prop.items =
-                  propKey === "data"
-                    ? { $ref: "#/definitions/FieldMap" }
+                  propKey === "data" && pathKey === "/records"
+                    ? { $ref: "#/definitions/Upsert200Response" }
                     : { type: "string" };
               }
             }
@@ -97,6 +110,47 @@ function fixArraySchemas(spec: Spec) {
         }
       }
     }
+  }
+
+  // Fix arrays in definitions
+  console.log("Fixing array schemas in definitions...");
+  const definitions = spec.definitions || {};
+
+  // Iterate over all definitions to fix nested arrays
+  for (const defKey in definitions) {
+    const def = definitions[defKey];
+    if (def.properties) {
+      for (const propKey in def.properties) {
+        const prop = def.properties[propKey];
+        if (prop.type === "array" && !prop.items) {
+          console.log(`Fixing missing items in ${defKey}.${propKey}`);
+          if (defKey === "runQueryRequest" && propKey === "select") {
+            prop.items = { type: "integer" }; // Field IDs are integers
+          } else if (propKey === "data") {
+            prop.items = { $ref: "#/definitions/Record" }; // Default for data arrays
+          } else {
+            prop.items = { type: "string" }; // Fallback
+          }
+        }
+        // Handle union types (e.g., sortBy in runQueryRequest)
+        if (prop["x-amf-union"]) {
+          prop["x-amf-union"].forEach((unionType: any) => {
+            if (unionType.type === "array" && !unionType.items) {
+              console.log(`Fixing union array in ${defKey}.${propKey}`);
+              unionType.items = { type: "object" }; // Default for sortBy-like structures
+            }
+          });
+        }
+      }
+    }
+  }
+
+  // Debug runQueryRequest state after fix
+  if (definitions.runQueryRequest) {
+    console.log(
+      "Debug: runQueryRequest after fix:",
+      JSON.stringify(definitions.runQueryRequest, null, 2)
+    );
   }
 }
 
@@ -127,22 +181,34 @@ function enhanceRawSpec(spec: Spec) {
     additionalProperties: { $ref: "#/definitions/FieldValue" },
   };
 
-  // Enhance operations with named definitions
+  // Enhance operations with named definitions and fix parameter types
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
       const opId =
         operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
 
-      // Request schema
+      // Fix parameter types and schemas
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
           if (
-            param.in === "body" &&
-            param.schema &&
-            param.schema.type === "object"
+            !param.type &&
+            !param.schema &&
+            (param.in === "path" || param.in === "query")
           ) {
+            param.type = param.name.includes("Id") ? "string" : "string";
+            console.log(
+              `Set default type 'string' for ${pathKey}(${method}).${param.name}`
+            );
+          }
+          if (param.in === "body" && param.schema) {
             const requestName = `${opId}Request`;
+            if (!param.schema.type) {
+              param.schema.type = "string";
+              console.log(
+                `Set schema type to 'string' for ${pathKey}(${method}).${param.name}`
+              );
+            }
             spec.definitions[requestName] = param.schema;
             param.schema = { $ref: `#/definitions/${requestName}` };
             console.log(
@@ -215,7 +281,12 @@ async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
               param.name = toCamelCase(param.name);
               if ("example" in param) delete param.example;
               if ("schema" in param && param.in !== "body") delete param.schema;
-              if (!param.type && param.in !== "body") param.type = "string";
+              if (!param.type && param.in !== "body") {
+                param.type = param.name.includes("Id") ? "string" : "string";
+                console.log(
+                  `Set default type 'string' for ${pathKey}(${method}).${param.name} in initial pass`
+                );
+              }
               return param;
             });
         }
