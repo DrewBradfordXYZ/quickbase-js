@@ -1,0 +1,1605 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Quick Base API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/tables": {
+      "post": {
+        "description": "Creates a table in an application.",
+        "summary": "Create a table",
+        "operationId": "createTable",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
+              "example": {
+                "name": "My table",
+                "description": "my first table",
+                "singleRecordName": "record",
+                "pluralRecordName": "records"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name for the table.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pluralRecordName": {
+                  "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
+                  "type": "string"
+                },
+                "singleRecordName": {
+                  "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the table. If this value is not passed the default value is blank.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "name": "Example Table",
+                "created": "2020-03-27T18:34:40Z",
+                "updated": "2020-04-03T19:12:40Z",
+                "alias": "_dbid_example_table",
+                "description": "Table as an example.",
+                "id": "bpqe82s0",
+                "nextRecordId": 1,
+                "nextFieldId": 1,
+                "defaultSortFieldId": 2,
+                "defaultSortOrder": "ASC",
+                "keyFieldId": 3,
+                "singleRecordName": "Example Record",
+                "pluralRecordName": "Example Records",
+                "sizeLimit": "150 MB",
+                "spaceUsed": "17 MB",
+                "spaceRemaining": "133 MB"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "description": "The name of the table.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The unique identifier (dbid) of the table.",
+                  "type": "string"
+                },
+                "alias": {
+                  "description": "The automatically-created table alias for the table.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description of the table, as configured by an application administrator.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "nextRecordId": {
+                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "nextFieldId": {
+                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "defaultSortFieldId": {
+                  "description": "The id of the field that is configured for default sorting.",
+                  "type": "integer"
+                },
+                "defaultSortOrder": {
+                  "description": "The configuration of the default sort order on the table.",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ],
+                  "type": "string"
+                },
+                "keyFieldId": {
+                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
+                  "type": "integer"
+                },
+                "singleRecordName": {
+                  "description": "The builder-configured singular noun of the table.",
+                  "type": "string"
+                },
+                "pluralRecordName": {
+                  "description": "The builder-configured plural noun of the table.",
+                  "type": "string"
+                },
+                "sizeLimit": {
+                  "description": "The size limit for the table.",
+                  "type": "string"
+                },
+                "spaceUsed": {
+                  "description": "The amount of space currently being used by the table.",
+                  "type": "string"
+                },
+                "spaceRemaining": {
+                  "description": "The amount of space remaining for use by the table.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      },
+      "get": {
+        "description": "Gets a list of all the tables that exist in a specific application. The properties for each table are the same as what is returned in Get table.",
+        "operationId": "getAppTables",
+        "summary": "Get tables for an app",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": [
+                {
+                  "name": "Example Table #0",
+                  "created": "2020-03-27T18:34:40Z",
+                  "updated": "2020-04-03T19:12:40Z",
+                  "alias": "_dbid_example_table_#0",
+                  "description": "Table zero as an example.",
+                  "id": "bpqe82s1",
+                  "nextRecordId": 1,
+                  "nextFieldId": 1,
+                  "defaultSortFieldId": 2,
+                  "defaultSortOrder": "ASC",
+                  "keyFieldId": 3,
+                  "singleRecordName": "Example Record",
+                  "pluralRecordName": "Example Records",
+                  "sizeLimit": "150 MB",
+                  "spaceUsed": "17 MB",
+                  "spaceRemaining": "133 MB"
+                },
+                {
+                  "name": "Example Table #2",
+                  "created": "2020-03-27T18:34:40Z",
+                  "updated": "2020-04-03T19:12:40Z",
+                  "alias": "_dbid_example_table_#2",
+                  "description": "Table two as an example.",
+                  "id": "bpqe82z1",
+                  "nextRecordId": 10,
+                  "nextFieldId": 111,
+                  "defaultSortFieldId": 12,
+                  "defaultSortOrder": "DESC",
+                  "keyFieldId": 33,
+                  "singleRecordName": "Another Record",
+                  "pluralRecordName": "More Records",
+                  "sizeLimit": "150 MB",
+                  "spaceUsed": "22 MB",
+                  "spaceRemaining": "128 MB"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "example": {
+                  "name": "Example Table",
+                  "created": "2020-03-27T18:34:40Z",
+                  "updated": "2020-04-03T19:12:40Z",
+                  "alias": "_dbid_example_table",
+                  "description": "Table as an example.",
+                  "id": "bpqe82s0",
+                  "nextRecordId": 1,
+                  "nextFieldId": 1,
+                  "defaultSortFieldId": 2,
+                  "defaultSortOrder": "ASC",
+                  "keyFieldId": 3,
+                  "singleRecordName": "Example Record",
+                  "pluralRecordName": "Example Records",
+                  "sizeLimit": "150 MB",
+                  "spaceUsed": "17 MB",
+                  "spaceRemaining": "133 MB"
+                },
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "name": {
+                    "description": "The name of the table.",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "The unique identifier (dbid) of the table.",
+                    "type": "string"
+                  },
+                  "alias": {
+                    "description": "The automatically-created table alias for the table.",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "The description of the table, as configured by an application administrator.",
+                    "type": "string"
+                  },
+                  "created": {
+                    "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                    "type": "string"
+                  },
+                  "updated": {
+                    "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                    "type": "string"
+                  },
+                  "nextRecordId": {
+                    "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
+                    "type": "integer"
+                  },
+                  "nextFieldId": {
+                    "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
+                    "type": "integer"
+                  },
+                  "defaultSortFieldId": {
+                    "description": "The id of the field that is configured for default sorting.",
+                    "type": "integer"
+                  },
+                  "defaultSortOrder": {
+                    "description": "The configuration of the default sort order on the table.",
+                    "enum": [
+                      "ASC",
+                      "DESC"
+                    ],
+                    "type": "string"
+                  },
+                  "keyFieldId": {
+                    "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
+                    "type": "integer"
+                  },
+                  "singleRecordName": {
+                    "description": "The builder-configured singular noun of the table.",
+                    "type": "string"
+                  },
+                  "pluralRecordName": {
+                    "description": "The builder-configured plural noun of the table.",
+                    "type": "string"
+                  },
+                  "sizeLimit": {
+                    "description": "The size limit for the table.",
+                    "type": "string"
+                  },
+                  "spaceUsed": {
+                    "description": "The amount of space currently being used by the table.",
+                    "type": "string"
+                  },
+                  "spaceRemaining": {
+                    "description": "The amount of space remaining for use by the table.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/tables/{tableId}": {
+      "get": {
+        "description": "Gets the properties of an individual table that is part of an application.",
+        "operationId": "getTable",
+        "summary": "Get a table",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "name": "Example Table",
+                "created": "2020-03-27T18:34:40Z",
+                "updated": "2020-04-03T19:12:40Z",
+                "alias": "_dbid_example_table",
+                "description": "Table as an example.",
+                "id": "bpqe82s0",
+                "nextRecordId": 1,
+                "nextFieldId": 1,
+                "defaultSortFieldId": 2,
+                "defaultSortOrder": "ASC",
+                "keyFieldId": 3,
+                "singleRecordName": "Example Record",
+                "pluralRecordName": "Example Records",
+                "sizeLimit": "150 MB",
+                "spaceUsed": "17 MB",
+                "spaceRemaining": "133 MB"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "description": "The name of the table.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The unique identifier (dbid) of the table.",
+                  "type": "string"
+                },
+                "alias": {
+                  "description": "The automatically-created table alias for the table.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description of the table, as configured by an application administrator.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "nextRecordId": {
+                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "nextFieldId": {
+                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "defaultSortFieldId": {
+                  "description": "The id of the field that is configured for default sorting.",
+                  "type": "integer"
+                },
+                "defaultSortOrder": {
+                  "description": "The configuration of the default sort order on the table.",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ],
+                  "type": "string"
+                },
+                "keyFieldId": {
+                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
+                  "type": "integer"
+                },
+                "singleRecordName": {
+                  "description": "The builder-configured singular noun of the table.",
+                  "type": "string"
+                },
+                "pluralRecordName": {
+                  "description": "The builder-configured plural noun of the table.",
+                  "type": "string"
+                },
+                "sizeLimit": {
+                  "description": "The size limit for the table.",
+                  "type": "string"
+                },
+                "spaceUsed": {
+                  "description": "The amount of space currently being used by the table.",
+                  "type": "string"
+                },
+                "spaceRemaining": {
+                  "description": "The amount of space remaining for use by the table.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      },
+      "post": {
+        "description": "Updates the main properties of a specific table. Any properties of the table that you do not specify in the request body will remain unchanged.",
+        "summary": "Update a table",
+        "operationId": "updateTable",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
+              "example": {
+                "name": "My table",
+                "description": "my first table",
+                "singleRecordName": "record",
+                "pluralRecordName": "records"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "description": "The name for the table.",
+                  "type": "string"
+                },
+                "pluralRecordName": {
+                  "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
+                  "type": "string"
+                },
+                "singleRecordName": {
+                  "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the table. If this value is not passed the default value is blank.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "name": "Example Table",
+                "created": "2020-03-27T18:34:40Z",
+                "updated": "2020-04-03T19:12:40Z",
+                "alias": "_dbid_example_table",
+                "description": "Table as an example.",
+                "id": "bpqe82s0",
+                "nextRecordId": 1,
+                "nextFieldId": 1,
+                "defaultSortFieldId": 2,
+                "defaultSortOrder": "ASC",
+                "keyFieldId": 3,
+                "singleRecordName": "Example Record",
+                "pluralRecordName": "Example Records",
+                "sizeLimit": "150 MB",
+                "spaceUsed": "17 MB",
+                "spaceRemaining": "133 MB"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "description": "The name of the table.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The unique identifier (dbid) of the table.",
+                  "type": "string"
+                },
+                "alias": {
+                  "description": "The automatically-created table alias for the table.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description of the table, as configured by an application administrator.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "nextRecordId": {
+                  "description": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "nextFieldId": {
+                  "description": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.",
+                  "type": "integer"
+                },
+                "defaultSortFieldId": {
+                  "description": "The id of the field that is configured for default sorting.",
+                  "type": "integer"
+                },
+                "defaultSortOrder": {
+                  "description": "The configuration of the default sort order on the table.",
+                  "enum": [
+                    "ASC",
+                    "DESC"
+                  ],
+                  "type": "string"
+                },
+                "keyFieldId": {
+                  "description": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.",
+                  "type": "integer"
+                },
+                "singleRecordName": {
+                  "description": "The builder-configured singular noun of the table.",
+                  "type": "string"
+                },
+                "pluralRecordName": {
+                  "description": "The builder-configured plural noun of the table.",
+                  "type": "string"
+                },
+                "sizeLimit": {
+                  "description": "The size limit for the table.",
+                  "type": "string"
+                },
+                "spaceUsed": {
+                  "description": "The amount of space currently being used by the table.",
+                  "type": "string"
+                },
+                "spaceRemaining": {
+                  "description": "The amount of space remaining for use by the table.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      },
+      "delete": {
+        "description": "Deletes a specific table in an application, including all of the data within it.",
+        "operationId": "deleteTable",
+        "summary": "Delete a table",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "deletedTableId": "bck7gp3q2"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "deletedTableId": {
+                  "description": "The deleted table id.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/tables/{tableId}/relationships": {
+      "get": {
+        "description": "Get a list of all relationships, and their definitions, for a specific table. Details are provided for the child side of relationships within a given application. Limited details are returned for cross-application relationships.",
+        "operationId": "getRelationships",
+        "summary": "Get all relationships",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "The number of relationships to skip.",
+            "type": "integer"
+          },
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the child table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "metadata": {
+                  "numRelationships": 1,
+                  "skip": 0,
+                  "totalRelationships": 1
+                },
+                "relationships": [
+                  {
+                    "childTableId": "bqqjnwsuy",
+                    "foreignKeyField": {
+                      "id": 6,
+                      "label": "Related record",
+                      "type": "numeric"
+                    },
+                    "id": 6,
+                    "isCrossApp": false,
+                    "lookupFields": [
+                      {
+                        "id": 3,
+                        "label": "Name",
+                        "type": "text"
+                      }
+                    ],
+                    "parentTableId": "bck7gp3q2",
+                    "summaryFields": [
+                      {
+                        "id": 8,
+                        "label": "my summary field",
+                        "type": "numeric"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "relationships"
+              ],
+              "properties": {
+                "relationships": {
+                  "description": "The relationships in a table.",
+                  "type": "array",
+                  "items": {
+                    "example": {
+                      "id": 6,
+                      "foreignKeyField": {
+                        "id": 6,
+                        "label": "Related record",
+                        "type": "numeric"
+                      },
+                      "lookupFields": [
+                        {
+                          "id": 7,
+                          "label": "record - text field",
+                          "type": "text"
+                        }
+                      ],
+                      "isCrossApp": false,
+                      "parentTableId": "bck7gp3q2",
+                      "childTableId": "bck7gp3q3",
+                      "summaryFields": [
+                        {
+                          "id": 8,
+                          "label": "Summary of Record ID#2",
+                          "type": "numeric"
+                        }
+                      ]
+                    },
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                      "id",
+                      "parentTableId",
+                      "childTableId",
+                      "isCrossApp"
+                    ],
+                    "properties": {
+                      "id": {
+                        "description": "The relationship id (foreign key field id).",
+                        "type": "integer"
+                      },
+                      "parentTableId": {
+                        "description": "The parent table id of the relationship.",
+                        "type": "string"
+                      },
+                      "childTableId": {
+                        "description": "The child table id of the relationship.",
+                        "type": "string"
+                      },
+                      "foreignKeyField": {
+                        "description": "The foreign key field information.",
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                          "id": {
+                            "description": "Field id.",
+                            "type": "integer"
+                          },
+                          "label": {
+                            "description": "Field label.",
+                            "type": "string"
+                          },
+                          "type": {
+                            "description": "Field type.",
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "isCrossApp": {
+                        "description": "Whether this is a cross-app relationship.",
+                        "type": "boolean"
+                      },
+                      "lookupFields": {
+                        "description": "The lookup fields array.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": true,
+                          "properties": {
+                            "id": {
+                              "description": "Field id.",
+                              "type": "integer"
+                            },
+                            "label": {
+                              "description": "Field label.",
+                              "type": "string"
+                            },
+                            "type": {
+                              "description": "Field type.",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "summaryFields": {
+                        "description": "The summary fields array.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": true,
+                          "properties": {
+                            "id": {
+                              "description": "Field id.",
+                              "type": "integer"
+                            },
+                            "label": {
+                              "description": "Field label.",
+                              "type": "string"
+                            },
+                            "type": {
+                              "description": "Field type.",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "description": "Additional information about the results that may be helpful.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "skip": {
+                      "description": "The number of relationships to skip.",
+                      "type": "integer"
+                    },
+                    "totalRelationships": {
+                      "description": "The total number of relationships.",
+                      "type": "integer"
+                    },
+                    "numRelationships": {
+                      "description": "The number of relationships in the current response object.",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/tables/{tableId}/relationship": {
+      "post": {
+        "description": "Creates a relationship in a table as well as lookup/summary fields. Relationships can only be created for tables within the same app.",
+        "summary": "Create a relationship",
+        "operationId": "createRelationship",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table. This will be the child table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "example": {
+                "parentTableId": "bck7gp3q2",
+                "foreignKeyField": {
+                  "label": "my relationship field"
+                },
+                "lookupFieldIds": [
+                  1,
+                  2,
+                  3
+                ],
+                "summaryFields": [
+                  {
+                    "summaryFid": 3,
+                    "label": "my first summary field",
+                    "accumulationType": "AVG",
+                    "where": "{'3'.EX.1}"
+                  },
+                  {
+                    "summaryFid": 4,
+                    "label": "my second summary field",
+                    "accumulationType": "SUM"
+                  }
+                ]
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "parentTableId"
+              ],
+              "properties": {
+                "summaryFields": {
+                  "description": "Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                      "accumulationType"
+                    ],
+                    "properties": {
+                      "summaryFid": {
+                        "description": "The field id to summarize.",
+                        "type": "number"
+                      },
+                      "label": {
+                        "description": "The label for the summary field.",
+                        "type": "string"
+                      },
+                      "accumulationType": {
+                        "description": "The accumulation type for the summary field.",
+                        "enum": [
+                          "AVG",
+                          "SUM",
+                          "MAX",
+                          "MIN",
+                          "STD-DEV",
+                          "COUNT",
+                          "COMBINED-TEXT",
+                          "COMBINED-USER",
+                          "DISTINCT-COUNT"
+                        ],
+                        "type": "string"
+                      },
+                      "where": {
+                        "description": "The filter, using the Quickbase query language, which determines the records to return.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "lookupFieldIds": {
+                  "description": "Array of field ids in the parent table that will become lookup fields in the child table.",
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "parentTableId": {
+                  "description": "The parent table id for the relationship.",
+                  "type": "string"
+                },
+                "foreignKeyField": {
+                  "description": "This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>’, where <record> is the name of a record in the parent table.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "label": {
+                      "description": "The label for the foreign key field.",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "id": 6,
+                "foreignKeyField": {
+                  "id": 6,
+                  "label": "Related record",
+                  "type": "numeric"
+                },
+                "lookupFields": [
+                  {
+                    "id": 7,
+                    "label": "record - text field",
+                    "type": "text"
+                  }
+                ],
+                "isCrossApp": false,
+                "parentTableId": "bck7gp3q2",
+                "childTableId": "bck7gp3q3",
+                "summaryFields": [
+                  {
+                    "id": 8,
+                    "label": "Summary of Record ID#2",
+                    "type": "numeric"
+                  }
+                ]
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "id",
+                "parentTableId",
+                "childTableId",
+                "isCrossApp"
+              ],
+              "properties": {
+                "id": {
+                  "description": "The relationship id (foreign key field id).",
+                  "type": "integer"
+                },
+                "parentTableId": {
+                  "description": "The parent table id of the relationship.",
+                  "type": "string"
+                },
+                "childTableId": {
+                  "description": "The child table id of the relationship.",
+                  "type": "string"
+                },
+                "foreignKeyField": {
+                  "description": "The foreign key field information.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "id": {
+                      "description": "Field id.",
+                      "type": "integer"
+                    },
+                    "label": {
+                      "description": "Field label.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Field type.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "isCrossApp": {
+                  "description": "Whether this is a cross-app relationship.",
+                  "type": "boolean"
+                },
+                "lookupFields": {
+                  "description": "The lookup fields array.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "summaryFields": {
+                  "description": "The summary fields array.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/tables/{tableId}/relationship/{relationshipId}": {
+      "post": {
+        "description": "Use this endpoint to add lookup fields and summary fields to an existing relationship. Updating a relationship will not delete existing lookup/summary fields.",
+        "summary": "Update a relationship",
+        "operationId": "updateRelationship",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table. This will be the child table.",
+            "type": "string"
+          },
+          {
+            "name": "relationshipId",
+            "in": "path",
+            "required": true,
+            "description": "The relationship id. This is the field id of the reference field on the child table.",
+            "type": "number"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "example": {
+                "lookupFieldIds": [
+                  4,
+                  5,
+                  6
+                ],
+                "summaryFields": [
+                  {
+                    "summaryFid": 3,
+                    "label": "my summary field",
+                    "accumulationType": "COUNT",
+                    "where": "{'3'.EX.1}"
+                  }
+                ]
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "summaryFields": {
+                  "description": "An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                      "accumulationType"
+                    ],
+                    "properties": {
+                      "summaryFid": {
+                        "description": "The field id to summarize.",
+                        "type": "number"
+                      },
+                      "label": {
+                        "description": "The label for the summary field.",
+                        "type": "string"
+                      },
+                      "accumulationType": {
+                        "description": "The accumulation type for the summary field.",
+                        "enum": [
+                          "AVG",
+                          "SUM",
+                          "MAX",
+                          "MIN",
+                          "STD-DEV",
+                          "COUNT",
+                          "COMBINED-TEXT",
+                          "COMBINED-USER",
+                          "DISTINCT-COUNT"
+                        ],
+                        "type": "string"
+                      },
+                      "where": {
+                        "description": "The filter, using the Quickbase query language, which determines the records to return.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "lookupFieldIds": {
+                  "description": "An array of field ids on the parent table that will become lookup fields on the child table.",
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "id": 6,
+                "foreignKeyField": {
+                  "id": 6,
+                  "label": "Related record",
+                  "type": "numeric"
+                },
+                "lookupFields": [
+                  {
+                    "id": 7,
+                    "label": "record - text field",
+                    "type": "text"
+                  }
+                ],
+                "isCrossApp": false,
+                "parentTableId": "bck7gp3q2",
+                "childTableId": "bck7gp3q3",
+                "summaryFields": [
+                  {
+                    "id": 8,
+                    "label": "Summary of Record ID#2",
+                    "type": "numeric"
+                  }
+                ]
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "id",
+                "parentTableId",
+                "childTableId",
+                "isCrossApp"
+              ],
+              "properties": {
+                "id": {
+                  "description": "The relationship id (foreign key field id).",
+                  "type": "integer"
+                },
+                "parentTableId": {
+                  "description": "The parent table id of the relationship.",
+                  "type": "string"
+                },
+                "childTableId": {
+                  "description": "The child table id of the relationship.",
+                  "type": "string"
+                },
+                "foreignKeyField": {
+                  "description": "The foreign key field information.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "id": {
+                      "description": "Field id.",
+                      "type": "integer"
+                    },
+                    "label": {
+                      "description": "Field label.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Field type.",
+                      "type": "string"
+                    }
+                  }
+                },
+                "isCrossApp": {
+                  "description": "Whether this is a cross-app relationship.",
+                  "type": "boolean"
+                },
+                "lookupFields": {
+                  "description": "The lookup fields array.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "summaryFields": {
+                  "description": "The summary fields array.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      },
+      "delete": {
+        "description": "Use this endpoint to delete an entire relationship, including all lookup and summary fields. The reference field in the relationship will not be deleted.",
+        "summary": "Delete a relationship",
+        "operationId": "deleteRelationship",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (dbid) of the table. This will be the child table.",
+            "type": "string"
+          },
+          {
+            "name": "relationshipId",
+            "in": "path",
+            "required": true,
+            "description": "The relationship id. This is the field id of the reference field on the child table.",
+            "type": "number"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "relationshipId": 6
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "relationshipId"
+              ],
+              "properties": {
+                "relationshipId": {
+                  "description": "The relationship id.",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Tables"
+        ]
+      }
+    }
+  },
+  "definitions": {}
+}

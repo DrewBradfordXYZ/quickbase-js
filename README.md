@@ -6,54 +6,46 @@
 npm install --save quickbase-js
 ```
 
-## Example
+## Examples
+
+### CDN Code Page
 
 ```html
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Quickbase Test</title>
+    <title>Quickbase</title>
+    <script src="https://cdn.jsdelivr.net/npm/quickbase-js@1.1.0-beta.6/dist/umd/quickbase.umd.min.js"></script>
   </head>
 
   <body>
     <div>
-      <h1>Quickbase Test</h1>
+      <h1>Quickbase-js CDN Example</h1>
       <p id="result">Loading...</p>
     </div>
-    <script type="module">
-      import { quickbase } from "quickbase-js";
-      // Initalize the QuickBase client
-      const qb = quickbase({
-        realm: "your-realm", // Replace with actual QuickBase realm
-        // ## ------------------------------
-        // ## Authentication Options
-        // ## ----------------------------
-        // ## OPTION 1: User Token Authentication
-        // ## - Use this if you have a QuickBase user token.
-        // ## - Works in Node.js or browsers, ideal for standalone apps or testing outside QuickBase
-        // ## - Uncomment the line below and replace with your token; comment out 'useTempTokens'
-        // userToken: "your-user-token",
-
-        // ## ----------------------------
-        // ## OPTION 2: Temporary Token Authentication
-        // ## - Use this for QuickBase code pages, leveraging the browser’s authenticated session
-        // ## - No user token needed; requires running in a QuickBase browser context
-        // ## - Uncomment the line below and comment out 'userToken' if using this option
-        // useTempTokens: true,
-      });
-
-      // Fetch the app
-      qb.getApp({ appId: "your-app-id" }) // Replace with actual app ID
-        .then((app) => {
-          document.getElementById(
-            "result"
-          ).textContent = `App Name: ${app.name}`;
-        })
-        .catch((err) => {
-          console.error("Error fetching app:", err);
-          document.getElementById("result").textContent =
-            err.message || "Failed to load app";
+    <script>
+      var realm = "xxxxxxxxxxxxxxxxxxxx"; // replace with your realm
+      var appId = "xxxxxxxxxxxxxxxxxxxx"; // replace with your app ID
+      if (typeof QuickbaseJS === "undefined") {
+        document.getElementById("result").textContent =
+          "Error: Failed to load QuickbaseJS library.";
+      } else {
+        var qbClient = QuickbaseJS.quickbase({
+          realm,
+          useTempTokens: true,
         });
+
+        qbClient
+          .getApp({ appId })
+          .then(function (app) {
+            document.getElementById("result").textContent =
+              "App Name: " + app.name;
+          })
+          .catch(function (err) {
+            document.getElementById("result").textContent =
+              "Error: " + (err.message || "Failed to load app");
+          });
+      }
     </script>
   </body>
 </html>
@@ -62,7 +54,7 @@ npm install --save quickbase-js
 # Development workflow
 
 ```bash
-npm run regenerate:all
+npm run gen:all
 npm run build
 npm run test:all
 ```

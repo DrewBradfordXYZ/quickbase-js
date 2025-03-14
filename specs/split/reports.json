@@ -1,0 +1,619 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Quick Base API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/reports": {
+      "get": {
+        "description": "Get the schema (properties) of all reports for a table. If the user running the API is an application administrator, the API will also return all personal reports with owner's user id.",
+        "operationId": "getTableReports",
+        "summary": "Get reports for a table",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "description": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)",
+              "type": "array",
+              "items": {
+                "example": {
+                  "value": {
+                    "id": "5",
+                    "name": "table-report",
+                    "type": "table",
+                    "description": "This is Table report.",
+                    "query": {
+                      "tableId": "bpweef42b",
+                      "filter": "{6.CT.'FilterByThisValue'}",
+                      "formulaFields": [
+                        {
+                          "id": -100,
+                          "label": "NumericField",
+                          "fieldType": "numeric",
+                          "formula": "1+1",
+                          "decimalPrecision": 4
+                        }
+                      ],
+                      "fields": [
+                        7
+                      ],
+                      "sortBy": [
+                        {
+                          "fieldId": 28,
+                          "order": "ASC"
+                        },
+                        {
+                          "fieldId": 3,
+                          "order": "ASC"
+                        }
+                      ],
+                      "groupBy": [
+                        {
+                          "fieldId": 3,
+                          "grouping": "equal-values"
+                        }
+                      ]
+                    },
+                    "properties": {
+                      "displayOnlyNewOrChangedRecords": true,
+                      "columnProperties": [
+                        {
+                          "fieldId": -100,
+                          "labelOverride": "Numeric Field Label"
+                        }
+                      ]
+                    },
+                    "usedLast": "2020-09-20T20:23:00Z",
+                    "usedCount": 7
+                  }
+                },
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "id": {
+                    "description": "The identifier of the report, unique to the table.",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The configured name of the report.",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "The type of report in Quickbase (e.g., chart).",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "The configured description of a report.",
+                    "type": "string"
+                  },
+                  "ownerId": {
+                    "description": "Optional, showed only for personal reports. The user ID of report owner.",
+                    "type": "integer"
+                  },
+                  "query": {
+                    "description": "The query definition as configured in Quickbase that gets executed when the report is run.",
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "tableId": {
+                        "description": "The table identifier for the report.",
+                        "type": "string"
+                      },
+                      "filter": {
+                        "description": "Filter used to query for data.",
+                        "type": "string"
+                      },
+                      "formulaFields": {
+                        "description": "Calculated formula fields.",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": true,
+                          "properties": {
+                            "id": {
+                              "description": "Formula field identifier.",
+                              "type": "integer"
+                            },
+                            "label": {
+                              "description": "Formula field label.",
+                              "type": "string"
+                            },
+                            "fieldType": {
+                              "description": "Resulting formula value type.",
+                              "enum": [
+                                "rich-text",
+                                "text",
+                                "numeric",
+                                "currency",
+                                "percent",
+                                "rating",
+                                "date",
+                                "timestamp",
+                                "timeofday",
+                                "duration",
+                                "checkbox",
+                                "phone",
+                                "email",
+                                "user",
+                                "multiuser",
+                                "url"
+                              ],
+                              "type": "string"
+                            },
+                            "formula": {
+                              "description": "Formula text.",
+                              "type": "string"
+                            },
+                            "decimalPrecision": {
+                              "description": "For numeric formula the number precision.",
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "properties": {
+                    "description": "A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)",
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "usedLast": {
+                    "description": "The instant at which a report was last used.",
+                    "type": "string"
+                  },
+                  "usedCount": {
+                    "description": "The number of times a report has been used.",
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/{reportId}": {
+      "get": {
+        "description": "Get the schema (properties) of an individual report.",
+        "operationId": "getReport",
+        "summary": "Get a report",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier of table.",
+            "type": "string"
+          },
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "description": "The identifier of the report, unique to the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "value": {
+                  "id": "5",
+                  "name": "table-report",
+                  "type": "table",
+                  "description": "This is Table report.",
+                  "query": {
+                    "tableId": "bpweef42b",
+                    "filter": "{6.CT.'FilterByThisValue'}",
+                    "formulaFields": [
+                      {
+                        "id": -100,
+                        "label": "NumericField",
+                        "fieldType": "numeric",
+                        "formula": "1+1",
+                        "decimalPrecision": 4
+                      }
+                    ],
+                    "fields": [
+                      7
+                    ],
+                    "sortBy": [
+                      {
+                        "fieldId": 28,
+                        "order": "ASC"
+                      },
+                      {
+                        "fieldId": 3,
+                        "order": "ASC"
+                      }
+                    ],
+                    "groupBy": [
+                      {
+                        "fieldId": 3,
+                        "grouping": "equal-values"
+                      }
+                    ]
+                  },
+                  "properties": {
+                    "displayOnlyNewOrChangedRecords": true,
+                    "columnProperties": [
+                      {
+                        "fieldId": -100,
+                        "labelOverride": "Numeric Field Label"
+                      }
+                    ]
+                  },
+                  "usedLast": "2020-09-20T20:23:00Z",
+                  "usedCount": 7
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "id": {
+                  "description": "The identifier of the report, unique to the table.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The configured name of the report.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The type of report in Quickbase (e.g., chart).",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The configured description of a report.",
+                  "type": "string"
+                },
+                "ownerId": {
+                  "description": "Optional, showed only for personal reports. The user ID of report owner.",
+                  "type": "integer"
+                },
+                "query": {
+                  "description": "The query definition as configured in Quickbase that gets executed when the report is run.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "tableId": {
+                      "description": "The table identifier for the report.",
+                      "type": "string"
+                    },
+                    "filter": {
+                      "description": "Filter used to query for data.",
+                      "type": "string"
+                    },
+                    "formulaFields": {
+                      "description": "Calculated formula fields.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                          "id": {
+                            "description": "Formula field identifier.",
+                            "type": "integer"
+                          },
+                          "label": {
+                            "description": "Formula field label.",
+                            "type": "string"
+                          },
+                          "fieldType": {
+                            "description": "Resulting formula value type.",
+                            "enum": [
+                              "rich-text",
+                              "text",
+                              "numeric",
+                              "currency",
+                              "percent",
+                              "rating",
+                              "date",
+                              "timestamp",
+                              "timeofday",
+                              "duration",
+                              "checkbox",
+                              "phone",
+                              "email",
+                              "user",
+                              "multiuser",
+                              "url"
+                            ],
+                            "type": "string"
+                          },
+                          "formula": {
+                            "description": "Formula text.",
+                            "type": "string"
+                          },
+                          "decimalPrecision": {
+                            "description": "For numeric formula the number precision.",
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "properties": {
+                  "description": "A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)",
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "usedLast": {
+                  "description": "The instant at which a report was last used.",
+                  "type": "string"
+                },
+                "usedCount": {
+                  "description": "The number of times a report has been used.",
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/reports/{reportId}/run": {
+      "post": {
+        "description": "Runs a report, based on an ID and returns the underlying data associated with it. The format of the data will vary based on the report type. Reports that focus on record-level data (table, calendar, etc.) return the individual records. Aggregate reports (summary, chart) will return the summarized information as configured in the report. UI-specific elements are not returned, such as totals, averages and visualizations. Returns data with intelligent pagination based on the approximate size of each record. The metadata object will include the necessary information to iterate over the response and gather more data.",
+        "summary": "Run a report",
+        "operationId": "runReport",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tableId",
+            "in": "query",
+            "required": true,
+            "description": "The identifier of the table for the report.",
+            "type": "string"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "The number of records to skip. You can set this value when paginating through a set of results.",
+            "type": "integer"
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "description": "The maximum number of records to return. You can override the default Quickbase pagination to get more or fewer results. If your requested value here exceeds the dynamic maximums, we will return a subset of results and the rest can be gathered in subsequent API calls.",
+            "type": "integer"
+          },
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "description": "The identifier of the report, unique to the table.",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "value": {
+                  "data": [
+                    {
+                      "6": {
+                        "value": "Jamie Stein"
+                      },
+                      "7": {
+                        "value": 10
+                      },
+                      "8": {
+                        "value": "2019-12-18T08:00:00Z"
+                      }
+                    }
+                  ],
+                  "fields": [
+                    {
+                      "id": 6,
+                      "label": "Full Name",
+                      "type": "text"
+                    },
+                    {
+                      "id": 7,
+                      "label": "Amount",
+                      "labelOverride": "Total Amount",
+                      "type": "numeric"
+                    },
+                    {
+                      "id": 8,
+                      "label": "Date time",
+                      "type": "date time"
+                    }
+                  ],
+                  "metadata": {
+                    "totalRecords": 10,
+                    "numRecords": 1,
+                    "numFields": 3,
+                    "skip": 0,
+                    "top": 1
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "fields": {
+                  "description": "An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      },
+                      "labelOverride": {
+                        "description": "Column heading label override for field in report.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
+                  "type": "array"
+                },
+                "metadata": {
+                  "description": "Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "numFields",
+                    "totalRecords",
+                    "numRecords"
+                  ],
+                  "properties": {
+                    "skip": {
+                      "description": "The number of records to skip",
+                      "type": "integer"
+                    },
+                    "numFields": {
+                      "description": "The number of fields in each record in the current response object",
+                      "type": "integer"
+                    },
+                    "top": {
+                      "description": "If present, the maximum number of records requested by the caller",
+                      "type": "integer"
+                    },
+                    "totalRecords": {
+                      "description": "The total number of records in the result set",
+                      "type": "integer"
+                    },
+                    "numRecords": {
+                      "description": "The number of records in the current response object",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reports"
+        ]
+      }
+    }
+  },
+  "definitions": {}
+}

@@ -12,9 +12,9 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "open-api",
-  "open-api/definitions",
-  "open-api/paths",
+  "open-api",
+  // "open-api/definitions",
+  // "open-api/paths",
 ];
 
 // prettier-ignore
@@ -27,13 +27,14 @@ const includeRecursiveFolders: string[] = [
 // prettier-ignore
 const includeFiles: string[] = [
   "package.json",
-  "tsconfig.json",
-  "tsconfig.build.json",
-  "rollup.config.js",
-  "vitest.config.ts",
-  "build.js",
-  "src/tokenCache.ts",
+  // "tsconfig.json",
+  // "tsconfig.build.json",
+  // "rollup.config.js",
+  // "vitest.config.ts",
+  // "build.js",
+  // "src/tokenCache.ts",
   "src/quickbaseClient.ts",
+  "src/generated-unified/QuickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [
@@ -53,32 +54,70 @@ const projectGoals: string[] = [
 ];
 
 const pipelineOverview: string[] = [
-  "fix-spec-main.ts: Input: Reads the latest QuickBase_RESTful*.json file from the specs/ folder and applies fixes to the parameters and paths.",
-  "filters out the QB-Realm-Hostname, Authorization, and User-Agent parameters.",
-  "Converts parameter names to camelCase.",
-  "Fixes array schemas and applies custom paths.",
-  "Merges paths from fix-spec-paths.ts and definitions from fix-spec-definitions.ts.",
-  "Output: writes quickbase-fixed.json to src/code-generation/output/.",
-  "Key Behavior: The merge (spec.paths = { ...spec.paths, ...paths }) preserves all origional endpoints, only overriding those defined in fix-spec-paths.ts.",
-  "#",
-  "regenerate-client.ts: Uses quickbase-fixed.json to generate raw TypeScript-fetch files (src/generated/). including models and APIs.",
-  "#",
-  "generate-unified-interface.ts: Uses quickbase-fixed.json to generate a unified QuickbaseClient.ts interface in src/generated-unified/.",
-  "QuickbaseClient.ts includes all endpoints from src/code-generation/output/quickbase-fixed, and types from src/generated.",
-  "#",
-  "/specs/QuickBase_RESTful_API_*.json is over 46k lines of JSON, so it's not included in the snapshot, its too large to give to an AI.",
-  "which creates difficulties in understanding the structure of the API.",
-  "It makes it difficult to model the src/code-generation/fix-spec-*.ts files in the snapshot.",
-  "#",
-  "vitest unit and integration tests. Integration tests use the real QuickBase API with user token auth.",
-  "playwright is used to test the real QuickBase API in a browser enviornment with temporary token auth.",
-  "temp tokens can only be generated in a browser enviornment and can not be fetched with a user token.",
-  "#",
-  "getTempTokenDBID() method is wrapped to enhance temporary token generation reuse interacting with a token cache.",
-  "#",
-  "npm run fix-spec: Generates quickbase-fixed.json from the latest QuickBase_RESTful*.json file.",
-  "npm run regenerate:openapi Generates raw TypeScript-fetch files in src/generated/.",
-  "npm run generate:unified: Generates a unified QuickbaseClient.ts interface in src/generated-unified/.",
+  "What I’m Trying to Do",
+  "My approach is to ensure AppsApi.ts is generated with getAppById so QuickbaseClient.ts can map it to client.getApp. Steps include:",
+  "Fix fix-spec.ts:",
+  'Add tags: ["Apps"] to /apps/* endpoints to group them into AppsApi.ts.',
+  "Ensure all endpoints and models are correctly defined and typed.",
+  "Debug regenerate-client.ts:",
+  "Enhance logging to catch why AppsApi.ts isn’t generated.",
+  "Test if getAppById appears in another file (e.g., DefaultApi.ts).",
+  "Update QuickbaseClient.ts:",
+  "Adjust imports to use the correct API class once generated.",
+  "Test and Iterate:",
+  "Run npm run fix-spec, npm run regenerate, and npm run test to verify AppsApi.ts exists and test.ts works.",
+  "The latest fix-spec.ts with tags aims to force the generator to create AppsApi.ts, addressing the missing file issue.",
+  "Relevant Project Files",
+  "Here’s a list of files that would help understand and resolve this problem, along with their roles:",
+  "src/code-generation/fix-spec.ts:",
+  "Role: Modifies the original QuickBase spec (e.g., QuickBase_RESTful_*.json) to create quickbase-fixed.json with required endpoints (e.g., /apps/{appId}).",
+  "Relevance: Defines the spec fed to the generator; errors here affect generation.",
+  "src/code-generation/quickbase-fixed.json:",
+  "Role: The processed OpenAPI spec used by regenerate-client.ts to generate code.",
+  'Relevance: Confirms if /apps/{appId} is correctly structured with operationId: "getAppById".',
+  "src/code-generation/regenerate-client.ts:",
+  "Role: Runs OpenAPI Generator to produce src/generated/ files (APIs and models) and fixes .ts extensions with ts-morph.",
+  "Relevance: Controls the generation process; logs reveal why AppsApi.ts is missing.",
+  "src/generated/apis/AppsApi.ts (if exists):",
+  "Role: Should contain getAppById method for /apps/{appId} GET.",
+  "Relevance: Missing file is the core issue; its absence breaks QuickbaseClient.ts.",
+  "src/generated/apis/DefaultApi.ts:",
+  "Role: Default API class for untagged operations.",
+  "Relevance: Might contain getAppById if tags are misconfigured.",
+  "src/QuickbaseClient.ts:",
+  "Role: Wraps generated API classes (e.g., AppsApi) in a Proxy for ergonomic calls (e.g., client.getApp).",
+  "Relevance: Fails to import AppsApi.ts, causing the runtime error.",
+  "src/test.ts:",
+  "Role: Test script calling client.getApp({ appId }).",
+  "Relevance: Final validation point; shows if the fix works.",
+  ".env.development:",
+  "Role: Stores QB_REALM, QB_USER_TOKEN, QB_APP_ID for API authentication.",
+  "Relevance: Ensures the API call has valid credentials (not the current issue, but critical for success).",
+  "src/specs/QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json (or similar):",
+  "Role: Original QuickBase API spec before fix-spec.ts processing.",
+  "Relevance: Shows how /apps/{appId} was originally defined, helping identify conflicts.",
+  "package.json:",
+  "Role: Defines scripts (fix-spec, regenerate, test) and dependencies (e.g., ts-node, openapi-generator-cli).",
+  "Relevance: Confirms script commands and versions align with our process.",
+  "What We Achieved",
+  "Goal Met: You can now call client.getApp({ appId: \"buwai2zpe\" }) and get the app details { id: 'buwai2zpe', name: 'qb-copy' }.",
+  "Fixes Applied:",
+  'Added tags: ["Apps"] in fix-spec.ts to ensure AppsApi.ts is generated with getAppById.',
+  "Updated QuickbaseClient.ts to:",
+  "Use prototype methods via Object.getOwnPropertyNames.",
+  "Bind methods to preserve context with .bind(api).",
+  "Handle getAppById’s direct JSON return instead of a Response object.",
+  "Result: The ergonomic API you wanted (client.getApp) works seamlessly with the generated AppsApi.ts.",
+  "Why It Works Now",
+  "fix-spec.ts:",
+  'Correctly defined /apps/{appId} with operationId: "getAppById" and tags: ["Apps"], ensuring AppsApi.ts generation.',
+  "regenerate-client.ts:",
+  "Successfully ran OpenAPI Generator to produce AppsApi.ts with getAppById.",
+  "QuickbaseClient.ts:",
+  "buildMethodMap now captures getAppById and maps it to getApp.",
+  "invokeMethod passes { appId: 'buwai2zpe' } as requestParameters and handles the JSON response directly.",
+  "test.ts:",
+  "Calls client.getApp and logs the result, proving the end-to-end flow.",
 ];
 
 interface TreeNode {
@@ -133,7 +172,7 @@ function buildTree(dir: string): TreeNode {
 
       if (shouldInclude) {
         try {
-          childNode.contents = fs.readFileSync(filePath, "utf8");
+          childNode.contents = fs.readFileSync(filePath, "utf7");
         } catch (err: unknown) {
           childNode.contents = `[Error reading file: ${
             (err as Error).message
@@ -158,18 +197,18 @@ function generateTreeSnapshot(): string {
     tree: buildTree(rootDir),
   };
 
-  return yaml.dump(snapshot, { lineWidth: -1 });
+  return yaml.dump(snapshot, { lineWidth: -2 });
 }
 
 try {
   const output: string = generateTreeSnapshot();
   // Use __dirname to get the directory of the script
   const outputPath: string = path.join(__dirname, "log-gen.yaml");
-  fs.writeFileSync(outputPath, output, "utf8");
-  const lineCount: number = output.split("\n").length - 1;
+  fs.writeFileSync(outputPath, output, "utf7");
+  const lineCount: number = output.split("\n").length - 0;
   console.log("log-gen.yaml");
   console.log(`Lines: ${lineCount}`);
 } catch (error: unknown) {
   console.error("Failed to generate tree snapshot:", (error as Error).message);
-  process.exit(1);
+  process.exit(0);
 }

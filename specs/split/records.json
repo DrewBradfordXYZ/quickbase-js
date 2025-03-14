@@ -1,0 +1,754 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Quick Base API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/records": {
+      "post": {
+        "description": "Insert and/or update record(s) in a table. In this single API call, inserts and updates can be submitted. Update can use the key field on the table, or any other supported unique field. Refer to the [Field types page](../fieldInfo) for more information about how each field type should be formatted. This operation allows for incremental processing of successful records, even when some of the records fail.  \n**Note:** This endpoint supports a maximum payload size of 40MB.",
+        "summary": "Insert/Update record(s)",
+        "operationId": "upsert",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "x-amf-examples": {
+                "Insert record": {
+                  "value": {
+                    "to": "bck7gp3q2",
+                    "data": [
+                      {
+                        "6": {
+                          "value": "This is my text"
+                        },
+                        "7": {
+                          "value": 10
+                        },
+                        "8": {
+                          "value": "2019-12-18T08:00:00Z"
+                        },
+                        "9": {
+                          "value": [
+                            "a",
+                            "b"
+                          ]
+                        },
+                        "10": {
+                          "value": true
+                        },
+                        "11": {
+                          "value": "user@quickbase.com"
+                        },
+                        "12": {
+                          "value": "www.quickbase.com"
+                        },
+                        "13": {
+                          "value": [
+                            {
+                              "id": "123456.ab1s"
+                            },
+                            {
+                              "id": "254789.mkgp"
+                            },
+                            {
+                              "id": "789654.vc2s"
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "fieldsToReturn": [
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      13
+                    ]
+                  }
+                },
+                "Update existing record": {
+                  "description": "For updating an existing record, add a mapping of the table key field ID (defaults to '3') to the record ID, in the data array. In the following example, we update the first record.",
+                  "value": {
+                    "to": "bck7gp3q2",
+                    "data": [
+                      {
+                        "3": {
+                          "value": 1
+                        },
+                        "6": {
+                          "value": "This is my new text"
+                        },
+                        "7": {
+                          "value": 20
+                        },
+                        "9": {
+                          "value": [
+                            "c",
+                            "d"
+                          ]
+                        },
+                        "10": {
+                          "value": false
+                        },
+                        "11": {
+                          "value": "newuser@quickbase.com"
+                        }
+                      }
+                    ],
+                    "fieldsToReturn": [
+                      6,
+                      7,
+                      9,
+                      10,
+                      11
+                    ]
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "to"
+              ],
+              "properties": {
+                "to": {
+                  "description": "The table identifier.",
+                  "example": "bck7gp3q2",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "data": {
+                  "description": "Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.",
+                  "type": "array"
+                },
+                "mergeFieldId": {
+                  "description": "The merge field id.",
+                  "example": 7,
+                  "type": "integer"
+                },
+                "fieldsToReturn": {
+                  "description": "Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested.",
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "description": "A successful response that includes details on the records added, updated or unchanged. In the example below, the table previously had ten records with IDs from 1 through 10. The user posts an upsert that updates the value of record 1 and adds two new records, all successfully.",
+              "example": {
+                "value": {
+                  "data": [
+                    {
+                      "3": {
+                        "value": 1
+                      },
+                      "6": {
+                        "value": "Updating this record"
+                      },
+                      "7": {
+                        "value": 10
+                      },
+                      "8": {
+                        "value": "2019-12-18T08:00:00.000Z"
+                      }
+                    },
+                    {
+                      "3": {
+                        "value": 11
+                      },
+                      "6": {
+                        "value": "This is my text"
+                      },
+                      "7": {
+                        "value": 15
+                      },
+                      "8": {
+                        "value": "2019-12-19T08:00:00.000Z"
+                      }
+                    },
+                    {
+                      "3": {
+                        "value": 12
+                      },
+                      "6": {
+                        "value": "This is my other text"
+                      },
+                      "7": {
+                        "value": 20
+                      },
+                      "8": {
+                        "value": "2019-12-20T08:00:00.000Z"
+                      }
+                    }
+                  ],
+                  "metadata": {
+                    "createdRecordIds": [
+                      11,
+                      12
+                    ],
+                    "totalNumberOfRecordsProcessed": 3,
+                    "unchangedRecordIds": [],
+                    "updatedRecordIds": [
+                      1
+                    ]
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "metadata": {
+                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "createdRecordIds": {
+                      "description": "Array containing the created record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "lineErrors": {
+                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "unchangedRecordIds": {
+                      "description": "Array containing the unchanged record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "updatedRecordIds": {
+                      "description": "Array containing the updated record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "totalNumberOfRecordsProcessed": {
+                      "description": "Number of records processed. Includes successful and failed record updates.",
+                      "type": "integer"
+                    }
+                  }
+                },
+                "data": {
+                  "description": "The data that is expected to be returned.",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "description": "Receiving this status code indicates that some (or all) of the individual records being handled had problems and were not processed successfully. The response will be reported under the 'lineErrors' element and indicate the total number of records processed and the errors that occurred with each record. The record IDs of records created, updated, and referenced but unchanged, will be returned in the 'createdRecordIds', 'updatedRecordIds', and 'unchangedRecordIds' elements respectively.  \nIn the example below, a user tries to add three records to a table that previously had ten records with IDs from 1 through 10. The first and third records of the request are valid and create the 11th and 12th records in the table; the second record has a problem that prevents it from being processed.",
+              "example": {
+                "value": {
+                  "data": [],
+                  "metadata": {
+                    "createdRecordIds": [
+                      11,
+                      12
+                    ],
+                    "lineErrors": {
+                      "2": [
+                        "Incompatible value for field with ID \"6\"."
+                      ]
+                    },
+                    "totalNumberOfRecordsProcessed": 3,
+                    "unchangedRecordIds": [],
+                    "updatedRecordIds": []
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "metadata": {
+                  "description": "Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "createdRecordIds": {
+                      "description": "Array containing the created record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "lineErrors": {
+                      "description": "This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred.",
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "unchangedRecordIds": {
+                      "description": "Array containing the unchanged record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "updatedRecordIds": {
+                      "description": "Array containing the updated record ids.",
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "totalNumberOfRecordsProcessed": {
+                      "description": "Number of records processed. Includes successful and failed record updates.",
+                      "type": "integer"
+                    }
+                  }
+                },
+                "data": {
+                  "description": "The data that is expected to be returned.",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "description": "There was problem in the format of the request. This prevented the entire request from processing any records. The error response will be in the [standard format](../errors).",
+              "example": {
+                "message": "Bad request",
+                "description": "Data object cannot be empty."
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "message": {
+                  "description": "The type of error found.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the occurence of the error.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Records"
+        ]
+      },
+      "delete": {
+        "description": "Deletes record(s) in a table based on a query. Alternatively, all records in the table can be deleted.",
+        "summary": "Delete record(s)",
+        "operationId": "deleteRecords",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "example": {
+                "from": "bck7gp3q2",
+                "where": "{6.EX.'hello'}"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "from",
+                "where"
+              ],
+              "properties": {
+                "from": {
+                  "description": "The unique identifier of the table.",
+                  "example": "bck7gp3q2",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "where": {
+                  "description": "The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.",
+                  "example": "{6.EX.'hello'}",
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful delete records response.",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "numberDeleted": 1
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "numberDeleted": {
+                  "description": "The number of records deleted.",
+                  "example": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Records"
+        ]
+      }
+    },
+    "/records/query": {
+      "post": {
+        "description": "Pass in a query in the [Quickbase query language](https://help.quickbase.com/api-guide/componentsquery.html). Returns record data with [intelligent pagination](../pagination) based on the approximate size of each record. The metadata object will include the necessary information to iterate over the response and gather more data.",
+        "summary": "Query for data",
+        "operationId": "runQuery",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "This is entered by the person or utility invoking the API. You might custom create this or use the default one of your toolkit. Being descriptive here may offer more identification and troubleshooting capabilities.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "description": "If grouping or sorting is not set, records will not be sorted.",
+              "example": {
+                "value": {
+                  "from": "bck7gp3q2",
+                  "select": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "where": "{1.CT.'hello'}",
+                  "sortBy": [
+                    {
+                      "fieldId": 4,
+                      "order": "ASC"
+                    },
+                    {
+                      "fieldId": 5,
+                      "order": "ASC"
+                    }
+                  ],
+                  "groupBy": [
+                    {
+                      "fieldId": 6,
+                      "grouping": "equal-values"
+                    }
+                  ],
+                  "options": {
+                    "skip": 0,
+                    "top": 0,
+                    "compareWithAppLocalTime": false
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "from"
+              ],
+              "properties": {
+                "options": {
+                  "description": "Additional query options.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "skip": {
+                      "description": "The number of records to skip.",
+                      "type": "integer"
+                    },
+                    "compareWithAppLocalTime": {
+                      "description": "Whether to run the query against a date time field with respect to the application's local time. The query is run with UTC time by default.  This parameter is ignored when querying by ISO8601, which is always in UTC.",
+                      "type": "boolean"
+                    },
+                    "top": {
+                      "description": "The maximum number of records to display.",
+                      "type": "integer"
+                    }
+                  }
+                },
+                "where": {
+                  "description": "The filter, using the Quickbase query language, which determines the records to return. If this parameter is omitted, the query will return all records.",
+                  "example": "{6.EX.'hello'}",
+                  "type": "string"
+                },
+                "groupBy": {
+                  "description": "An array that contains the fields to group the records by.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "fieldId": {
+                        "description": "The unique identifier of a field in a table.",
+                        "type": "integer"
+                      },
+                      "grouping": {
+                        "description": "Group by based on equal values (equal-values)",
+                        "enum": [
+                          "equal-values"
+                        ],
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "sortBy": {
+                  "description": "An array of field IDs and sort directions. If this attribute is not set or set to false, queries will be unsorted to improve performance.",
+                  "x-amf-union": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                          "fieldId": {
+                            "description": "The unique identifier of a field in a table.",
+                            "type": "integer"
+                          },
+                          "order": {
+                            "description": "Sort based on ascending order (ASC), descending order (DESC) or equal values (equal-values)",
+                            "enum": [
+                              "ASC",
+                              "DESC",
+                              "equal-values"
+                            ],
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "select": {
+                  "description": "An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned.",
+                  "type": "array"
+                },
+                "from": {
+                  "description": "The table identifier.",
+                  "example": "bck7gp3q2",
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "value": {
+                  "data": [
+                    {
+                      "6": {
+                        "value": "Andre Harris"
+                      },
+                      "7": {
+                        "value": 10
+                      },
+                      "8": {
+                        "value": "2019-12-18T08:00:00Z"
+                      }
+                    }
+                  ],
+                  "fields": [
+                    {
+                      "id": 6,
+                      "label": "Full Name",
+                      "type": "text"
+                    },
+                    {
+                      "id": 7,
+                      "label": "Amount",
+                      "type": "numeric"
+                    },
+                    {
+                      "id": 8,
+                      "label": "Date time",
+                      "type": "date time"
+                    }
+                  ],
+                  "metadata": {
+                    "totalRecords": 10,
+                    "numRecords": 1,
+                    "numFields": 3,
+                    "skip": 0
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "fields": {
+                  "description": "An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "description": "Field id.",
+                        "type": "integer"
+                      },
+                      "label": {
+                        "description": "Field label.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "Field type.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
+                  "type": "array"
+                },
+                "metadata": {
+                  "description": "Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed.",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "numFields",
+                    "totalRecords",
+                    "numRecords"
+                  ],
+                  "properties": {
+                    "skip": {
+                      "description": "The number of records to skip",
+                      "type": "integer"
+                    },
+                    "numFields": {
+                      "description": "The number of fields in each record in the current response object",
+                      "type": "integer"
+                    },
+                    "top": {
+                      "description": "If present, the maximum number of records requested by the caller",
+                      "type": "integer"
+                    },
+                    "totalRecords": {
+                      "description": "The total number of records in the result set",
+                      "type": "integer"
+                    },
+                    "numRecords": {
+                      "description": "The number of records in the current response object",
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Records"
+        ]
+      }
+    }
+  },
+  "definitions": {}
+}

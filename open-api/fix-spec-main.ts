@@ -3,8 +3,6 @@ import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import * as glob from "glob";
-import { paths } from "./paths/index.ts";
-import { definitions } from "./definitions/index.ts";
 
 interface Parameter {
   name: string;
@@ -26,9 +24,17 @@ interface Operation {
 interface Spec {
   paths: Record<string, Record<string, Operation>>;
   definitions?: Record<string, any>;
+  swagger: string;
+  info: any;
   operations?: any;
   groups?: any;
   components?: any;
+}
+
+interface FixSpecConfig {
+  applyOverrides?: boolean;
+  overridePaths?: string[];
+  overrideDefinitions?: string[];
 }
 
 function toCamelCase(str: string): string {
@@ -43,28 +49,23 @@ function fixArraySchemas(spec: Spec) {
       const operation = spec.paths[pathKey][method];
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
-          if (param.schema) {
-            if (param.schema.type === "array" && !param.schema.items) {
-              console.log(
-                `Fixing missing items in ${pathKey}(${method}).${param.name}`
-              );
-              param.schema.items =
-                pathKey === "/records" && param.name === "generated"
-                  ? { $ref: "#/definitions/Record" }
-                  : { type: "string" };
-            }
-            if (param.schema.properties) {
-              for (const propKey in param.schema.properties) {
-                const prop = param.schema.properties[propKey];
-                if (prop.type === "array" && !prop.items) {
-                  console.log(
-                    `Fixing nested array in ${pathKey}(${method}).${param.name}.${propKey}`
-                  );
-                  prop.items =
-                    propKey === "data" && pathKey === "/records"
-                      ? { $ref: "#/definitions/Record" }
-                      : { type: "string" };
-                }
+          if (param.schema?.type === "array" && !param.schema.items) {
+            console.log(
+              `Fixing array schema for ${pathKey}(${method}).${param.name}`
+            );
+            param.schema.items = { $ref: "#/definitions/FieldMap" };
+          }
+          if (param.schema?.properties) {
+            for (const propKey in param.schema.properties) {
+              const prop = param.schema.properties[propKey];
+              if (prop.type === "array" && !prop.items) {
+                console.log(
+                  `Fixing nested array for ${pathKey}(${method}).${param.name}.${propKey}`
+                );
+                prop.items =
+                  propKey === "data"
+                    ? { $ref: "#/definitions/FieldMap" }
+                    : { type: "string" };
               }
             }
           }
@@ -73,28 +74,23 @@ function fixArraySchemas(spec: Spec) {
       if (operation.responses) {
         for (const status in operation.responses) {
           const response = operation.responses[status];
-          if (response.schema) {
-            if (response.schema.type === "array" && !response.schema.items) {
-              console.log(
-                `Fixing missing items in ${pathKey}(${method}).responses.${status}`
-              );
-              response.schema.items =
-                pathKey === "/records"
-                  ? { $ref: "#/definitions/Upsert200Response" }
-                  : { type: "string" };
-            }
-            if (response.schema.properties) {
-              for (const propKey in response.schema.properties) {
-                const prop = response.schema.properties[propKey];
-                if (prop.type === "array" && !prop.items) {
-                  console.log(
-                    `Fixing nested array in ${pathKey}(${method}).responses.${status}.${propKey}`
-                  );
-                  prop.items =
-                    propKey === "data" && pathKey === "/records"
-                      ? { $ref: "#/definitions/Upsert200Response" }
-                      : { type: "string" };
-                }
+          if (response.schema?.type === "array" && !response.schema.items) {
+            console.log(
+              `Fixing array schema for ${pathKey}(${method}).responses.${status}`
+            );
+            response.schema.items = { $ref: "#/definitions/FieldMap" };
+          }
+          if (response.schema?.properties) {
+            for (const propKey in response.schema.properties) {
+              const prop = response.schema.properties[propKey];
+              if (prop.type === "array" && !prop.items) {
+                console.log(
+                  `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`
+                );
+                prop.items =
+                  propKey === "data"
+                    ? { $ref: "#/definitions/FieldMap" }
+                    : { type: "string" };
               }
             }
           }
@@ -104,7 +100,85 @@ function fixArraySchemas(spec: Spec) {
   }
 }
 
-async function fixQuickBaseSpec(): Promise<void> {
+function enhanceRawSpec(spec: Spec) {
+  spec.definitions = spec.definitions || {};
+
+  // Define FieldValue and FieldMap
+  spec.definitions["FieldValue"] = {
+    type: "object",
+    description: "A value for a QuickBase field.",
+    properties: {
+      value: {
+        anyOf: [
+          { type: "string" },
+          { type: "number" },
+          { type: "boolean" },
+          { type: "object" },
+          { type: "array", items: { type: "string" } },
+        ],
+      },
+    },
+    required: ["value"],
+  };
+
+  spec.definitions["FieldMap"] = {
+    type: "object",
+    description: "A mapping of field IDs to their values.",
+    additionalProperties: { $ref: "#/definitions/FieldValue" },
+  };
+
+  // Enhance operations with named definitions
+  for (const pathKey in spec.paths) {
+    for (const method in spec.paths[pathKey]) {
+      const operation = spec.paths[pathKey][method];
+      const opId =
+        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+
+      // Request schema
+      if (operation.parameters) {
+        operation.parameters.forEach((param: Parameter) => {
+          if (
+            param.in === "body" &&
+            param.schema &&
+            param.schema.type === "object"
+          ) {
+            const requestName = `${opId}Request`;
+            spec.definitions[requestName] = param.schema;
+            param.schema = { $ref: `#/definitions/${requestName}` };
+            console.log(
+              `Added ${requestName} to definitions for ${pathKey}(${method})`
+            );
+          }
+        });
+      }
+
+      // Response schemas
+      if (operation.responses) {
+        for (const status in operation.responses) {
+          const response = operation.responses[status];
+          if (response.schema && response.schema.type === "object") {
+            const responseName = `${opId}${status}Response`;
+            spec.definitions[responseName] = response.schema;
+            response.schema = { $ref: `#/definitions/${responseName}` };
+            console.log(
+              `Added ${responseName} to definitions for ${pathKey}(${method})`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  console.log("Fixing array schemas...");
+  fixArraySchemas(spec);
+
+  console.log("Removing unexpected top-level attributes...");
+  delete spec.operations;
+  delete spec.groups;
+  delete spec.components;
+}
+
+async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
     const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
@@ -114,10 +188,9 @@ async function fixQuickBaseSpec(): Promise<void> {
       path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
     );
     if (specFiles.length === 0) {
-      console.error(
+      throw new Error(
         "No QuickBase_RESTful_*.json files found in specs/ folder."
       );
-      process.exit(1);
     }
     const inputFile = specFiles.sort().pop() as string;
     const outputFile = path.join(OUTPUT_DIR, "quickbase-fixed.json");
@@ -149,19 +222,8 @@ async function fixQuickBaseSpec(): Promise<void> {
       }
     }
 
-    console.log("Applying endpoint fixes...");
-    spec.paths = { ...spec.paths, ...paths }; // Merge original and custom paths
-
-    console.log("Fixing array schemas...");
-    fixArraySchemas(spec);
-
-    console.log("Applying definitions...");
-    spec.definitions = { ...spec.definitions, ...definitions }; // Merge definitions
-
-    console.log("Removing unexpected top-level attributes...");
-    delete spec.operations;
-    delete spec.groups;
-    delete spec.components;
+    console.log("Enhancing raw spec...");
+    enhanceRawSpec(spec);
 
     console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
     await fs.mkdir(OUTPUT_DIR, { recursive: true });
@@ -173,4 +235,23 @@ async function fixQuickBaseSpec(): Promise<void> {
   }
 }
 
-fixQuickBaseSpec();
+async function main() {
+  try {
+    const args = process.argv.slice(2);
+    let config: FixSpecConfig = {};
+
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === "--config" && i + 1 < args.length) {
+        config = JSON.parse(args[i + 1]);
+        i++;
+      }
+    }
+
+    await fixQuickBaseSpec(config);
+  } catch (error) {
+    console.error("Fatal error in script execution:", error);
+    process.exit(1);
+  }
+}
+
+main();

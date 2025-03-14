@@ -1,0 +1,1315 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Quick Base API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/apps": {
+      "post": {
+        "description": "Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.",
+        "summary": "Create an app",
+        "operationId": "createApp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "description": "The example below shows all the properties that can be set with this request. Additional properties that you can see, with the corresponding GET request, cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
+              "example": {
+                "value": {
+                  "name": "My App",
+                  "description": "My first app",
+                  "assignToken": true,
+                  "securityProperties": {
+                    "allowClone": false,
+                    "allowExport": false,
+                    "enableAppTokens": false,
+                    "hideFromPublic": false,
+                    "mustBeRealmApproved": true,
+                    "useIPFilter": true
+                  },
+                  "variables": [
+                    {
+                      "name": "Variable1",
+                      "value": "Value1"
+                    }
+                  ]
+                }
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "assignToken": {
+                  "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
+                  "example": false,
+                  "type": "boolean"
+                },
+                "variables": {
+                  "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "The name for the variable.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "The value for the variable.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "name": {
+                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+                  "type": "string"
+                },
+                "securityProperties": {
+                  "description": "Application security properties.",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "hideFromPublic": {
+                      "description": "Hide from public application searches",
+                      "type": "boolean"
+                    },
+                    "mustBeRealmApproved": {
+                      "description": "Only \"approved\" users may access this application",
+                      "type": "boolean"
+                    },
+                    "allowClone": {
+                      "description": "Allow users who are not administrators to copy",
+                      "type": "boolean"
+                    },
+                    "useIPFilter": {
+                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
+                      "type": "boolean"
+                    },
+                    "allowExport": {
+                      "description": "Allow users who are not administrators to export data",
+                      "type": "boolean"
+                    },
+                    "enableAppTokens": {
+                      "description": "Require Application Tokens",
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "description": {
+                  "description": "The description for the app. If this property is left out, the app description will be blank.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "x-amf-examples": {
+                "Simple Application": {
+                  "created": "2020-03-27T18:34:12Z",
+                  "dateFormat": "MM-DD-YYYY",
+                  "description": "My testing app",
+                  "hasEveryoneOnTheInternet": true,
+                  "id": "bpqe82s1",
+                  "memoryInfo": {
+                    "estMemory": 1,
+                    "estMemoryInclDependentApps": 2
+                  },
+                  "name": "Testing App",
+                  "securityProperties": {
+                    "allowClone": false,
+                    "allowExport": false,
+                    "enableAppTokens": false,
+                    "hideFromPublic": false,
+                    "mustBeRealmApproved": true,
+                    "useIPFilter": true
+                  },
+                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                  "updated": "2020-04-03T19:12:20Z",
+                  "dataClassification": "Confidential"
+                },
+                "Application with defined variables": {
+                  "description": "This examples shows the response of an application that contains one or more variables.",
+                  "value": {
+                    "created": "2020-03-27T18:34:12Z",
+                    "dateFormat": "MM-DD-YYYY",
+                    "description": "My testing app",
+                    "hasEveryoneOnTheInternet": true,
+                    "id": "bpqe82s1",
+                    "memoryInfo": {
+                      "estMemory": 1,
+                      "estMemoryInclDependentApps": 2
+                    },
+                    "name": "Testing App",
+                    "securityProperties": {
+                      "allowClone": false,
+                      "allowExport": false,
+                      "enableAppTokens": false,
+                      "hideFromPublic": false,
+                      "mustBeRealmApproved": true,
+                      "useIPFilter": true
+                    },
+                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                    "variables": [
+                      {
+                        "name": "Project End Date",
+                        "value": "7-16-2025"
+                      },
+                      {
+                        "name": "Project Manager Email",
+                        "value": "p.diaz@company.com"
+                      }
+                    ],
+                    "updated": "2020-04-03T19:12:20Z"
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the app. If this property is left out, the app description will be blank.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "dateFormat": {
+                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
+                  "type": "string"
+                },
+                "timeZone": {
+                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
+                  "type": "string"
+                },
+                "memoryInfo": {
+                  "type": "object",
+                  "description": "Application memory info",
+                  "additionalProperties": false,
+                  "properties": {
+                    "estMemory": {
+                      "type": "number",
+                      "description": "The estimated memory of this application in gigabytes"
+                    },
+                    "estMemoryInclDependentApps": {
+                      "type": "number",
+                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
+                    }
+                  }
+                },
+                "id": {
+                  "description": "The unique identifier for this application.",
+                  "type": "string"
+                },
+                "hasEveryoneOnTheInternet": {
+                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
+                  "type": "boolean"
+                },
+                "variables": {
+                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "description": "Variable name.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Variable value.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "dataClassification": {
+                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
+                  "type": "string"
+                },
+                "securityProperties": {
+                  "description": "Security properties of the application",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "allowClone": {
+                      "description": "Allow users who are not administrators to copy",
+                      "type": "boolean"
+                    },
+                    "allowExport": {
+                      "description": "Allow users who are not administrators to export data",
+                      "type": "boolean"
+                    },
+                    "hideFromPublic": {
+                      "description": "Hide from public application searches",
+                      "type": "boolean"
+                    },
+                    "enableAppTokens": {
+                      "description": "Require Application Tokens",
+                      "type": "boolean"
+                    },
+                    "useIPFilter": {
+                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
+                      "type": "boolean"
+                    },
+                    "mustBeRealmApproved": {
+                      "description": "Only \"approved\" users may access this application",
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      }
+    },
+    "/apps/{appId}": {
+      "get": {
+        "description": "Returns the main properties of an application, including application variables.",
+        "summary": "Get an app",
+        "operationId": "getApp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "x-amf-examples": {
+                "Simple Application": {
+                  "ancestorId": "bqhskthaq",
+                  "created": "2020-03-27T18:34:12Z",
+                  "dateFormat": "MM-DD-YYYY",
+                  "description": "My testing app",
+                  "hasEveryoneOnTheInternet": true,
+                  "memoryInfo": {
+                    "estMemory": 1,
+                    "estMemoryInclDependentApps": 2
+                  },
+                  "id": "bpqe82s1",
+                  "name": "Testing App",
+                  "securityProperties": {
+                    "allowClone": false,
+                    "allowExport": false,
+                    "enableAppTokens": false,
+                    "hideFromPublic": false,
+                    "mustBeRealmApproved": true,
+                    "useIPFilter": true
+                  },
+                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                  "updated": "2020-04-03T19:12:20Z",
+                  "dataClassification": "Confidential"
+                },
+                "Application with defined variables": {
+                  "description": "This examples shows the response of an application that contains one or more variables.",
+                  "value": {
+                    "ancestorId": "bqhskthaq",
+                    "created": "2020-03-27T18:34:12Z",
+                    "dateFormat": "MM-DD-YYYY",
+                    "description": "My testing app",
+                    "hasEveryoneOnTheInternet": true,
+                    "id": "bpqe82s1",
+                    "memoryInfo": {
+                      "estMemory": 1,
+                      "estMemoryInclDependentApps": 2
+                    },
+                    "name": "Testing App",
+                    "securityProperties": {
+                      "allowClone": false,
+                      "allowExport": false,
+                      "enableAppTokens": false,
+                      "hideFromPublic": false,
+                      "mustBeRealmApproved": true,
+                      "useIPFilter": true
+                    },
+                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                    "variables": [
+                      {
+                        "name": "Project End Date",
+                        "value": "7-16-2025"
+                      },
+                      {
+                        "name": "Project Manager Email",
+                        "value": "p.diaz@company.com"
+                      }
+                    ],
+                    "updated": "2020-04-03T19:12:20Z"
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "ancestorId": {
+                  "description": "The id of the app from which this app was copied",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the app. If this property is left out, the app description will be blank.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "dateFormat": {
+                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
+                  "type": "string"
+                },
+                "timeZone": {
+                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
+                  "type": "string"
+                },
+                "memoryInfo": {
+                  "type": "object",
+                  "description": "Application memory info",
+                  "additionalProperties": false,
+                  "properties": {
+                    "estMemory": {
+                      "type": "number",
+                      "description": "The estimated memory of this application in gigabytes"
+                    },
+                    "estMemoryInclDependentApps": {
+                      "type": "number",
+                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
+                    }
+                  }
+                },
+                "id": {
+                  "description": "The unique identifier for this application.",
+                  "type": "string"
+                },
+                "hasEveryoneOnTheInternet": {
+                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
+                  "type": "boolean"
+                },
+                "variables": {
+                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "description": "Variable name.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Variable value.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "dataClassification": {
+                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
+                  "type": "string"
+                },
+                "securityProperties": {
+                  "description": "Security properties of the application",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "allowClone": {
+                      "description": "Allow users who are not administrators to copy",
+                      "type": "boolean"
+                    },
+                    "allowExport": {
+                      "description": "Allow users who are not administrators to export data",
+                      "type": "boolean"
+                    },
+                    "hideFromPublic": {
+                      "description": "Hide from public application searches",
+                      "type": "boolean"
+                    },
+                    "enableAppTokens": {
+                      "description": "Require Application Tokens",
+                      "type": "boolean"
+                    },
+                    "useIPFilter": {
+                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
+                      "type": "boolean"
+                    },
+                    "mustBeRealmApproved": {
+                      "description": "Only \"approved\" users may access this application",
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      },
+      "post": {
+        "description": "Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.",
+        "summary": "Update an app",
+        "operationId": "updateApp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
+              "example": {
+                "value": {
+                  "name": "My App",
+                  "description": "My first app",
+                  "variables": [
+                    {
+                      "name": "Variable1",
+                      "value": "Value1"
+                    }
+                  ]
+                }
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "variables": {
+                  "description": "The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "properties": {
+                      "name": {
+                        "description": "The name for the variable.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "The value for the variable.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "name": {
+                  "description": "The name for the app.",
+                  "type": "string"
+                },
+                "securityProperties": {
+                  "description": "Security properties of the application",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "hideFromPublic": {
+                      "description": "Hide from public application searches",
+                      "type": "boolean"
+                    },
+                    "mustBeRealmApproved": {
+                      "description": "Only \"approved\" users may access this application",
+                      "type": "boolean"
+                    },
+                    "allowClone": {
+                      "description": "Allow users who are not administrators to copy",
+                      "type": "boolean"
+                    },
+                    "useIPFilter": {
+                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
+                      "type": "boolean"
+                    },
+                    "allowExport": {
+                      "description": "Allow users who are not administrators to export data",
+                      "type": "boolean"
+                    },
+                    "enableAppTokens": {
+                      "description": "Require Application Tokens",
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "description": {
+                  "description": "The description for the app.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "x-amf-examples": {
+                "Simple Application": {
+                  "ancestorId": "bqhskthaq",
+                  "created": "2020-03-27T18:34:12Z",
+                  "dateFormat": "MM-DD-YYYY",
+                  "description": "My testing app",
+                  "hasEveryoneOnTheInternet": true,
+                  "memoryInfo": {
+                    "estMemory": 1,
+                    "estMemoryInclDependentApps": 2
+                  },
+                  "id": "bpqe82s1",
+                  "name": "Testing App",
+                  "securityProperties": {
+                    "allowClone": false,
+                    "allowExport": false,
+                    "enableAppTokens": false,
+                    "hideFromPublic": false,
+                    "mustBeRealmApproved": true,
+                    "useIPFilter": true
+                  },
+                  "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                  "updated": "2020-04-03T19:12:20Z",
+                  "dataClassification": "Confidential"
+                },
+                "Application with defined variables": {
+                  "description": "This examples shows the response of an application that contains one or more variables.",
+                  "value": {
+                    "ancestorId": "bqhskthaq",
+                    "created": "2020-03-27T18:34:12Z",
+                    "dateFormat": "MM-DD-YYYY",
+                    "description": "My testing app",
+                    "hasEveryoneOnTheInternet": true,
+                    "id": "bpqe82s1",
+                    "memoryInfo": {
+                      "estMemory": 1,
+                      "estMemoryInclDependentApps": 2
+                    },
+                    "name": "Testing App",
+                    "securityProperties": {
+                      "allowClone": false,
+                      "allowExport": false,
+                      "enableAppTokens": false,
+                      "hideFromPublic": false,
+                      "mustBeRealmApproved": true,
+                      "useIPFilter": true
+                    },
+                    "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                    "variables": [
+                      {
+                        "name": "Project End Date",
+                        "value": "7-16-2025"
+                      },
+                      {
+                        "name": "Project Manager Email",
+                        "value": "p.diaz@company.com"
+                      }
+                    ],
+                    "updated": "2020-04-03T19:12:20Z"
+                  }
+                }
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "ancestorId": {
+                  "description": "The id of the app from which this app was copied",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the app. If this property is left out, the app description will be blank.",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "dateFormat": {
+                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
+                  "type": "string"
+                },
+                "timeZone": {
+                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
+                  "type": "string"
+                },
+                "memoryInfo": {
+                  "description": "Application memory info",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "estMemory": {
+                      "type": "number",
+                      "description": "The estimated memory of this application in gigabytes"
+                    },
+                    "estMemoryInclDependentApps": {
+                      "type": "number",
+                      "description": "The estimated memory of this application and all dependent applications in gigabytes"
+                    }
+                  }
+                },
+                "id": {
+                  "description": "The unique identifier for this application.",
+                  "type": "string"
+                },
+                "hasEveryoneOnTheInternet": {
+                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
+                  "type": "boolean"
+                },
+                "variables": {
+                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "description": "Variable name.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Variable value.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "dataClassification": {
+                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
+                  "type": "string"
+                },
+                "securityProperties": {
+                  "description": "Security properties of the application",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "allowClone": {
+                      "description": "Allow users who are not administrators to copy",
+                      "type": "boolean"
+                    },
+                    "allowExport": {
+                      "description": "Allow users who are not administrators to export data",
+                      "type": "boolean"
+                    },
+                    "hideFromPublic": {
+                      "description": "Hide from public application searches",
+                      "type": "boolean"
+                    },
+                    "enableAppTokens": {
+                      "description": "Require Application Tokens",
+                      "type": "boolean"
+                    },
+                    "useIPFilter": {
+                      "description": "Only users logging in from \"approved\" IP addresses may access this application",
+                      "type": "boolean"
+                    },
+                    "mustBeRealmApproved": {
+                      "description": "Only \"approved\" users may access this application",
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      },
+      "delete": {
+        "description": "Deletes an entire application, including all of the tables and data.",
+        "summary": "Delete an app",
+        "operationId": "deleteApp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "example": {
+                "name": "Name of an application to delete"
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "To confirm application deletion we ask for application name.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "deletedAppId": "bqhskthaq"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "deletedAppId": {
+                  "description": "An ID of deleted application.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      }
+    },
+    "/apps/{appId}/events": {
+      "get": {
+        "description": "Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).",
+        "summary": "Get app events",
+        "operationId": "getAppEvents",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": [
+                {
+                  "type": "qb-action",
+                  "owner": {
+                    "email": "jsmith@quickbase.com",
+                    "id": "123456.ab1s",
+                    "name": "Juliet Smith",
+                    "userName": "jsmith"
+                  },
+                  "isActive": true,
+                  "tableId": "bqwriv8bw",
+                  "name": "Quick Base Action"
+                },
+                {
+                  "type": "webhook",
+                  "owner": {
+                    "email": "tanderson@quickbase.com",
+                    "id": "654321.ab1s",
+                    "name": "Thomas A. Anderson",
+                    "userName": "tanderson"
+                  },
+                  "isActive": false,
+                  "tableId": "bqwriv8bw",
+                  "name": "Webhook"
+                },
+                {
+                  "type": "email-notification",
+                  "owner": {
+                    "email": "jsmith@quickbase.com",
+                    "id": "123456.ab1s",
+                    "name": "Juliet Smith",
+                    "userName": "jsmith"
+                  },
+                  "isActive": false,
+                  "tableId": "bqwriv8bw",
+                  "name": "Notification"
+                },
+                {
+                  "type": "subscription",
+                  "owner": {
+                    "email": "tanderson@quickbase.com",
+                    "id": "654321.ab1s",
+                    "name": "Thomas A. Anderson",
+                    "userName": "tanderson"
+                  },
+                  "isActive": true,
+                  "tableId": "bqwriv8bw",
+                  "name": "Subscription"
+                },
+                {
+                  "type": "reminder",
+                  "owner": {
+                    "email": "jsmith@quickbase.com",
+                    "id": "123456.ab1s",
+                    "name": "Juliet Smith",
+                    "userName": "jsmith"
+                  },
+                  "isActive": true,
+                  "tableId": "bqwriv8bw",
+                  "name": "Reminder"
+                },
+                {
+                  "type": "automation",
+                  "owner": {
+                    "email": "tanderson@quickbase.com",
+                    "id": "654321.ab1s",
+                    "name": "Thomas A. Anderson",
+                    "userName": "tanderson"
+                  },
+                  "isActive": true,
+                  "tableId": "bqwriv8bw",
+                  "url": "https://realm.quickbase.com/ui/automation/qb/db/bqwria893/automations/70eecab9-634f-42d9-9037-9340a1a9e8ce"
+                }
+              ],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "isActive": {
+                    "description": "Indication of whether current event is active.",
+                    "type": "boolean"
+                  },
+                  "type": {
+                    "description": "Type of an event.",
+                    "enum": [
+                      "webhook",
+                      "qb-action",
+                      "email-notification",
+                      "subscription",
+                      "reminder",
+                      "automation"
+                    ],
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "The name of the event. This property is not returned for automations.",
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "The url to automation that can be accessed from the browser. Only returned for automations.",
+                    "type": "string"
+                  },
+                  "owner": {
+                    "description": "The user that owns the event.",
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "description": "User full name.",
+                        "type": "string"
+                      },
+                      "id": {
+                        "description": "User Id.",
+                        "type": "string"
+                      },
+                      "email": {
+                        "description": "User email.",
+                        "type": "string"
+                      },
+                      "userName": {
+                        "description": "User Name as updated in user properties. Optional, appears if not the same as user email.",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "tableId": {
+                    "description": "The unique identifier of the table to which event belongs to.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      }
+    },
+    "/apps/{appId}/copy": {
+      "post": {
+        "description": "Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.",
+        "summary": "Copy an app",
+        "operationId": "copyApp",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of an app",
+            "type": "string"
+          },
+          {
+            "name": "QB-Realm-Hostname",
+            "in": "header",
+            "required": true,
+            "description": "Your Quickbase domain, for example demo.quickbase.com",
+            "type": "string"
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": false,
+            "description": "Information is entered by the person or utility invoking the API. Choose between the default in your toolkit or custom create it. Being as descriptive as possible will help in identification and troubleshooting.",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "The Quickbase authentication scheme you are using to authenticate the request, as described on the [authorization page](../auth).",
+            "type": "string"
+          },
+          {
+            "name": "generated",
+            "in": "body",
+            "schema": {
+              "example": {
+                "name": "my copied app",
+                "description": "copied from my original app",
+                "properties": {
+                  "keepData": false,
+                  "excludeFiles": true,
+                  "usersAndRoles": false,
+                  "assignUserToken": true
+                }
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The name of the newly copied app",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description of the newly copied app",
+                  "type": "string"
+                },
+                "properties": {
+                  "description": "The configuration properties for performing the app copy",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "assignUserToken": {
+                      "description": "Whether to add the user token used to make this request to the new app",
+                      "type": "boolean"
+                    },
+                    "excludeFiles": {
+                      "description": "If keepData is true, whether to copy the file attachments as well. If keepData is false, this property is ignored",
+                      "type": "boolean"
+                    },
+                    "keepData": {
+                      "description": "Whether to copy the app's data along with the schema",
+                      "type": "boolean"
+                    },
+                    "usersAndRoles": {
+                      "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned",
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "x-amf-mediaType": "application/json",
+            "schema": {
+              "example": {
+                "ancestorId": "bqhskthaq",
+                "created": "2020-03-27T18:34:12Z",
+                "dateFormat": "MM-DD-YYYY",
+                "description": "My testing app",
+                "hasEveryoneOnTheInternet": true,
+                "id": "bpqe82s1",
+                "name": "Testing App",
+                "timeZone": "(UTC-08:00) Pacific Time (US & Canada)",
+                "updated": "2020-04-03T19:12:20Z",
+                "dataClassification": "None"
+              },
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the app",
+                  "type": "string"
+                },
+                "created": {
+                  "description": "The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "updated": {
+                  "description": "The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).",
+                  "type": "string"
+                },
+                "dateFormat": {
+                  "description": "A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format.",
+                  "type": "string"
+                },
+                "timeZone": {
+                  "description": "A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The unique identifier for this application.",
+                  "type": "string"
+                },
+                "hasEveryoneOnTheInternet": {
+                  "description": "Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)",
+                  "type": "boolean"
+                },
+                "variables": {
+                  "description": "The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "description": "Variable name.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Variable value.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "ancestorId": {
+                  "description": "The id of the app from which this app was copied",
+                  "type": "string"
+                },
+                "dataClassification": {
+                  "description": "The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None\".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Apps"
+        ]
+      }
+    }
+  },
+  "definitions": {}
+}
