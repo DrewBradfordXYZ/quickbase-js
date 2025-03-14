@@ -2101,14 +2101,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution401/403Response"
+              "$ref": "#/definitions/exportSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution4xx/5xxResponse"
+              "$ref": "#/definitions/exportSolution4xx_5xxResponse"
             }
           }
         },
@@ -2170,14 +2170,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution401/403Response"
+              "$ref": "#/definitions/updateSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution4xx/5xxResponse"
+              "$ref": "#/definitions/updateSolution4xx_5xxResponse"
             }
           }
         },
@@ -2234,14 +2234,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution401/403Response"
+              "$ref": "#/definitions/createSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution4xx/5xxResponse"
+              "$ref": "#/definitions/createSolution4xx_5xxResponse"
             }
           }
         },
@@ -2321,14 +2321,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord401/403Response"
+              "$ref": "#/definitions/exportSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord4xx/5xxResponse"
+              "$ref": "#/definitions/exportSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2401,14 +2401,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord401/403Response"
+              "$ref": "#/definitions/createSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord4xx/5xxResponse"
+              "$ref": "#/definitions/createSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2488,14 +2488,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord401/403Response"
+              "$ref": "#/definitions/updateSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord4xx/5xxResponse"
+              "$ref": "#/definitions/updateSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2566,14 +2566,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution401/403Response"
+              "$ref": "#/definitions/changesetSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution4xx/5xxResponse"
+              "$ref": "#/definitions/changesetSolution4xx_5xxResponse"
             }
           }
         },
@@ -2653,14 +2653,14 @@
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord401/403Response"
+              "$ref": "#/definitions/changesetSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord4xx/5xxResponse"
+              "$ref": "#/definitions/changesetSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2802,6 +2802,13 @@
     "FieldMap": {
       "type": "object",
       "description": "A mapping of field IDs to their values.",
+      "additionalProperties": {
+        "$ref": "#/definitions/FieldValue"
+      }
+    },
+    "Record": {
+      "type": "object",
+      "description": "A generic QuickBase record.",
       "additionalProperties": {
         "$ref": "#/definitions/FieldValue"
       }
@@ -10960,13 +10967,13 @@
         "description": ""
       }
     },
-    "exportSolution401/403Response": {
+    "exportSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "exportSolution4xx/5xxResponse": {
+    "exportSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -10992,13 +10999,13 @@
         "description": ""
       }
     },
-    "updateSolution401/403Response": {
+    "updateSolution401_403Response": {
       "example": {
         "message": "Forbidden",
         "description": ""
       }
     },
-    "updateSolution4xx/5xxResponse": {
+    "updateSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11024,13 +11031,13 @@
         "description": ""
       }
     },
-    "createSolution401/403Response": {
+    "createSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "createSolution4xx/5xxResponse": {
+    "createSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11054,13 +11061,13 @@
         "description": ""
       }
     },
-    "exportSolutionToRecord401/403Response": {
+    "exportSolutionToRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "exportSolutionToRecord4xx/5xxResponse": {
+    "exportSolutionToRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11091,13 +11098,13 @@
         "description": ""
       }
     },
-    "createSolutionFromRecord401/403Response": {
+    "createSolutionFromRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "createSolutionFromRecord4xx/5xxResponse": {
+    "createSolutionFromRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11128,13 +11135,13 @@
         "description": ""
       }
     },
-    "updateSolutionToRecord401/403Response": {
+    "updateSolutionToRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "updateSolutionToRecord4xx/5xxResponse": {
+    "updateSolutionToRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11179,13 +11186,13 @@
         "description": ""
       }
     },
-    "changesetSolution401/403Response": {
+    "changesetSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "changesetSolution4xx/5xxResponse": {
+    "changesetSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
@@ -11237,13 +11244,13 @@
         "description": ""
       }
     },
-    "changesetSolutionFromRecord401/403Response": {
+    "changesetSolutionFromRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "changesetSolutionFromRecord4xx/5xxResponse": {
+    "changesetSolutionFromRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""

@@ -116,7 +116,6 @@ function fixArraySchemas(spec: Spec) {
   console.log("Fixing array schemas in definitions...");
   const definitions = spec.definitions || {};
 
-  // Iterate over all definitions to fix nested arrays
   for (const defKey in definitions) {
     const def = definitions[defKey];
     if (def.properties) {
@@ -125,14 +124,13 @@ function fixArraySchemas(spec: Spec) {
         if (prop.type === "array" && !prop.items) {
           console.log(`Fixing missing items in ${defKey}.${propKey}`);
           if (defKey === "runQueryRequest" && propKey === "select") {
-            prop.items = { type: "integer" }; // Field IDs are integers
+            prop.items = { type: "integer" }; // Field IDs
           } else if (propKey === "data") {
-            prop.items = { $ref: "#/definitions/Record" }; // Default for data arrays
+            prop.items = { $ref: "#/definitions/Record" }; // Data arrays
           } else {
             prop.items = { type: "string" }; // Fallback
           }
         }
-        // Handle union types (e.g., sortBy in runQueryRequest)
         if (prop["x-amf-union"]) {
           prop["x-amf-union"].forEach((unionType: any) => {
             if (unionType.type === "array" && !unionType.items) {
@@ -144,16 +142,7 @@ function fixArraySchemas(spec: Spec) {
       }
     }
   }
-
-  // Debug runQueryRequest state after fix
-  if (definitions.runQueryRequest) {
-    console.log(
-      "Debug: runQueryRequest after fix:",
-      JSON.stringify(definitions.runQueryRequest, null, 2)
-    );
-  }
 }
-
 function enhanceRawSpec(spec: Spec) {
   spec.definitions = spec.definitions || {};
 
@@ -181,14 +170,23 @@ function enhanceRawSpec(spec: Spec) {
     additionalProperties: { $ref: "#/definitions/FieldValue" },
   };
 
-  // Enhance operations with named definitions and fix parameter types
+  // Define Record if not present (basic structure for data arrays)
+  if (!spec.definitions["Record"]) {
+    spec.definitions["Record"] = {
+      type: "object",
+      description: "A generic QuickBase record.",
+      additionalProperties: { $ref: "#/definitions/FieldValue" },
+    };
+    console.log("Added Record to definitions");
+  }
+
+  // Enhance operations
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
       const opId =
         operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
 
-      // Fix parameter types and schemas
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
           if (
@@ -218,12 +216,12 @@ function enhanceRawSpec(spec: Spec) {
         });
       }
 
-      // Response schemas
       if (operation.responses) {
         for (const status in operation.responses) {
           const response = operation.responses[status];
           if (response.schema) {
-            const responseName = `${opId}${status}Response`;
+            const cleanStatus = status.replace("/", "_");
+            const responseName = `${opId}${cleanStatus}Response`;
             spec.definitions[responseName] = response.schema;
             response.schema = { $ref: `#/definitions/${responseName}` };
             console.log(
