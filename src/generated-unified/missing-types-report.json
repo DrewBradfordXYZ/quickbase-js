@@ -1,6 +1,3 @@
 {
-  "missingTypes": [
-    "DownloadFile200Response",
-    "ExportSolution200Response"
-  ]
+  "missingTypes": []
 }

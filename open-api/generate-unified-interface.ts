@@ -235,19 +235,20 @@ function generateInterface() {
     }
   }
 
+  // Always write the missing-types-report.json to reflect the current state
   if (missingTypes.size > 0) {
     console.log(
       "Missing types detected (defaulted to 'any'):",
       Array.from(missingTypes)
     );
-    writeFileSync(
-      join(OUTPUT_DIR, "missing-types-report.json"),
-      JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
-    );
-    console.log("Missing types report saved to missing-types-report.json");
   } else {
     console.log("No missing types detected.");
   }
+  writeFileSync(
+    join(OUTPUT_DIR, "missing-types-report.json"),
+    JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
+  );
+  console.log("Missing types report saved to missing-types-report.json");
 
   const importStatement =
     modelImports.size > 0
