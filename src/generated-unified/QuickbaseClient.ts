@@ -1,5 +1,5 @@
-// Generated on 2025-03-14T19:56:31.208Z
-import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, AuditRequest, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, ChangesetSolutionRequest, CloneUserToken200Response, CloneUserTokenRequest, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateSolutionRequest, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExchangeSsoTokenRequest, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummariesRequest, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunFormulaRequest, RunQuery200Response, RunQueryRequest, RunReport200Response, RunReportRequest, TransferUserToken200Response, TransferUserTokenRequest, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionRequest, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-15T20:32:41.783Z
+import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, AuditRequest, ChangesetSolutionRequest, CloneUserToken200Response, CloneUserTokenRequest, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolutionRequest, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, ExchangeSsoToken200Response, ExchangeSsoTokenRequest, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummariesRequest, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunFormulaRequest, RunQuery200Response, RunQueryRequest, RunReport200Response, RunReportRequest, TransferUserToken200Response, TransferUserTokenRequest, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolutionRequest, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   /**
@@ -217,7 +217,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the downloadFile operation
    * @returns A promise resolving to the downloadFile response
    */
-  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DownloadFile200Response>;
+  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<any>;
   /**
    * Delete file
    * @param params - Parameters for the deleteFile operation
@@ -307,49 +307,49 @@ export interface QuickbaseClient {
    * @param params - Parameters for the exportSolution operation
    * @returns A promise resolving to the exportSolution response
    */
-  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<ExportSolution200Response>;
+  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<any>;
   /**
    * Update a solution
    * @param params - Parameters for the updateSolution operation
    * @returns A promise resolving to the updateSolution response
    */
-  updateSolution: (params: { solutionId: string; body?: UpdateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
+  updateSolution: (params: { solutionId: string; body?: UpdateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * Create a solution
    * @param params - Parameters for the createSolution operation
    * @returns A promise resolving to the createSolution response
    */
-  createSolution: (params: { body?: CreateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
+  createSolution: (params: { body?: CreateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * Export solution to record
    * @param params - Parameters for the exportSolutionToRecord operation
    * @returns A promise resolving to the exportSolutionToRecord response
    */
-  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<ExportSolutionToRecord200Response>;
+  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<any>;
   /**
    * Create solution from record
    * @param params - Parameters for the createSolutionFromRecord operation
    * @returns A promise resolving to the createSolutionFromRecord response
    */
-  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolutionFromRecord200Response>;
+  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * Update solution from record
    * @param params - Parameters for the updateSolutionToRecord operation
    * @returns A promise resolving to the updateSolutionToRecord response
    */
-  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolutionToRecord200Response>;
+  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * List solution changes
    * @param params - Parameters for the changesetSolution operation
    * @returns A promise resolving to the changesetSolution response
    */
-  changesetSolution: (params: { solutionId: string; body?: ChangesetSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
+  changesetSolution: (params: { solutionId: string; body?: ChangesetSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * List solution changes from record
    * @param params - Parameters for the changesetSolutionFromRecord operation
    * @returns A promise resolving to the changesetSolutionFromRecord response
    */
-  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolutionFromRecord200Response>;
+  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
   /**
    * Generate a document
    * @param params - Parameters for the generateDocument operation

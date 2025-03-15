@@ -1,3 +1,4 @@
+// build-common.js
 import { execSync } from "child_process";
 import { rollup } from "rollup";
 import terser from "@rollup/plugin-terser";
@@ -33,7 +34,7 @@ export const globals = { "node-fetch": "fetch" };
 export const srcDir = join(process.cwd(), "src");
 export const tempSrcDir = join(process.cwd(), "dist/temp-src");
 export const excludeDirs = ["specs"];
-export const excludeFiles = [];
+export const excludeFiles = ["generated/index.ts"]; // Exclude generated/index.ts to avoid duplicate exports
 
 export function copyAndRewriteTsExtensions(src, dest) {
   console.log(`Copying from ${src} to ${dest}`);
@@ -51,7 +52,7 @@ export function copyAndRewriteTsExtensions(src, dest) {
       }
       copyAndRewriteTsExtensions(srcPath, destPath);
     } else if (file.name.endsWith(".ts")) {
-      if (excludeFiles.includes(file.name)) {
+      if (excludeFiles.some((excluded) => srcPath.includes(excluded))) {
         console.log(`Skipping excluded file ${srcPath}`);
         continue;
       }

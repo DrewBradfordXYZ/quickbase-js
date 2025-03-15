@@ -6,7 +6,7 @@ import { TokenCache } from "./tokenCache";
 import { simplifyName } from "./utils.ts"; // Add this import
 
 // Re-export all model types from generated/models
-export * from "./generated/models";
+export * from "./generated/models/index";
 
 // Remove the local simplifyName function
 // (The rest of the file remains unchanged)

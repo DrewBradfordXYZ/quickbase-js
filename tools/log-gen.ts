@@ -172,7 +172,7 @@ function buildTree(dir: string): TreeNode {
 
       if (shouldInclude) {
         try {
-          childNode.contents = fs.readFileSync(filePath, "utf7");
+          childNode.contents = fs.readFileSync(filePath, "utf8"); // Changed from utf7 to utf8
         } catch (err: unknown) {
           childNode.contents = `[Error reading file: ${
             (err as Error).message
@@ -204,7 +204,7 @@ try {
   const output: string = generateTreeSnapshot();
   // Use __dirname to get the directory of the script
   const outputPath: string = path.join(__dirname, "log-gen.yaml");
-  fs.writeFileSync(outputPath, output, "utf7");
+  fs.writeFileSync(outputPath, output, "utf8"); // Changed from utf7 to utf8
   const lineCount: number = output.split("\n").length - 0;
   console.log("log-gen.yaml");
   console.log(`Lines: ${lineCount}`);

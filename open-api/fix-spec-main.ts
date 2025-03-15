@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -50,7 +51,6 @@ function toCamelCase(str: string): string {
 }
 
 function fixArraySchemas(spec: Spec) {
-  // Fix arrays in paths
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
@@ -60,10 +60,7 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing array schema for ${pathKey}(${method}).${param.name}`
             );
-            param.schema.items =
-              pathKey === "/records" && param.name === "generated"
-                ? { $ref: "#/definitions/Record" }
-                : { type: "string" };
+            param.schema.items = { type: "string" };
           }
           if (param.schema?.properties) {
             for (const propKey in param.schema.properties) {
@@ -72,10 +69,7 @@ function fixArraySchemas(spec: Spec) {
                 console.log(
                   `Fixing nested array for ${pathKey}(${method}).${param.name}.${propKey}`
                 );
-                prop.items =
-                  propKey === "data" && pathKey === "/records"
-                    ? { $ref: "#/definitions/Record" }
-                    : { type: "string" };
+                prop.items = { type: "string" };
               }
             }
           }
@@ -88,10 +82,7 @@ function fixArraySchemas(spec: Spec) {
             console.log(
               `Fixing array schema for ${pathKey}(${method}).responses.${status}`
             );
-            response.schema.items =
-              pathKey === "/records"
-                ? { $ref: "#/definitions/Upsert200Response" }
-                : { type: "string" };
+            response.schema.items = { type: "string" };
           }
           if (response.schema?.properties) {
             for (const propKey in response.schema.properties) {
@@ -100,10 +91,7 @@ function fixArraySchemas(spec: Spec) {
                 console.log(
                   `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`
                 );
-                prop.items =
-                  propKey === "data" && pathKey === "/records"
-                    ? { $ref: "#/definitions/Upsert200Response" }
-                    : { type: "string" };
+                prop.items = { type: "string" };
               }
             }
           }
@@ -112,7 +100,6 @@ function fixArraySchemas(spec: Spec) {
     }
   }
 
-  // Fix arrays in definitions
   console.log("Fixing array schemas in definitions...");
   const definitions = spec.definitions || {};
 
@@ -123,64 +110,37 @@ function fixArraySchemas(spec: Spec) {
         const prop = def.properties[propKey];
         if (prop.type === "array" && !prop.items) {
           console.log(`Fixing missing items in ${defKey}.${propKey}`);
-          if (defKey === "runQueryRequest" && propKey === "select") {
-            prop.items = { type: "integer" }; // Field IDs
-          } else if (propKey === "data") {
-            prop.items = { $ref: "#/definitions/Record" }; // Data arrays
-          } else {
-            prop.items = { type: "string" }; // Fallback
-          }
-        }
-        if (prop["x-amf-union"]) {
-          prop["x-amf-union"].forEach((unionType: any) => {
-            if (unionType.type === "array" && !unionType.items) {
-              console.log(`Fixing union array in ${defKey}.${propKey}`);
-              unionType.items = { type: "object" }; // Default for sortBy-like structures
-            }
-          });
+          prop.items = { type: "string" };
         }
       }
     }
   }
 }
+
 function enhanceRawSpec(spec: Spec) {
   spec.definitions = spec.definitions || {};
 
-  // Define FieldValue and FieldMap
-  spec.definitions["FieldValue"] = {
-    type: "object",
-    description: "A value for a QuickBase field.",
-    properties: {
-      value: {
-        anyOf: [
-          { type: "string" },
-          { type: "number" },
-          { type: "boolean" },
-          { type: "object" },
-          { type: "array", items: { type: "string" } },
-        ],
-      },
-    },
-    required: ["value"],
-  };
-
-  spec.definitions["FieldMap"] = {
-    type: "object",
-    description: "A mapping of field IDs to their values.",
-    additionalProperties: { $ref: "#/definitions/FieldValue" },
-  };
-
-  // Define Record if not present (basic structure for data arrays)
+  // Define Record if not present
   if (!spec.definitions["Record"]) {
     spec.definitions["Record"] = {
       type: "object",
-      description: "A generic QuickBase record.",
-      additionalProperties: { $ref: "#/definitions/FieldValue" },
+      additionalProperties: {
+        type: "object",
+        properties: {
+          value: { type: "string" }, // Generic field value, can be refined later
+        },
+        required: ["value"],
+      },
+      description: "A generic QuickBase record with field ID-value pairs",
     };
     console.log("Added Record to definitions");
   }
 
-  // Enhance operations
+  // Normalize definition names to camelCase
+  const normalizeDefinitionName = (name: string) => {
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
@@ -189,7 +149,155 @@ function enhanceRawSpec(spec: Spec) {
 
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
-          if (
+          if (param.in === "body") {
+            if (!param.schema) {
+              param.schema = {};
+            }
+            let requestName =
+              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+            requestName = normalizeDefinitionName(requestName);
+
+            if (spec.definitions[requestName]?.type === "array") {
+              console.log(
+                `Wrapping array schema for ${requestName} in ${pathKey}(${method})`
+              );
+              const arraySchema = spec.definitions[requestName];
+              let wrapperPropName = operation.tags?.includes("Users")
+                ? "userIds"
+                : "items";
+              if (
+                operation.tags?.includes("Groups") &&
+                operation.summary?.toLowerCase().includes("subgroup")
+              ) {
+                wrapperPropName = "groupIds";
+              }
+              spec.definitions[requestName] = {
+                type: "object",
+                properties: {
+                  [wrapperPropName]: arraySchema,
+                },
+                required: arraySchema.minItems > 0 ? [wrapperPropName] : [],
+                description:
+                  arraySchema.description || `Request body for ${opId}`,
+              };
+            } else {
+              let properties = spec.definitions[requestName]?.properties || {};
+              if (
+                !spec.definitions[requestName] ||
+                !spec.definitions[requestName].type ||
+                Object.keys(properties).length === 0
+              ) {
+                console.log(
+                  `Defining schema for ${requestName} in ${pathKey}(${method})`
+                );
+                if (operation.tags?.includes("Users")) {
+                  properties = {
+                    userIds: { type: "array", items: { type: "string" } },
+                  };
+                } else if (
+                  operation.tags?.includes("Groups") &&
+                  operation.summary?.toLowerCase().includes("subgroup")
+                ) {
+                  properties = {
+                    groupIds: { type: "array", items: { type: "string" } },
+                  };
+                } else if (
+                  operation.tags?.includes("Records") &&
+                  method === "post"
+                ) {
+                  properties = {
+                    data: {
+                      type: "array",
+                      items: { $ref: "#/definitions/Record" },
+                    },
+                    to: { type: "string" },
+                    fieldsToReturn: {
+                      type: "array",
+                      items: { type: "integer" },
+                    },
+                  };
+                } else if (
+                  operation.tags?.includes("Records") &&
+                  method === "delete"
+                ) {
+                  properties = {
+                    from: { type: "string" },
+                    where: { type: "string" },
+                  };
+                } else if (
+                  operation.tags?.includes("Records") &&
+                  operation.summary?.toLowerCase().includes("query")
+                ) {
+                  properties = {
+                    from: { type: "string" },
+                    select: { type: "array", items: { type: "integer" } },
+                    where: { type: "string" },
+                  };
+                } else if (operation.tags?.includes("Formulas")) {
+                  properties = { formula: { type: "string" } };
+                } else if (
+                  operation.tags?.includes("Apps") ||
+                  operation.tags?.includes("Tables")
+                ) {
+                  properties = { name: { type: "string" } };
+                } else if (operation.tags?.includes("Fields")) {
+                  properties =
+                    method === "delete"
+                      ? {
+                          fieldIds: {
+                            type: "array",
+                            items: { type: "integer" },
+                          },
+                        }
+                      : {
+                          label: { type: "string" },
+                          fieldType: { type: "string" },
+                        };
+                } else if (operation.tags?.includes("Reports")) {
+                  properties = {
+                    filters: { type: "array", items: { type: "object" } },
+                  };
+                } else if (operation.tags?.includes("Auth")) {
+                  properties = { token: { type: "string" } };
+                } else if (operation.tags?.includes("UserToken")) {
+                  properties = operation.summary
+                    ?.toLowerCase()
+                    .includes("transfer")
+                    ? {
+                        userToken: { type: "string" },
+                        toUserId: { type: "string" },
+                      }
+                    : { userToken: { type: "string" } };
+                } else if (operation.tags?.includes("Audit")) {
+                  properties = {
+                    events: { type: "array", items: { type: "object" } },
+                  };
+                } else if (operation.tags?.includes("Analytics")) {
+                  properties = {
+                    where: { type: "array", items: { type: "object" } },
+                  };
+                } else if (operation.tags?.includes("Solutions")) {
+                  properties = { name: { type: "string" } };
+                } else {
+                  properties = {
+                    items: { type: "array", items: { type: "string" } },
+                  };
+                }
+                spec.definitions[requestName] = {
+                  type: "object",
+                  properties,
+                  required: Object.keys(properties).filter(
+                    (key) => key !== "fieldsToReturn"
+                  ),
+                  description: operation.summary || `Request body for ${opId}`,
+                };
+              }
+            }
+            param.schema = { $ref: `#/definitions/${requestName}` };
+            console.log(
+              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+            );
+          } else if (
             !param.type &&
             !param.schema &&
             (param.in === "path" || param.in === "query")
@@ -197,20 +305,6 @@ function enhanceRawSpec(spec: Spec) {
             param.type = param.name.includes("Id") ? "string" : "string";
             console.log(
               `Set default type 'string' for ${pathKey}(${method}).${param.name}`
-            );
-          }
-          if (param.in === "body" && param.schema) {
-            const requestName = `${opId}Request`;
-            if (!param.schema.type) {
-              param.schema.type = "string";
-              console.log(
-                `Set schema type to 'string' for ${pathKey}(${method}).${param.name}`
-              );
-            }
-            spec.definitions[requestName] = param.schema;
-            param.schema = { $ref: `#/definitions/${requestName}` };
-            console.log(
-              `Added ${requestName} to definitions for ${pathKey}(${method})`
             );
           }
         });
@@ -221,12 +315,16 @@ function enhanceRawSpec(spec: Spec) {
           const response = operation.responses[status];
           if (response.schema) {
             const cleanStatus = status.replace("/", "_");
-            const responseName = `${opId}${cleanStatus}Response`;
-            spec.definitions[responseName] = response.schema;
-            response.schema = { $ref: `#/definitions/${responseName}` };
-            console.log(
-              `Added ${responseName} to definitions for ${pathKey}(${method})`
+            const responseName = normalizeDefinitionName(
+              `${opId}${cleanStatus}Response`
             );
+            if (!spec.definitions[responseName]) {
+              console.log(
+                `Adding ${responseName} to definitions for ${pathKey}(${method})`
+              );
+              spec.definitions[responseName] = response.schema;
+            }
+            response.schema = { $ref: `#/definitions/${responseName}` };
           }
         }
       }
@@ -291,6 +389,9 @@ async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
       }
     }
 
+    if (!config.applyOverrides) {
+      console.log("Running with no overrides, using raw spec only...");
+    }
     console.log("Enhancing raw spec...");
     enhanceRawSpec(spec);
 

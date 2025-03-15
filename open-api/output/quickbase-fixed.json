@@ -27,7 +27,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/createAppRequest"
+              "$ref": "#/definitions/CreateAppRequest"
             }
           }
         ],
@@ -36,7 +36,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createApp200Response"
+              "$ref": "#/definitions/CreateApp200Response"
             }
           }
         },
@@ -70,7 +70,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getApp200Response"
+              "$ref": "#/definitions/GetApp200Response"
             }
           }
         },
@@ -101,7 +101,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/updateAppRequest"
+              "$ref": "#/definitions/UpdateAppRequest"
             }
           }
         ],
@@ -110,7 +110,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateApp200Response"
+              "$ref": "#/definitions/UpdateApp200Response"
             }
           }
         },
@@ -141,7 +141,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/deleteAppRequest"
+              "$ref": "#/definitions/DeleteAppRequest"
             }
           }
         ],
@@ -150,7 +150,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteApp200Response"
+              "$ref": "#/definitions/DeleteApp200Response"
             }
           }
         },
@@ -184,7 +184,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getAppEvents200Response"
+              "$ref": "#/definitions/GetAppEvents200Response"
             }
           }
         },
@@ -217,7 +217,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/copyAppRequest"
+              "$ref": "#/definitions/CopyAppRequest"
             }
           }
         ],
@@ -226,7 +226,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/copyApp200Response"
+              "$ref": "#/definitions/CopyApp200Response"
             }
           }
         },
@@ -259,7 +259,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/createTableRequest"
+              "$ref": "#/definitions/CreateTableRequest"
             }
           }
         ],
@@ -268,7 +268,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createTable200Response"
+              "$ref": "#/definitions/CreateTable200Response"
             }
           }
         },
@@ -300,7 +300,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getAppTables200Response"
+              "$ref": "#/definitions/GetAppTables200Response"
             }
           }
         },
@@ -341,7 +341,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getTable200Response"
+              "$ref": "#/definitions/GetTable200Response"
             }
           }
         },
@@ -379,7 +379,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/updateTableRequest"
+              "$ref": "#/definitions/UpdateTableRequest"
             }
           }
         ],
@@ -388,7 +388,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateTable200Response"
+              "$ref": "#/definitions/UpdateTable200Response"
             }
           }
         },
@@ -427,7 +427,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteTable200Response"
+              "$ref": "#/definitions/DeleteTable200Response"
             }
           }
         },
@@ -468,7 +468,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getRelationships200Response"
+              "$ref": "#/definitions/GetRelationships200Response"
             }
           }
         },
@@ -501,7 +501,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/createRelationshipRequest"
+              "$ref": "#/definitions/CreateRelationshipRequest"
             }
           }
         ],
@@ -510,7 +510,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createRelationship200Response"
+              "$ref": "#/definitions/CreateRelationship200Response"
             }
           }
         },
@@ -550,7 +550,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/updateRelationshipRequest"
+              "$ref": "#/definitions/UpdateRelationshipRequest"
             }
           }
         ],
@@ -559,7 +559,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateRelationship200Response"
+              "$ref": "#/definitions/UpdateRelationship200Response"
             }
           }
         },
@@ -598,7 +598,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteRelationship200Response"
+              "$ref": "#/definitions/DeleteRelationship200Response"
             }
           }
         },
@@ -632,7 +632,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getTableReports200Response"
+              "$ref": "#/definitions/GetTableReports200Response"
             }
           }
         },
@@ -673,7 +673,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getReport200Response"
+              "$ref": "#/definitions/GetReport200Response"
             }
           }
         },
@@ -727,7 +727,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/runReportRequest"
+              "$ref": "#/definitions/RunReportRequest"
             }
           }
         ],
@@ -736,7 +736,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/runReport200Response"
+              "$ref": "#/definitions/RunReport200Response"
             }
           }
         },
@@ -778,7 +778,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getFields200Response"
+              "$ref": "#/definitions/GetFields200Response"
             }
           }
         },
@@ -809,7 +809,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/createFieldRequest"
+              "$ref": "#/definitions/CreateFieldRequest"
             }
           }
         ],
@@ -818,7 +818,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createField200Response"
+              "$ref": "#/definitions/CreateField200Response"
             }
           }
         },
@@ -849,7 +849,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/deleteFieldsRequest"
+              "$ref": "#/definitions/DeleteFieldsRequest"
             }
           }
         ],
@@ -858,7 +858,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteFields200Response"
+              "$ref": "#/definitions/DeleteFields200Response"
             }
           }
         },
@@ -907,7 +907,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getField200Response"
+              "$ref": "#/definitions/GetField200Response"
             }
           }
         },
@@ -945,7 +945,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/updateFieldRequest"
+              "$ref": "#/definitions/UpdateFieldRequest"
             }
           }
         ],
@@ -954,7 +954,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateField200Response"
+              "$ref": "#/definitions/UpdateField200Response"
             }
           }
         },
@@ -1002,7 +1002,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getFieldsUsage200Response"
+              "$ref": "#/definitions/GetFieldsUsage200Response"
             }
           }
         },
@@ -1043,7 +1043,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getFieldUsage200Response"
+              "$ref": "#/definitions/GetFieldUsage200Response"
             }
           }
         },
@@ -1069,7 +1069,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/runFormulaRequest"
+              "$ref": "#/definitions/RunFormulaRequest"
             }
           }
         ],
@@ -1078,7 +1078,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/runFormula200Response"
+              "$ref": "#/definitions/RunFormula200Response"
             }
           }
         },
@@ -1104,7 +1104,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/upsertRequest"
+              "$ref": "#/definitions/UpsertRequest"
             }
           }
         ],
@@ -1113,21 +1113,21 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/upsert200Response"
+              "$ref": "#/definitions/Upsert200Response"
             }
           },
           "207": {
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/upsert207Response"
+              "$ref": "#/definitions/Upsert207Response"
             }
           },
           "400": {
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/upsert400Response"
+              "$ref": "#/definitions/Upsert400Response"
             }
           }
         },
@@ -1151,7 +1151,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/deleteRecordsRequest"
+              "$ref": "#/definitions/DeleteRecordsRequest"
             }
           }
         ],
@@ -1160,7 +1160,7 @@
             "description": "Successful delete records response.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteRecords200Response"
+              "$ref": "#/definitions/DeleteRecords200Response"
             }
           }
         },
@@ -1186,7 +1186,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/runQueryRequest"
+              "$ref": "#/definitions/RunQueryRequest"
             }
           }
         ],
@@ -1195,7 +1195,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/runQuery200Response"
+              "$ref": "#/definitions/RunQuery200Response"
             }
           }
         },
@@ -1236,7 +1236,7 @@
             "description": "This token is used in the authorization header value (similar to the QB-USER-TOKEN), except it uses the QB-TEMP-TOKEN prefix header['Authorization'] = 'QB-TEMP-TOKEN {token}'",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getTempTokenDBID200Response"
+              "$ref": "#/definitions/GetTempTokenDBID200Response"
             }
           }
         },
@@ -1262,7 +1262,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/exchangeSsoTokenRequest"
+              "$ref": "#/definitions/ExchangeSsoTokenRequest"
             }
           }
         ],
@@ -1271,7 +1271,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exchangeSsoToken200Response"
+              "$ref": "#/definitions/ExchangeSsoToken200Response"
             }
           }
         },
@@ -1297,7 +1297,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/cloneUserTokenRequest"
+              "$ref": "#/definitions/CloneUserTokenRequest"
             }
           }
         ],
@@ -1306,7 +1306,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/cloneUserToken200Response"
+              "$ref": "#/definitions/CloneUserToken200Response"
             }
           }
         },
@@ -1332,7 +1332,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/transferUserTokenRequest"
+              "$ref": "#/definitions/TransferUserTokenRequest"
             }
           }
         ],
@@ -1341,7 +1341,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/transferUserToken200Response"
+              "$ref": "#/definitions/TransferUserToken200Response"
             }
           }
         },
@@ -1367,7 +1367,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deactivateUserToken200Response"
+              "$ref": "#/definitions/DeactivateUserToken200Response"
             }
           }
         },
@@ -1393,7 +1393,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteUserToken200Response"
+              "$ref": "#/definitions/DeleteUserToken200Response"
             }
           }
         },
@@ -1448,7 +1448,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/octet-stream",
             "schema": {
-              "$ref": "#/definitions/downloadFile200Response"
+              "$ref": "#/definitions/DownloadFile200Response"
             }
           }
         },
@@ -1501,7 +1501,7 @@
             "description": "Successfully Deleted the File Attachment",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/deleteFile200Response"
+              "$ref": "#/definitions/DeleteFile200Response"
             }
           }
         },
@@ -1534,7 +1534,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/getUsersRequest"
+              "$ref": "#/definitions/GetUsersRequest"
             }
           }
         ],
@@ -1543,7 +1543,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/getUsers200Response"
+              "$ref": "#/definitions/GetUsers200Response"
             }
           }
         },
@@ -1576,7 +1576,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/denyUsersRequest"
+              "$ref": "#/definitions/DenyUsersRequest"
             }
           }
         ],
@@ -1585,7 +1585,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/denyUsers200Response"
+              "$ref": "#/definitions/DenyUsers200Response"
             }
           }
         },
@@ -1625,7 +1625,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/denyUsersAndGroupsRequest"
+              "$ref": "#/definitions/DenyUsersAndGroupsRequest"
             }
           }
         ],
@@ -1634,7 +1634,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/denyUsersAndGroups200Response"
+              "$ref": "#/definitions/DenyUsersAndGroups200Response"
             }
           }
         },
@@ -1667,7 +1667,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/undenyUsersRequest"
+              "$ref": "#/definitions/UndenyUsersRequest"
             }
           }
         ],
@@ -1676,7 +1676,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/undenyUsers200Response"
+              "$ref": "#/definitions/UndenyUsers200Response"
             }
           }
         },
@@ -1709,7 +1709,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/addMembersToGroupRequest"
+              "$ref": "#/definitions/AddMembersToGroupRequest"
             }
           }
         ],
@@ -1718,7 +1718,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/addMembersToGroup200Response"
+              "$ref": "#/definitions/AddMembersToGroup200Response"
             }
           }
         },
@@ -1749,7 +1749,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/removeMembersFromGroupRequest"
+              "$ref": "#/definitions/RemoveMembersFromGroupRequest"
             }
           }
         ],
@@ -1758,7 +1758,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/removeMembersFromGroup200Response"
+              "$ref": "#/definitions/RemoveMembersFromGroup200Response"
             }
           }
         },
@@ -1791,7 +1791,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/addManagersToGroupRequest"
+              "$ref": "#/definitions/AddManagersToGroupRequest"
             }
           }
         ],
@@ -1800,7 +1800,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/addManagersToGroup200Response"
+              "$ref": "#/definitions/AddManagersToGroup200Response"
             }
           }
         },
@@ -1831,7 +1831,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/removeManagersFromGroupRequest"
+              "$ref": "#/definitions/RemoveManagersFromGroupRequest"
             }
           }
         ],
@@ -1840,7 +1840,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/removeManagersFromGroup200Response"
+              "$ref": "#/definitions/RemoveManagersFromGroup200Response"
             }
           }
         },
@@ -1873,7 +1873,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/addSubgroupsToGroupRequest"
+              "$ref": "#/definitions/AddSubgroupsToGroupRequest"
             }
           }
         ],
@@ -1882,7 +1882,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/addSubgroupsToGroup200Response"
+              "$ref": "#/definitions/AddSubgroupsToGroup200Response"
             }
           }
         },
@@ -1913,7 +1913,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/removeSubgroupsFromGroupRequest"
+              "$ref": "#/definitions/RemoveSubgroupsFromGroupRequest"
             }
           }
         ],
@@ -1922,7 +1922,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/removeSubgroupsFromGroup200Response"
+              "$ref": "#/definitions/RemoveSubgroupsFromGroup200Response"
             }
           }
         },
@@ -1948,7 +1948,7 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/auditRequest"
+              "$ref": "#/definitions/AuditRequest"
             }
           }
         ],
@@ -1957,14 +1957,14 @@
             "description": "Query ran successfully and has returned the events for the given time period.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/audit200Response"
+              "$ref": "#/definitions/Audit200Response"
             }
           },
           "202": {
             "description": "Query still being processed. Pass the queryId back to the API to check for results.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/audit202Response"
+              "$ref": "#/definitions/Audit202Response"
             }
           }
         },
@@ -1999,7 +1999,7 @@
             "description": "Summaries returned succesfully",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/platformAnalyticReads200Response"
+              "$ref": "#/definitions/PlatformAnalyticReads200Response"
             }
           }
         },
@@ -2031,7 +2031,7 @@
             "x-amf-mediaType": "application/json",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/platformAnalyticEventSummariesRequest"
+              "$ref": "#/definitions/PlatformAnalyticEventSummariesRequest"
             }
           }
         ],
@@ -2039,7 +2039,7 @@
           "200": {
             "description": "Event summaries returned succesfully",
             "schema": {
-              "$ref": "#/definitions/platformAnalyticEventSummaries200Response"
+              "$ref": "#/definitions/PlatformAnalyticEventSummaries200Response"
             }
           }
         },
@@ -2080,35 +2080,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/x-yaml",
             "schema": {
-              "$ref": "#/definitions/exportSolution200Response"
+              "$ref": "#/definitions/ExportSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution400Response"
+              "$ref": "#/definitions/ExportSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution404Response"
+              "$ref": "#/definitions/ExportSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution401_403Response"
+              "$ref": "#/definitions/ExportSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolution4xx_5xxResponse"
+              "$ref": "#/definitions/ExportSolution4xx_5xxResponse"
             }
           }
         },
@@ -2140,7 +2140,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/updateSolutionRequest"
+              "$ref": "#/definitions/UpdateSolutionRequest"
             }
           },
           {
@@ -2156,28 +2156,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution200Response"
+              "$ref": "#/definitions/UpdateSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution400Response"
+              "$ref": "#/definitions/UpdateSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution401_403Response"
+              "$ref": "#/definitions/UpdateSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolution4xx_5xxResponse"
+              "$ref": "#/definitions/UpdateSolution4xx_5xxResponse"
             }
           }
         },
@@ -2204,7 +2204,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/createSolutionRequest"
+              "$ref": "#/definitions/CreateSolutionRequest"
             }
           },
           {
@@ -2220,28 +2220,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution200Response"
+              "$ref": "#/definitions/CreateSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution400Response"
+              "$ref": "#/definitions/CreateSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution401_403Response"
+              "$ref": "#/definitions/CreateSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolution4xx_5xxResponse"
+              "$ref": "#/definitions/CreateSolution4xx_5xxResponse"
             }
           }
         },
@@ -2300,35 +2300,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord200Response"
+              "$ref": "#/definitions/ExportSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord400Response"
+              "$ref": "#/definitions/ExportSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution or field does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord404Response"
+              "$ref": "#/definitions/ExportSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord401_403Response"
+              "$ref": "#/definitions/ExportSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/exportSolutionToRecord4xx_5xxResponse"
+              "$ref": "#/definitions/ExportSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2380,35 +2380,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord200Response"
+              "$ref": "#/definitions/CreateSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord400Response"
+              "$ref": "#/definitions/CreateSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord404Response"
+              "$ref": "#/definitions/CreateSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord401_403Response"
+              "$ref": "#/definitions/CreateSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/createSolutionFromRecord4xx_5xxResponse"
+              "$ref": "#/definitions/CreateSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2467,35 +2467,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord200Response"
+              "$ref": "#/definitions/UpdateSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord400Response"
+              "$ref": "#/definitions/UpdateSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord404Response"
+              "$ref": "#/definitions/UpdateSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord401_403Response"
+              "$ref": "#/definitions/UpdateSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/updateSolutionToRecord4xx_5xxResponse"
+              "$ref": "#/definitions/UpdateSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2529,7 +2529,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionRequest"
+              "$ref": "#/definitions/ChangesetSolutionRequest"
             }
           },
           {
@@ -2545,35 +2545,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution200Response"
+              "$ref": "#/definitions/ChangesetSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution400Response"
+              "$ref": "#/definitions/ChangesetSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution404Response"
+              "$ref": "#/definitions/ChangesetSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution401_403Response"
+              "$ref": "#/definitions/ChangesetSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolution4xx_5xxResponse"
+              "$ref": "#/definitions/ChangesetSolution4xx_5xxResponse"
             }
           }
         },
@@ -2632,35 +2632,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord200Response"
+              "$ref": "#/definitions/ChangesetSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord400Response"
+              "$ref": "#/definitions/ChangesetSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord404Response"
+              "$ref": "#/definitions/ChangesetSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord401_403Response"
+              "$ref": "#/definitions/ChangesetSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/changesetSolutionFromRecord4xx_5xxResponse"
+              "$ref": "#/definitions/ChangesetSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2760,7 +2760,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/generateDocument200Response"
+              "$ref": "#/definitions/GenerateDocument200Response"
             }
           }
         }
@@ -2768,149 +2768,34 @@
     }
   },
   "definitions": {
-    "FieldValue": {
-      "type": "object",
-      "description": "A value for a QuickBase field.",
-      "properties": {
-        "value": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "object"
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          ]
-        }
-      },
-      "required": [
-        "value"
-      ]
-    },
-    "FieldMap": {
-      "type": "object",
-      "description": "A mapping of field IDs to their values.",
-      "additionalProperties": {
-        "$ref": "#/definitions/FieldValue"
-      }
-    },
     "Record": {
       "type": "object",
-      "description": "A generic QuickBase record.",
       "additionalProperties": {
-        "$ref": "#/definitions/FieldValue"
-      }
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "description": "A generic QuickBase record with field ID-value pairs"
     },
-    "createAppRequest": {
-      "description": "The example below shows all the properties that can be set with this request. Additional properties that you can see, with the corresponding GET request, cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
-      "example": {
-        "value": {
-          "name": "My App",
-          "description": "My first app",
-          "assignToken": true,
-          "securityProperties": {
-            "allowClone": false,
-            "allowExport": false,
-            "enableAppTokens": false,
-            "hideFromPublic": false,
-            "mustBeRealmApproved": true,
-            "useIPFilter": true
-          },
-          "variables": [
-            {
-              "name": "Variable1",
-              "value": "Value1"
-            }
-          ]
+    "CreateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
         }
       },
-      "type": "object",
-      "additionalProperties": false,
       "required": [
         "name"
       ],
-      "properties": {
-        "assignToken": {
-          "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
-          "example": false,
-          "type": "boolean"
-        },
-        "variables": {
-          "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "value"
-            ],
-            "properties": {
-              "name": {
-                "description": "The name for the variable.",
-                "type": "string"
-              },
-              "value": {
-                "description": "The value for the variable.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "name": {
-          "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-          "type": "string"
-        },
-        "securityProperties": {
-          "description": "Application security properties.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "hideFromPublic": {
-              "description": "Hide from public application searches",
-              "type": "boolean"
-            },
-            "mustBeRealmApproved": {
-              "description": "Only \"approved\" users may access this application",
-              "type": "boolean"
-            },
-            "allowClone": {
-              "description": "Allow users who are not administrators to copy",
-              "type": "boolean"
-            },
-            "useIPFilter": {
-              "description": "Only users logging in from \"approved\" IP addresses may access this application",
-              "type": "boolean"
-            },
-            "allowExport": {
-              "description": "Allow users who are not administrators to export data",
-              "type": "boolean"
-            },
-            "enableAppTokens": {
-              "description": "Require Application Tokens",
-              "type": "boolean"
-            }
-          }
-        },
-        "description": {
-          "description": "The description for the app. If this property is left out, the app description will be blank.",
-          "type": "string"
-        }
-      }
+      "description": "Create an app"
     },
-    "createApp200Response": {
+    "CreateApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "created": "2020-03-27T18:34:12Z",
@@ -3079,7 +2964,7 @@
         }
       }
     },
-    "getApp200Response": {
+    "GetApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "ancestorId": "bqhskthaq",
@@ -3254,87 +3139,19 @@
         }
       }
     },
-    "updateAppRequest": {
-      "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API. See individual property descriptions below for details on how to set or change each.",
-      "example": {
-        "value": {
-          "name": "My App",
-          "description": "My first app",
-          "variables": [
-            {
-              "name": "Variable1",
-              "value": "Value1"
-            }
-          ]
+    "UpdateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
         }
       },
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "variables": {
-          "description": "The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "value"
-            ],
-            "properties": {
-              "name": {
-                "description": "The name for the variable.",
-                "type": "string"
-              },
-              "value": {
-                "description": "The value for the variable.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "name": {
-          "description": "The name for the app.",
-          "type": "string"
-        },
-        "securityProperties": {
-          "description": "Security properties of the application",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "hideFromPublic": {
-              "description": "Hide from public application searches",
-              "type": "boolean"
-            },
-            "mustBeRealmApproved": {
-              "description": "Only \"approved\" users may access this application",
-              "type": "boolean"
-            },
-            "allowClone": {
-              "description": "Allow users who are not administrators to copy",
-              "type": "boolean"
-            },
-            "useIPFilter": {
-              "description": "Only users logging in from \"approved\" IP addresses may access this application",
-              "type": "boolean"
-            },
-            "allowExport": {
-              "description": "Allow users who are not administrators to export data",
-              "type": "boolean"
-            },
-            "enableAppTokens": {
-              "description": "Require Application Tokens",
-              "type": "boolean"
-            }
-          }
-        },
-        "description": {
-          "description": "The description for the app.",
-          "type": "string"
-        }
-      }
+      "required": [
+        "name"
+      ],
+      "description": "Update an app"
     },
-    "updateApp200Response": {
+    "UpdateApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "ancestorId": "bqhskthaq",
@@ -3509,23 +3326,19 @@
         }
       }
     },
-    "deleteAppRequest": {
-      "example": {
-        "name": "Name of an application to delete"
-      },
+    "DeleteAppRequest": {
       "type": "object",
-      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
       "required": [
         "name"
       ],
-      "properties": {
-        "name": {
-          "description": "To confirm application deletion we ask for application name.",
-          "type": "string"
-        }
-      }
+      "description": "Delete an app"
     },
-    "deleteApp200Response": {
+    "DeleteApp200Response": {
       "example": {
         "deletedAppId": "bqhskthaq"
       },
@@ -3538,7 +3351,7 @@
         }
       }
     },
-    "getAppEvents200Response": {
+    "GetAppEvents200Response": {
       "example": [
         {
           "type": "qb-action",
@@ -3672,57 +3485,19 @@
         }
       }
     },
-    "copyAppRequest": {
-      "example": {
-        "name": "my copied app",
-        "description": "copied from my original app",
-        "properties": {
-          "keepData": false,
-          "excludeFiles": true,
-          "usersAndRoles": false,
-          "assignUserToken": true
+    "CopyAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
         }
       },
-      "type": "object",
-      "additionalProperties": false,
       "required": [
         "name"
       ],
-      "properties": {
-        "name": {
-          "description": "The name of the newly copied app",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description of the newly copied app",
-          "type": "string"
-        },
-        "properties": {
-          "description": "The configuration properties for performing the app copy",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "assignUserToken": {
-              "description": "Whether to add the user token used to make this request to the new app",
-              "type": "boolean"
-            },
-            "excludeFiles": {
-              "description": "If keepData is true, whether to copy the file attachments as well. If keepData is false, this property is ignored",
-              "type": "boolean"
-            },
-            "keepData": {
-              "description": "Whether to copy the app's data along with the schema",
-              "type": "boolean"
-            },
-            "usersAndRoles": {
-              "description": "If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned",
-              "type": "boolean"
-            }
-          }
-        }
-      }
+      "description": "Copy an app"
     },
-    "copyApp200Response": {
+    "CopyApp200Response": {
       "example": {
         "ancestorId": "bqhskthaq",
         "created": "2020-03-27T18:34:12Z",
@@ -3801,40 +3576,19 @@
         }
       }
     },
-    "createTableRequest": {
-      "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-      "example": {
-        "name": "My table",
-        "description": "my first table",
-        "singleRecordName": "record",
-        "pluralRecordName": "records"
-      },
+    "CreateTableRequest": {
       "type": "object",
-      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
       "required": [
         "name"
       ],
-      "properties": {
-        "name": {
-          "description": "The name for the table.",
-          "type": "string",
-          "minLength": 1
-        },
-        "pluralRecordName": {
-          "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
-          "type": "string"
-        },
-        "singleRecordName": {
-          "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description for the table. If this value is not passed the default value is blank.",
-          "type": "string"
-        }
-      }
+      "description": "Create a table"
     },
-    "createTable200Response": {
+    "CreateTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -3926,7 +3680,7 @@
         }
       }
     },
-    "getAppTables200Response": {
+    "GetAppTables200Response": {
       "example": [
         {
           "name": "Example Table #0",
@@ -4059,7 +3813,7 @@
         }
       }
     },
-    "getTable200Response": {
+    "GetTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -4151,36 +3905,19 @@
         }
       }
     },
-    "updateTableRequest": {
-      "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-      "example": {
-        "name": "My table",
-        "description": "my first table",
-        "singleRecordName": "record",
-        "pluralRecordName": "records"
-      },
+    "UpdateTableRequest": {
       "type": "object",
-      "additionalProperties": true,
       "properties": {
         "name": {
-          "description": "The name for the table.",
-          "type": "string"
-        },
-        "pluralRecordName": {
-          "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
-          "type": "string"
-        },
-        "singleRecordName": {
-          "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description for the table. If this value is not passed the default value is blank.",
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Update a table"
     },
-    "updateTable200Response": {
+    "UpdateTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -4272,7 +4009,7 @@
         }
       }
     },
-    "deleteTable200Response": {
+    "DeleteTable200Response": {
       "example": {
         "deletedTableId": "bck7gp3q2"
       },
@@ -4285,7 +4022,7 @@
         }
       }
     },
-    "getRelationships200Response": {
+    "GetRelationships200Response": {
       "example": {
         "metadata": {
           "numRelationships": 1,
@@ -4467,102 +4204,19 @@
         }
       }
     },
-    "createRelationshipRequest": {
-      "example": {
-        "parentTableId": "bck7gp3q2",
-        "foreignKeyField": {
-          "label": "my relationship field"
-        },
-        "lookupFieldIds": [
-          1,
-          2,
-          3
-        ],
-        "summaryFields": [
-          {
-            "summaryFid": 3,
-            "label": "my first summary field",
-            "accumulationType": "AVG",
-            "where": "{'3'.EX.1}"
-          },
-          {
-            "summaryFid": 4,
-            "label": "my second summary field",
-            "accumulationType": "SUM"
-          }
-        ]
-      },
+    "CreateRelationshipRequest": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "parentTableId"
-      ],
       "properties": {
-        "summaryFields": {
-          "description": "Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": true,
-            "required": [
-              "accumulationType"
-            ],
-            "properties": {
-              "summaryFid": {
-                "description": "The field id to summarize.",
-                "type": "number"
-              },
-              "label": {
-                "description": "The label for the summary field.",
-                "type": "string"
-              },
-              "accumulationType": {
-                "description": "The accumulation type for the summary field.",
-                "enum": [
-                  "AVG",
-                  "SUM",
-                  "MAX",
-                  "MIN",
-                  "STD-DEV",
-                  "COUNT",
-                  "COMBINED-TEXT",
-                  "COMBINED-USER",
-                  "DISTINCT-COUNT"
-                ],
-                "type": "string"
-              },
-              "where": {
-                "description": "The filter, using the Quickbase query language, which determines the records to return.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "lookupFieldIds": {
-          "description": "Array of field ids in the parent table that will become lookup fields in the child table.",
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        },
-        "parentTableId": {
-          "description": "The parent table id for the relationship.",
+        "name": {
           "type": "string"
-        },
-        "foreignKeyField": {
-          "description": "This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>’, where <record> is the name of a record in the parent table.",
-          "type": "object",
-          "additionalProperties": true,
-          "properties": {
-            "label": {
-              "description": "The label for the foreign key field.",
-              "type": "string"
-            }
-          }
         }
-      }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Create a relationship"
     },
-    "createRelationship200Response": {
+    "CreateRelationship200Response": {
       "example": {
         "id": 6,
         "foreignKeyField": {
@@ -4678,75 +4332,19 @@
         }
       }
     },
-    "updateRelationshipRequest": {
-      "example": {
-        "lookupFieldIds": [
-          4,
-          5,
-          6
-        ],
-        "summaryFields": [
-          {
-            "summaryFid": 3,
-            "label": "my summary field",
-            "accumulationType": "COUNT",
-            "where": "{'3'.EX.1}"
-          }
-        ]
-      },
+    "UpdateRelationshipRequest": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "summaryFields": {
-          "description": "An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": true,
-            "required": [
-              "accumulationType"
-            ],
-            "properties": {
-              "summaryFid": {
-                "description": "The field id to summarize.",
-                "type": "number"
-              },
-              "label": {
-                "description": "The label for the summary field.",
-                "type": "string"
-              },
-              "accumulationType": {
-                "description": "The accumulation type for the summary field.",
-                "enum": [
-                  "AVG",
-                  "SUM",
-                  "MAX",
-                  "MIN",
-                  "STD-DEV",
-                  "COUNT",
-                  "COMBINED-TEXT",
-                  "COMBINED-USER",
-                  "DISTINCT-COUNT"
-                ],
-                "type": "string"
-              },
-              "where": {
-                "description": "The filter, using the Quickbase query language, which determines the records to return.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "lookupFieldIds": {
-          "description": "An array of field ids on the parent table that will become lookup fields on the child table.",
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
+        "name": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Update a relationship"
     },
-    "updateRelationship200Response": {
+    "UpdateRelationship200Response": {
       "example": {
         "id": 6,
         "foreignKeyField": {
@@ -4862,7 +4460,7 @@
         }
       }
     },
-    "deleteRelationship200Response": {
+    "DeleteRelationship200Response": {
       "example": {
         "relationshipId": 6
       },
@@ -4878,7 +4476,7 @@
         }
       }
     },
-    "getTableReports200Response": {
+    "GetTableReports200Response": {
       "description": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)",
       "type": "array",
       "items": {
@@ -5035,7 +4633,7 @@
         }
       }
     },
-    "getReport200Response": {
+    "GetReport200Response": {
       "example": {
         "value": {
           "id": "5",
@@ -5188,10 +4786,22 @@
         }
       }
     },
-    "runReportRequest": {
-      "type": "string"
+    "RunReportRequest": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "filters"
+      ],
+      "description": "Run a report"
     },
-    "runReport200Response": {
+    "RunReport200Response": {
       "example": {
         "value": {
           "data": [
@@ -5267,7 +4877,7 @@
           "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Record"
+            "type": "string"
           }
         },
         "metadata": {
@@ -5304,7 +4914,7 @@
         }
       }
     },
-    "getFields200Response": {
+    "GetFields200Response": {
       "example": [
         {
           "id": 1,
@@ -5838,390 +5448,23 @@
         }
       }
     },
-    "createFieldRequest": {
-      "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-      "example": {
-        "label": "Field1",
-        "fieldType": "text",
-        "noWrap": false,
-        "bold": false,
-        "appearsByDefault": false,
-        "findEnabled": false,
-        "fieldHelp": "field help",
-        "addToForms": true,
-        "properties": {
-          "maxLength": 0,
-          "appendOnly": false,
-          "sortAsGiven": false
-        },
-        "permissions": [
-          {
-            "role": "Viewer",
-            "permissionType": "View",
-            "roleId": 10
-          },
-          {
-            "role": "Participant",
-            "permissionType": "None",
-            "roleId": 11
-          },
-          {
-            "role": "Administrator",
-            "permissionType": "Modify",
-            "roleId": 12
-          }
-        ]
-      },
+    "CreateFieldRequest": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "fieldType",
-        "label"
-      ],
       "properties": {
-        "audited": {
-          "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to \"true\" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html). Defaults to false.",
-          "type": "boolean"
-        },
-        "fieldHelp": {
-          "description": "The configured help text shown to users within the product.",
+        "label": {
           "type": "string"
-        },
-        "bold": {
-          "description": "Indicates if the field is configured to display in bold in the product. Defaults to false.",
-          "type": "boolean"
-        },
-        "properties": {
-          "description": "Specific field properties.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "allowMentions": {
-              "description": "If someone can @mention users in the rich text field to generate an email notification.",
-              "type": "boolean"
-            },
-            "comments": {
-              "description": "The comments entered on the field properties by an administrator.",
-              "type": "string"
-            },
-            "doesTotal": {
-              "description": "Whether this field totals in reports within the product.",
-              "type": "boolean"
-            },
-            "autoSave": {
-              "description": "Whether the link field will auto save.",
-              "type": "boolean"
-            },
-            "defaultValueLuid": {
-              "description": "Default user id value.",
-              "type": "integer"
-            },
-            "useI18NFormat": {
-              "description": "Whether phone numbers should be in E.164 standard international format",
-              "type": "boolean"
-            },
-            "maxVersions": {
-              "description": "The maximum number of versions configured for a file attachment.",
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1
-            },
-            "format": {
-              "description": "The format to display time.",
-              "type": "integer"
-            },
-            "carryChoices": {
-              "description": "Whether the field should carry its multiple choice fields when copied.",
-              "type": "boolean"
-            },
-            "maxLength": {
-              "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
-              "type": "integer"
-            },
-            "linkText": {
-              "description": "The configured text value that replaces the URL that users see within the product.",
-              "type": "string"
-            },
-            "parentFieldId": {
-              "description": "The id of the parent composite field, when applicable.",
-              "type": "integer"
-            },
-            "displayTimezone": {
-              "description": "Indicates whether to display the timezone within the product.",
-              "type": "boolean"
-            },
-            "allowNewChoices": {
-              "description": "Indicates if users can add new choices to a selection list.",
-              "type": "boolean"
-            },
-            "defaultToday": {
-              "description": "Indicates if the field value is defaulted today for new records.",
-              "type": "boolean"
-            },
-            "units": {
-              "description": "The units label.",
-              "type": "string"
-            },
-            "openTargetIn": {
-              "description": "Indicates which target the URL should open in when a user clicks it within the product.",
-              "enum": [
-                "sameWindow",
-                "newWindow",
-                "popup"
-              ],
-              "type": "string"
-            },
-            "sourceFieldId": {
-              "description": "The id of the source field.",
-              "type": "integer"
-            },
-            "doesAverage": {
-              "description": "Whether this field averages in reports within the product.",
-              "type": "boolean"
-            },
-            "formula": {
-              "description": "The formula of the field as configured in Quickbase.",
-              "type": "string"
-            },
-            "decimalPlaces": {
-              "description": "The number of decimal places displayed in the product for this field.",
-              "type": "integer"
-            },
-            "defaultCountryCode": {
-              "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
-              "type": "string"
-            },
-            "displayMonth": {
-              "description": "How to display months.",
-              "type": "string"
-            },
-            "seeVersions": {
-              "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
-              "type": "boolean"
-            },
-            "numLines": {
-              "description": "The number of lines shown in Quickbase for this text field.",
-              "type": "integer"
-            },
-            "defaultKind": {
-              "description": "The user default type.",
-              "type": "string"
-            },
-            "displayEmail": {
-              "description": "How the email is displayed.",
-              "type": "string"
-            },
-            "coverText": {
-              "description": "An alternate user friendly text that can be used to display a link in the browser.",
-              "type": "string"
-            },
-            "currencySymbol": {
-              "description": "The current symbol used when displaying field values within the product.",
-              "type": "string"
-            },
-            "targetFieldId": {
-              "description": "The id of the target field.",
-              "type": "integer"
-            },
-            "displayUser": {
-              "description": "The configured option for how users display within the product.",
-              "type": "string"
-            },
-            "blankIsZero": {
-              "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
-              "type": "boolean"
-            },
-            "exact": {
-              "description": "Whether an exact match is required for a report link.",
-              "type": "boolean"
-            },
-            "defaultDomain": {
-              "description": "Default email domain.",
-              "type": "string"
-            },
-            "defaultValue": {
-              "description": "The default value configured for a field when a new record is added.",
-              "type": "string"
-            },
-            "abbreviate": {
-              "description": "Don't show the URL protocol when showing the URL.",
-              "type": "boolean"
-            },
-            "numberFormat": {
-              "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
-              "type": "integer"
-            },
-            "targetTableName": {
-              "description": "The field's target table name.",
-              "type": "string"
-            },
-            "appearsAs": {
-              "description": "The link text, if empty, the url will be used as link text.",
-              "type": "string"
-            },
-            "width": {
-              "description": "The field's html input width in the product.",
-              "type": "integer"
-            },
-            "currencyFormat": {
-              "description": "The currency format used when displaying field values within the product.",
-              "enum": [
-                "left",
-                "right",
-                "middle"
-              ],
-              "type": "string"
-            },
-            "displayDayOfWeek": {
-              "description": "Indicates whether to display the day of the week within the product.",
-              "type": "boolean"
-            },
-            "commaStart": {
-              "description": "The number of digits before commas display in the product, when applicable.",
-              "type": "integer"
-            },
-            "choices": {
-              "description": "An array of entries that exist for a field that offers choices to the user. Note that these choices refer to the valid values of any records added in the future. You are allowed to remove values from the list of choices even if there are existing records with those values in this field. They will be displayed in red when users look at the data in the browser but there is no other effect. While updating a field with this property, the old choices are removed and replaced by the new choices.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "targetTableId": {
-              "description": "The id of the target table.",
-              "type": "string"
-            },
-            "displayRelative": {
-              "description": "Whether to display time as relative.",
-              "type": "boolean"
-            },
-            "compositeFields": {
-              "description": "An array of the fields that make up a composite field (e.g., address).",
-              "type": "array"
-            },
-            "displayCheckboxAsText": {
-              "description": "Indicates whether the checkbox values will be shown as text in reports.",
-              "type": "boolean"
-            },
-            "displayTime": {
-              "description": "Indicates whether to display the time, in addition to the date.",
-              "type": "boolean"
-            },
-            "versionMode": {
-              "description": "Version modes for files. Keep all versions vs keep last version.",
-              "enum": [
-                "keepallversions",
-                "keeplastversions"
-              ],
-              "type": "string"
-            },
-            "snapFieldId": {
-              "description": "The id of the field that is used to snapshot values from, when applicable.",
-              "type": "integer"
-            },
-            "hours24": {
-              "description": "Indicates whether or not to display time in the 24-hour format within the product.",
-              "type": "boolean"
-            },
-            "sortAlpha": {
-              "description": "Whether to sort alphabetically, default sort is by record ID.",
-              "type": "boolean"
-            },
-            "sortAsGiven": {
-              "description": "Indicates if the listed entries sort as entered vs alphabetically.",
-              "type": "boolean"
-            },
-            "hasExtension": {
-              "description": "Whether this field has a phone extension.",
-              "type": "boolean"
-            },
-            "useNewWindow": {
-              "description": "Indicates if the file should open a new window when a user clicks it within the product.",
-              "type": "boolean"
-            },
-            "appendOnly": {
-              "description": "Whether this field is append only.",
-              "type": "boolean"
-            },
-            "displayAsLink": {
-              "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
-              "type": "boolean"
-            }
-          }
-        },
-        "appearsByDefault": {
-          "description": "Indicates if the field is marked as a default in reports. Defaults to true.",
-          "type": "boolean"
         },
         "fieldType": {
-          "description": "The [field types](https://help.quickbase.com/user-assistance/field_types.html), click on any of the field type links for more info.",
-          "enum": [
-            "text",
-            "text-multiple-choice",
-            "text-multi-line",
-            "rich-text",
-            "numeric",
-            "currency",
-            "rating",
-            "percent",
-            "multitext",
-            "email",
-            "url",
-            "duration",
-            "date",
-            "datetime",
-            "timestamp",
-            "timeofday",
-            "checkbox",
-            "user",
-            "multiuser",
-            "address",
-            "phone",
-            "file"
-          ],
           "type": "string"
-        },
-        "permissions": {
-          "description": "Field Permissions for different roles.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "role": {
-                "description": "The role associated with a given permission for the field",
-                "type": "string"
-              },
-              "permissionType": {
-                "description": "The permission given to the role for this field",
-                "type": "string"
-              },
-              "roleId": {
-                "description": "The Id of the given role",
-                "type": "integer"
-              }
-            }
-          }
-        },
-        "addToForms": {
-          "description": "Whether the field you are adding should appear on forms. Defaults to false.",
-          "type": "boolean"
-        },
-        "label": {
-          "description": "The label (name) of the field.",
-          "type": "string"
-        },
-        "findEnabled": {
-          "description": "Indicates if the field is marked as searchable. Defaults to true.",
-          "type": "boolean"
-        },
-        "noWrap": {
-          "description": "Indicates if the field is configured to not wrap when displayed in the product. Defaults to false.",
-          "type": "boolean"
         }
-      }
+      },
+      "required": [
+        "label",
+        "fieldType"
+      ],
+      "description": "Create a field"
     },
-    "createField200Response": {
+    "CreateField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -6670,30 +5913,22 @@
         }
       }
     },
-    "deleteFieldsRequest": {
-      "example": {
-        "fieldIds": [
-          6,
-          7,
-          8
-        ]
-      },
+    "DeleteFieldsRequest": {
       "type": "object",
-      "additionalProperties": true,
-      "required": [
-        "fieldIds"
-      ],
       "properties": {
         "fieldIds": {
-          "description": "List of field ids to be deleted.",
           "type": "array",
           "items": {
             "type": "integer"
           }
         }
-      }
+      },
+      "required": [
+        "fieldIds"
+      ],
+      "description": "Delete field(s)"
     },
-    "deleteFields200Response": {
+    "DeleteFields200Response": {
       "example": {
         "deletedFieldIds": [
           6,
@@ -6726,7 +5961,7 @@
         }
       }
     },
-    "getField200Response": {
+    "GetField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -7175,407 +6410,23 @@
         }
       }
     },
-    "updateFieldRequest": {
-      "description": "The example below shows all the properties that can be changed with this request. Additional properties that you can see with the corresponding GET request cannot be set through this API.",
-      "example": {
-        "label": "Field1",
-        "noWrap": false,
-        "bold": false,
-        "required": true,
-        "appearsByDefault": false,
-        "findEnabled": false,
-        "unique": true,
-        "fieldHelp": "field help",
-        "addToForms": true,
-        "properties": {
-          "numLines": 1,
-          "maxLength": 0,
-          "appendOnly": false,
-          "sortAsGiven": false
-        },
-        "permissions": [
-          {
-            "role": "Viewer",
-            "permissionType": "View",
-            "roleId": 10
-          },
-          {
-            "role": "Participant",
-            "permissionType": "None",
-            "roleId": 11
-          },
-          {
-            "role": "Administrator",
-            "permissionType": "Modify",
-            "roleId": 12
-          }
-        ]
-      },
+    "UpdateFieldRequest": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "audited": {
-          "description": "Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to \"true\" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html).",
-          "type": "boolean"
-        },
-        "fieldHelp": {
-          "description": "The configured help text shown to users within the product.",
-          "type": "string"
-        },
-        "bold": {
-          "description": "Indicates if the field is configured to display in bold in the product.",
-          "type": "boolean"
-        },
-        "required": {
-          "description": "Indicates if the field is required (i.e. if every record must have a non-null value in this field). If you attempt to change a field from not-required to required, and the table currently contains records that have null values in that field, you will get an error indicating that there are null values of the field. In this case you need to find and update those records with null values of the field before changing the field to required.",
-          "type": "boolean"
-        },
-        "properties": {
-          "description": "Specific field properties.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "allowMentions": {
-              "description": "If someone can @mention users in the rich text field to generate an email notification.",
-              "type": "boolean"
-            },
-            "comments": {
-              "description": "The comments entered on the field properties by an administrator.",
-              "type": "string"
-            },
-            "doesTotal": {
-              "description": "Whether this field totals in reports within the product.",
-              "type": "boolean"
-            },
-            "autoSave": {
-              "description": "Whether the link field will auto save.",
-              "type": "boolean"
-            },
-            "defaultValueLuid": {
-              "description": "Default user id value.",
-              "type": "integer"
-            },
-            "useI18NFormat": {
-              "description": "Whether phone numbers should be in E.164 standard international format",
-              "type": "boolean"
-            },
-            "maxVersions": {
-              "description": "The maximum number of versions configured for a file attachment.",
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1
-            },
-            "format": {
-              "description": "The format to display time.",
-              "type": "integer"
-            },
-            "carryChoices": {
-              "description": "Whether the field should carry its multiple choice fields when copied.",
-              "type": "boolean"
-            },
-            "maxLength": {
-              "description": "The maximum number of characters allowed for entry in Quickbase for this field.",
-              "type": "integer"
-            },
-            "linkText": {
-              "description": "The configured text value that replaces the URL that users see within the product.",
-              "type": "string"
-            },
-            "parentFieldId": {
-              "description": "The id of the parent composite field, when applicable.",
-              "type": "integer"
-            },
-            "displayTimezone": {
-              "description": "Indicates whether to display the timezone within the product.",
-              "type": "boolean"
-            },
-            "summaryTargetFieldId": {
-              "description": "The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count).",
-              "type": "integer"
-            },
-            "allowNewChoices": {
-              "description": "Indicates if users can add new choices to a selection list.",
-              "type": "boolean"
-            },
-            "defaultToday": {
-              "description": "Indicates if the field value is defaulted today for new records.",
-              "type": "boolean"
-            },
-            "units": {
-              "description": "The units label.",
-              "type": "string"
-            },
-            "openTargetIn": {
-              "description": "Indicates which target the URL should open in when a user clicks it within the product.",
-              "enum": [
-                "sameWindow",
-                "newWindow",
-                "popup"
-              ],
-              "type": "string"
-            },
-            "lookupTargetFieldId": {
-              "description": "The id of the field that is the target on the parent table for this lookup.",
-              "type": "integer"
-            },
-            "summaryFunction": {
-              "description": "The accumulation type for the summary field.",
-              "enum": [
-                "AVG",
-                "SUM",
-                "MAX",
-                "MIN",
-                "STD-DEV",
-                "COUNT",
-                "COMBINED-TEXT",
-                "COMBINED-USER",
-                "DISTINCT-COUNT"
-              ],
-              "type": "string"
-            },
-            "sourceFieldId": {
-              "description": "The id of the source field.",
-              "type": "integer"
-            },
-            "doesAverage": {
-              "description": "Whether this field averages in reports within the product.",
-              "type": "boolean"
-            },
-            "formula": {
-              "description": "The formula of the field as configured in Quickbase.",
-              "type": "string"
-            },
-            "decimalPlaces": {
-              "description": "The number of decimal places displayed in the product for this field.",
-              "type": "integer"
-            },
-            "defaultCountryCode": {
-              "description": "Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format.",
-              "type": "string"
-            },
-            "displayMonth": {
-              "description": "How to display months.",
-              "type": "string"
-            },
-            "seeVersions": {
-              "description": "Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product.",
-              "type": "boolean"
-            },
-            "numLines": {
-              "description": "The number of lines shown in Quickbase for this text field.",
-              "type": "integer"
-            },
-            "defaultKind": {
-              "description": "The user default type.",
-              "type": "string"
-            },
-            "displayEmail": {
-              "description": "How the email is displayed.",
-              "type": "string"
-            },
-            "coverText": {
-              "description": "An alternate user friendly text that can be used to display a link in the browser.",
-              "type": "string"
-            },
-            "currencySymbol": {
-              "description": "The current symbol used when displaying field values within the product.",
-              "type": "string"
-            },
-            "summaryQuery": {
-              "description": "The summary query.",
-              "type": "string"
-            },
-            "targetFieldId": {
-              "description": "The id of the target field.",
-              "type": "integer"
-            },
-            "displayUser": {
-              "description": "The configured option for how users display within the product.",
-              "type": "string"
-            },
-            "blankIsZero": {
-              "description": "Whether a blank value is treated the same as 0 in calculations within the product.",
-              "type": "boolean"
-            },
-            "exact": {
-              "description": "Whether an exact match is required for a report link.",
-              "type": "boolean"
-            },
-            "defaultDomain": {
-              "description": "Default email domain.",
-              "type": "string"
-            },
-            "defaultValue": {
-              "description": "The default value configured for a field when a new record is added.",
-              "type": "string"
-            },
-            "abbreviate": {
-              "description": "Don't show the URL protocol when showing the URL.",
-              "type": "boolean"
-            },
-            "numberFormat": {
-              "description": "The format used for displaying numeric values in the product (decimal, separators, digit group).",
-              "type": "integer"
-            },
-            "targetTableName": {
-              "description": "The field's target table name.",
-              "type": "string"
-            },
-            "appearsAs": {
-              "description": "The link text, if empty, the url will be used as link text.",
-              "type": "string"
-            },
-            "width": {
-              "description": "The field's html input width in the product.",
-              "type": "integer"
-            },
-            "currencyFormat": {
-              "description": "The currency format used when displaying field values within the product.",
-              "enum": [
-                "left",
-                "right",
-                "middle"
-              ],
-              "type": "string"
-            },
-            "displayDayOfWeek": {
-              "description": "Indicates whether to display the day of the week within the product.",
-              "type": "boolean"
-            },
-            "summaryReferenceFieldId": {
-              "description": "The id of the field that is the reference in the relationship for this summary.",
-              "type": "integer"
-            },
-            "commaStart": {
-              "description": "The number of digits before commas display in the product, when applicable.",
-              "type": "integer"
-            },
-            "choices": {
-              "description": "An array of entries that exist for a field that offers choices to the user. Note that these choices refer to the valid values of any records added in the future. You are allowed to remove values from the list of choices even if there are existing records with those values in this field. They will be displayed in red when users look at the data in the browser but there is no other effect. While updating a field with this property, the old choices are removed and replaced by the new choices.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "targetTableId": {
-              "description": "The id of the target table.",
-              "type": "string"
-            },
-            "displayRelative": {
-              "description": "Whether to display time as relative.",
-              "type": "boolean"
-            },
-            "compositeFields": {
-              "description": "An array of the fields that make up a composite field (e.g., address).",
-              "type": "array"
-            },
-            "displayCheckboxAsText": {
-              "description": "Indicates whether the checkbox values will be shown as text in reports.",
-              "type": "boolean"
-            },
-            "summaryTableId": {
-              "description": "The table the summary field references fields from.",
-              "type": "string"
-            },
-            "displayTime": {
-              "description": "Indicates whether to display the time, in addition to the date.",
-              "type": "boolean"
-            },
-            "versionMode": {
-              "description": "Version modes for files. Keep all versions vs keep last version.",
-              "enum": [
-                "keepallversions",
-                "keeplastversions"
-              ],
-              "type": "string"
-            },
-            "snapFieldId": {
-              "description": "The id of the field that is used to snapshot values from, when applicable.",
-              "type": "integer"
-            },
-            "hours24": {
-              "description": "Indicates whether or not to display time in the 24-hour format within the product.",
-              "type": "boolean"
-            },
-            "sortAlpha": {
-              "description": "Whether to sort alphabetically, default sort is by record ID.",
-              "type": "boolean"
-            },
-            "sortAsGiven": {
-              "description": "Indicates if the listed entries sort as entered vs alphabetically.",
-              "type": "boolean"
-            },
-            "hasExtension": {
-              "description": "Whether this field has a phone extension.",
-              "type": "boolean"
-            },
-            "useNewWindow": {
-              "description": "Indicates if the file should open a new window when a user clicks it within the product.",
-              "type": "boolean"
-            },
-            "appendOnly": {
-              "description": "Whether this field is append only.",
-              "type": "boolean"
-            },
-            "displayAsLink": {
-              "description": "Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product.",
-              "type": "boolean"
-            },
-            "lookupReferenceFieldId": {
-              "description": "The id of the field that is the reference in the relationship for this lookup.",
-              "type": "integer"
-            }
-          }
-        },
-        "appearsByDefault": {
-          "description": "Indicates if the field is marked as a default in reports.",
-          "type": "boolean"
-        },
-        "unique": {
-          "description": "Indicates if every record in the table must contain a unique value of this field. If you attempt to change a field from not-unique to unique, and the table currently contains records with the same value of this field, you will get an error. In this case you need to find and update those records with duplicate values of the field before changing the field to unique.",
-          "type": "boolean"
-        },
-        "permissions": {
-          "description": "Field Permissions for different roles.",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "role": {
-                "description": "The role associated with a given permission for the field",
-                "type": "string"
-              },
-              "permissionType": {
-                "description": "The permission given to the role for this field",
-                "type": "string"
-              },
-              "roleId": {
-                "description": "The Id of the given role",
-                "type": "integer"
-              }
-            }
-          }
-        },
-        "addToForms": {
-          "description": "Whether the field you are adding should appear on forms.",
-          "type": "boolean"
-        },
         "label": {
-          "description": "The label (name) of the field.",
           "type": "string"
         },
-        "findEnabled": {
-          "description": "Indicates if the field is marked as searchable.",
-          "type": "boolean"
-        },
-        "noWrap": {
-          "description": "Indicates if the field is configured to not wrap when displayed in the product.",
-          "type": "boolean"
+        "fieldType": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "label",
+        "fieldType"
+      ],
+      "description": "Update a field"
     },
-    "updateField200Response": {
+    "UpdateField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -8024,7 +6875,7 @@
         }
       }
     },
-    "getFieldsUsage200Response": {
+    "GetFieldsUsage200Response": {
       "example": [
         {
           "field": {
@@ -8384,7 +7235,7 @@
         }
       }
     },
-    "getFieldUsage200Response": {
+    "GetFieldUsage200Response": {
       "example": [
         {
           "field": {
@@ -8744,36 +7595,19 @@
         }
       }
     },
-    "runFormulaRequest": {
-      "description": "The following example will execute a Sum() for '20' and the value in a record with id 1 for the field with label 'NumericField'. Since this API is able to run any type of formula, all results will be returned as a string.",
-      "example": {
-        "from": "bck7gp3q2",
-        "formula": "Sum([NumericField],20)",
-        "rid": 1
-      },
+    "RunFormulaRequest": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "formula",
-        "from"
-      ],
       "properties": {
         "formula": {
-          "description": "The formula to run. This must be a valid Quickbase formula.",
-          "type": "string"
-        },
-        "rid": {
-          "description": "The record ID to run the formula against. Only necessary for formulas that are run in the context of a record. For example, the formula User() does not need a record ID.",
-          "type": "integer"
-        },
-        "from": {
-          "description": "The unique identifier (dbid) of the table.",
-          "example": "bck7gp3q2",
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "formula"
+      ],
+      "description": "Run a formula"
     },
-    "runFormula200Response": {
+    "RunFormula200Response": {
       "example": {
         "result": "30"
       },
@@ -8786,137 +7620,32 @@
         }
       }
     },
-    "upsertRequest": {
-      "x-amf-examples": {
-        "Insert record": {
-          "value": {
-            "to": "bck7gp3q2",
-            "data": [
-              {
-                "6": {
-                  "value": "This is my text"
-                },
-                "7": {
-                  "value": 10
-                },
-                "8": {
-                  "value": "2019-12-18T08:00:00Z"
-                },
-                "9": {
-                  "value": [
-                    "a",
-                    "b"
-                  ]
-                },
-                "10": {
-                  "value": true
-                },
-                "11": {
-                  "value": "user@quickbase.com"
-                },
-                "12": {
-                  "value": "www.quickbase.com"
-                },
-                "13": {
-                  "value": [
-                    {
-                      "id": "123456.ab1s"
-                    },
-                    {
-                      "id": "254789.mkgp"
-                    },
-                    {
-                      "id": "789654.vc2s"
-                    }
-                  ]
-                }
-              }
-            ],
-            "fieldsToReturn": [
-              6,
-              7,
-              8,
-              9,
-              10,
-              11,
-              12,
-              13
-            ]
-          }
-        },
-        "Update existing record": {
-          "description": "For updating an existing record, add a mapping of the table key field ID (defaults to '3') to the record ID, in the data array. In the following example, we update the first record.",
-          "value": {
-            "to": "bck7gp3q2",
-            "data": [
-              {
-                "3": {
-                  "value": 1
-                },
-                "6": {
-                  "value": "This is my new text"
-                },
-                "7": {
-                  "value": 20
-                },
-                "9": {
-                  "value": [
-                    "c",
-                    "d"
-                  ]
-                },
-                "10": {
-                  "value": false
-                },
-                "11": {
-                  "value": "newuser@quickbase.com"
-                }
-              }
-            ],
-            "fieldsToReturn": [
-              6,
-              7,
-              9,
-              10,
-              11
-            ]
-          }
-        }
-      },
+    "UpsertRequest": {
       "type": "object",
-      "additionalProperties": true,
-      "required": [
-        "to"
-      ],
       "properties": {
-        "to": {
-          "description": "The table identifier.",
-          "example": "bck7gp3q2",
-          "type": "string",
-          "minLength": 1
-        },
         "data": {
-          "description": "Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/Record"
           }
         },
-        "mergeFieldId": {
-          "description": "The merge field id.",
-          "example": 7,
-          "type": "integer"
+        "to": {
+          "type": "string"
         },
         "fieldsToReturn": {
-          "description": "Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested.",
           "type": "array",
           "items": {
             "type": "integer"
           }
         }
-      }
+      },
+      "required": [
+        "data",
+        "to"
+      ],
+      "description": "Insert/Update record(s)"
     },
-    "upsert200Response": {
+    "Upsert200Response": {
       "description": "A successful response that includes details on the records added, updated or unchanged. In the example below, the table previously had ten records with IDs from 1 through 10. The user posts an upsert that updates the value of record 1 and adds two new records, all successfully.",
       "example": {
         "value": {
@@ -9021,12 +7750,12 @@
           "description": "The data that is expected to be returned.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Record"
+            "type": "string"
           }
         }
       }
     },
-    "upsert207Response": {
+    "Upsert207Response": {
       "description": "Receiving this status code indicates that some (or all) of the individual records being handled had problems and were not processed successfully. The response will be reported under the 'lineErrors' element and indicate the total number of records processed and the errors that occurred with each record. The record IDs of records created, updated, and referenced but unchanged, will be returned in the 'createdRecordIds', 'updatedRecordIds', and 'unchangedRecordIds' elements respectively.  \nIn the example below, a user tries to add three records to a table that previously had ten records with IDs from 1 through 10. The first and third records of the request are valid and create the 11th and 12th records in the table; the second record has a problem that prevents it from being processed.",
       "example": {
         "value": {
@@ -9091,12 +7820,12 @@
           "description": "The data that is expected to be returned.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Record"
+            "type": "string"
           }
         }
       }
     },
-    "upsert400Response": {
+    "Upsert400Response": {
       "description": "There was problem in the format of the request. This prevented the entire request from processing any records. The error response will be in the [standard format](../errors).",
       "example": {
         "message": "Bad request",
@@ -9115,33 +7844,23 @@
         }
       }
     },
-    "deleteRecordsRequest": {
-      "example": {
-        "from": "bck7gp3q2",
-        "where": "{6.EX.'hello'}"
-      },
+    "DeleteRecordsRequest": {
       "type": "object",
-      "additionalProperties": true,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "where": {
+          "type": "string"
+        }
+      },
       "required": [
         "from",
         "where"
       ],
-      "properties": {
-        "from": {
-          "description": "The unique identifier of the table.",
-          "example": "bck7gp3q2",
-          "type": "string",
-          "minLength": 1
-        },
-        "where": {
-          "description": "The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.",
-          "example": "{6.EX.'hello'}",
-          "type": "string",
-          "minLength": 1
-        }
-      }
+      "description": "Delete record(s)"
     },
-    "deleteRecords200Response": {
+    "DeleteRecords200Response": {
       "example": {
         "numberDeleted": 1
       },
@@ -9155,137 +7874,32 @@
         }
       }
     },
-    "runQueryRequest": {
-      "description": "If grouping or sorting is not set, records will not be sorted.",
-      "example": {
-        "value": {
-          "from": "bck7gp3q2",
-          "select": [
-            1,
-            2,
-            3
-          ],
-          "where": "{1.CT.'hello'}",
-          "sortBy": [
-            {
-              "fieldId": 4,
-              "order": "ASC"
-            },
-            {
-              "fieldId": 5,
-              "order": "ASC"
-            }
-          ],
-          "groupBy": [
-            {
-              "fieldId": 6,
-              "grouping": "equal-values"
-            }
-          ],
-          "options": {
-            "skip": 0,
-            "top": 0,
-            "compareWithAppLocalTime": false
-          }
-        }
-      },
+    "RunQueryRequest": {
       "type": "object",
-      "additionalProperties": true,
-      "required": [
-        "from"
-      ],
       "properties": {
-        "options": {
-          "description": "Additional query options.",
-          "type": "object",
-          "additionalProperties": true,
-          "properties": {
-            "skip": {
-              "description": "The number of records to skip.",
-              "type": "integer"
-            },
-            "compareWithAppLocalTime": {
-              "description": "Whether to run the query against a date time field with respect to the application's local time. The query is run with UTC time by default.  This parameter is ignored when querying by ISO8601, which is always in UTC.",
-              "type": "boolean"
-            },
-            "top": {
-              "description": "The maximum number of records to display.",
-              "type": "integer"
-            }
-          }
-        },
-        "where": {
-          "description": "The filter, using the Quickbase query language, which determines the records to return. If this parameter is omitted, the query will return all records.",
-          "example": "{6.EX.'hello'}",
-          "type": "string"
-        },
-        "groupBy": {
-          "description": "An array that contains the fields to group the records by.",
+        "data": {
           "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": true,
-            "properties": {
-              "fieldId": {
-                "description": "The unique identifier of a field in a table.",
-                "type": "integer"
-              },
-              "grouping": {
-                "description": "Group by based on equal values (equal-values)",
-                "enum": [
-                  "equal-values"
-                ],
-                "type": "string"
-              }
-            }
+            "$ref": "#/definitions/Record"
           }
         },
-        "sortBy": {
-          "description": "An array of field IDs and sort directions. If this attribute is not set or set to false, queries will be unsorted to improve performance.",
-          "x-amf-union": [
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "additionalProperties": true,
-                "properties": {
-                  "fieldId": {
-                    "description": "The unique identifier of a field in a table.",
-                    "type": "integer"
-                  },
-                  "order": {
-                    "description": "Sort based on ascending order (ASC), descending order (DESC) or equal values (equal-values)",
-                    "enum": [
-                      "ASC",
-                      "DESC",
-                      "equal-values"
-                    ],
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            {
-              "type": "boolean"
-            }
-          ]
+        "to": {
+          "type": "string"
         },
-        "select": {
-          "description": "An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned.",
+        "fieldsToReturn": {
           "type": "array",
           "items": {
             "type": "integer"
           }
-        },
-        "from": {
-          "description": "The table identifier.",
-          "example": "bck7gp3q2",
-          "type": "string",
-          "minLength": 1
         }
-      }
+      },
+      "required": [
+        "data",
+        "to"
+      ],
+      "description": "Query for data"
     },
-    "runQuery200Response": {
+    "RunQuery200Response": {
       "example": {
         "value": {
           "data": [
@@ -9355,7 +7969,7 @@
           "description": "An array of objects that either represents the record data or summarized values, depending on the report type.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Record"
+            "type": "string"
           }
         },
         "metadata": {
@@ -9392,7 +8006,7 @@
         }
       }
     },
-    "getTempTokenDBID200Response": {
+    "GetTempTokenDBID200Response": {
       "example": {
         "temporaryAuthorization": "token"
       },
@@ -9405,51 +8019,19 @@
         }
       }
     },
-    "exchangeSsoTokenRequest": {
-      "example": {
-        "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-        "requested_token_type": "urn:quickbase:params:oauth:token-type:temp_ticket",
-        "subject_token": "PHNhbWxwOlJlc3BvbnNlDQogICAgeG1sbnM6c2FtbHA9bjp...",
-        "subject_token_type": "urn:ietf:params:oauth:token-type:saml2"
-      },
+    "ExchangeSsoTokenRequest": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "grant_type",
-        "subject_token",
-        "subject_token_type",
-        "requested_token_type"
-      ],
       "properties": {
-        "grant_type": {
-          "type": "string",
-          "description": "The value `urn:ietf:params:oauth:grant-type:token-exchange` indicates that a token exchange is being performed.",
-          "enum": [
-            "urn:ietf:params:oauth:grant-type:token-exchange"
-          ]
-        },
-        "requested_token_type": {
-          "type": "string",
-          "description": "An identifier for the type of the requested security token. For the RESTful API, use `urn:quickbase:params:oauth:token-type:temp_token`. For the XML or SCIM APIs use `urn:quickbase:params:oauth:token-type:temp_ticket`.",
-          "enum": [
-            "urn:quickbase:params:oauth:token-type:temp_ticket",
-            "urn:quickbase:params:oauth:token-type:temp_token"
-          ]
-        },
-        "subject_token": {
-          "type": "string",
-          "description": "A security token that represents the identity of the party on behalf of whom the request is being made. For SAML 2.0, the value should be a base64url-encoded SAML 2.0 assertion."
-        },
-        "subject_token_type": {
-          "type": "string",
-          "description": "An identifier that indicates the type of the security token in the `subject_token` parameter.",
-          "enum": [
-            "urn:ietf:params:oauth:token-type:saml2"
-          ]
+        "token": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "token"
+      ],
+      "description": "Exchange an SSO token"
     },
-    "exchangeSsoToken200Response": {
+    "ExchangeSsoToken200Response": {
       "example": {
         "access_token": "example_token_1NiIsImtpZCI6IjllciJ9w",
         "issued_token_type": "urn:quickbase:params:oauth:token-type:temp_ticket",
@@ -9479,25 +8061,19 @@
         }
       }
     },
-    "cloneUserTokenRequest": {
-      "example": {
-        "name": "My cloned user token",
-        "description": "Cloned from user token A"
-      },
+    "CloneUserTokenRequest": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "name": {
-          "description": "The new name for the cloned user token.",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description for the cloned user token.",
+        "userToken": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "userToken"
+      ],
+      "description": "Clone a user token"
     },
-    "cloneUserToken200Response": {
+    "CloneUserToken200Response": {
       "example": {
         "active": true,
         "apps": [
@@ -9563,30 +8139,23 @@
         }
       }
     },
-    "transferUserTokenRequest": {
-      "example": {
-        "id": 17658,
-        "from": "62341.tr3s",
-        "to": "123456.ab1s"
-      },
+    "TransferUserTokenRequest": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "id": {
-          "type": "number",
-          "description": "The id of the user token to transfer"
+        "userToken": {
+          "type": "string"
         },
-        "from": {
-          "type": "string",
-          "description": "The id of the user to transfer the user token from"
-        },
-        "to": {
-          "type": "string",
-          "description": "The id of the user to transfer the user token to"
+        "toUserId": {
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "userToken",
+        "toUserId"
+      ],
+      "description": "Transfer a user token"
     },
-    "transferUserToken200Response": {
+    "TransferUserToken200Response": {
       "example": {
         "active": true,
         "apps": [
@@ -9647,7 +8216,7 @@
         }
       }
     },
-    "deactivateUserToken200Response": {
+    "DeactivateUserToken200Response": {
       "example": {
         "id": 5
       },
@@ -9660,7 +8229,7 @@
         }
       }
     },
-    "deleteUserToken200Response": {
+    "DeleteUserToken200Response": {
       "example": {
         "id": 5
       },
@@ -9673,11 +8242,11 @@
         }
       }
     },
-    "downloadFile200Response": {
+    "DownloadFile200Response": {
       "description": "Base64 encoded file content.",
       "example": "UXVpY2sgQmFzZSBJbmMu"
     },
-    "deleteFile200Response": {
+    "DeleteFile200Response": {
       "example": {
         "versionNumber": 1,
         "fileName": "file.pdf",
@@ -9729,62 +8298,22 @@
         }
       }
     },
-    "getUsersRequest": {
-      "x-amf-examples": {
-        "Get first page example": {
-          "emails": [
-            "jswilson@domain.com",
-            "jon_doe@domain.com",
-            "sjackson@domain.com"
-          ],
-          "appIds": [
-            "ab3rd3",
-            "23erfd",
-            "xpsd32"
-          ],
-          "nextPageToken": ""
-        },
-        "Get next page example": {
-          "emails": [
-            "jswilson@domain.com",
-            "sjackson@domain.com"
-          ],
-          "appIds": [
-            "ab3rd3",
-            "23erfd"
-          ],
-          "nextPageToken": "bzw2a9"
-        }
-      },
+    "GetUsersRequest": {
       "type": "object",
-      "additionalProperties": true,
       "properties": {
-        "emails": {
-          "description": "When provided, the returned users will be narrowed down only to the users included in this list.",
+        "userIds": {
           "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^.+@.+\\..+$",
-            "minLength": 2,
-            "maxLength": 256
-          }
-        },
-        "appIds": {
-          "description": "When provided, the returned users will be narrowed down only to the users assigned to the app id's provided in this list. The provided app id's should belong to the same account.",
-          "type": "array",
-          "uniqueItems": true,
           "items": {
             "type": "string"
           }
-        },
-        "nextPageToken": {
-          "description": "Next page token used to get the next 'page' of results when available. When this field is empty, the first page is returned.",
-          "type": "string"
         }
-      }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Get users"
     },
-    "getUsers200Response": {
+    "GetUsers200Response": {
       "x-amf-examples": {
         "All results example": {
           "users": [
@@ -9890,22 +8419,22 @@
         }
       }
     },
-    "denyUsersRequest": {
-      "description": "A list of user IDs that need to be denied.",
-      "example": [
-        "123456.ab1s",
-        "423123.vc2d",
-        "78910.ba1s"
+    "DenyUsersRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string"
-      }
+      "description": "Deny users"
     },
-    "denyUsers200Response": {
+    "DenyUsers200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -9945,22 +8474,22 @@
         }
       }
     },
-    "denyUsersAndGroupsRequest": {
-      "description": "A list of user IDs that need to be denied.",
-      "example": [
-        "123456.ab1s",
-        "423123.vc2d",
-        "78910.ba1s"
+    "DenyUsersAndGroupsRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string"
-      }
+      "description": "Deny and remove users from groups"
     },
-    "denyUsersAndGroups200Response": {
+    "DenyUsersAndGroups200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -10000,22 +8529,22 @@
         }
       }
     },
-    "undenyUsersRequest": {
-      "description": "A list of user IDs that need to be undenied.",
-      "example": [
-        "123456.ab1s",
-        "423123.vc2d",
-        "78910.ba1s"
+    "UndenyUsersRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string"
-      }
+      "description": "Undeny users"
     },
-    "undenyUsers200Response": {
+    "UndenyUsers200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -10055,23 +8584,22 @@
         }
       }
     },
-    "addMembersToGroupRequest": {
-      "description": "A list of user IDs that will be added to a group.",
-      "example": [
-        "123456.ryyw",
-        "423123.b3x5",
-        "100000.be8s"
+    "AddMembersToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the user to be added to a group.",
-        "type": "string"
-      }
+      "description": "Add members"
     },
-    "addMembersToGroup200Response": {
+    "AddMembersToGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -10111,23 +8639,22 @@
         }
       }
     },
-    "removeMembersFromGroupRequest": {
-      "description": "A list of user IDs that will be removed from a group.",
-      "example": [
-        "123456.ryyw",
-        "423123.b3x5",
-        "100000.be8s"
+    "RemoveMembersFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the user to be removed from a group.",
-        "type": "string"
-      }
+      "description": "Remove members"
     },
-    "removeMembersFromGroup200Response": {
+    "RemoveMembersFromGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -10167,23 +8694,22 @@
         }
       }
     },
-    "addManagersToGroupRequest": {
-      "description": "A list of user IDs that will be added to a group.",
-      "example": [
-        "123456.ryyw",
-        "423123.b3x5",
-        "100000.be8s"
+    "AddManagersToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the user to be added to a group.",
-        "type": "string"
-      }
+      "description": "Add managers"
     },
-    "addManagersToGroup200Response": {
+    "AddManagersToGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -10223,23 +8749,22 @@
         }
       }
     },
-    "removeManagersFromGroupRequest": {
-      "description": "A list of user IDs that will be removed from a group.",
-      "example": [
-        "123456.ryyw",
-        "423123.b3x5",
-        "100000.be8s"
+    "RemoveManagersFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the user to be removed from a group.",
-        "type": "string"
-      }
+      "description": "Remove managers"
     },
-    "removeManagersFromGroup200Response": {
+    "RemoveManagersFromGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -10279,22 +8804,22 @@
         }
       }
     },
-    "addSubgroupsToGroupRequest": {
-      "description": "A list of group IDs that will be added to a group.",
-      "example": [
-        "1002.czm8",
-        "1003.bar3"
+    "AddSubgroupsToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the child group to be added to a group.",
-        "type": "string"
-      }
+      "description": "Add child groups"
     },
-    "addSubgroupsToGroup200Response": {
+    "AddSubgroupsToGroup200Response": {
       "example": {
         "failure": [
           "1002.czm8"
@@ -10332,22 +8857,22 @@
         }
       }
     },
-    "removeSubgroupsFromGroupRequest": {
-      "description": "A list of group IDs that will be removed from a group.",
-      "example": [
-        "1002.czm8",
-        "1003.bar3"
+    "RemoveSubgroupsFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
       ],
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "description": "The Id and its hash value of the child group to be removed from a group.",
-        "type": "string"
-      }
+      "description": "Remove child groups"
     },
-    "removeSubgroupsFromGroup200Response": {
+    "RemoveSubgroupsFromGroup200Response": {
       "example": {
         "failure": [
           "1002.czm8"
@@ -10385,49 +8910,22 @@
         }
       }
     },
-    "auditRequest": {
-      "example": {
-        "date": "2022-05-20",
-        "topics": [
-          "login",
-          "login_fail"
-        ]
-      },
+    "AuditRequest": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "nextToken": {
-          "description": "Token specifying start of page. For first page don't supply this.",
-          "example": "6a.f12x",
-          "type": "string"
-        },
-        "numRows": {
-          "description": "Number of logs to return per page, default is 10000, minimum is 1000, max is 50000.",
-          "example": 10000,
-          "type": "integer"
-        },
-        "queryId": {
-          "description": "The query id of an audit log request. This id is needed to fetch subsequent paged results of a single query.",
-          "example": "c41aa90e-0db6-4732-8e22-2ef80fe4092a",
-          "type": "string"
-        },
-        "date": {
-          "description": "The date for which audit logs need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past.",
-          "example": "2022-05-23",
-          "type": "string",
-          "format": "date"
-        },
-        "topics": {
+        "events": {
           "type": "array",
-          "maxItems": 20,
-          "description": "An array that may contain up to 20 [topics](https://resources.quickbase.com/nav/app/budurkasx/action/showpage/2b2941e4-f34d-4d41-9b0e-db790d20e9ab?pageIdV2=quickbase.com-DashboardGroup-15760d74-2243-4ce9-9495-7cc8790f12e7) to filter by. If empty, all topics are returned.",
           "items": {
-            "type": "string"
+            "type": "object"
           }
         }
-      }
+      },
+      "required": [
+        "events"
+      ],
+      "description": "Get audit logs"
     },
-    "audit200Response": {
+    "Audit200Response": {
       "example": {
         "events": [
           {
@@ -10575,7 +9073,7 @@
         }
       }
     },
-    "audit202Response": {
+    "Audit202Response": {
       "example": {
         "queryId": "797c0726-f8f4-4df9-883f-c7e8cbdf2f77.ALtInpuyQeBoW+fWrAqLrjPGqDqPl++IMb3bOxlmoF4="
       },
@@ -10591,7 +9089,7 @@
         }
       }
     },
-    "platformAnalyticReads200Response": {
+    "PlatformAnalyticReads200Response": {
       "example": {
         "date": "2022-01-01",
         "reads": {
@@ -10656,81 +9154,22 @@
         }
       }
     },
-    "platformAnalyticEventSummariesRequest": {
-      "example": {
-        "start": "2023-12-01T12:00:00.000-05:00",
-        "end": "2023-12-31T12:00:00.000-05:00",
-        "groupBy": "user",
-        "nextToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvZmZzZXQiOjEwMCwiaWF0IjoxNzA2NzE1OTI3LCJleHAiOjE3MDY4MDIzMjd9.aWGZCv5vJIai0Dw6sVcQ9FT70PHcqWcqP9sGdKBJeco",
-        "where": [
-          {
-            "id": "58351651.xc1",
-            "type": "user"
-          },
-          {
-            "id": "bpqe82s1",
-            "type": "app"
-          }
-        ]
-      },
+    "PlatformAnalyticEventSummariesRequest": {
+      "type": "object",
       "properties": {
-        "start": {
-          "description": "The start date and time of the requested summaries in ISO 8601 time format.",
-          "format": "date-time",
-          "type": "string"
-        },
-        "end": {
-          "description": "The end date and time of the requested summaries in ISO 8601 time format.",
-          "format": "date-time",
-          "type": "string"
-        },
-        "groupBy": {
-          "description": "How the events should be grouped.",
-          "enum": [
-            "app",
-            "user"
-          ],
-          "type": "string"
-        },
-        "nextToken": {
-          "description": "A pagination token from a previous response. Used to fetch the next page.",
-          "type": "string"
-        },
-        "where": {
-          "description": "A list of items to filter events by. Only events which match ALL criteria will be included in the results.",
+        "items": {
+          "type": "array",
           "items": {
-            "properties": {
-              "id": {
-                "description": "Id of the item to filter by - the hash uid if filtering a user, or the app id if filtering an app.",
-                "type": "string"
-              },
-              "type": {
-                "description": "The type of item to filter by.",
-                "enum": [
-                  "app",
-                  "user"
-                ],
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "type"
-            ],
-            "type": "object"
-          },
-          "maxItems": 10,
-          "type": "array"
+            "type": "string"
+          }
         }
       },
       "required": [
-        "start",
-        "end",
-        "groupBy"
+        "items"
       ],
-      "type": "object"
+      "description": "Get event summaries"
     },
-    "platformAnalyticEventSummaries200Response": {
+    "PlatformAnalyticEventSummaries200Response": {
       "example": {
         "accountId": "1234",
         "start": "2023-12-01T05:00:00Z",
@@ -10952,38 +9391,46 @@
       ],
       "type": "object"
     },
-    "exportSolution200Response": {
+    "ExportSolution200Response": {
       "example": "Solution:\n  Id: 8d2c3333-7d32-4ece-8073-57106c465384\n  Name: Example solution\n  Owner: manager@yourrealm.com\n  ExportDate: 2024-03-25 12:04:05\nVersion: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
     },
-    "exportSolution400Response": {
+    "ExportSolution400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "exportSolution404Response": {
+    "ExportSolution404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "exportSolution401_403Response": {
+    "ExportSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "exportSolution4xx_5xxResponse": {
+    "ExportSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "updateSolutionRequest": {
-      "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
-      "type": "string"
+    "UpdateSolutionRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Update a solution"
     },
-    "updateSolution200Response": {
+    "UpdateSolution200Response": {
       "example": {
         "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
         "alias": null,
@@ -10993,29 +9440,37 @@
         "warnings": []
       }
     },
-    "updateSolution400Response": {
+    "UpdateSolution400Response": {
       "example": {
         "message": "Bad request",
         "description": ""
       }
     },
-    "updateSolution401_403Response": {
+    "UpdateSolution401_403Response": {
       "example": {
         "message": "Forbidden",
         "description": ""
       }
     },
-    "updateSolution4xx_5xxResponse": {
+    "UpdateSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "createSolutionRequest": {
-      "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
-      "type": "string"
+    "CreateSolutionRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Create a solution"
     },
-    "createSolution200Response": {
+    "CreateSolution200Response": {
       "example": {
         "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
         "alias": null,
@@ -11025,55 +9480,55 @@
         "warnings": []
       }
     },
-    "createSolution400Response": {
+    "CreateSolution400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "createSolution401_403Response": {
+    "CreateSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "createSolution4xx_5xxResponse": {
+    "CreateSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "exportSolutionToRecord200Response": {
+    "ExportSolutionToRecord200Response": {
       "example": {
         "record_id": 1,
         "filename": "QBL-0.4-30d92a39-5940-49b6-9eb1-c2966f85a7c0.yaml"
       }
     },
-    "exportSolutionToRecord400Response": {
+    "ExportSolutionToRecord400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "exportSolutionToRecord404Response": {
+    "ExportSolutionToRecord404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "exportSolutionToRecord401_403Response": {
+    "ExportSolutionToRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "exportSolutionToRecord4xx_5xxResponse": {
+    "ExportSolutionToRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "createSolutionFromRecord200Response": {
+    "CreateSolutionFromRecord200Response": {
       "example": {
         "solutionId": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
         "alias": null,
@@ -11086,31 +9541,31 @@
         "warnings": []
       }
     },
-    "createSolutionFromRecord400Response": {
+    "CreateSolutionFromRecord400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "createSolutionFromRecord404Response": {
+    "CreateSolutionFromRecord404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "createSolutionFromRecord401_403Response": {
+    "CreateSolutionFromRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "createSolutionFromRecord4xx_5xxResponse": {
+    "CreateSolutionFromRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "updateSolutionToRecord200Response": {
+    "UpdateSolutionToRecord200Response": {
       "example": {
         "solutionId": "acfa89a2-5ec0-4552-ba69-1372e41288ea",
         "alias": null,
@@ -11123,35 +9578,43 @@
         "warnings": []
       }
     },
-    "updateSolutionToRecord400Response": {
+    "UpdateSolutionToRecord400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "updateSolutionToRecord404Response": {
+    "UpdateSolutionToRecord404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "updateSolutionToRecord401_403Response": {
+    "UpdateSolutionToRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "updateSolutionToRecord4xx_5xxResponse": {
+    "UpdateSolutionToRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "changesetSolutionRequest": {
-      "example": "Version: 0.4\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false",
-      "type": "string"
+    "ChangesetSolutionRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "List solution changes"
     },
-    "changesetSolution200Response": {
+    "ChangesetSolution200Response": {
       "example": {
         "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
         "changes": [
@@ -11174,31 +9637,31 @@
         ]
       }
     },
-    "changesetSolution400Response": {
+    "ChangesetSolution400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "changesetSolution404Response": {
+    "ChangesetSolution404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "changesetSolution401_403Response": {
+    "ChangesetSolution401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "changesetSolution4xx_5xxResponse": {
+    "ChangesetSolution4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "changesetSolutionFromRecord200Response": {
+    "ChangesetSolutionFromRecord200Response": {
       "example": {
         "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
         "changes": [
@@ -11232,31 +9695,31 @@
         ]
       }
     },
-    "changesetSolutionFromRecord400Response": {
+    "ChangesetSolutionFromRecord400Response": {
       "example": {
         "message": "Bad request.",
         "description": ""
       }
     },
-    "changesetSolutionFromRecord404Response": {
+    "ChangesetSolutionFromRecord404Response": {
       "example": {
         "message": "Not found.",
         "description": ""
       }
     },
-    "changesetSolutionFromRecord401_403Response": {
+    "ChangesetSolutionFromRecord401_403Response": {
       "example": {
         "message": "Forbidden.",
         "description": ""
       }
     },
-    "changesetSolutionFromRecord4xx_5xxResponse": {
+    "ChangesetSolutionFromRecord4xx_5xxResponse": {
       "example": {
         "message": "Internal server error.",
         "description": ""
       }
     },
-    "generateDocument200Response": {
+    "GenerateDocument200Response": {
       "example": {
         "fileName": "Document.pdf",
         "data": "data",

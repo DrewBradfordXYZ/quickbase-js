@@ -1,5 +1,11 @@
 // open-api/generate-unified-interface.ts
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  readdirSync,
+} from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { OpenAPIV2 } from "openapi-types";
@@ -9,6 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
+const MODELS_DIR = join(__dirname, "..", "src", "generated", "models");
 
 function mapOpenApiTypeToTs(
   openApiType: string | string[] | undefined
@@ -34,7 +41,9 @@ function mapRefToType(
   schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
   modelImports: Set<string>,
   spec: OpenAPIV2.Document,
-  depth: number = 0
+  depth: number = 0,
+  availableModels: string[],
+  missingTypes: Set<string>
 ): string {
   if (!schema) return "any";
 
@@ -42,8 +51,15 @@ function mapRefToType(
     const refParts = schema.$ref.split("/");
     const model = refParts[refParts.length - 1];
     const camelModel = model.charAt(0).toUpperCase() + model.slice(1);
-    modelImports.add(camelModel);
-    return camelModel;
+    if (availableModels.includes(camelModel)) {
+      modelImports.add(camelModel);
+      return camelModel;
+    }
+    missingTypes.add(camelModel);
+    console.warn(
+      `Type ${camelModel} not found in /generated/models, defaulting to 'any'`
+    );
+    return "any";
   }
 
   if ("type" in schema) {
@@ -51,7 +67,14 @@ function mapRefToType(
       const items = schema.items as
         | OpenAPIV2.SchemaObject
         | OpenAPIV2.ReferenceObject;
-      const itemType = mapRefToType(items, modelImports, spec, depth + 1);
+      const itemType = mapRefToType(
+        items,
+        modelImports,
+        spec,
+        depth + 1,
+        availableModels,
+        missingTypes
+      );
       return `${itemType}[]`;
     }
 
@@ -68,7 +91,9 @@ function mapRefToType(
           additionalProps,
           modelImports,
           spec,
-          depth + 1
+          depth + 1,
+          availableModels,
+          missingTypes
         );
         return `{ [key: string]: ${valueType} }`;
       }
@@ -79,7 +104,9 @@ function mapRefToType(
             propSchema,
             modelImports,
             spec,
-            depth + 1
+            depth + 1,
+            availableModels,
+            missingTypes
           );
           return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
         });
@@ -108,7 +135,14 @@ function generateInterface() {
   ) as OpenAPIV2.Document;
   const { paths } = spec;
 
+  // Load available models from /generated/models
+  const availableModels = readdirSync(MODELS_DIR)
+    .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
+    .map((file) => file.replace(".ts", ""));
+  console.log("Available models:", availableModels);
+
   const modelImports = new Set<string>();
+  const missingTypes = new Set<string>();
   const methods: string[] = [];
 
   for (const [path, methodsObj] of Object.entries(
@@ -133,10 +167,16 @@ function generateInterface() {
         })
         .map((param: OpenAPIV2.Parameter) => {
           if (!("name" in param)) return "";
-
           let type: string;
           if ("schema" in param && param.schema) {
-            type = mapRefToType(param.schema, modelImports, spec, 1);
+            type = mapRefToType(
+              param.schema,
+              modelImports,
+              spec,
+              1,
+              availableModels,
+              missingTypes
+            );
           } else if ("type" in param && param.type) {
             type = mapOpenApiTypeToTs(param.type);
           } else {
@@ -159,16 +199,22 @@ function generateInterface() {
             | undefined,
         }))
         .filter(({ response }) => response?.schema);
-      const returnTypes = successResponses.map(({ response }) => {
-        return mapRefToType(response!.schema, modelImports, spec, 1);
-      });
+      const returnTypes = successResponses.map(({ response }) =>
+        mapRefToType(
+          response!.schema,
+          modelImports,
+          spec,
+          1,
+          availableModels,
+          missingTypes
+        )
+      );
       const uniqueReturnTypes = [...new Set(returnTypes)];
       const returnType =
         uniqueReturnTypes.length > 1
           ? uniqueReturnTypes.join(" | ")
           : uniqueReturnTypes[0] || "void";
 
-      // Generate JSDoc
       const jsDoc = [
         `  /**`,
         `   * ${summary}`,
@@ -181,6 +227,21 @@ function generateInterface() {
         `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
       );
     }
+  }
+
+  // Log and report missing types
+  if (missingTypes.size > 0) {
+    console.log(
+      "Missing types detected (defaulted to 'any'):",
+      Array.from(missingTypes)
+    );
+    writeFileSync(
+      join(OUTPUT_DIR, "missing-types-report.json"),
+      JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
+    );
+    console.log("Missing types report saved to missing-types-report.json");
+  } else {
+    console.log("No missing types detected.");
   }
 
   const importStatement =
