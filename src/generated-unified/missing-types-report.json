@@ -1,13 +1,6 @@
 {
   "missingTypes": [
     "DownloadFile200Response",
-    "ExportSolution200Response",
-    "UpdateSolution200Response",
-    "CreateSolution200Response",
-    "ExportSolutionToRecord200Response",
-    "CreateSolutionFromRecord200Response",
-    "UpdateSolutionToRecord200Response",
-    "ChangesetSolution200Response",
-    "ChangesetSolutionFromRecord200Response"
+    "ExportSolution200Response"
   ]
 }

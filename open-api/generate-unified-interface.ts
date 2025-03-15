@@ -1,4 +1,5 @@
 // open-api/generate-unified-interface.ts
+
 import {
   readFileSync,
   writeFileSync,
@@ -50,19 +51,45 @@ function mapRefToType(
   if ("$ref" in schema && schema.$ref) {
     const refParts = schema.$ref.split("/");
     const model = refParts[refParts.length - 1];
-    const camelModel = model.charAt(0).toUpperCase() + model.slice(1);
-    if (availableModels.includes(camelModel)) {
+    const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
+    const camelModel = model.charAt(0).toLowerCase() + model.slice(1);
+    if (availableModels.includes(pascalModel)) {
+      modelImports.add(pascalModel);
+      return pascalModel;
+    } else if (availableModels.includes(camelModel)) {
       modelImports.add(camelModel);
       return camelModel;
     }
-    missingTypes.add(camelModel);
+    missingTypes.add(pascalModel);
     console.warn(
-      `Type ${camelModel} not found in /generated/models, defaulting to 'any'`
+      `Type ${pascalModel} not found in /generated/models, defaulting to 'any'`
     );
     return "any";
   }
 
   if ("type" in schema) {
+    if (schema.type === "object" && schema.properties) {
+      const props = schema.properties;
+      if (props.data && props.data.format === "binary") {
+        return "ArrayBuffer"; // Map binary object to ArrayBuffer
+      }
+      if (props.content && props.content.format === "yaml") {
+        return "string"; // Map YAML object to string
+      }
+      const propTypes = Object.entries(props).map(([key, prop]) => {
+        const propSchema = prop as OpenAPIV2.SchemaObject;
+        const propType = mapRefToType(
+          propSchema,
+          modelImports,
+          spec,
+          depth + 1,
+          availableModels,
+          missingTypes
+        );
+        return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
+      });
+      return `{ ${propTypes.join("; ")} }`;
+    }
     if (schema.type === "array" && schema.items) {
       const items = schema.items as
         | OpenAPIV2.SchemaObject
@@ -77,44 +104,24 @@ function mapRefToType(
       );
       return `${itemType}[]`;
     }
-
-    if (schema.type === "object") {
-      if (schema.additionalProperties) {
-        const additionalProps = schema.additionalProperties as
-          | OpenAPIV2.SchemaObject
-          | OpenAPIV2.ReferenceObject
-          | boolean;
-        if (typeof additionalProps === "boolean") {
-          return "{ [key: string]: any }";
-        }
-        const valueType = mapRefToType(
-          additionalProps,
-          modelImports,
-          spec,
-          depth + 1,
-          availableModels,
-          missingTypes
-        );
-        return `{ [key: string]: ${valueType} }`;
+    if (schema.type === "object" && schema.additionalProperties) {
+      const additionalProps = schema.additionalProperties as
+        | OpenAPIV2.SchemaObject
+        | OpenAPIV2.ReferenceObject
+        | boolean;
+      if (typeof additionalProps === "boolean") {
+        return "{ [key: string]: any }";
       }
-      if (schema.properties) {
-        const props = Object.entries(schema.properties).map(([key, prop]) => {
-          const propSchema = prop as OpenAPIV2.SchemaObject;
-          const propType = mapRefToType(
-            propSchema,
-            modelImports,
-            spec,
-            depth + 1,
-            availableModels,
-            missingTypes
-          );
-          return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
-        });
-        return `{ ${props.join("; ")} }`;
-      }
-      return "{ [key: string]: any }";
+      const valueType = mapRefToType(
+        additionalProps,
+        modelImports,
+        spec,
+        depth + 1,
+        availableModels,
+        missingTypes
+      );
+      return `{ [key: string]: ${valueType} }`;
     }
-
     return mapOpenApiTypeToTs(schema.type);
   }
 
@@ -135,7 +142,6 @@ function generateInterface() {
   ) as OpenAPIV2.Document;
   const { paths } = spec;
 
-  // Load available models from /generated/models
   const availableModels = readdirSync(MODELS_DIR)
     .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
     .map((file) => file.replace(".ts", ""));
@@ -229,7 +235,6 @@ function generateInterface() {
     }
   }
 
-  // Log and report missing types
   if (missingTypes.size > 0) {
     console.log(
       "Missing types detected (defaulted to 'any'):",

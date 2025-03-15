@@ -8243,8 +8243,14 @@
       }
     },
     "DownloadFile200Response": {
-      "description": "Base64 encoded file content.",
-      "example": "UXVpY2sgQmFzZSBJbmMu"
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "format": "binary"
+        }
+      },
+      "description": "Base64 encoded file content."
     },
     "DeleteFile200Response": {
       "example": {
@@ -9392,31 +9398,62 @@
       "type": "object"
     },
     "ExportSolution200Response": {
-      "example": "Solution:\n  Id: 8d2c3333-7d32-4ece-8073-57106c465384\n  Name: Example solution\n  Owner: manager@yourrealm.com\n  ExportDate: 2024-03-25 12:04:05\nVersion: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "format": "yaml"
+        }
+      },
+      "description": "YAML-formatted data"
     },
     "ExportSolution400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "ExportSolution404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Solution does not exist. The supplied solution ID was not found."
     },
     "ExportSolution401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "ExportSolution4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "UpdateSolutionRequest": {
       "type": "object",
@@ -9431,32 +9468,76 @@
       "description": "Update a solution"
     },
     "UpdateSolution200Response": {
-      "example": {
-        "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
-        "alias": null,
-        "createdResources": {
-          "apps": {}
-        },
-        "warnings": []
-      }
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "solutionId": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "object"
+          },
+          "createdResources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "apps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Success"
     },
     "UpdateSolution400Response": {
-      "example": {
-        "message": "Bad request",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "UpdateSolution401_403Response": {
-      "example": {
-        "message": "Forbidden",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "UpdateSolution4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "CreateSolutionRequest": {
       "type": "object",
@@ -9471,136 +9552,329 @@
       "description": "Create a solution"
     },
     "CreateSolution200Response": {
-      "example": {
-        "solutionId": "097aefef-113a-4fc1-9c78-3ecb1003b95c",
-        "alias": null,
-        "createdResources": {
-          "apps": {}
-        },
-        "warnings": []
-      }
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "solutionId": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "object"
+          },
+          "createdResources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "apps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Success"
     },
     "CreateSolution400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "CreateSolution401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "CreateSolution4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "ExportSolutionToRecord200Response": {
-      "example": {
-        "record_id": 1,
-        "filename": "QBL-0.4-30d92a39-5940-49b6-9eb1-c2966f85a7c0.yaml"
-      }
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "record_id": {
+            "type": "number"
+          },
+          "filename": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Success"
     },
     "ExportSolutionToRecord400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "ExportSolutionToRecord404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "A resource is missing. For example: The supplied solution or field does not exist."
     },
     "ExportSolutionToRecord401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "ExportSolutionToRecord4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "CreateSolutionFromRecord200Response": {
-      "example": {
-        "solutionId": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-        "alias": null,
-        "createdResources": {
-          "apps": {
-            "$App_IT_Total_Management": "bt6i6jc39"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "solutionId": {
+            "type": "string"
           },
-          "pipelines": {}
-        },
-        "warnings": []
-      }
+          "alias": {
+            "type": "object"
+          },
+          "createdResources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "apps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "$App_IT_Total_Management": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pipelines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Success"
     },
     "CreateSolutionFromRecord400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "CreateSolutionFromRecord404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
     "CreateSolutionFromRecord401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "CreateSolutionFromRecord4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "UpdateSolutionToRecord200Response": {
-      "example": {
-        "solutionId": "acfa89a2-5ec0-4552-ba69-1372e41288ea",
-        "alias": null,
-        "resources": {
-          "apps": {
-            "$App_IT_Total_Management": "bt6i6jc39"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "solutionId": {
+            "type": "string"
           },
-          "pipelines": {}
-        },
-        "warnings": []
-      }
+          "alias": {
+            "type": "object"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "apps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "$App_IT_Total_Management": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "pipelines": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Success"
     },
     "UpdateSolutionToRecord400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "UpdateSolutionToRecord404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
     "UpdateSolutionToRecord401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "UpdateSolutionToRecord4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "ChangesetSolutionRequest": {
       "type": "object",
@@ -9615,109 +9889,176 @@
       "description": "List solution changes"
     },
     "ChangesetSolution200Response": {
-      "example": {
-        "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-        "changes": [
-          {
-            "logicalType": "App",
-            "logicalId": "$App_Example_app",
-            "action": "Add",
-            "path": [
-              "$App_Example_app"
-            ]
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
           },
-          {
-            "logicalType": "App",
-            "logicalId": "$App_Simple_Project_Manager",
-            "action": "Remove",
-            "path": [
-              "$App_Simple_Project_Manager"
-            ]
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "logicalType": {
+                    "type": "string"
+                  },
+                  "logicalId": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
-        ]
-      }
+        }
+      },
+      "description": "Success"
     },
     "ChangesetSolution400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "ChangesetSolution404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Solution does not exist. The supplied solution ID was not found."
     },
     "ChangesetSolution401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "ChangesetSolution4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "ChangesetSolutionFromRecord200Response": {
-      "example": {
-        "id": "f53acd36-1e75-47ed-910c-0ca4fd165a84",
-        "changes": [
-          {
-            "logicalType": "Property",
-            "logicalId": "App::$App_MVP_App_234::Property::Name",
-            "action": "Update",
-            "path": [
-              "$App_MVP_App_234",
-              "Name"
-            ]
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
           },
-          {
-            "logicalType": "Table",
-            "logicalId": "$Table_Parents",
-            "action": "Remove",
-            "path": [
-              "$App_MVP_App_234",
-              "$Table_Parents"
-            ]
-          },
-          {
-            "logicalType": "Table",
-            "logicalId": "$Table_Children",
-            "action": "Remove",
-            "path": [
-              "$App_MVP_App_234",
-              "$Table_Children"
-            ]
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "logicalType": {
+                    "type": "string"
+                  },
+                  "logicalId": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
-        ]
-      }
+        }
+      },
+      "description": "Success"
     },
     "ChangesetSolutionFromRecord400Response": {
-      "example": {
-        "message": "Bad request.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
     "ChangesetSolutionFromRecord404Response": {
-      "example": {
-        "message": "Not found.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
     "ChangesetSolutionFromRecord401_403Response": {
-      "example": {
-        "message": "Forbidden.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
     "ChangesetSolutionFromRecord4xx_5xxResponse": {
-      "example": {
-        "message": "Internal server error.",
-        "description": ""
-      }
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
     "GenerateDocument200Response": {
       "example": {

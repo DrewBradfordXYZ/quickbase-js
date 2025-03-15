@@ -22,7 +22,10 @@ interface Parameter {
 
 interface Operation {
   parameters?: Parameter[];
-  responses?: Record<string, { description: string; schema?: any }>;
+  responses?: Record<
+    string,
+    { description: string; schema?: any; "x-amf-mediaType"?: string }
+  >;
   operationId?: string;
   summary?: string;
   tags?: string[];
@@ -102,7 +105,6 @@ function fixArraySchemas(spec: Spec) {
 
   console.log("Fixing array schemas in definitions...");
   const definitions = spec.definitions || {};
-
   for (const defKey in definitions) {
     const def = definitions[defKey];
     if (def.properties) {
@@ -117,18 +119,56 @@ function fixArraySchemas(spec: Spec) {
   }
 }
 
+function inferSchemaFromExample(example: any, operationId?: string): any {
+  if (!example || typeof example !== "object") {
+    return { type: "string" };
+  }
+  if (Array.isArray(example)) {
+    return {
+      type: "array",
+      items:
+        example.length > 0
+          ? inferSchemaFromExample(example[0], operationId)
+          : { type: "string" },
+    };
+  }
+  const properties: Record<string, any> = {};
+  for (const [key, value] of Object.entries(example)) {
+    if (Array.isArray(value)) {
+      properties[key] = {
+        type: "array",
+        items:
+          value.length > 0
+            ? inferSchemaFromExample(value[0], operationId)
+            : { type: "string" },
+      };
+    } else if (typeof value === "object" && value !== null) {
+      properties[key] = inferSchemaFromExample(value, operationId);
+    } else {
+      properties[key] = {
+        type:
+          typeof value === "object" && value === null
+            ? "object"
+            : typeof value || "string",
+      };
+    }
+  }
+  // Default to array for JSON 200 responses unless explicitly contradicted
+  if (operationId && operationId.endsWith("200Response")) {
+    return { type: "array", items: { type: "object", properties } };
+  }
+  return { type: "object", properties };
+}
+
 function enhanceRawSpec(spec: Spec) {
   spec.definitions = spec.definitions || {};
 
-  // Define Record if not present
   if (!spec.definitions["Record"]) {
     spec.definitions["Record"] = {
       type: "object",
       additionalProperties: {
         type: "object",
-        properties: {
-          value: { type: "string" }, // Generic field value, can be refined later
-        },
+        properties: { value: { type: "string" } },
         required: ["value"],
       },
       description: "A generic QuickBase record with field ID-value pairs",
@@ -136,10 +176,8 @@ function enhanceRawSpec(spec: Spec) {
     console.log("Added Record to definitions");
   }
 
-  // Normalize definition names to camelCase
-  const normalizeDefinitionName = (name: string) => {
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  };
+  const normalizeDefinitionName = (name: string) =>
+    name.charAt(0).toUpperCase() + name.slice(1);
 
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
@@ -150,9 +188,7 @@ function enhanceRawSpec(spec: Spec) {
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
           if (param.in === "body") {
-            if (!param.schema) {
-              param.schema = {};
-            }
+            if (!param.schema) param.schema = {};
             let requestName =
               param.schema.$ref?.split("/").pop() || `${opId}Request`;
             requestName = normalizeDefinitionName(requestName);
@@ -173,9 +209,7 @@ function enhanceRawSpec(spec: Spec) {
               }
               spec.definitions[requestName] = {
                 type: "object",
-                properties: {
-                  [wrapperPropName]: arraySchema,
-                },
+                properties: { [wrapperPropName]: arraySchema },
                 required: arraySchema.minItems > 0 ? [wrapperPropName] : [],
                 description:
                   arraySchema.description || `Request body for ${opId}`,
@@ -322,6 +356,35 @@ function enhanceRawSpec(spec: Spec) {
               console.log(
                 `Adding ${responseName} to definitions for ${pathKey}(${method})`
               );
+              if (!response.schema.type && response["x-amf-mediaType"]) {
+                const mediaType = response["x-amf-mediaType"];
+                if (mediaType === "application/octet-stream") {
+                  // Force a model for binary responses
+                  response.schema = {
+                    type: "object",
+                    properties: { data: { type: "string", format: "binary" } },
+                    description:
+                      response.schema?.description || "Binary file content",
+                  };
+                } else if (mediaType === "application/x-yaml") {
+                  // Force a model for YAML responses
+                  response.schema = {
+                    type: "object",
+                    properties: { content: { type: "string", format: "yaml" } },
+                    description: "YAML-formatted data",
+                  };
+                } else if (
+                  mediaType === "application/json" &&
+                  response.schema.example
+                ) {
+                  response.schema = inferSchemaFromExample(
+                    response.schema.example,
+                    responseName
+                  );
+                  response.schema.description =
+                    response.description || `Response for ${opId}`;
+                }
+              }
               spec.definitions[responseName] = response.schema;
             }
             response.schema = { $ref: `#/definitions/${responseName}` };
@@ -409,14 +472,12 @@ async function main() {
   try {
     const args = process.argv.slice(2);
     let config: FixSpecConfig = {};
-
     for (let i = 0; i < args.length; i++) {
       if (args[i] === "--config" && i + 1 < args.length) {
         config = JSON.parse(args[i + 1]);
         i++;
       }
     }
-
     await fixQuickBaseSpec(config);
   } catch (error) {
     console.error("Fatal error in script execution:", error);

@@ -749,1618 +749,28 @@ tree:
         directory
       children:
         - name: >-
-            temp
+            esm
           type: >-
             directory
           children:
             - name: >-
-                generated
-              type: >-
-                directory
-              children:
-                - name: >-
-                    apis
-                  type: >-
-                    directory
-                  children:
-                    - name: >-
-                        AppsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        AppsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AuditApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        AuditApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AuthApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        AuthApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DocumentTemplatesApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        DocumentTemplatesApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        FieldsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        FieldsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        FilesApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        FilesApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        FormulasApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        FormulasApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RecordsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        RecordsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ReportsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        ReportsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        SolutionsApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        SolutionsApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        TablesApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        TablesApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UserTokenApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        UserTokenApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UsersApi.js
-                      type: >-
-                        file
-                    - name: >-
-                        UsersApi.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        index.js
-                      type: >-
-                        file
-                    - name: >-
-                        index.js.map
-                      type: >-
-                        file
-                - name: >-
-                    index.js
-                  type: >-
-                    file
-                - name: >-
-                    index.js.map
-                  type: >-
-                    file
-                - name: >-
-                    models
-                  type: >-
-                    directory
-                  children:
-                    - name: >-
-                        AddManagersToGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddManagersToGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AddManagersToGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddManagersToGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Audit200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        Audit200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Audit202Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        Audit202Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        AuditRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        AuditRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200ResponseChangesInner.js
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200ResponseChangesInner.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionFromRecord200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionFromRecord200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserToken200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserToken200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserTokenRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserTokenRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CopyApp200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CopyApp200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CopyAppRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CopyAppRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateApp200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateApp200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateAppRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateAppRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateField200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateField200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateFieldRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateFieldRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationship200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationship200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationshipRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationshipRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolution200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolution200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionFromRecord200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionFromRecord200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTable200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTable200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTableRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTableRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeactivateUserToken200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeactivateUserToken200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteApp200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteApp200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteAppRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteAppRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFields200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFields200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFieldsRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFieldsRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFile200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFile200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecords200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecords200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecordsRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecordsRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRelationship200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRelationship200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteTable200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteTable200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteUserToken200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteUserToken200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsers200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsers200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroups200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroups200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroupsRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroupsRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        DownloadFile200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        DownloadFile200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoToken200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoToken200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoTokenRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoTokenRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolution200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolution200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolutionToRecord200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolutionToRecord200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        FieldMap.js
-                      type: >-
-                        file
-                    - name: >-
-                        FieldMap.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        FieldValue.js
-                      type: >-
-                        file
-                    - name: >-
-                        FieldValue.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GenerateDocument200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GenerateDocument200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetApp200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetApp200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppEvents200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppEvents200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppTables200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppTables200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetField200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetField200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldUsage200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldUsage200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetFields200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetFields200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldsUsage200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldsUsage200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetRelationships200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetRelationships200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetReport200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetReport200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetTable200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetTable200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetTableReports200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetTableReports200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetTempTokenDBID200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetTempTokenDBID200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsers200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsers200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsersRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsersRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseMetadata.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseMetadata.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInner.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInner.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseTotals.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseTotals.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseWhereInner.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseWhereInner.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequestWhereInner.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequestWhereInner.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticReads200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticReads200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Record.js
-                      type: >-
-                        file
-                    - name: >-
-                        Record.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroup200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroup200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroupRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroupRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormula200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormula200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormulaRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormulaRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunQuery200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunQuery200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunQueryRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunQueryRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunReport200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunReport200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        RunReportRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        RunReportRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserToken200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserToken200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserTokenRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserTokenRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsers200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsers200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsersRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsersRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateApp200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateApp200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateAppRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateAppRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateField200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateField200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateFieldRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateFieldRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationship200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationship200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationshipRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationshipRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolution200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolution200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionToRecord200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionToRecord200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTable200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTable200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTableRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTableRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert200Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert200Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert207Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert207Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert400Response.js
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert400Response.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        UpsertRequest.js
-                      type: >-
-                        file
-                    - name: >-
-                        UpsertRequest.js.map
-                      type: >-
-                        file
-                    - name: >-
-                        index.js
-                      type: >-
-                        file
-                    - name: >-
-                        index.js.map
-                      type: >-
-                        file
-                - name: >-
-                    runtime.js
-                  type: >-
-                    file
-                - name: >-
-                    runtime.js.map
-                  type: >-
-                    file
-            - name: >-
-                generated-unified
-              type: >-
-                directory
-              children:
-                - name: >-
-                    QuickbaseClient.js
-                  type: >-
-                    file
-                - name: >-
-                    QuickbaseClient.js.map
-                  type: >-
-                    file
-            - name: >-
-                index.js
+                quickbase.d.ts
               type: >-
                 file
             - name: >-
-                index.js.map
+                quickbase.js
               type: >-
                 file
             - name: >-
-                quickbaseClient.js
+                quickbase.js.map
               type: >-
                 file
             - name: >-
-                quickbaseClient.js.map
+                quickbase.min.js
               type: >-
                 file
             - name: >-
-                tokenCache.js
-              type: >-
-                file
-            - name: >-
-                tokenCache.js.map
-              type: >-
-                file
-            - name: >-
-                utils.js
-              type: >-
-                file
-            - name: >-
-                utils.js.map
-              type: >-
-                file
-        - name: >-
-            temp-src
-          type: >-
-            directory
-          children:
-            - name: >-
-                generated
-              type: >-
-                directory
-              children:
-                - name: >-
-                    .openapi-generator
-                  type: >-
-                    directory
-                  children: []
-                - name: >-
-                    apis
-                  type: >-
-                    directory
-                  children:
-                    - name: >-
-                        AppsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AuditApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AuthApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DocumentTemplatesApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        FieldsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        FilesApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        FormulasApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RecordsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ReportsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        SolutionsApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        TablesApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UserTokenApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UsersApi.ts
-                      type: >-
-                        file
-                    - name: >-
-                        index.ts
-                      type: >-
-                        file
-                - name: >-
-                    index.ts
-                  type: >-
-                    file
-                - name: >-
-                    models
-                  type: >-
-                    directory
-                  children:
-                    - name: >-
-                        AddManagersToGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AddManagersToGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AddMembersToGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AddSubgroupsToGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Audit200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Audit202Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        AuditRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolution200ResponseChangesInner.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionFromRecord200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ChangesetSolutionRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserToken200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CloneUserTokenRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CopyApp200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CopyAppRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateApp200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateAppRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateField200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateFieldRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationship200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateRelationshipRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolution200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionFromRecord200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateSolutionRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTable200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        CreateTableRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeactivateUserToken200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteApp200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteAppRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFields200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFieldsRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteFile200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecords200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRecordsRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteRelationship200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteTable200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DeleteUserToken200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsers200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroups200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersAndGroupsRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DenyUsersRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        DownloadFile200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoToken200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ExchangeSsoTokenRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolution200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        ExportSolutionToRecord200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        FieldMap.ts
-                      type: >-
-                        file
-                    - name: >-
-                        FieldValue.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GenerateDocument200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetApp200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppEvents200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetAppTables200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetField200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldUsage200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetFields200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetFieldsUsage200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetRelationships200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetReport200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetTable200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetTableReports200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetTempTokenDBID200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsers200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        GetUsersRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseMetadata.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInner.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseTotals.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummaries200ResponseWhereInner.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticEventSummariesRequestWhereInner.ts
-                      type: >-
-                        file
-                    - name: >-
-                        PlatformAnalyticReads200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Record.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveManagersFromGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveMembersFromGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroup200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RemoveSubgroupsFromGroupRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormula200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunFormulaRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunQuery200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunQueryRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunReport200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        RunReportRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserToken200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        TransferUserTokenRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsers200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UndenyUsersRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateApp200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateAppRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateField200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateFieldRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationship200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateRelationshipRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolution200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateSolutionToRecord200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTable200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpdateTableRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert200Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert207Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        Upsert400Response.ts
-                      type: >-
-                        file
-                    - name: >-
-                        UpsertRequest.ts
-                      type: >-
-                        file
-                    - name: >-
-                        index.ts
-                      type: >-
-                        file
-                - name: >-
-                    runtime.ts
-                  type: >-
-                    file
-            - name: >-
-                generated-unified
-              type: >-
-                directory
-              children:
-                - name: >-
-                    QuickbaseClient.ts
-                  type: >-
-                    file
-            - name: >-
-                index.ts
-              type: >-
-                file
-            - name: >-
-                quickbaseClient.ts
-              type: >-
-                file
-            - name: >-
-                tokenCache.ts
-              type: >-
-                file
-            - name: >-
-                utils.ts
+                quickbase.min.js.map
               type: >-
                 file
         - name: >-
@@ -2463,6 +873,7 @@ tree:
             #!/usr/bin/env
             node
 
+
             import
             {
             promises
@@ -2558,7 +969,6 @@ tree:
             fixArraySchemas(spec:
             Spec)
             {
-              // Fix arrays in paths
               for (const pathKey in spec.paths) {
                 for (const method in spec.paths[pathKey]) {
                   const operation = spec.paths[pathKey][method];
@@ -2568,10 +978,7 @@ tree:
                         console.log(
                           `Fixing array schema for ${pathKey}(${method}).${param.name}`
                         );
-                        param.schema.items =
-                          pathKey === "/records" && param.name === "generated"
-                            ? { $ref: "#/definitions/Record" }
-                            : { type: "string" };
+                        param.schema.items = { type: "string" };
                       }
                       if (param.schema?.properties) {
                         for (const propKey in param.schema.properties) {
@@ -2580,10 +987,7 @@ tree:
                             console.log(
                               `Fixing nested array for ${pathKey}(${method}).${param.name}.${propKey}`
                             );
-                            prop.items =
-                              propKey === "data" && pathKey === "/records"
-                                ? { $ref: "#/definitions/Record" }
-                                : { type: "string" };
+                            prop.items = { type: "string" };
                           }
                         }
                       }
@@ -2596,10 +1000,7 @@ tree:
                         console.log(
                           `Fixing array schema for ${pathKey}(${method}).responses.${status}`
                         );
-                        response.schema.items =
-                          pathKey === "/records"
-                            ? { $ref: "#/definitions/Upsert200Response" }
-                            : { type: "string" };
+                        response.schema.items = { type: "string" };
                       }
                       if (response.schema?.properties) {
                         for (const propKey in response.schema.properties) {
@@ -2608,10 +1009,7 @@ tree:
                             console.log(
                               `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`
                             );
-                            prop.items =
-                              propKey === "data" && pathKey === "/records"
-                                ? { $ref: "#/definitions/Upsert200Response" }
-                                : { type: "string" };
+                            prop.items = { type: "string" };
                           }
                         }
                       }
@@ -2620,7 +1018,6 @@ tree:
                 }
               }
 
-              // Fix arrays in definitions
               console.log("Fixing array schemas in definitions...");
               const definitions = spec.definitions || {};
 
@@ -2631,26 +1028,13 @@ tree:
                     const prop = def.properties[propKey];
                     if (prop.type === "array" && !prop.items) {
                       console.log(`Fixing missing items in ${defKey}.${propKey}`);
-                      if (defKey === "runQueryRequest" && propKey === "select") {
-                        prop.items = { type: "integer" }; // Field IDs
-                      } else if (propKey === "data") {
-                        prop.items = { $ref: "#/definitions/Record" }; // Data arrays
-                      } else {
-                        prop.items = { type: "string" }; // Fallback
-                      }
-                    }
-                    if (prop["x-amf-union"]) {
-                      prop["x-amf-union"].forEach((unionType: any) => {
-                        if (unionType.type === "array" && !unionType.items) {
-                          console.log(`Fixing union array in ${defKey}.${propKey}`);
-                          unionType.items = { type: "object" }; // Default for sortBy-like structures
-                        }
-                      });
+                      prop.items = { type: "string" };
                     }
                   }
                 }
               }
             }
+
 
             function
             enhanceRawSpec(spec:
@@ -2658,41 +1042,27 @@ tree:
             {
               spec.definitions = spec.definitions || {};
 
-              // Define FieldValue and FieldMap
-              spec.definitions["FieldValue"] = {
-                type: "object",
-                description: "A value for a QuickBase field.",
-                properties: {
-                  value: {
-                    anyOf: [
-                      { type: "string" },
-                      { type: "number" },
-                      { type: "boolean" },
-                      { type: "object" },
-                      { type: "array", items: { type: "string" } },
-                    ],
-                  },
-                },
-                required: ["value"],
-              };
-
-              spec.definitions["FieldMap"] = {
-                type: "object",
-                description: "A mapping of field IDs to their values.",
-                additionalProperties: { $ref: "#/definitions/FieldValue" },
-              };
-
-              // Define Record if not present (basic structure for data arrays)
+              // Define Record if not present
               if (!spec.definitions["Record"]) {
                 spec.definitions["Record"] = {
                   type: "object",
-                  description: "A generic QuickBase record.",
-                  additionalProperties: { $ref: "#/definitions/FieldValue" },
+                  additionalProperties: {
+                    type: "object",
+                    properties: {
+                      value: { type: "string" }, // Generic field value, can be refined later
+                    },
+                    required: ["value"],
+                  },
+                  description: "A generic QuickBase record with field ID-value pairs",
                 };
                 console.log("Added Record to definitions");
               }
 
-              // Enhance operations
+              // Normalize definition names to camelCase
+              const normalizeDefinitionName = (name: string) => {
+                return name.charAt(0).toUpperCase() + name.slice(1);
+              };
+
               for (const pathKey in spec.paths) {
                 for (const method in spec.paths[pathKey]) {
                   const operation = spec.paths[pathKey][method];
@@ -2701,7 +1071,155 @@ tree:
 
                   if (operation.parameters) {
                     operation.parameters.forEach((param: Parameter) => {
-                      if (
+                      if (param.in === "body") {
+                        if (!param.schema) {
+                          param.schema = {};
+                        }
+                        let requestName =
+                          param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                        requestName = normalizeDefinitionName(requestName);
+
+                        if (spec.definitions[requestName]?.type === "array") {
+                          console.log(
+                            `Wrapping array schema for ${requestName} in ${pathKey}(${method})`
+                          );
+                          const arraySchema = spec.definitions[requestName];
+                          let wrapperPropName = operation.tags?.includes("Users")
+                            ? "userIds"
+                            : "items";
+                          if (
+                            operation.tags?.includes("Groups") &&
+                            operation.summary?.toLowerCase().includes("subgroup")
+                          ) {
+                            wrapperPropName = "groupIds";
+                          }
+                          spec.definitions[requestName] = {
+                            type: "object",
+                            properties: {
+                              [wrapperPropName]: arraySchema,
+                            },
+                            required: arraySchema.minItems > 0 ? [wrapperPropName] : [],
+                            description:
+                              arraySchema.description || `Request body for ${opId}`,
+                          };
+                        } else {
+                          let properties = spec.definitions[requestName]?.properties || {};
+                          if (
+                            !spec.definitions[requestName] ||
+                            !spec.definitions[requestName].type ||
+                            Object.keys(properties).length === 0
+                          ) {
+                            console.log(
+                              `Defining schema for ${requestName} in ${pathKey}(${method})`
+                            );
+                            if (operation.tags?.includes("Users")) {
+                              properties = {
+                                userIds: { type: "array", items: { type: "string" } },
+                              };
+                            } else if (
+                              operation.tags?.includes("Groups") &&
+                              operation.summary?.toLowerCase().includes("subgroup")
+                            ) {
+                              properties = {
+                                groupIds: { type: "array", items: { type: "string" } },
+                              };
+                            } else if (
+                              operation.tags?.includes("Records") &&
+                              method === "post"
+                            ) {
+                              properties = {
+                                data: {
+                                  type: "array",
+                                  items: { $ref: "#/definitions/Record" },
+                                },
+                                to: { type: "string" },
+                                fieldsToReturn: {
+                                  type: "array",
+                                  items: { type: "integer" },
+                                },
+                              };
+                            } else if (
+                              operation.tags?.includes("Records") &&
+                              method === "delete"
+                            ) {
+                              properties = {
+                                from: { type: "string" },
+                                where: { type: "string" },
+                              };
+                            } else if (
+                              operation.tags?.includes("Records") &&
+                              operation.summary?.toLowerCase().includes("query")
+                            ) {
+                              properties = {
+                                from: { type: "string" },
+                                select: { type: "array", items: { type: "integer" } },
+                                where: { type: "string" },
+                              };
+                            } else if (operation.tags?.includes("Formulas")) {
+                              properties = { formula: { type: "string" } };
+                            } else if (
+                              operation.tags?.includes("Apps") ||
+                              operation.tags?.includes("Tables")
+                            ) {
+                              properties = { name: { type: "string" } };
+                            } else if (operation.tags?.includes("Fields")) {
+                              properties =
+                                method === "delete"
+                                  ? {
+                                      fieldIds: {
+                                        type: "array",
+                                        items: { type: "integer" },
+                                      },
+                                    }
+                                  : {
+                                      label: { type: "string" },
+                                      fieldType: { type: "string" },
+                                    };
+                            } else if (operation.tags?.includes("Reports")) {
+                              properties = {
+                                filters: { type: "array", items: { type: "object" } },
+                              };
+                            } else if (operation.tags?.includes("Auth")) {
+                              properties = { token: { type: "string" } };
+                            } else if (operation.tags?.includes("UserToken")) {
+                              properties = operation.summary
+                                ?.toLowerCase()
+                                .includes("transfer")
+                                ? {
+                                    userToken: { type: "string" },
+                                    toUserId: { type: "string" },
+                                  }
+                                : { userToken: { type: "string" } };
+                            } else if (operation.tags?.includes("Audit")) {
+                              properties = {
+                                events: { type: "array", items: { type: "object" } },
+                              };
+                            } else if (operation.tags?.includes("Analytics")) {
+                              properties = {
+                                where: { type: "array", items: { type: "object" } },
+                              };
+                            } else if (operation.tags?.includes("Solutions")) {
+                              properties = { name: { type: "string" } };
+                            } else {
+                              properties = {
+                                items: { type: "array", items: { type: "string" } },
+                              };
+                            }
+                            spec.definitions[requestName] = {
+                              type: "object",
+                              properties,
+                              required: Object.keys(properties).filter(
+                                (key) => key !== "fieldsToReturn"
+                              ),
+                              description: operation.summary || `Request body for ${opId}`,
+                            };
+                          }
+                        }
+                        param.schema = { $ref: `#/definitions/${requestName}` };
+                        console.log(
+                          `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                        );
+                      } else if (
                         !param.type &&
                         !param.schema &&
                         (param.in === "path" || param.in === "query")
@@ -2709,20 +1227,6 @@ tree:
                         param.type = param.name.includes("Id") ? "string" : "string";
                         console.log(
                           `Set default type 'string' for ${pathKey}(${method}).${param.name}`
-                        );
-                      }
-                      if (param.in === "body" && param.schema) {
-                        const requestName = `${opId}Request`;
-                        if (!param.schema.type) {
-                          param.schema.type = "string";
-                          console.log(
-                            `Set schema type to 'string' for ${pathKey}(${method}).${param.name}`
-                          );
-                        }
-                        spec.definitions[requestName] = param.schema;
-                        param.schema = { $ref: `#/definitions/${requestName}` };
-                        console.log(
-                          `Added ${requestName} to definitions for ${pathKey}(${method})`
                         );
                       }
                     });
@@ -2733,12 +1237,16 @@ tree:
                       const response = operation.responses[status];
                       if (response.schema) {
                         const cleanStatus = status.replace("/", "_");
-                        const responseName = `${opId}${cleanStatus}Response`;
-                        spec.definitions[responseName] = response.schema;
-                        response.schema = { $ref: `#/definitions/${responseName}` };
-                        console.log(
-                          `Added ${responseName} to definitions for ${pathKey}(${method})`
+                        const responseName = normalizeDefinitionName(
+                          `${opId}${cleanStatus}Response`
                         );
+                        if (!spec.definitions[responseName]) {
+                          console.log(
+                            `Adding ${responseName} to definitions for ${pathKey}(${method})`
+                          );
+                          spec.definitions[responseName] = response.schema;
+                        }
+                        response.schema = { $ref: `#/definitions/${responseName}` };
                       }
                     }
                   }
@@ -2811,6 +1319,9 @@ tree:
                   }
                 }
 
+                if (!config.applyOverrides) {
+                  console.log("Running with no overrides, using raw spec only...");
+                }
                 console.log("Enhancing raw spec...");
                 enhanceRawSpec(spec);
 
@@ -2859,10 +1370,11 @@ tree:
 
             import
             {
-            readFileSync,
-            writeFileSync,
-            mkdirSync,
-            existsSync
+              readFileSync,
+              writeFileSync,
+              mkdirSync,
+              existsSync,
+              readdirSync,
             }
             from
             "fs";
@@ -2923,6 +1435,15 @@ tree:
             join(OUTPUT_DIR,
             "QuickbaseClient.ts");
 
+            const
+            MODELS_DIR
+            =
+            join(__dirname,
+            "..",
+            "src",
+            "generated",
+            "models");
+
 
             function
             mapOpenApiTypeToTs(
@@ -2953,7 +1474,9 @@ tree:
               schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
               modelImports: Set<string>,
               spec: OpenAPIV2.Document,
-              depth: number = 0
+              depth: number = 0,
+              availableModels: string[],
+              missingTypes: Set<string>
             ):
             string
             {
@@ -2963,8 +1486,15 @@ tree:
                 const refParts = schema.$ref.split("/");
                 const model = refParts[refParts.length - 1];
                 const camelModel = model.charAt(0).toUpperCase() + model.slice(1);
-                modelImports.add(camelModel);
-                return camelModel;
+                if (availableModels.includes(camelModel)) {
+                  modelImports.add(camelModel);
+                  return camelModel;
+                }
+                missingTypes.add(camelModel);
+                console.warn(
+                  `Type ${camelModel} not found in /generated/models, defaulting to 'any'`
+                );
+                return "any";
               }
 
               if ("type" in schema) {
@@ -2972,7 +1502,14 @@ tree:
                   const items = schema.items as
                     | OpenAPIV2.SchemaObject
                     | OpenAPIV2.ReferenceObject;
-                  const itemType = mapRefToType(items, modelImports, spec, depth + 1);
+                  const itemType = mapRefToType(
+                    items,
+                    modelImports,
+                    spec,
+                    depth + 1,
+                    availableModels,
+                    missingTypes
+                  );
                   return `${itemType}[]`;
                 }
 
@@ -2989,7 +1526,9 @@ tree:
                       additionalProps,
                       modelImports,
                       spec,
-                      depth + 1
+                      depth + 1,
+                      availableModels,
+                      missingTypes
                     );
                     return `{ [key: string]: ${valueType} }`;
                   }
@@ -3000,7 +1539,9 @@ tree:
                         propSchema,
                         modelImports,
                         spec,
-                        depth + 1
+                        depth + 1,
+                        availableModels,
+                        missingTypes
                       );
                       return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
                     });
@@ -3032,7 +1573,14 @@ tree:
               ) as OpenAPIV2.Document;
               const { paths } = spec;
 
+              // Load available models from /generated/models
+              const availableModels = readdirSync(MODELS_DIR)
+                .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
+                .map((file) => file.replace(".ts", ""));
+              console.log("Available models:", availableModels);
+
               const modelImports = new Set<string>();
+              const missingTypes = new Set<string>();
               const methods: string[] = [];
 
               for (const [path, methodsObj] of Object.entries(
@@ -3057,10 +1605,16 @@ tree:
                     })
                     .map((param: OpenAPIV2.Parameter) => {
                       if (!("name" in param)) return "";
-
                       let type: string;
                       if ("schema" in param && param.schema) {
-                        type = mapRefToType(param.schema, modelImports, spec, 1);
+                        type = mapRefToType(
+                          param.schema,
+                          modelImports,
+                          spec,
+                          1,
+                          availableModels,
+                          missingTypes
+                        );
                       } else if ("type" in param && param.type) {
                         type = mapOpenApiTypeToTs(param.type);
                       } else {
@@ -3083,16 +1637,22 @@ tree:
                         | undefined,
                     }))
                     .filter(({ response }) => response?.schema);
-                  const returnTypes = successResponses.map(({ response }) => {
-                    return mapRefToType(response!.schema, modelImports, spec, 1);
-                  });
+                  const returnTypes = successResponses.map(({ response }) =>
+                    mapRefToType(
+                      response!.schema,
+                      modelImports,
+                      spec,
+                      1,
+                      availableModels,
+                      missingTypes
+                    )
+                  );
                   const uniqueReturnTypes = [...new Set(returnTypes)];
                   const returnType =
                     uniqueReturnTypes.length > 1
                       ? uniqueReturnTypes.join(" | ")
                       : uniqueReturnTypes[0] || "void";
 
-                  // Generate JSDoc
                   const jsDoc = [
                     `  /**`,
                     `   * ${summary}`,
@@ -3105,6 +1665,21 @@ tree:
                     `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
                   );
                 }
+              }
+
+              // Log and report missing types
+              if (missingTypes.size > 0) {
+                console.log(
+                  "Missing types detected (defaulted to 'any'):",
+                  Array.from(missingTypes)
+                );
+                writeFileSync(
+                  join(OUTPUT_DIR, "missing-types-report.json"),
+                  JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
+                );
+                console.log("Missing types report saved to missing-types-report.json");
+              } else {
+                console.log("No missing types detected.");
               }
 
               const importStatement =
@@ -3689,11 +2264,39 @@ tree:
                   type: >-
                     file
                 - name: >-
-                    ChangesetSolution200ResponseChangesInner.ts
+                    ChangesetSolution400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolution401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolution404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolution4xx5xxResponse.ts
                   type: >-
                     file
                 - name: >-
                     ChangesetSolutionFromRecord200Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolutionFromRecord400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolutionFromRecord401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolutionFromRecord404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolutionFromRecord4xx5xxResponse.ts
                   type: >-
                     file
                 - name: >-
@@ -3745,7 +2348,35 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    CreateSolution400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolution401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolution4xx5xxResponse.ts
+                  type: >-
+                    file
+                - name: >-
                     CreateSolutionFromRecord200Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolutionFromRecord400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolutionFromRecord401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolutionFromRecord404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolutionFromRecord4xx5xxResponse.ts
                   type: >-
                     file
                 - name: >-
@@ -3837,15 +2468,39 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    ExportSolution400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ExportSolution401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ExportSolution404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ExportSolution4xx5xxResponse.ts
+                  type: >-
+                    file
+                - name: >-
                     ExportSolutionToRecord200Response.ts
                   type: >-
                     file
                 - name: >-
-                    FieldMap.ts
+                    ExportSolutionToRecord400Response.ts
                   type: >-
                     file
                 - name: >-
-                    FieldValue.ts
+                    ExportSolutionToRecord401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ExportSolutionToRecord404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ExportSolutionToRecord4xx5xxResponse.ts
                   type: >-
                     file
                 - name: >-
@@ -3913,35 +2568,7 @@ tree:
                   type: >-
                     file
                 - name: >-
-                    PlatformAnalyticEventSummaries200ResponseMetadata.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummaries200ResponseResultsInner.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummaries200ResponseResultsInnerTotals.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummaries200ResponseTotals.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummaries200ResponseWhereInner.ts
-                  type: >-
-                    file
-                - name: >-
                     PlatformAnalyticEventSummariesRequest.ts
-                  type: >-
-                    file
-                - name: >-
-                    PlatformAnalyticEventSummariesRequestWhereInner.ts
                   type: >-
                     file
                 - name: >-
@@ -3950,6 +2577,10 @@ tree:
                     file
                 - name: >-
                     Record.ts
+                  type: >-
+                    file
+                - name: >-
+                    RecordValue.ts
                   type: >-
                     file
                 - name: >-
@@ -4045,11 +2676,39 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    UpdateSolution400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolution401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolution4xx5xxResponse.ts
+                  type: >-
+                    file
+                - name: >-
                     UpdateSolutionRequest.ts
                   type: >-
                     file
                 - name: >-
                     UpdateSolutionToRecord200Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolutionToRecord400Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolutionToRecord401403Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolutionToRecord404Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolutionToRecord4xx5xxResponse.ts
                   type: >-
                     file
                 - name: >-
@@ -4097,7 +2756,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-14T19:56:31.208Z
+                2025-03-15T20:32:41.783Z
 
                 import
                 {
@@ -4109,8 +2768,6 @@ tree:
                 AddSubgroupsToGroupRequest,
                 Audit200Response,
                 AuditRequest,
-                ChangesetSolution200Response,
-                ChangesetSolutionFromRecord200Response,
                 ChangesetSolutionRequest,
                 CloneUserToken200Response,
                 CloneUserTokenRequest,
@@ -4122,8 +2779,6 @@ tree:
                 CreateFieldRequest,
                 CreateRelationship200Response,
                 CreateRelationshipRequest,
-                CreateSolution200Response,
-                CreateSolutionFromRecord200Response,
                 CreateSolutionRequest,
                 CreateTable200Response,
                 CreateTableRequest,
@@ -4142,11 +2797,8 @@ tree:
                 DenyUsersAndGroups200Response,
                 DenyUsersAndGroupsRequest,
                 DenyUsersRequest,
-                DownloadFile200Response,
                 ExchangeSsoToken200Response,
                 ExchangeSsoTokenRequest,
-                ExportSolution200Response,
-                ExportSolutionToRecord200Response,
                 GenerateDocument200Response,
                 GetApp200Response,
                 GetAppEvents200Response,
@@ -4187,9 +2839,7 @@ tree:
                 UpdateFieldRequest,
                 UpdateRelationship200Response,
                 UpdateRelationshipRequest,
-                UpdateSolution200Response,
                 UpdateSolutionRequest,
-                UpdateSolutionToRecord200Response,
                 UpdateTable200Response,
                 UpdateTableRequest,
                 Upsert200Response,
@@ -4419,7 +3069,7 @@ tree:
                    * @param params - Parameters for the downloadFile operation
                    * @returns A promise resolving to the downloadFile response
                    */
-                  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DownloadFile200Response>;
+                  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<any>;
                   /**
                    * Delete file
                    * @param params - Parameters for the deleteFile operation
@@ -4509,49 +3159,49 @@ tree:
                    * @param params - Parameters for the exportSolution operation
                    * @returns A promise resolving to the exportSolution response
                    */
-                  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<ExportSolution200Response>;
+                  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<any>;
                   /**
                    * Update a solution
                    * @param params - Parameters for the updateSolution operation
                    * @returns A promise resolving to the updateSolution response
                    */
-                  updateSolution: (params: { solutionId: string; body?: UpdateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
+                  updateSolution: (params: { solutionId: string; body?: UpdateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * Create a solution
                    * @param params - Parameters for the createSolution operation
                    * @returns A promise resolving to the createSolution response
                    */
-                  createSolution: (params: { body?: CreateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
+                  createSolution: (params: { body?: CreateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * Export solution to record
                    * @param params - Parameters for the exportSolutionToRecord operation
                    * @returns A promise resolving to the exportSolutionToRecord response
                    */
-                  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<ExportSolutionToRecord200Response>;
+                  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<any>;
                   /**
                    * Create solution from record
                    * @param params - Parameters for the createSolutionFromRecord operation
                    * @returns A promise resolving to the createSolutionFromRecord response
                    */
-                  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolutionFromRecord200Response>;
+                  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * Update solution from record
                    * @param params - Parameters for the updateSolutionToRecord operation
                    * @returns A promise resolving to the updateSolutionToRecord response
                    */
-                  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolutionToRecord200Response>;
+                  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * List solution changes
                    * @param params - Parameters for the changesetSolution operation
                    * @returns A promise resolving to the changesetSolution response
                    */
-                  changesetSolution: (params: { solutionId: string; body?: ChangesetSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
+                  changesetSolution: (params: { solutionId: string; body?: ChangesetSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * List solution changes from record
                    * @param params - Parameters for the changesetSolutionFromRecord operation
                    * @returns A promise resolving to the changesetSolutionFromRecord response
                    */
-                  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolutionFromRecord200Response>;
+                  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<any>;
                   /**
                    * Generate a document
                    * @param params - Parameters for the generateDocument operation
@@ -4559,6 +3209,10 @@ tree:
                    */
                   generateDocument: (params: { templateId: number; tableId: string; recordId?: number; filename: string; accept?: string; format?: string; margin?: string; unit?: string; pageSize?: string; orientation?: string; realm?: string }) => Promise<GenerateDocument200Response>;
                 }
+            - name: >-
+                missing-types-report.json
+              type: >-
+                file
         - name: >-
             index.ts
           type: >-
@@ -4626,7 +3280,7 @@ tree:
             export
             *
             from
-            "./generated/models";
+            "./generated/models/index";
 
 
             //

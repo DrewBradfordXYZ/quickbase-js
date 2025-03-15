@@ -1,15 +1,12 @@
 // src/quickbaseClient.ts
+
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders, ResponseError } from "./generated/runtime";
 import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
-import { simplifyName } from "./utils.ts"; // Add this import
+import { simplifyName } from "./utils.ts";
 
-// Re-export all model types from generated/models
 export * from "./generated/models/index";
-
-// Remove the local simplifyName function
-// (The rest of the file remains unchanged)
 
 export interface QuickbaseClient extends IQuickbaseClient {}
 
@@ -46,7 +43,7 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .toString()
     .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
     .split(",")
-    .map((p) => p.trim().split("=")[0].trim())
+    .map((p) => p.trim().split("=")[0]?.trim())
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
 const extractDbid = (
@@ -92,7 +89,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     basePath: baseUrl,
     headers: { ...baseHeaders },
     fetchApi: fetchApi || defaultFetch,
-    credentials: "omit", // Default to "omit" for all requests
+    credentials: "omit",
   });
 
   if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
@@ -157,7 +154,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       {
         method: "GET",
         headers: { ...baseHeaders },
-        credentials: "include", // Explicitly include credentials for token fetch
+        credentials: "include",
       }
     );
 
@@ -177,13 +174,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
     tokenCache.set(dbid, token);
     if (debug) {
-      console.log(
-        `Fetched and cached new token for dbid: ${dbid}`,
-        token,
-        `Expires at: ${new Date(
-          Date.now() + (4 * 60 + 50) * 1000
-        ).toISOString()}`
-      );
+      console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
     }
     return token;
   };
@@ -204,7 +195,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         ? { requestParameters: params }
         : params;
     let requestOptions: RequestInit = {
-      credentials: "omit", // Explicitly set to "omit" for API calls
+      credentials: "omit",
     };
 
     const selectedToken =
@@ -245,7 +236,27 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
 
     try {
-      return await methodInfo.method(requestParameters, requestOptions);
+      const response = await methodInfo.method(
+        requestParameters,
+        requestOptions
+      );
+      if (response instanceof Response) {
+        const contentType = response.headers.get("Content-Type")?.toLowerCase();
+        if (contentType?.includes("application/octet-stream")) {
+          return (await response.arrayBuffer()) as ReturnType<
+            QuickbaseClient[K]
+          >;
+        } else if (
+          contentType?.includes("application/x-yaml") ||
+          contentType?.includes("text/yaml")
+        ) {
+          return (await response.text()) as ReturnType<QuickbaseClient[K]>;
+        } else if (contentType?.includes("application/json")) {
+          return (await response.json()) as ReturnType<QuickbaseClient[K]>;
+        }
+        return response as ReturnType<QuickbaseClient[K]>;
+      }
+      return response;
     } catch (error) {
       if (
         error instanceof ResponseError &&
