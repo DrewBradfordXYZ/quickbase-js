@@ -1,6 +1,6 @@
 {
   "name": "quickbase-js",
-  "version": "0.1.0-beta.6",
+  "version": "0.1.0-beta.7",
   "description": "QuickBase JavaScript client for frameworks and vanilla JS",
   "type": "module",
   "main": "dist/esm/quickbase.js",

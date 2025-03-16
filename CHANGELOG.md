@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.7](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.6...v0.1.0-beta.7) (2025-03-16)
+
+
+### Features
+
+* added Record, hybrid semantic naming, fully typed QuickbaseClient with few response models left as type:any ([535a02e](https://github.com/DrewBradfordXYZ/quickbase-js/commit/535a02e10d5974d2a2deb6dc213286da94d68dea))
+* all fields tests pass ([84c539f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/84c539fce7ba9d57c997b831be404a1398a6ac25))
+* all types, methods and files generated ([f25bea0](https://github.com/DrewBradfordXYZ/quickbase-js/commit/f25bea0e65a019d75b39a9caf85901d520bf1ac8))
+* build files always produce production code ([2f78598](https://github.com/DrewBradfordXYZ/quickbase-js/commit/2f785984416c61e1b3deda2b801071cbb1303a74))
+* copyApp unit test passes ([0e13f91](https://github.com/DrewBradfordXYZ/quickbase-js/commit/0e13f918c5daabbbd6e17c2424b3f18eca2eb3a4))
+* FieldMap issue resolved ([b3b7b41](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b3b7b415d6a0f7701851f32a5e0b1207a07ba481))
+* getApp and deleteApp test passes ([f5225e0](https://github.com/DrewBradfordXYZ/quickbase-js/commit/f5225e06299de58f34d6a765e73268d9a54e807d))
+* getAppEvents spec update ([1028255](https://github.com/DrewBradfordXYZ/quickbase-js/commit/10282559cd76d004899fa2ebcea6f5f435ffae2b))
+* import and upsert success ([ea9d9ee](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ea9d9eef8384ad73b8cffb8183fbc374ab9cc25b))
+* log-gen yaml file gets created next to the build file ([cfe25af](https://github.com/DrewBradfordXYZ/quickbase-js/commit/cfe25afb60498909d2bac8ec963484e1c1b42d3f))
+* logging for swagger2.0 ([819aa17](https://github.com/DrewBradfordXYZ/quickbase-js/commit/819aa170cfc02e4e5b223ac13834d50bce5dda93))
+* missing-types-report updated to empty on success ([e35b28d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/e35b28d61563b21f7bad3e1c9c3751bfa254ab4a))
+* QuickbaseClient is fully-typed from raw spec ([5c875c2](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5c875c2ee07c38731c5609c384aaa8d3fbbdd64a))
+* reorganize open-api folder ([a0fe5bd](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a0fe5bda606c37e7636d36c7fc5e233d191ac249))
+* simplifyName refactor again ([2a2952e](https://github.com/DrewBradfordXYZ/quickbase-js/commit/2a2952ea90fab818501d17908d6cd85a79c41adb))
+* split up fix-spec- files ([85b6a3e](https://github.com/DrewBradfordXYZ/quickbase-js/commit/85b6a3efb92520a46aa619bdfc4bf70d06984b3f))
+* unit auth tests pass ([494897f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/494897f4551854096f89b1af43df4a455dfd9f4b))
+* unit records tests pass ([8160b53](https://github.com/DrewBradfordXYZ/quickbase-js/commit/8160b53378447fcd8e37fac178e7d4693b502288))
+* unit tables tests pass ([c4ec0ac](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c4ec0ac378dd03e5d018b4ea83530e2c0fe905a2))
+* unit tests for apps folder is passing ([72ae8e5](https://github.com/DrewBradfordXYZ/quickbase-js/commit/72ae8e529cddc66626617c6b1ff672f40763f7b7))
+* update scripts to call integration tests, all tests pass ([08911f7](https://github.com/DrewBradfordXYZ/quickbase-js/commit/08911f76b214e6eb3ca8b4362c156d55383d7264))
+
+
+### Bug Fixes
+
+* added back CreateRelationshipRequest and UpdateRelationshipRequest ([0d932ee](https://github.com/DrewBradfordXYZ/quickbase-js/commit/0d932eed8b603c6b84e13b8834a89722b91fabf3))
+* generate-unified-interface type fixes ([b8acd16](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b8acd16805f456336d396856c6ff88a29aa02813))
+* playwright cleanup and type fixes ([ff30a15](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ff30a15c1a244c7eb1ad4f52941f60b775bb88d4))
+* remove the old /paths /definitons completely in scripts ([48ee6a3](https://github.com/DrewBradfordXYZ/quickbase-js/commit/48ee6a3b15579ca9224b89acde73f492e0769cab))
+* update tags/tables.ts to match raw schema ([c6ed554](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c6ed554f0994187224219b454d1e8671307fc189))
+
 ## [1.1.0-beta.6](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2025-03-13)
 
 
