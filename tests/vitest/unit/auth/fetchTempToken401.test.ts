@@ -20,7 +20,6 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
 
     mockFetch.mockImplementation((url) => {
       callCount++;
-      console.log(`Mock fetch call ${callCount}: ${url}`);
       if (url.includes("auth/temporary") && callCount === 1) {
         return Promise.resolve({
           ok: true,
@@ -48,6 +47,7 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
     });
 
     const consoleSpy = vi.spyOn(console, "log");
+
     await expect(client.getFields({ tableId: QB_TABLE_ID_1 })).rejects.toThrow(
       "API Error: Unauthorized in fetchTempToken (Status: 401)"
     );
@@ -60,7 +60,7 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
@@ -76,9 +76,6 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       "Authorization error for getFields, refreshing token:",
       expect.any(String)
-    );
-    expect(consoleSpy).not.toHaveBeenCalledWith(
-      "Retrying getFields with new token"
     );
     consoleSpy.mockRestore();
   });

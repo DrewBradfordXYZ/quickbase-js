@@ -1,5 +1,4 @@
 // src/quickbaseClient.ts
-
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders, ResponseError } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -49,10 +48,7 @@ const getParamNames = (fn: (...args: any[]) => any): string[] =>
     .map((p) => p.trim().split("=")[0]?.trim())
     .filter((p) => p && !p.match(/^\{/) && p !== "options");
 
-const extractDbid = (
-  params: Partial<TempTokenParams>,
-  errorMessage: string
-): string => {
+const extractDbid = (params: Partial<TempTokenParams>, errorMessage: string): string => {
   const dbid = params.dbid || params.tableId || params.appId;
   if (!dbid) {
     throw new Error(errorMessage);
@@ -63,15 +59,11 @@ const extractDbid = (
 // Utility to convert ISO date strings to Date objects recursively, with optional conversion
 function transformDates(obj: any, convertStringsToDates: boolean = true): any {
   if (obj === null || obj === undefined) return obj;
-  // If it's already a Date object, return it as-is
   if (obj instanceof Date) return obj;
-  // Convert strings to Date objects if enabled
   if (
     convertStringsToDates &&
     typeof obj === "string" &&
-    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(
-      obj
-    )
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(obj)
   ) {
     return new Date(obj);
   }
@@ -153,13 +145,10 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       Object.getOwnPropertyNames(Object.getPrototypeOf(api))
         .filter(
           (name) =>
-            isValidMethod(name) &&
-            typeof api[name as keyof typeof api] === "function"
+            isValidMethod(name) && typeof api[name as keyof typeof api] === "function"
         )
         .forEach((rawMethodName) => {
-          const simplifiedName = simplifyName(
-            rawMethodName
-          ) as keyof QuickbaseClient;
+          const simplifiedName = simplifyName(rawMethodName) as keyof QuickbaseClient;
           const method = api[rawMethodName as keyof typeof api];
           const boundMethod = method.bind(api as any) as unknown;
           if (typeof boundMethod === "function" && boundMethod.length <= 2) {
@@ -177,9 +166,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const fetchTempToken = async (dbid: string): Promise<string> => {
     const effectiveFetch = fetchApi || defaultFetch;
     if (!effectiveFetch) {
-      throw new Error(
-        "No fetch implementation available for fetching temp token"
-      );
+      throw new Error("No fetch implementation available for fetching temp token");
     }
 
     const response = await effectiveFetch(
@@ -194,9 +181,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     if (!response.ok) {
       const errorBody: { message?: string } = await response.json();
       throw new Error(
-        `API Error: ${errorBody.message || "Unknown error"} (Status: ${
-          response.status
-        })`
+        `API Error: ${errorBody.message || "Unknown error"} (Status: ${response.status})`
       );
     }
 
@@ -222,9 +207,13 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
+    // Separate body and non-body parameters
+    const { body, ...restParams } = params;
+
+    // Construct requestParameters with body preserved and other params mapped
     const requestParameters: any = {
-      ...params,
-      generated: "body" in params ? { ...params.body } : undefined,
+      ...restParams, // e.g., tableId, fieldId, etc.
+      ...(body ? { body: { ...body } } : {}), // Include full body if present
     };
 
     let requestOptions: RequestInit = {
@@ -238,9 +227,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
       const cachedToken = tokenCache.get(dbid);
       if (cachedToken) {
-        return { temporaryAuthorization: cachedToken } as ReturnType<
-          QuickbaseClient[K]
-        >;
+        return { temporaryAuthorization: cachedToken } as ReturnType<QuickbaseClient[K]>;
       }
     }
 
@@ -274,10 +261,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
 
     try {
-      const response = await methodInfo.method(
-        requestParameters,
-        requestOptions
-      );
+      const response = await methodInfo.method(requestParameters, requestOptions);
       if (debug) {
         console.log(`[${methodName}] rawResponse:`, response);
       }
@@ -287,9 +271,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           console.log(`[${methodName}] contentType:`, contentType);
         }
         if (contentType?.includes("application/octet-stream")) {
-          return (await response.arrayBuffer()) as ReturnType<
-            QuickbaseClient[K]
-          >;
+          return (await response.arrayBuffer()) as ReturnType<QuickbaseClient[K]>;
         } else if (
           contentType?.includes("application/x-yaml") ||
           contentType?.includes("text/yaml")
@@ -300,33 +282,20 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           if (debug) {
             console.log(`[${methodName}] jsonResponse:`, jsonResponse);
           }
-          const transformedResponse = transformDates(
-            jsonResponse,
-            convertDates
-          );
+          const transformedResponse = transformDates(jsonResponse, convertDates);
           if (debug) {
-            console.log(
-              `[${methodName}] transformedResponse:`,
-              transformedResponse
-            );
+            console.log(`[${methodName}] transformedResponse:`, transformedResponse);
           }
           return transformedResponse as ReturnType<QuickbaseClient[K]>;
         }
         return response as ReturnType<QuickbaseClient[K]>;
       } else {
         if (debug) {
-          console.log(
-            `[${methodName}] non-Response return, applying transform:`,
-            response
-          );
+          console.log(`[${methodName}] non-Response return, applying transform:`, response);
         }
-        // Handle case where the generated API returns a pre-parsed object
         const transformedResponse = transformDates(response, convertDates);
         if (debug) {
-          console.log(
-            `[${methodName}] transformedNonResponse:`,
-            transformedResponse
-          );
+          console.log(`[${methodName}] transformedNonResponse:`, transformedResponse);
         }
         return transformedResponse as ReturnType<QuickbaseClient[K]>;
       }
@@ -338,10 +307,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         useTempTokens
       ) {
         if (debug) {
-          console.log(
-            `Authorization error for ${methodName}, refreshing token:`,
-            error.message
-          );
+          console.log(`Authorization error for ${methodName}, refreshing token:`, error.message);
         }
         const dbid = extractDbid(
           params,
@@ -360,7 +326,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       if (error instanceof ResponseError) {
         let errorMessage = error.message;
         try {
-          const errorBody: { message?: string } = await error.response.json();
+          const errorBody: { message Seismic?): string } = await error.response.json();
           if (debug) {
             console.log(`Error response body for ${methodName}:`, errorBody);
           }
@@ -368,9 +334,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         } catch (e) {
           // Silent fail on parse error
         }
-        throw new Error(
-          `API Error: ${errorMessage} (Status: ${error.response.status})`
-        );
+        throw new Error(`API Error: ${errorMessage} (Status: ${error.response.status})`);
       }
       throw error;
     }
@@ -386,6 +350,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       return undefined;
     },
   });
+
+  if (debug) {
+    console.log("[createClient] Config:", config);
+    console.log("[createClient] Returning:", proxy);
+  }
 
   return proxy;
 }

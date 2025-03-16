@@ -1,3 +1,4 @@
+// tests/vitest/unit/auth/two401s.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createClient, mockFetch } from "@tests/setup.ts";
 
@@ -16,7 +17,6 @@ describe("QuickbaseClient - Two 401s in a Row", () => {
 
     mockFetch.mockImplementation((url) => {
       callCount++;
-      console.log(`Mock fetch call ${callCount}: ${url}`);
       if (url.includes("auth/temporary") && callCount === 1) {
         return Promise.resolve({
           ok: true,
@@ -43,26 +43,34 @@ describe("QuickbaseClient - Two 401s in a Row", () => {
         return Promise.resolve({
           ok: false,
           status: 401,
-          json: () => Promise.resolve({ message: "Unauthorized again" }), // Changed to json()
-          text: () => Promise.resolve("Unauthorized again"), // Keep text() for fallback
+          json: () => Promise.resolve({ message: "Unauthorized again" }),
         });
       }
       return Promise.reject(new Error(`Unexpected fetch call: ${url}`));
     });
 
     const consoleSpy = vi.spyOn(console, "log");
+
     await expect(client.getFields({ tableId: mockDbid })).rejects.toThrow(
       "API Error: Unauthorized again (Status: 401)"
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(4);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields, refreshing token:",
-      expect.any(String)
+
+    const tokenLogs = consoleSpy.mock.calls.filter((call) =>
+      call[0].includes("Fetched and cached new token")
     );
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(tokenLogs).toContainEqual([
+      "Fetched and cached new token for dbid: mockDbid123",
+      mockToken,
+    ]);
+    expect(tokenLogs).toContainEqual([
       "Fetched and cached new token for dbid: mockDbid123",
       mockToken + "_retry",
+    ]);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Authorization error for getFields, refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -72,6 +80,7 @@ describe("QuickbaseClient - Two 401s in a Row", () => {
       "Error response body for getFields:",
       { message: "Unauthorized again" }
     );
+
     consoleSpy.mockRestore();
   });
 });

@@ -1,7 +1,7 @@
 project: >-
   quickbase-js
 date: >-
-  3/15/2025
+  3/16/2025
 root: >-
   /home/drew/Projects/quickbase-js
 goals:
@@ -2409,7 +2409,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-16T01:42:41.163Z
+                2025-03-16T03:01:39.677Z
 
                 import
                 {
@@ -2952,6 +2952,7 @@ tree:
               useTempTokens?: boolean;
               debug?: boolean;
               fetchApi?: typeof fetch;
+              convertDates?: boolean; // New flag to control date string conversion, defaults to true
             }
 
 
@@ -2995,11 +2996,7 @@ tree:
             MethodMap
             =
             {
-            [K
-            in
-            keyof
-            QuickbaseClient]:
-            MethodInfo<K>
+              [K in keyof QuickbaseClient]: MethodInfo<K>;
             };
 
 
@@ -3048,16 +3045,26 @@ tree:
             to
             Date
             objects
-            recursively
+            recursively,
+            with
+            optional
+            conversion
 
             function
             transformDates(obj:
-            any):
+            any,
+            convertStringsToDates:
+            boolean
+            =
+            true):
             any
             {
               if (obj === null || obj === undefined) return obj;
-              // Match ISO 8601 dates (e.g., "2025-03-11T10:00:00Z", "2025-03-11T10:00:00.000Z")
+              // If it's already a Date object, return it as-is
+              if (obj instanceof Date) return obj;
+              // Convert strings to Date objects if enabled
               if (
+                convertStringsToDates &&
                 typeof obj === "string" &&
                 /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(
                   obj
@@ -3066,11 +3073,14 @@ tree:
                 return new Date(obj);
               }
               if (Array.isArray(obj)) {
-                return obj.map(transformDates);
+                return obj.map((item) => transformDates(item, convertStringsToDates));
               }
               if (typeof obj === "object") {
                 return Object.fromEntries(
-                  Object.entries(obj).map(([key, value]) => [key, transformDates(value)])
+                  Object.entries(obj).map(([key, value]) => [
+                    key,
+                    transformDates(value, convertStringsToDates),
+                  ])
                 );
               }
               return obj;
@@ -3090,6 +3100,7 @@ tree:
                 useTempTokens,
                 fetchApi,
                 debug,
+                convertDates = true, // Default to true for backward compatibility
               } = config;
               const baseUrl = `https://api.quickbase.com/v1`;
 
@@ -3292,7 +3303,10 @@ tree:
                       if (debug) {
                         console.log(`[${methodName}] jsonResponse:`, jsonResponse);
                       }
-                      const transformedResponse = transformDates(jsonResponse);
+                      const transformedResponse = transformDates(
+                        jsonResponse,
+                        convertDates
+                      );
                       if (debug) {
                         console.log(
                           `[${methodName}] transformedResponse:`,
@@ -3310,7 +3324,7 @@ tree:
                       );
                     }
                     // Handle case where the generated API returns a pre-parsed object
-                    const transformedResponse = transformDates(response);
+                    const transformedResponse = transformDates(response, convertDates);
                     if (debug) {
                       console.log(
                         `[${methodName}] transformedNonResponse:`,
@@ -3595,6 +3609,7 @@ tree:
                         //
                         tests/vitest/unit/apps/copyApp.test.ts
 
+
                         import
                         {
                         describe,
@@ -3648,8 +3663,8 @@ tree:
                             expect(typeof client.copyApp).toBe("function");
                           });
 
-                          it("calls copyApp successfully with user token", async () => {
-                            client = createClient(mockFetch, { debug: true });
+                          it("calls copyApp successfully with user token and dates as Date objects", async () => {
+                            client = createClient(mockFetch, { debug: true }); // convertDates defaults to true
 
                             const request: CopyAppRequest = {
                               name: "Copied App",
@@ -3666,8 +3681,8 @@ tree:
                               id: "bpqe82s1",
                               name: "Copied App",
                               description: "A copy of the original app",
-                              created: new Date("2025-03-11T10:00:00Z"), // Date object
-                              updated: new Date("2025-03-11T10:00:00Z"), // Date object
+                              created: new Date("2025-03-11T10:00:00Z"), // Expect Date object
+                              updated: new Date("2025-03-11T10:00:00Z"), // Expect Date object
                               dateFormat: "MM-DD-YYYY",
                               timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                               hasEveryoneOnTheInternet: false,
@@ -3700,7 +3715,59 @@ tree:
                             );
                           });
 
-                          it("calls copyApp successfully with temp token", async () => {
+                          it("calls copyApp successfully with user token and dates as strings", async () => {
+                            client = createClient(mockFetch, { debug: true, convertDates: false });
+
+                            const request: CopyAppRequest = {
+                              name: "Copied App",
+                              description: "A copy of the original app",
+                              properties: {
+                                keepData: false,
+                                excludeFiles: true,
+                                usersAndRoles: false,
+                                assignUserToken: true,
+                              },
+                            };
+
+                            const mockResponse = {
+                              id: "bpqe82s1",
+                              name: "Copied App",
+                              description: "A copy of the original app",
+                              created: "2025-03-11T10:00:00Z", // Expect string
+                              updated: "2025-03-11T10:00:00Z", // Expect string
+                              dateFormat: "MM-DD-YYYY",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              hasEveryoneOnTheInternet: false,
+                              ancestorId: "buwai2zpe",
+                              dataClassification: "None",
+                              variables: [],
+                            };
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.copyApp({ appId: QB_APP_ID, body: request });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+                              expect.objectContaining({
+                                method: "POST",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                                credentials: "omit",
+                                body: JSON.stringify(request),
+                              })
+                            );
+                          });
+
+                          it("calls copyApp successfully with temp token and dates as Date objects", async () => {
                             client = createClient(mockFetch, { useTempTokens: true, debug: true });
 
                             const request: CopyAppRequest = {
@@ -3718,8 +3785,8 @@ tree:
                               id: "bpqe82s2",
                               name: "Copied App with Temp Token",
                               description: "A copy using temp token",
-                              created: "2025-03-11T11:00:00Z",
-                              updated: "2025-03-11T11:00:00Z",
+                              created: new Date("2025-03-11T11:00:00Z"), // Expect Date object
+                              updated: new Date("2025-03-11T11:00:00Z"), // Expect Date object
                               dateFormat: "MM-DD-YYYY",
                               timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                               hasEveryoneOnTheInternet: true,
@@ -3772,7 +3839,83 @@ tree:
                             );
                           });
 
-                          it("retries successfully after 401 with temp token", async () => {
+                          it("calls copyApp successfully with temp token and dates as strings", async () => {
+                            client = createClient(mockFetch, {
+                              useTempTokens: true,
+                              debug: true,
+                              convertDates: false,
+                            });
+
+                            const request: CopyAppRequest = {
+                              name: "Copied App with Temp Token",
+                              description: "A copy using temp token",
+                              properties: {
+                                keepData: true,
+                                excludeFiles: false,
+                                usersAndRoles: true,
+                                assignUserToken: false,
+                              },
+                            };
+
+                            const mockResponse = {
+                              id: "bpqe82s2",
+                              name: "Copied App with Temp Token",
+                              description: "A copy using temp token",
+                              created: "2025-03-11T11:00:00Z", // Expect string
+                              updated: "2025-03-11T11:00:00Z", // Expect string
+                              dateFormat: "MM-DD-YYYY",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              hasEveryoneOnTheInternet: true,
+                              ancestorId: QB_APP_ID,
+                              dataClassification: "None",
+                              variables: [],
+                            };
+
+                            mockFetch
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve({ temporaryAuthorization: "temp_token" }),
+                              })
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve(mockResponse),
+                              });
+
+                            const result = await client.copyApp({ appId: QB_APP_ID, body: request });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledTimes(2);
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              1,
+                              `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  "Content-Type": "application/json",
+                                }),
+                                credentials: "include",
+                              })
+                            );
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              2,
+                              `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+                              expect.objectContaining({
+                                method: "POST",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: "QB-TEMP-TOKEN temp_token",
+                                  "Content-Type": "application/json",
+                                }),
+                                credentials: "omit",
+                                body: JSON.stringify(request),
+                              })
+                            );
+                          });
+
+                          it("retries successfully after 401 with temp token and dates as Date objects", async () => {
                             client = createClient(mockFetch, { useTempTokens: true, debug: true });
 
                             const request: CopyAppRequest = {
@@ -3790,8 +3933,97 @@ tree:
                               id: "bpqe82s3",
                               name: "Retry Copied App",
                               description: "Retry after 401",
-                              created: "2025-03-11T12:00:00Z",
-                              updated: "2025-03-11T12:00:00Z",
+                              created: new Date("2025-03-11T12:00:00Z"), // Expect Date object
+                              updated: new Date("2025-03-11T12:00:00Z"), // Expect Date object
+                              dateFormat: "MM-DD-YYYY",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              hasEveryoneOnTheInternet: false,
+                              ancestorId: QB_APP_ID,
+                              dataClassification: "None",
+                              variables: [],
+                            };
+
+                            mockFetch
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () =>
+                                  Promise.resolve({ temporaryAuthorization: "initial_token" }),
+                              })
+                              .mockResolvedValueOnce({
+                                ok: false,
+                                status: 401,
+                                json: () => Promise.resolve({ message: "Unauthorized" }),
+                              })
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve({ temporaryAuthorization: "new_token" }),
+                              })
+                              .mockResolvedValueOnce({
+                                ok: true,
+                                status: 200,
+                                json: () => Promise.resolve(mockResponse),
+                              });
+
+                            const result = await client.copyApp({ appId: QB_APP_ID, body: request });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledTimes(4);
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              1,
+                              `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+                              expect.any(Object)
+                            );
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              2,
+                              `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+                              expect.objectContaining({
+                                headers: expect.objectContaining({
+                                  Authorization: "QB-TEMP-TOKEN initial_token",
+                                }),
+                              })
+                            );
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              3,
+                              `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+                              expect.any(Object)
+                            );
+                            expect(mockFetch).toHaveBeenNthCalledWith(
+                              4,
+                              `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+                              expect.objectContaining({
+                                headers: expect.objectContaining({
+                                  Authorization: "QB-TEMP-TOKEN new_token",
+                                }),
+                              })
+                            );
+                          });
+
+                          it("retries successfully after 401 with temp token and dates as strings", async () => {
+                            client = createClient(mockFetch, {
+                              useTempTokens: true,
+                              debug: true,
+                              convertDates: false,
+                            });
+
+                            const request: CopyAppRequest = {
+                              name: "Retry Copied App",
+                              description: "Retry after 401",
+                              properties: {
+                                keepData: false,
+                                excludeFiles: true,
+                                usersAndRoles: false,
+                                assignUserToken: true,
+                              },
+                            };
+
+                            const mockResponse = {
+                              id: "bpqe82s3",
+                              name: "Retry Copied App",
+                              description: "Retry after 401",
+                              created: "2025-03-11T12:00:00Z", // Expect string
+                              updated: "2025-03-11T12:00:00Z", // Expect string
                               dateFormat: "MM-DD-YYYY",
                               timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                               hasEveryoneOnTheInternet: false,
@@ -3898,6 +4130,7 @@ tree:
                         //
                         tests/vitest/unit/apps/createApp.test.ts
 
+
                         import
                         {
                         describe,
@@ -3934,6 +4167,10 @@ tree:
                         ()
                         =>
                         {
+                          console.log(
+                            "Running updated createApp.test.ts - Version with full request expectation"
+                          );
+
                           let client: ReturnType<typeof createClient>;
 
                           beforeEach(() => {
@@ -3950,7 +4187,7 @@ tree:
                             expect(typeof client.createApp).toBe("function");
                           });
 
-                          it("calls createApp successfully with user token", async () => {
+                          it("calls createApp successfully with user token and dates as Date objects", async () => {
                             client = createClient(mockFetch, { debug: true });
 
                             const request: CreateAppRequest = {
@@ -3963,8 +4200,8 @@ tree:
                               id: "new-app-id",
                               name: "New App",
                               description: "A new app for testing",
-                              created: new Date("2025-03-11T10:00:00Z"), // Date object
-                              updated: new Date("2025-03-11T10:00:00Z"), // Date object
+                              created: new Date("2025-03-11T10:00:00Z"),
+                              updated: new Date("2025-03-11T10:00:00Z"),
                               dateFormat: "MM-DD-YYYY",
                               timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                               hasEveryoneOnTheInternet: false,
@@ -3984,17 +4221,16 @@ tree:
                             mockFetch.mockResolvedValueOnce({
                               ok: true,
                               status: 200,
-                              json: () =>
-                                Promise.resolve({
-                                  ...mockResponse,
-                                  created: "2025-03-11T10:00:00Z", // Mock returns string, transformed to Date
-                                  updated: "2025-03-11T10:00:00Z",
-                                }),
+                              json: () => Promise.resolve(mockResponse),
                             });
 
                             const result = await client.createApp({ body: request });
 
                             expect(result).toEqual(mockResponse);
+                            const callArgs = mockFetch.mock.calls[0];
+                            const body = JSON.parse(callArgs[1].body as string);
+                            console.log("Date objects test - Expected request:", request);
+                            console.log("Date objects test - Actual body:", body);
                             expect(mockFetch).toHaveBeenCalledWith(
                               `https://api.quickbase.com/v1/apps`,
                               expect.objectContaining({
@@ -4004,13 +4240,71 @@ tree:
                                   Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
                                   "Content-Type": "application/json",
                                 }),
-                                body: expect.stringContaining('"name":"New App"'),
+                                body: expect.any(String), // Ensure it’s a string, we’ll check content below
                                 credentials: "omit",
                               })
                             );
+                            expect(body).toEqual(request); // Moved outside toHaveBeenCalledWith
+                          });
+
+                          it("calls createApp successfully with user token and dates as strings", async () => {
+                            client = createClient(mockFetch, { debug: true, convertDates: false });
+
+                            const request: CreateAppRequest = {
+                              name: "New App",
+                              description: "A new app for testing",
+                              assignToken: true,
+                            };
+
+                            const mockResponse = {
+                              id: "new-app-id",
+                              name: "New App",
+                              description: "A new app for testing",
+                              created: "2025-03-11T10:00:00Z",
+                              updated: "2025-03-11T10:00:00Z",
+                              dateFormat: "MM-DD-YYYY",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              hasEveryoneOnTheInternet: false,
+                              variables: [],
+                              dataClassification: "None",
+                              memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+                              securityProperties: {
+                                allowClone: false,
+                                allowExport: true,
+                                enableAppTokens: true,
+                                hideFromPublic: false,
+                                mustBeRealmApproved: false,
+                                useIPFilter: false,
+                              },
+                            };
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.createApp({ body: request });
+
+                            expect(result).toEqual(mockResponse);
                             const callArgs = mockFetch.mock.calls[0];
                             const body = JSON.parse(callArgs[1].body as string);
-                            expect(body).toEqual(request); // Check request body
+                            console.log("Strings test - Expected request:", request);
+                            console.log("Strings test - Actual body:", body);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/apps`,
+                              expect.objectContaining({
+                                method: "POST",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
+                                }),
+                                body: expect.any(String), // Ensure it’s a string, we’ll check content below
+                                credentials: "omit",
+                              })
+                            );
+                            expect(body).toEqual(request); // Moved outside toHaveBeenCalledWith
                           });
 
                           it("handles 400 error for invalid request", async () => {
@@ -4054,6 +4348,7 @@ tree:
                       contents: >
                         //
                         tests/vitest/unit/apps/deleteApp.test.ts
+
 
                         import
                         {
@@ -4268,7 +4563,7 @@ tree:
                             client = createClient(mockFetch, { debug: true });
 
                             const request: DeleteAppRequest = {
-                              name: "Wrong Name", // Assuming this doesn’t match the app’s actual name
+                              name: "Wrong Name",
                             };
 
                             mockFetch.mockResolvedValueOnce({
@@ -4302,6 +4597,7 @@ tree:
                       contents: >
                         //
                         tests/vitest/unit/apps/getApp.test.ts
+
 
                         import
                         {
@@ -4348,14 +4644,14 @@ tree:
                             expect(typeof client.getApp).toBe("function");
                           });
 
-                          it("calls getApp successfully", async () => {
+                          it("calls getApp successfully with dates as Date objects", async () => {
                             client = createClient(mockFetch, { debug: true });
 
                             const mockResponse = {
                               id: QB_APP_ID,
                               name: "qb-copy",
-                              created: new Date("2025-02-13T18:22:33Z"), // Date object
-                              updated: new Date("2025-03-04T04:25:51Z"), // Date object
+                              created: new Date("2025-02-13T18:22:33Z"), // Expect Date object
+                              updated: new Date("2025-03-04T04:25:51Z"), // Expect Date object
                               description: "",
                               timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
                               dateFormat: "MM-DD-YYYY",
@@ -4377,12 +4673,57 @@ tree:
                             mockFetch.mockResolvedValueOnce({
                               ok: true,
                               status: 200,
-                              json: () =>
-                                Promise.resolve({
-                                  ...mockResponse,
-                                  created: "2025-02-13T18:22:33Z", // Mock returns string, transformed to Date
-                                  updated: "2025-03-04T04:25:51Z",
+                              json: () => Promise.resolve(mockResponse),
+                            });
+
+                            const result = await client.getApp({ appId: QB_APP_ID });
+
+                            expect(result).toEqual(mockResponse);
+                            expect(mockFetch).toHaveBeenCalledWith(
+                              `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
+                              expect.objectContaining({
+                                method: "GET",
+                                headers: expect.objectContaining({
+                                  "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+                                  Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+                                  "Content-Type": "application/json",
                                 }),
+                                body: undefined,
+                                credentials: "omit",
+                              })
+                            );
+                          });
+
+                          it("calls getApp successfully with dates as strings", async () => {
+                            client = createClient(mockFetch, { debug: true, convertDates: false });
+
+                            const mockResponse = {
+                              id: QB_APP_ID,
+                              name: "qb-copy",
+                              created: "2025-02-13T18:22:33Z", // Expect string
+                              updated: "2025-03-04T04:25:51Z", // Expect string
+                              description: "",
+                              timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
+                              dateFormat: "MM-DD-YYYY",
+                              hasEveryoneOnTheInternet: false,
+                              memoryInfo: { estMemory: 0, estMemoryInclDependentApps: 0 },
+                              securityProperties: {
+                                allowClone: false,
+                                allowExport: true,
+                                enableAppTokens: true,
+                                hideFromPublic: false,
+                                mustBeRealmApproved: false,
+                                useIPFilter: false,
+                              },
+                              ancestorId: undefined,
+                              variables: undefined,
+                              dataClassification: undefined,
+                            };
+
+                            mockFetch.mockResolvedValueOnce({
+                              ok: true,
+                              status: 200,
+                              json: () => Promise.resolve(mockResponse),
                             });
 
                             const result = await client.getApp({ appId: QB_APP_ID });

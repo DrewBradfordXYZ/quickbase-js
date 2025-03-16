@@ -20,9 +20,9 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     const mockFields = [{ id: 1, label: "Field1" }];
     let callCount = 0;
 
+    // Mock fetch without console.log interference
     mockFetch.mockImplementation((url) => {
       callCount++;
-      console.log(`Mock fetch call ${callCount}: ${url}`);
       if (url.includes("auth/temporary") && callCount === 1) {
         return Promise.resolve({
           ok: true,
@@ -34,7 +34,7 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
         return Promise.resolve({
           ok: false,
           status: 401,
-          text: () => Promise.resolve("Unauthorized"),
+          json: () => Promise.resolve({ message: "Unauthorized" }),
         });
       }
       if (url.includes("auth/temporary") && callCount === 3) {
@@ -56,6 +56,7 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     });
 
     const consoleSpy = vi.spyOn(console, "log");
+
     const result = await client.getFields({ tableId: QB_TABLE_ID_1 });
 
     expect(result).toEqual(mockFields);
@@ -67,7 +68,7 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
@@ -81,7 +82,7 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
-      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`, // Removed &includeFieldPerms=false
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
@@ -89,18 +90,27 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
       })
     );
 
+    // Filter console logs to only those we care about
+    const tokenLogs = consoleSpy.mock.calls.filter((call) =>
+      call[0].includes("Fetched and cached new token")
+    );
+    expect(tokenLogs).toContainEqual([
+      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
+      mockToken,
+    ]);
+    expect(tokenLogs).toContainEqual([
+      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
+      mockToken + "_retry",
+    ]);
+
     expect(consoleSpy).toHaveBeenCalledWith(
       "Authorization error for getFields, refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
-      mockToken + "_retry",
-      expect.any(String)
-    );
-    expect(consoleSpy).toHaveBeenCalledWith(
       "Retrying getFields with new token"
     );
+
     consoleSpy.mockRestore();
   });
 });
