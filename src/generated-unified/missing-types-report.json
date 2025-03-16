@@ -1,6 +1,3 @@
 {
-  "missingTypes": [
-    "CreateRelationshipRequest",
-    "UpdateRelationshipRequest"
-  ]
+  "missingTypes": []
 }

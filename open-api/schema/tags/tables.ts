@@ -38,18 +38,15 @@ export function enhanceTables(
               },
               description: {
                 type: "string",
-                description:
-                  "The description for the table. If this value is not passed the default value is blank.",
+                description: "The description for the table...",
               },
               singleRecordName: {
                 type: "string",
-                description:
-                  "The singular noun for records in the table. If this value is not passed the default value is 'Record'.",
+                description: "The singular noun for records...",
               },
               pluralRecordName: {
                 type: "string",
-                description:
-                  "The plural noun for records in the table. If this value is not passed the default value is 'Records'.",
+                description: "The plural noun for records...",
               },
             };
           } else if (pathKey === "/tables/{tableId}" && method === "post") {
@@ -64,13 +61,53 @@ export function enhanceTables(
                 description: "The updated description for the table.",
               },
             };
+          } else if (
+            pathKey === "/tables/{tableId}/relationship" &&
+            method === "post"
+          ) {
+            // Create Relationship
+            properties = {
+              parentTableId: {
+                type: "string",
+                description: "The ID of the parent table.",
+              },
+              childTableId: {
+                type: "string",
+                description: "The ID of the child table.",
+              },
+              foreignKeyFieldId: {
+                type: "integer",
+                description: "The field ID to use as the foreign key.",
+              },
+            };
+          } else if (
+            pathKey === "/tables/{tableId}/relationship/{relationshipId}" &&
+            method === "post"
+          ) {
+            // Update Relationship
+            properties = {
+              parentTableId: {
+                type: "string",
+                description: "The updated ID of the parent table.",
+              },
+              childTableId: {
+                type: "string",
+                description: "The updated ID of the child table.",
+              },
+              foreignKeyFieldId: {
+                type: "integer",
+                description: "The updated field ID to use as the foreign key.",
+              },
+            };
           }
           if (properties) {
             spec.definitions[requestName] = {
               type: "object",
               properties,
-              required: ["name"], // Only name is required for create
-              additionalProperties: true, // Match raw spec
+              required: pathKey.includes("relationship")
+                ? ["parentTableId", "childTableId", "foreignKeyFieldId"]
+                : ["name"],
+              additionalProperties: true,
               description: operation.summary || `Request body for ${opId}`,
             };
           }

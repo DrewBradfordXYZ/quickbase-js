@@ -3093,15 +3093,15 @@
         },
         "description": {
           "type": "string",
-          "description": "The description for the table. If this value is not passed the default value is blank."
+          "description": "The description for the table..."
         },
         "singleRecordName": {
           "type": "string",
-          "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'."
+          "description": "The singular noun for records..."
         },
         "pluralRecordName": {
           "type": "string",
-          "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'."
+          "description": "The plural noun for records..."
         }
       },
       "required": [
@@ -3127,6 +3127,54 @@
       ],
       "additionalProperties": true,
       "description": "Update a table"
+    },
+    "CreateRelationshipRequest": {
+      "type": "object",
+      "properties": {
+        "parentTableId": {
+          "type": "string",
+          "description": "The ID of the parent table."
+        },
+        "childTableId": {
+          "type": "string",
+          "description": "The ID of the child table."
+        },
+        "foreignKeyFieldId": {
+          "type": "integer",
+          "description": "The field ID to use as the foreign key."
+        }
+      },
+      "required": [
+        "parentTableId",
+        "childTableId",
+        "foreignKeyFieldId"
+      ],
+      "additionalProperties": true,
+      "description": "Create a relationship"
+    },
+    "UpdateRelationshipRequest": {
+      "type": "object",
+      "properties": {
+        "parentTableId": {
+          "type": "string",
+          "description": "The updated ID of the parent table."
+        },
+        "childTableId": {
+          "type": "string",
+          "description": "The updated ID of the child table."
+        },
+        "foreignKeyFieldId": {
+          "type": "integer",
+          "description": "The updated field ID to use as the foreign key."
+        }
+      },
+      "required": [
+        "parentTableId",
+        "childTableId",
+        "foreignKeyFieldId"
+      ],
+      "additionalProperties": true,
+      "description": "Update a relationship"
     },
     "CreateFieldRequest": {
       "type": "object",
