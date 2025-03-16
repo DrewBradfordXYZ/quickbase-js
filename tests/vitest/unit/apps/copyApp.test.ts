@@ -44,8 +44,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s1",
       name: "Copied App",
       description: "A copy of the original app",
-      created: new Date("2025-03-11T10:00:00Z"), // Changed to Date object
-      updated: new Date("2025-03-11T10:00:00Z"), // Changed to Date object
+      created: "2025-03-11T10:00:00Z",
+      updated: "2025-03-11T10:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -57,12 +57,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: () =>
-        Promise.resolve({
-          ...mockResponse,
-          created: "2025-03-11T10:00:00Z", // API returns string
-          updated: "2025-03-11T10:00:00Z", // API returns string
-        }),
+      json: () => Promise.resolve(mockResponse),
     });
 
     const result = await client.copyApp({ appId: QB_APP_ID, body: request });
@@ -77,6 +72,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
+        credentials: "omit",
         body: JSON.stringify(request),
       })
     );
@@ -100,8 +96,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s2",
       name: "Copied App with Temp Token",
       description: "A copy using temp token",
-      created: new Date("2025-03-11T11:00:00Z"), // Changed to Date object
-      updated: new Date("2025-03-11T11:00:00Z"), // Changed to Date object
+      created: "2025-03-11T11:00:00Z",
+      updated: "2025-03-11T11:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: true,
@@ -119,12 +115,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () =>
-          Promise.resolve({
-            ...mockResponse,
-            created: "2025-03-11T11:00:00Z", // API returns string
-            updated: "2025-03-11T11:00:00Z", // API returns string
-          }),
+        json: () => Promise.resolve(mockResponse),
       });
 
     const result = await client.copyApp({ appId: QB_APP_ID, body: request });
@@ -153,6 +144,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
           Authorization: "QB-TEMP-TOKEN temp_token",
           "Content-Type": "application/json",
         }),
+        credentials: "omit",
         body: JSON.stringify(request),
       })
     );
@@ -176,8 +168,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s3",
       name: "Retry Copied App",
       description: "Retry after 401",
-      created: new Date("2025-03-11T12:00:00Z"), // Changed to Date object
-      updated: new Date("2025-03-11T12:00:00Z"), // Changed to Date object
+      created: "2025-03-11T12:00:00Z",
+      updated: "2025-03-11T12:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -206,12 +198,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () =>
-          Promise.resolve({
-            ...mockResponse,
-            created: "2025-03-11T12:00:00Z", // API returns string
-            updated: "2025-03-11T12:00:00Z", // API returns string
-          }),
+        json: () => Promise.resolve(mockResponse),
       });
 
     const result = await client.copyApp({ appId: QB_APP_ID, body: request });
@@ -252,7 +239,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
     client = createClient(mockFetch, { debug: true });
 
     const request: CopyAppRequest = {
-      name: "", // Invalid: name is required
+      name: "",
       description: "Invalid request",
     };
 
@@ -275,6 +262,7 @@ describe("QuickbaseClient Unit - copyApp", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
+        credentials: "omit",
         body: JSON.stringify(request),
       })
     );

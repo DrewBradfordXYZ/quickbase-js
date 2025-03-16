@@ -189,20 +189,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
-    // Adjust params to match generated method's expectation
-    let adjustedParams = { ...params };
-    if ("body" in params) {
-      adjustedParams = { ...params, generated: params.body }; // Explicitly set 'generated'
-      delete adjustedParams.body;
-    }
+    const requestParameters: any = {
+      ...params,
+      generated: "body" in params ? { ...params.body } : undefined,
+    };
 
-    const requestParameters =
-      methodInfo.paramMap.length === 1 &&
-      methodInfo.paramMap[0] === "requestParameters"
-        ? { requestParameters: adjustedParams }
-        : adjustedParams;
     let requestOptions: RequestInit = {
       credentials: "omit",
+      // Remove default method; let the generated API method set it
     };
 
     const selectedToken =
@@ -240,6 +234,16 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         ...baseHeaders,
         Authorization: `QB-USER-TOKEN ${authorizationToken}`,
       };
+    }
+
+    // Remove method override; rely on generated method's HTTP method
+    if ("generated" in requestParameters && requestParameters.generated) {
+      // Do not set method here; let AppsApi.ts define it
+    }
+
+    if (debug) {
+      console.log(`[${methodName}] requestParameters:`, requestParameters);
+      console.log(`[${methodName}] requestOptions:`, requestOptions);
     }
 
     try {

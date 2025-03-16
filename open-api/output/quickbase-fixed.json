@@ -3489,7 +3489,34 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the new app."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the new app."
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "keepData": {
+              "type": "boolean",
+              "description": "Whether to copy data."
+            },
+            "excludeFiles": {
+              "type": "boolean",
+              "description": "Whether to exclude files."
+            },
+            "usersAndRoles": {
+              "type": "boolean",
+              "description": "Whether to copy users and roles."
+            },
+            "assignUserToken": {
+              "type": "boolean",
+              "description": "Whether to assign the user token."
+            }
+          },
+          "description": "Options for customizing the app copy process."
         }
       },
       "required": [

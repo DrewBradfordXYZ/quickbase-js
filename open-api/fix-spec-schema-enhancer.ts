@@ -1,3 +1,5 @@
+// open-api/fix-spec-schema-enhancer.ts
+
 import { Operation, Parameter, Spec } from "./fix-spec-types.ts";
 import { normalizeDefinitionName } from "./fix-spec-utils.ts";
 
@@ -147,10 +149,46 @@ export function enhanceRawSpec(spec: Spec): void {
                   };
                 } else if (operation.tags?.includes("Formulas")) {
                   properties = { formula: { type: "string" } };
-                } else if (
-                  operation.tags?.includes("Apps") ||
-                  operation.tags?.includes("Tables")
-                ) {
+                } else if (operation.tags?.includes("Apps")) {
+                  // Enhanced schema for Apps operations
+                  if (pathKey.includes("/copy") && method === "post") {
+                    properties = {
+                      name: {
+                        type: "string",
+                        description: "The name of the new app.",
+                      },
+                      description: {
+                        type: "string",
+                        description: "A description for the new app.",
+                      },
+                      properties: {
+                        type: "object",
+                        properties: {
+                          keepData: {
+                            type: "boolean",
+                            description: "Whether to copy data.",
+                          },
+                          excludeFiles: {
+                            type: "boolean",
+                            description: "Whether to exclude files.",
+                          },
+                          usersAndRoles: {
+                            type: "boolean",
+                            description: "Whether to copy users and roles.",
+                          },
+                          assignUserToken: {
+                            type: "boolean",
+                            description: "Whether to assign the user token.",
+                          },
+                        },
+                        description:
+                          "Options for customizing the app copy process.",
+                      },
+                    };
+                  } else {
+                    properties = { name: { type: "string" } };
+                  }
+                } else if (operation.tags?.includes("Tables")) {
                   properties = { name: { type: "string" } };
                 } else if (operation.tags?.includes("Fields")) {
                   properties =
@@ -199,7 +237,10 @@ export function enhanceRawSpec(spec: Spec): void {
                   type: "object",
                   properties,
                   required: Object.keys(properties).filter(
-                    (key) => key !== "fieldsToReturn"
+                    (key) =>
+                      key !== "fieldsToReturn" &&
+                      key !== "description" &&
+                      key !== "properties"
                   ),
                   description: operation.summary || `Request body for ${opId}`,
                 };
