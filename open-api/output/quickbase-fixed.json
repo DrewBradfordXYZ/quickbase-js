@@ -3087,49 +3087,46 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name for the table.",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "The description for the table. If this value is not passed the default value is blank."
+        },
+        "singleRecordName": {
+          "type": "string",
+          "description": "The singular noun for records in the table. If this value is not passed the default value is 'Record'."
+        },
+        "pluralRecordName": {
+          "type": "string",
+          "description": "The plural noun for records in the table. If this value is not passed the default value is 'Records'."
         }
       },
       "required": [
         "name"
       ],
+      "additionalProperties": true,
       "description": "Create a table"
     },
     "UpdateTableRequest": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The updated name of the table."
+        },
+        "description": {
+          "type": "string",
+          "description": "The updated description for the table."
         }
       },
       "required": [
         "name"
       ],
+      "additionalProperties": true,
       "description": "Update a table"
-    },
-    "CreateRelationshipRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Create a relationship"
-    },
-    "UpdateRelationshipRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Update a relationship"
     },
     "CreateFieldRequest": {
       "type": "object",
