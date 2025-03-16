@@ -1,5 +1,4 @@
 // open-api/fix-spec-schema-enhancer.ts
-
 import { Operation, Parameter, Spec } from "./fix-spec-types.ts";
 import { normalizeDefinitionName } from "./fix-spec-utils.ts";
 
@@ -57,6 +56,23 @@ export function enhanceRawSpec(spec: Spec): void {
       description: "A generic QuickBase record with field ID-value pairs",
     };
     console.log("Added Record to definitions");
+  }
+
+  if (!spec.definitions["Permission"]) {
+    spec.definitions["Permission"] = {
+      type: "object",
+      properties: {
+        role: { type: "string", description: "The role name" },
+        permissionType: {
+          type: "string",
+          description: "Permission type (e.g., View, Modify)",
+        },
+        roleId: { type: "integer", description: "The role identifier" },
+      },
+      required: ["role", "permissionType", "roleId"],
+      description: "A single permission entry for a field",
+    };
+    console.log("Added Permission to definitions");
   }
 
   for (const pathKey in spec.paths) {
@@ -150,7 +166,6 @@ export function enhanceRawSpec(spec: Spec): void {
                 } else if (operation.tags?.includes("Formulas")) {
                   properties = { formula: { type: "string" } };
                 } else if (operation.tags?.includes("Apps")) {
-                  // Enhanced schema for Apps operations
                   if (pathKey.includes("/copy") && method === "post") {
                     properties = {
                       name: {
@@ -190,7 +205,6 @@ export function enhanceRawSpec(spec: Spec): void {
                     !param.schema.properties ||
                     Object.keys(param.schema.properties).length === 0
                   ) {
-                    // Only define if no schema exists or it’s empty in the raw spec
                     console.log(
                       `No schema found for ${pathKey}(${method}), defining default`
                     );
@@ -209,17 +223,11 @@ export function enhanceRawSpec(spec: Spec): void {
                       },
                     };
                   } else {
-                    // Preserve the existing schema from the raw spec
                     console.log(
                       `Preserving existing schema for ${pathKey}(${method})`
                     );
                     properties = param.schema.properties;
                   }
-                  // Original logic kept as a comment for easy revert if needed
-                  // Note: This was likely added to enforce a minimal schema or fix missing types in older specs
-                  // } else {
-                  //   properties = { name: { type: "string" } };
-                  // }
                 } else if (operation.tags?.includes("Tables")) {
                   properties = { name: { type: "string" } };
                 } else if (operation.tags?.includes("Fields")) {
@@ -232,8 +240,100 @@ export function enhanceRawSpec(spec: Spec): void {
                           },
                         }
                       : {
-                          label: { type: "string" },
-                          fieldType: { type: "string" },
+                          label: {
+                            type: "string",
+                            description: "The label of the field",
+                          },
+                          fieldType: {
+                            type: "string",
+                            description: "The type of the field",
+                            enum: [
+                              "text",
+                              "text-multiple-choice",
+                              "text-multi-line",
+                              "rich-text",
+                              "numeric",
+                              "currency",
+                              "percent",
+                              "rating",
+                              "date",
+                              "date-time",
+                              "time-of-day",
+                              "duration",
+                              "checkbox",
+                              "user",
+                              "multi-user",
+                              "address",
+                              "email",
+                              "phone",
+                              "url",
+                              "file",
+                              "record-id",
+                            ],
+                          },
+                          fieldHelp: {
+                            type: "string",
+                            description: "Help text for the field",
+                            nullable: true,
+                          },
+                          addToForms: {
+                            type: "boolean",
+                            description: "Whether to add the field to forms",
+                            nullable: true,
+                          },
+                          permissions: {
+                            anyOf: [
+                              {
+                                type: "array",
+                                items: { $ref: "#/definitions/Permission" },
+                              },
+                              { type: "null" },
+                            ],
+                            description: "Custom permissions for the field",
+                          },
+                          required: {
+                            type: "boolean",
+                            description: "Whether the field is required",
+                            nullable: true,
+                          },
+                          unique: {
+                            type: "boolean",
+                            description:
+                              "Whether the field must have unique values",
+                            nullable: true,
+                          },
+                          noWrap: {
+                            type: "boolean",
+                            description: "Whether text wrapping is disabled",
+                            nullable: true,
+                          },
+                          bold: {
+                            type: "boolean",
+                            description: "Whether the field is bolded",
+                            nullable: true,
+                          },
+                          appearsByDefault: {
+                            type: "boolean",
+                            description:
+                              "Whether the field appears by default in reports",
+                            nullable: true,
+                          },
+                          findEnabled: {
+                            type: "boolean",
+                            description: "Whether the field is searchable",
+                            nullable: true,
+                          },
+                          doesDataCopy: {
+                            type: "boolean",
+                            description: "Whether the field copies data",
+                            nullable: true,
+                          },
+                          audited: {
+                            type: "boolean",
+                            description:
+                              "Whether changes to the field are audited",
+                            nullable: true,
+                          },
                         };
                 } else if (operation.tags?.includes("Reports")) {
                   properties = {

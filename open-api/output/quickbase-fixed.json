@@ -2783,6 +2783,29 @@
       },
       "description": "A generic QuickBase record with field ID-value pairs"
     },
+    "Permission": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The role name"
+        },
+        "permissionType": {
+          "type": "string",
+          "description": "Permission type (e.g., View, Modify)"
+        },
+        "roleId": {
+          "type": "integer",
+          "description": "The role identifier"
+        }
+      },
+      "required": [
+        "role",
+        "permissionType",
+        "roleId"
+      ],
+      "description": "A single permission entry for a field"
+    },
     "CreateAppRequest": {
       "type": "object",
       "properties": {
@@ -5606,15 +5629,115 @@
       "type": "object",
       "properties": {
         "label": {
-          "type": "string"
+          "type": "string",
+          "description": "The label of the field"
         },
         "fieldType": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of the field",
+          "enum": [
+            "text",
+            "text-multiple-choice",
+            "text-multi-line",
+            "rich-text",
+            "numeric",
+            "currency",
+            "percent",
+            "rating",
+            "date",
+            "date-time",
+            "time-of-day",
+            "duration",
+            "checkbox",
+            "user",
+            "multi-user",
+            "address",
+            "email",
+            "phone",
+            "url",
+            "file",
+            "record-id"
+          ]
+        },
+        "fieldHelp": {
+          "type": "string",
+          "description": "Help text for the field",
+          "nullable": true
+        },
+        "addToForms": {
+          "type": "boolean",
+          "description": "Whether to add the field to forms",
+          "nullable": true
+        },
+        "permissions": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Permission"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Custom permissions for the field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required",
+          "nullable": true
+        },
+        "unique": {
+          "type": "boolean",
+          "description": "Whether the field must have unique values",
+          "nullable": true
+        },
+        "noWrap": {
+          "type": "boolean",
+          "description": "Whether text wrapping is disabled",
+          "nullable": true
+        },
+        "bold": {
+          "type": "boolean",
+          "description": "Whether the field is bolded",
+          "nullable": true
+        },
+        "appearsByDefault": {
+          "type": "boolean",
+          "description": "Whether the field appears by default in reports",
+          "nullable": true
+        },
+        "findEnabled": {
+          "type": "boolean",
+          "description": "Whether the field is searchable",
+          "nullable": true
+        },
+        "doesDataCopy": {
+          "type": "boolean",
+          "description": "Whether the field copies data",
+          "nullable": true
+        },
+        "audited": {
+          "type": "boolean",
+          "description": "Whether changes to the field are audited",
+          "nullable": true
         }
       },
       "required": [
         "label",
-        "fieldType"
+        "fieldType",
+        "fieldHelp",
+        "addToForms",
+        "permissions",
+        "required",
+        "unique",
+        "noWrap",
+        "bold",
+        "appearsByDefault",
+        "findEnabled",
+        "doesDataCopy",
+        "audited"
       ],
       "description": "Create a field"
     },
@@ -6568,15 +6691,115 @@
       "type": "object",
       "properties": {
         "label": {
-          "type": "string"
+          "type": "string",
+          "description": "The label of the field"
         },
         "fieldType": {
-          "type": "string"
+          "type": "string",
+          "description": "The type of the field",
+          "enum": [
+            "text",
+            "text-multiple-choice",
+            "text-multi-line",
+            "rich-text",
+            "numeric",
+            "currency",
+            "percent",
+            "rating",
+            "date",
+            "date-time",
+            "time-of-day",
+            "duration",
+            "checkbox",
+            "user",
+            "multi-user",
+            "address",
+            "email",
+            "phone",
+            "url",
+            "file",
+            "record-id"
+          ]
+        },
+        "fieldHelp": {
+          "type": "string",
+          "description": "Help text for the field",
+          "nullable": true
+        },
+        "addToForms": {
+          "type": "boolean",
+          "description": "Whether to add the field to forms",
+          "nullable": true
+        },
+        "permissions": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Permission"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Custom permissions for the field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required",
+          "nullable": true
+        },
+        "unique": {
+          "type": "boolean",
+          "description": "Whether the field must have unique values",
+          "nullable": true
+        },
+        "noWrap": {
+          "type": "boolean",
+          "description": "Whether text wrapping is disabled",
+          "nullable": true
+        },
+        "bold": {
+          "type": "boolean",
+          "description": "Whether the field is bolded",
+          "nullable": true
+        },
+        "appearsByDefault": {
+          "type": "boolean",
+          "description": "Whether the field appears by default in reports",
+          "nullable": true
+        },
+        "findEnabled": {
+          "type": "boolean",
+          "description": "Whether the field is searchable",
+          "nullable": true
+        },
+        "doesDataCopy": {
+          "type": "boolean",
+          "description": "Whether the field copies data",
+          "nullable": true
+        },
+        "audited": {
+          "type": "boolean",
+          "description": "Whether changes to the field are audited",
+          "nullable": true
         }
       },
       "required": [
         "label",
-        "fieldType"
+        "fieldType",
+        "fieldHelp",
+        "addToForms",
+        "permissions",
+        "required",
+        "unique",
+        "noWrap",
+        "bold",
+        "appearsByDefault",
+        "findEnabled",
+        "doesDataCopy",
+        "audited"
       ],
       "description": "Update a field"
     },

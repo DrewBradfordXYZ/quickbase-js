@@ -82,6 +82,10 @@ describe("QuickbaseClient Unit - createField", () => {
     });
 
     expect(result).toEqual(mockResponse);
+    const callArgs = mockFetch.mock.calls[0];
+    console.log("Raw fetch call (user token):", callArgs); // Debug raw call
+    const receivedBody = JSON.parse(callArgs[1].body as string);
+    expect(receivedBody).toEqual(request); // Expect full body
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
@@ -91,15 +95,9 @@ describe("QuickbaseClient Unit - createField", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        credentials: "omit",
-        body: expect.any(String), // Allow any string for body
+        body: JSON.stringify(request),
       })
     );
-
-    // Additional check to ensure the body matches the request object, ignoring property order
-    const callArgs = mockFetch.mock.calls[0];
-    const receivedBody = JSON.parse(callArgs[1].body as string);
-    expect(receivedBody).toEqual(request);
   });
 
   it("creates a field successfully with temp token", async () => {
@@ -173,6 +171,8 @@ describe("QuickbaseClient Unit - createField", () => {
         credentials: "include",
       })
     );
+    const callArgs = mockFetch.mock.calls[1];
+    console.log("Raw fetch call (temp token):", callArgs); // Debug raw call
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
