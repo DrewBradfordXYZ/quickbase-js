@@ -4,13 +4,14 @@ import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import * as glob from "glob";
-import { enhanceTags } from "./schema/tags/index.ts"; // Updated import
+import { enhanceTags } from "./schema/tags/index.ts";
 import { enhanceGeneral } from "./schema/enhance-general.ts";
 import { fixArrays } from "./schema/fix-arrays.ts";
-import { FixSpecConfig, Spec } from "./types/spec.ts";
+import { Spec } from "./types/spec.ts";
 import { toCamelCase } from "./utils/naming.ts";
 
-async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
+// Removed FixSpecConfig since applyOverrides is no longer needed
+async function fixQuickBaseSpec(): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
     const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
@@ -59,11 +60,9 @@ async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
       }
     }
 
-    if (!config.applyOverrides) {
-      console.log("Running with no overrides, using raw spec only...");
-    }
+    // Removed applyOverrides conditional logic
     console.log("Enhancing raw spec with tags...");
-    enhanceTags(spec); // Updated call
+    enhanceTags(spec);
     console.log("Enhancing raw spec with general enhancements...");
     enhanceGeneral(spec);
 
@@ -87,15 +86,7 @@ async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
 
 async function main() {
   try {
-    const args = process.argv.slice(2);
-    let config: FixSpecConfig = {};
-    for (let i = 0; i < args.length; i++) {
-      if (args[i] === "--config" && i + 1 < args.length) {
-        config = JSON.parse(args[i + 1]);
-        i++;
-      }
-    }
-    await fixQuickBaseSpec(config);
+    await fixQuickBaseSpec();
   } catch (error) {
     console.error("Fatal error in script execution:", error);
     process.exit(1);
