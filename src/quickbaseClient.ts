@@ -189,11 +189,18 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
+    // Adjust params to match generated method's expectation
+    let adjustedParams = { ...params };
+    if ("body" in params) {
+      adjustedParams = { ...params, generated: params.body }; // Explicitly set 'generated'
+      delete adjustedParams.body;
+    }
+
     const requestParameters =
       methodInfo.paramMap.length === 1 &&
       methodInfo.paramMap[0] === "requestParameters"
-        ? { requestParameters: params }
-        : params;
+        ? { requestParameters: adjustedParams }
+        : adjustedParams;
     let requestOptions: RequestInit = {
       credentials: "omit",
     };

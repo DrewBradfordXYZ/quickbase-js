@@ -13,7 +13,7 @@ describe("QuickbaseClient Unit - getApp", () => {
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = createClient(mockFetch, { debug: true }); // Add debug: true for consistency
+    client = createClient(mockFetch, { debug: true });
   });
 
   it("initializes without errors", () => {
@@ -57,8 +57,8 @@ describe("QuickbaseClient Unit - getApp", () => {
     expect(result).toEqual({
       id: QB_APP_ID,
       name: "qb-copy",
-      created: new Date("2025-02-13T18:22:33Z"),
-      updated: new Date("2025-03-04T04:25:51Z"),
+      created: "2025-02-13T18:22:33Z", // String, not Date
+      updated: "2025-03-04T04:25:51Z", // String, not Date
       description: "",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       dateFormat: "MM-DD-YYYY",
@@ -72,6 +72,9 @@ describe("QuickbaseClient Unit - getApp", () => {
         mustBeRealmApproved: false,
         useIPFilter: false,
       },
+      ancestorId: undefined, // Include optional fields
+      dataClassification: undefined,
+      variables: undefined,
     });
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,

@@ -12,7 +12,7 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "open-api",
+  // "open-api",
   // "open-api/definitions",
   // "open-api/paths",
 ];
@@ -20,17 +20,17 @@ const includeFolders: string[] = [
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
   // "tests",
-  // "tests/vitest/unit",
+  "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
 // prettier-ignore
 const includeFiles: string[] = [
   "package.json",
-  // "tsconfig.json",
+  "tsconfig.json",
   // "tsconfig.build.json",
   // "rollup.config.js",
-  // "vitest.config.ts",
+  "vitest.config.ts",
   // "build-common.js",
   // "build-umd.js",
   // "build-esm.js",
