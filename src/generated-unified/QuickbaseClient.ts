@@ -1,5 +1,5 @@
-// Generated on 2025-03-16T18:05:31.515Z
-import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, AuditRequest, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, ChangesetSolutionRequest, CloneUserToken200Response, CloneUserTokenRequest, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateSolutionRequest, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExchangeSsoTokenRequest, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummariesRequest, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunFormulaRequest, RunQuery200Response, RunQueryRequest, RunReport200Response, RunReportRequest, TransferUserToken200Response, TransferUserTokenRequest, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionRequest, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
+// Generated on 2025-03-16T18:46:28.007Z
+import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
   /**
@@ -109,7 +109,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the runReport operation
    * @returns A promise resolving to the runReport response
    */
-  runReport: (params: { tableId: string; skip?: number; top?: number; reportId: string; body?: RunReportRequest }) => Promise<RunReport200Response>;
+  runReport: (params: { tableId: string; skip?: number; top?: number; reportId: string; body?: any }) => Promise<RunReport200Response>;
   /**
    * Get fields for a table
    * @param params - Parameters for the getFields operation
@@ -157,7 +157,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the runFormula operation
    * @returns A promise resolving to the runFormula response
    */
-  runFormula: (params: { body?: RunFormulaRequest }) => Promise<RunFormula200Response>;
+  runFormula: (params: { body?: { formula?: string; rid?: number; from?: string } }) => Promise<RunFormula200Response>;
   /**
    * Insert/Update record(s)
    * @param params - Parameters for the upsert operation
@@ -187,19 +187,19 @@ export interface QuickbaseClient {
    * @param params - Parameters for the exchangeSsoToken operation
    * @returns A promise resolving to the exchangeSsoToken response
    */
-  exchangeSsoToken: (params: { body?: ExchangeSsoTokenRequest }) => Promise<ExchangeSsoToken200Response>;
+  exchangeSsoToken: (params: { body?: { grant_type?: string; requested_token_type?: string; subject_token?: string; subject_token_type?: string } }) => Promise<ExchangeSsoToken200Response>;
   /**
    * Clone a user token
    * @param params - Parameters for the cloneUserToken operation
    * @returns A promise resolving to the cloneUserToken response
    */
-  cloneUserToken: (params: { body?: CloneUserTokenRequest }) => Promise<CloneUserToken200Response>;
+  cloneUserToken: (params: { body?: { name?: string; description?: string } }) => Promise<CloneUserToken200Response>;
   /**
    * Transfer a user token
    * @param params - Parameters for the transferUserToken operation
    * @returns A promise resolving to the transferUserToken response
    */
-  transferUserToken: (params: { body?: TransferUserTokenRequest }) => Promise<TransferUserToken200Response>;
+  transferUserToken: (params: { body?: { id?: number; from?: string; to?: string } }) => Promise<TransferUserToken200Response>;
   /**
    * Deactivate a user token
    * @param params - Parameters for the deactivateUserToken operation
@@ -289,7 +289,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the audit operation
    * @returns A promise resolving to the audit response
    */
-  audit: (params: { body?: AuditRequest }) => Promise<Audit200Response>;
+  audit: (params: { body?: { nextToken?: string; numRows?: number; queryId?: string; date?: string; topics?: string[] } }) => Promise<Audit200Response>;
   /**
    * Get read summaries
    * @param params - Parameters for the platformAnalyticReads operation
@@ -301,7 +301,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the platformAnalyticEventSummaries operation
    * @returns A promise resolving to the platformAnalyticEventSummaries response
    */
-  platformAnalyticEventSummaries: (params: { accountId?: number; body?: PlatformAnalyticEventSummariesRequest }) => Promise<PlatformAnalyticEventSummaries200Response>;
+  platformAnalyticEventSummaries: (params: { accountId?: number; body?: { start?: string; end?: string; groupBy?: string; nextToken?: string; where?: { id?: string; type?: string }[] } }) => Promise<PlatformAnalyticEventSummaries200Response>;
   /**
    * Export a solution
    * @param params - Parameters for the exportSolution operation
@@ -313,13 +313,13 @@ export interface QuickbaseClient {
    * @param params - Parameters for the updateSolution operation
    * @returns A promise resolving to the updateSolution response
    */
-  updateSolution: (params: { solutionId: string; body?: UpdateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
+  updateSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
   /**
    * Create a solution
    * @param params - Parameters for the createSolution operation
    * @returns A promise resolving to the createSolution response
    */
-  createSolution: (params: { body?: CreateSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
+  createSolution: (params: { body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
   /**
    * Export solution to record
    * @param params - Parameters for the exportSolutionToRecord operation
@@ -343,7 +343,7 @@ export interface QuickbaseClient {
    * @param params - Parameters for the changesetSolution operation
    * @returns A promise resolving to the changesetSolution response
    */
-  changesetSolution: (params: { solutionId: string; body?: ChangesetSolutionRequest; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
+  changesetSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
   /**
    * List solution changes from record
    * @param params - Parameters for the changesetSolutionFromRecord operation

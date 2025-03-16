@@ -1,6 +1,7 @@
-import { Parameter, Spec } from "./fix-spec-types.ts";
+// schema/fix-arrays.ts
+import { Parameter, Spec } from "../types/spec.ts";
 
-export function fixArraySchemas(spec: Spec): void {
+export function fixArrays(spec: Spec): void {
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
       const operation = spec.paths[pathKey][method];
@@ -35,8 +36,9 @@ export function fixArraySchemas(spec: Spec): void {
             response.schema.items = { type: "string" };
           }
           if (response.schema?.properties) {
-            for (const propKey in param.schema.properties) {
-              const prop = param.schema.properties[propKey];
+            for (const propKey in response.schema.properties) {
+              // Fixed: Changed param to response
+              const prop = response.schema.properties[propKey];
               if (prop.type === "array" && !prop.items) {
                 console.log(
                   `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`

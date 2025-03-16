@@ -36,7 +36,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateApp200Response"
+              "$ref": "#/definitions/createApp200Response"
             }
           }
         },
@@ -70,7 +70,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetApp200Response"
+              "$ref": "#/definitions/getApp200Response"
             }
           }
         },
@@ -110,7 +110,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateApp200Response"
+              "$ref": "#/definitions/updateApp200Response"
             }
           }
         },
@@ -150,7 +150,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteApp200Response"
+              "$ref": "#/definitions/deleteApp200Response"
             }
           }
         },
@@ -184,7 +184,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetAppEvents200Response"
+              "$ref": "#/definitions/getAppEvents200Response"
             }
           }
         },
@@ -226,7 +226,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CopyApp200Response"
+              "$ref": "#/definitions/copyApp200Response"
             }
           }
         },
@@ -268,7 +268,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateTable200Response"
+              "$ref": "#/definitions/createTable200Response"
             }
           }
         },
@@ -300,7 +300,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetAppTables200Response"
+              "$ref": "#/definitions/getAppTables200Response"
             }
           }
         },
@@ -341,7 +341,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetTable200Response"
+              "$ref": "#/definitions/getTable200Response"
             }
           }
         },
@@ -388,7 +388,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateTable200Response"
+              "$ref": "#/definitions/updateTable200Response"
             }
           }
         },
@@ -427,7 +427,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteTable200Response"
+              "$ref": "#/definitions/deleteTable200Response"
             }
           }
         },
@@ -468,7 +468,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetRelationships200Response"
+              "$ref": "#/definitions/getRelationships200Response"
             }
           }
         },
@@ -510,7 +510,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateRelationship200Response"
+              "$ref": "#/definitions/createRelationship200Response"
             }
           }
         },
@@ -559,7 +559,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateRelationship200Response"
+              "$ref": "#/definitions/updateRelationship200Response"
             }
           }
         },
@@ -598,7 +598,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteRelationship200Response"
+              "$ref": "#/definitions/deleteRelationship200Response"
             }
           }
         },
@@ -632,7 +632,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetTableReports200Response"
+              "$ref": "#/definitions/getTableReports200Response"
             }
           }
         },
@@ -673,7 +673,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetReport200Response"
+              "$ref": "#/definitions/getReport200Response"
             }
           }
         },
@@ -726,9 +726,7 @@
             "x-amf-mediaType": "application/json",
             "in": "body",
             "name": "generated",
-            "schema": {
-              "$ref": "#/definitions/RunReportRequest"
-            }
+            "schema": {}
           }
         ],
         "responses": {
@@ -736,7 +734,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RunReport200Response"
+              "$ref": "#/definitions/runReport200Response"
             }
           }
         },
@@ -778,7 +776,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetFields200Response"
+              "$ref": "#/definitions/getFields200Response"
             }
           }
         },
@@ -818,7 +816,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateField200Response"
+              "$ref": "#/definitions/createField200Response"
             }
           }
         },
@@ -858,7 +856,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteFields200Response"
+              "$ref": "#/definitions/deleteFields200Response"
             }
           }
         },
@@ -907,7 +905,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetField200Response"
+              "$ref": "#/definitions/getField200Response"
             }
           }
         },
@@ -954,7 +952,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateField200Response"
+              "$ref": "#/definitions/updateField200Response"
             }
           }
         },
@@ -1002,7 +1000,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetFieldsUsage200Response"
+              "$ref": "#/definitions/getFieldsUsage200Response"
             }
           }
         },
@@ -1043,7 +1041,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetFieldUsage200Response"
+              "$ref": "#/definitions/getFieldUsage200Response"
             }
           }
         },
@@ -1069,7 +1067,33 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/RunFormulaRequest"
+              "description": "The following example will execute a Sum() for '20' and the value in a record with id 1 for the field with label 'NumericField'. Since this API is able to run any type of formula, all results will be returned as a string.",
+              "example": {
+                "from": "bck7gp3q2",
+                "formula": "Sum([NumericField],20)",
+                "rid": 1
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "formula",
+                "from"
+              ],
+              "properties": {
+                "formula": {
+                  "description": "The formula to run. This must be a valid Quickbase formula.",
+                  "type": "string"
+                },
+                "rid": {
+                  "description": "The record ID to run the formula against. Only necessary for formulas that are run in the context of a record. For example, the formula User() does not need a record ID.",
+                  "type": "integer"
+                },
+                "from": {
+                  "description": "The unique identifier (dbid) of the table.",
+                  "example": "bck7gp3q2",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1078,7 +1102,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RunFormula200Response"
+              "$ref": "#/definitions/runFormula200Response"
             }
           }
         },
@@ -1113,21 +1137,21 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/Upsert200Response"
+              "$ref": "#/definitions/upsert200Response"
             }
           },
           "207": {
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/Upsert207Response"
+              "$ref": "#/definitions/upsert207Response"
             }
           },
           "400": {
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/Upsert400Response"
+              "$ref": "#/definitions/upsert400Response"
             }
           }
         },
@@ -1160,7 +1184,7 @@
             "description": "Successful delete records response.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteRecords200Response"
+              "$ref": "#/definitions/deleteRecords200Response"
             }
           }
         },
@@ -1195,7 +1219,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RunQuery200Response"
+              "$ref": "#/definitions/runQuery200Response"
             }
           }
         },
@@ -1236,7 +1260,7 @@
             "description": "This token is used in the authorization header value (similar to the QB-USER-TOKEN), except it uses the QB-TEMP-TOKEN prefix header['Authorization'] = 'QB-TEMP-TOKEN {token}'",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetTempTokenDBID200Response"
+              "$ref": "#/definitions/getTempTokenDBID200Response"
             }
           }
         },
@@ -1262,7 +1286,48 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/ExchangeSsoTokenRequest"
+              "example": {
+                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                "requested_token_type": "urn:quickbase:params:oauth:token-type:temp_ticket",
+                "subject_token": "PHNhbWxwOlJlc3BvbnNlDQogICAgeG1sbnM6c2FtbHA9bjp...",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:saml2"
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "grant_type",
+                "subject_token",
+                "subject_token_type",
+                "requested_token_type"
+              ],
+              "properties": {
+                "grant_type": {
+                  "type": "string",
+                  "description": "The value `urn:ietf:params:oauth:grant-type:token-exchange` indicates that a token exchange is being performed.",
+                  "enum": [
+                    "urn:ietf:params:oauth:grant-type:token-exchange"
+                  ]
+                },
+                "requested_token_type": {
+                  "type": "string",
+                  "description": "An identifier for the type of the requested security token. For the RESTful API, use `urn:quickbase:params:oauth:token-type:temp_token`. For the XML or SCIM APIs use `urn:quickbase:params:oauth:token-type:temp_ticket`.",
+                  "enum": [
+                    "urn:quickbase:params:oauth:token-type:temp_ticket",
+                    "urn:quickbase:params:oauth:token-type:temp_token"
+                  ]
+                },
+                "subject_token": {
+                  "type": "string",
+                  "description": "A security token that represents the identity of the party on behalf of whom the request is being made. For SAML 2.0, the value should be a base64url-encoded SAML 2.0 assertion."
+                },
+                "subject_token_type": {
+                  "type": "string",
+                  "description": "An identifier that indicates the type of the security token in the `subject_token` parameter.",
+                  "enum": [
+                    "urn:ietf:params:oauth:token-type:saml2"
+                  ]
+                }
+              }
             }
           }
         ],
@@ -1271,7 +1336,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExchangeSsoToken200Response"
+              "$ref": "#/definitions/exchangeSsoToken200Response"
             }
           }
         },
@@ -1297,7 +1362,22 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/CloneUserTokenRequest"
+              "example": {
+                "name": "My cloned user token",
+                "description": "Cloned from user token A"
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "description": "The new name for the cloned user token.",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "The description for the cloned user token.",
+                  "type": "string"
+                }
+              }
             }
           }
         ],
@@ -1306,7 +1386,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CloneUserToken200Response"
+              "$ref": "#/definitions/cloneUserToken200Response"
             }
           }
         },
@@ -1332,7 +1412,27 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/TransferUserTokenRequest"
+              "example": {
+                "id": 17658,
+                "from": "62341.tr3s",
+                "to": "123456.ab1s"
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "The id of the user token to transfer"
+                },
+                "from": {
+                  "type": "string",
+                  "description": "The id of the user to transfer the user token from"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The id of the user to transfer the user token to"
+                }
+              }
             }
           }
         ],
@@ -1341,7 +1441,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/TransferUserToken200Response"
+              "$ref": "#/definitions/transferUserToken200Response"
             }
           }
         },
@@ -1367,7 +1467,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeactivateUserToken200Response"
+              "$ref": "#/definitions/deactivateUserToken200Response"
             }
           }
         },
@@ -1393,7 +1493,7 @@
             "description": "",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteUserToken200Response"
+              "$ref": "#/definitions/deleteUserToken200Response"
             }
           }
         },
@@ -1448,7 +1548,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/octet-stream",
             "schema": {
-              "$ref": "#/definitions/DownloadFile200Response"
+              "$ref": "#/definitions/downloadFile200Response"
             }
           }
         },
@@ -1501,7 +1601,7 @@
             "description": "Successfully Deleted the File Attachment",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DeleteFile200Response"
+              "$ref": "#/definitions/deleteFile200Response"
             }
           }
         },
@@ -1543,7 +1643,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GetUsers200Response"
+              "$ref": "#/definitions/getUsers200Response"
             }
           }
         },
@@ -1585,7 +1685,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DenyUsers200Response"
+              "$ref": "#/definitions/denyUsers200Response"
             }
           }
         },
@@ -1634,7 +1734,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/DenyUsersAndGroups200Response"
+              "$ref": "#/definitions/denyUsersAndGroups200Response"
             }
           }
         },
@@ -1676,7 +1776,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UndenyUsers200Response"
+              "$ref": "#/definitions/undenyUsers200Response"
             }
           }
         },
@@ -1718,7 +1818,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/AddMembersToGroup200Response"
+              "$ref": "#/definitions/addMembersToGroup200Response"
             }
           }
         },
@@ -1758,7 +1858,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RemoveMembersFromGroup200Response"
+              "$ref": "#/definitions/removeMembersFromGroup200Response"
             }
           }
         },
@@ -1800,7 +1900,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/AddManagersToGroup200Response"
+              "$ref": "#/definitions/addManagersToGroup200Response"
             }
           }
         },
@@ -1840,7 +1940,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RemoveManagersFromGroup200Response"
+              "$ref": "#/definitions/removeManagersFromGroup200Response"
             }
           }
         },
@@ -1882,7 +1982,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/AddSubgroupsToGroup200Response"
+              "$ref": "#/definitions/addSubgroupsToGroup200Response"
             }
           }
         },
@@ -1922,7 +2022,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/RemoveSubgroupsFromGroup200Response"
+              "$ref": "#/definitions/removeSubgroupsFromGroup200Response"
             }
           }
         },
@@ -1948,7 +2048,46 @@
             "in": "body",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/AuditRequest"
+              "example": {
+                "date": "2022-05-20",
+                "topics": [
+                  "login",
+                  "login_fail"
+                ]
+              },
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "nextToken": {
+                  "description": "Token specifying start of page. For first page don't supply this.",
+                  "example": "6a.f12x",
+                  "type": "string"
+                },
+                "numRows": {
+                  "description": "Number of logs to return per page, default is 10000, minimum is 1000, max is 50000.",
+                  "example": 10000,
+                  "type": "integer"
+                },
+                "queryId": {
+                  "description": "The query id of an audit log request. This id is needed to fetch subsequent paged results of a single query.",
+                  "example": "c41aa90e-0db6-4732-8e22-2ef80fe4092a",
+                  "type": "string"
+                },
+                "date": {
+                  "description": "The date for which audit logs need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past.",
+                  "example": "2022-05-23",
+                  "type": "string",
+                  "format": "date"
+                },
+                "topics": {
+                  "type": "array",
+                  "maxItems": 20,
+                  "description": "An array that may contain up to 20 [topics](https://resources.quickbase.com/nav/app/budurkasx/action/showpage/2b2941e4-f34d-4d41-9b0e-db790d20e9ab?pageIdV2=quickbase.com-DashboardGroup-15760d74-2243-4ce9-9495-7cc8790f12e7) to filter by. If empty, all topics are returned.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         ],
@@ -1957,14 +2096,14 @@
             "description": "Query ran successfully and has returned the events for the given time period.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/Audit200Response"
+              "$ref": "#/definitions/audit200Response"
             }
           },
           "202": {
             "description": "Query still being processed. Pass the queryId back to the API to check for results.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/Audit202Response"
+              "$ref": "#/definitions/audit202Response"
             }
           }
         },
@@ -1999,7 +2138,7 @@
             "description": "Summaries returned succesfully",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/PlatformAnalyticReads200Response"
+              "$ref": "#/definitions/platformAnalyticReads200Response"
             }
           }
         },
@@ -2031,7 +2170,78 @@
             "x-amf-mediaType": "application/json",
             "name": "generated",
             "schema": {
-              "$ref": "#/definitions/PlatformAnalyticEventSummariesRequest"
+              "example": {
+                "start": "2023-12-01T12:00:00.000-05:00",
+                "end": "2023-12-31T12:00:00.000-05:00",
+                "groupBy": "user",
+                "nextToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvZmZzZXQiOjEwMCwiaWF0IjoxNzA2NzE1OTI3LCJleHAiOjE3MDY4MDIzMjd9.aWGZCv5vJIai0Dw6sVcQ9FT70PHcqWcqP9sGdKBJeco",
+                "where": [
+                  {
+                    "id": "58351651.xc1",
+                    "type": "user"
+                  },
+                  {
+                    "id": "bpqe82s1",
+                    "type": "app"
+                  }
+                ]
+              },
+              "properties": {
+                "start": {
+                  "description": "The start date and time of the requested summaries in ISO 8601 time format.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "end": {
+                  "description": "The end date and time of the requested summaries in ISO 8601 time format.",
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "groupBy": {
+                  "description": "How the events should be grouped.",
+                  "enum": [
+                    "app",
+                    "user"
+                  ],
+                  "type": "string"
+                },
+                "nextToken": {
+                  "description": "A pagination token from a previous response. Used to fetch the next page.",
+                  "type": "string"
+                },
+                "where": {
+                  "description": "A list of items to filter events by. Only events which match ALL criteria will be included in the results.",
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "description": "Id of the item to filter by - the hash uid if filtering a user, or the app id if filtering an app.",
+                        "type": "string"
+                      },
+                      "type": {
+                        "description": "The type of item to filter by.",
+                        "enum": [
+                          "app",
+                          "user"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type"
+                    ],
+                    "type": "object"
+                  },
+                  "maxItems": 10,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "start",
+                "end",
+                "groupBy"
+              ],
+              "type": "object"
             }
           }
         ],
@@ -2039,7 +2249,7 @@
           "200": {
             "description": "Event summaries returned succesfully",
             "schema": {
-              "$ref": "#/definitions/PlatformAnalyticEventSummaries200Response"
+              "$ref": "#/definitions/platformAnalyticEventSummaries200Response"
             }
           }
         },
@@ -2080,35 +2290,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/x-yaml",
             "schema": {
-              "$ref": "#/definitions/ExportSolution200Response"
+              "$ref": "#/definitions/exportSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolution400Response"
+              "$ref": "#/definitions/exportSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolution404Response"
+              "$ref": "#/definitions/exportSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolution401_403Response"
+              "$ref": "#/definitions/exportSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolution4xx_5xxResponse"
+              "$ref": "#/definitions/exportSolution4xx_5xxResponse"
             }
           }
         },
@@ -2140,7 +2350,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionRequest"
+              "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
             }
           },
           {
@@ -2156,28 +2366,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolution200Response"
+              "$ref": "#/definitions/updateSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolution400Response"
+              "$ref": "#/definitions/updateSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolution401_403Response"
+              "$ref": "#/definitions/updateSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolution4xx_5xxResponse"
+              "$ref": "#/definitions/updateSolution4xx_5xxResponse"
             }
           }
         },
@@ -2204,7 +2414,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionRequest"
+              "example": "Version: 0.2\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
             }
           },
           {
@@ -2220,28 +2430,28 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolution200Response"
+              "$ref": "#/definitions/createSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolution400Response"
+              "$ref": "#/definitions/createSolution400Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolution401_403Response"
+              "$ref": "#/definitions/createSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolution4xx_5xxResponse"
+              "$ref": "#/definitions/createSolution4xx_5xxResponse"
             }
           }
         },
@@ -2300,35 +2510,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolutionToRecord200Response"
+              "$ref": "#/definitions/exportSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolutionToRecord400Response"
+              "$ref": "#/definitions/exportSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution or field does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolutionToRecord404Response"
+              "$ref": "#/definitions/exportSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolutionToRecord401_403Response"
+              "$ref": "#/definitions/exportSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ExportSolutionToRecord4xx_5xxResponse"
+              "$ref": "#/definitions/exportSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2380,35 +2590,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionFromRecord200Response"
+              "$ref": "#/definitions/createSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionFromRecord400Response"
+              "$ref": "#/definitions/createSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionFromRecord404Response"
+              "$ref": "#/definitions/createSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionFromRecord401_403Response"
+              "$ref": "#/definitions/createSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/CreateSolutionFromRecord4xx_5xxResponse"
+              "$ref": "#/definitions/createSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2467,35 +2677,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionToRecord200Response"
+              "$ref": "#/definitions/updateSolutionToRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionToRecord400Response"
+              "$ref": "#/definitions/updateSolutionToRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionToRecord404Response"
+              "$ref": "#/definitions/updateSolutionToRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionToRecord401_403Response"
+              "$ref": "#/definitions/updateSolutionToRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/UpdateSolutionToRecord4xx_5xxResponse"
+              "$ref": "#/definitions/updateSolutionToRecord4xx_5xxResponse"
             }
           }
         },
@@ -2529,7 +2739,7 @@
             "x-amf-mediaType": "application/x-yaml",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionRequest"
+              "example": "Version: 0.4\nResources:\n  $App_Example_app:\n    Type: QB::Application\n    Properties:\n      Name: Example app\n      Description: \n      AppColor: '#72509a'\n      Manager: manager@yourrealm.com\n      TableOrder: []\n      AppIcon: Application\n      CurrencySymbol: $\n      FiscalYearDesignation: Last\n      FirstDayOfWeek: Sun\n      DateFormat: MM-DD-YYYY\n      FirstMonthOfFiscalYear: Jan\n      CurrencySymbolPosition: Between\n      NumberFormat:\n        SeparatorStyle: CommaGroupingPeriodDecimal\n        SeparatorPlaces: none\n      DefaultViewMode: Auto\n      HideNewUpdatedIcons: false\n      DisableAllUsersSelection: false\n      CanCopyApp: Admin\n      CanExportData: Everyone\n      Searchable: false\n      RequireAppToken: true\n      ShowPerformanceBar: false\n      ShowPerformanceAnalyzer: false\n      GlobalSearchExactMatch: false\n      Utf8DataEncoding: false\n      Timezone: Default\n      Branding:\n        AppHeader:\n          HideQuickbaseStandardMenu: false\n        AppFooter: {}\n      RoleOrder:\n        - !Ref\n          Role: $Role_Viewer\n        - !Ref\n          Role: $Role_Participant\n        - !Ref\n          Role: $Role_Administrator\n    Roles:\n      $Role_Viewer:\n        Type: QB::Application::Role\n        Properties:\n          Name: Viewer\n          Description: \n          Default: false\n          ManageUsers: false\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Participant:\n        Type: QB::Application::Role\n        Properties:\n          Name: Participant\n          Description: \n          Default: true\n          ManageUsers: true\n          EditApp: false\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false\n      $Role_Administrator:\n        Type: QB::Application::Role\n        Properties:\n          Name: Administrator\n          Description: \n          Default: false\n          ManageUsers: true\n          EditApp: true\n          DisableAccess: false\n          AppUI:\n            HideSettings: false\n            HideUsers: false\n            HideFavorites: false\n            HideSearch: false\n            HideHelp: false\n            HideTestAs: false\n          TableUI:\n            Global:\n              HideInBar: false\n              HideNewRecord: false\n              HideGridEdit: false\n              HideEmail: false\n              HidePrint: false\n              HideImportExport: false\n              HideSaveSpreadsheet: false\n              HideCreateCustomizeReport: false\n              HidePersonalSettings: false"
             }
           },
           {
@@ -2545,35 +2755,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolution200Response"
+              "$ref": "#/definitions/changesetSolution200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolution400Response"
+              "$ref": "#/definitions/changesetSolution400Response"
             }
           },
           "404": {
             "description": "Solution does not exist. The supplied solution ID was not found.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolution404Response"
+              "$ref": "#/definitions/changesetSolution404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolution401_403Response"
+              "$ref": "#/definitions/changesetSolution401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolution4xx_5xxResponse"
+              "$ref": "#/definitions/changesetSolution4xx_5xxResponse"
             }
           }
         },
@@ -2632,35 +2842,35 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionFromRecord200Response"
+              "$ref": "#/definitions/changesetSolutionFromRecord200Response"
             }
           },
           "400": {
             "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionFromRecord400Response"
+              "$ref": "#/definitions/changesetSolutionFromRecord400Response"
             }
           },
           "404": {
             "description": "A resource is missing. For example: The supplied solution, field or record does not exist.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionFromRecord404Response"
+              "$ref": "#/definitions/changesetSolutionFromRecord404Response"
             }
           },
           "401/403": {
             "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionFromRecord401_403Response"
+              "$ref": "#/definitions/changesetSolutionFromRecord401_403Response"
             }
           },
           "4xx/5xx": {
             "description": "Non-common error, reach out to support if there’s lack of clarity.",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/ChangesetSolutionFromRecord4xx_5xxResponse"
+              "$ref": "#/definitions/changesetSolutionFromRecord4xx_5xxResponse"
             }
           }
         },
@@ -2760,7 +2970,7 @@
             "description": "Success",
             "x-amf-mediaType": "application/json",
             "schema": {
-              "$ref": "#/definitions/GenerateDocument200Response"
+              "$ref": "#/definitions/generateDocument200Response"
             }
           }
         }
@@ -2768,6 +2978,600 @@
     }
   },
   "definitions": {
+    "CreateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the app."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the app."
+        },
+        "assignToken": {
+          "type": "boolean",
+          "description": "Whether to assign the user token."
+        }
+      },
+      "required": [
+        "name",
+        "assignToken"
+      ],
+      "description": "Create an app"
+    },
+    "UpdateAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the app."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the app."
+        },
+        "assignToken": {
+          "type": "boolean",
+          "description": "Whether to assign the user token."
+        }
+      },
+      "required": [
+        "name",
+        "assignToken"
+      ],
+      "description": "Update an app"
+    },
+    "DeleteAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the app."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the app."
+        },
+        "assignToken": {
+          "type": "boolean",
+          "description": "Whether to assign the user token."
+        }
+      },
+      "required": [
+        "name",
+        "assignToken"
+      ],
+      "description": "Delete an app"
+    },
+    "CopyAppRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the new app."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description for the new app."
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "keepData": {
+              "type": "boolean",
+              "description": "Whether to copy data."
+            },
+            "excludeFiles": {
+              "type": "boolean",
+              "description": "Whether to exclude files."
+            },
+            "usersAndRoles": {
+              "type": "boolean",
+              "description": "Whether to copy users and roles."
+            },
+            "assignUserToken": {
+              "type": "boolean",
+              "description": "Whether to assign the user token."
+            }
+          },
+          "description": "Options for customizing the app copy process."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Copy an app"
+    },
+    "CreateTableRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Create a table"
+    },
+    "UpdateTableRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Update a table"
+    },
+    "CreateRelationshipRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Create a relationship"
+    },
+    "UpdateRelationshipRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Update a relationship"
+    },
+    "CreateFieldRequest": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label of the field"
+        },
+        "fieldType": {
+          "type": "string",
+          "description": "The type of the field",
+          "enum": [
+            "text",
+            "text-multiple-choice",
+            "text-multi-line",
+            "rich-text",
+            "numeric",
+            "currency",
+            "percent",
+            "rating",
+            "date",
+            "date-time",
+            "time-of-day",
+            "duration",
+            "checkbox",
+            "user",
+            "multi-user",
+            "address",
+            "email",
+            "phone",
+            "url",
+            "file",
+            "record-id"
+          ]
+        },
+        "fieldHelp": {
+          "type": "string",
+          "description": "Help text for the field",
+          "nullable": true
+        },
+        "addToForms": {
+          "type": "boolean",
+          "description": "Whether to add the field to forms",
+          "nullable": true
+        },
+        "permissions": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Permission"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Custom permissions for the field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required",
+          "nullable": true
+        },
+        "unique": {
+          "type": "boolean",
+          "description": "Whether the field must have unique values",
+          "nullable": true
+        },
+        "noWrap": {
+          "type": "boolean",
+          "description": "Whether text wrapping is disabled",
+          "nullable": true
+        },
+        "bold": {
+          "type": "boolean",
+          "description": "Whether the field is bolded",
+          "nullable": true
+        },
+        "appearsByDefault": {
+          "type": "boolean",
+          "description": "Whether the field appears by default in reports",
+          "nullable": true
+        },
+        "findEnabled": {
+          "type": "boolean",
+          "description": "Whether the field is searchable",
+          "nullable": true
+        },
+        "doesDataCopy": {
+          "type": "boolean",
+          "description": "Whether the field copies data",
+          "nullable": true
+        },
+        "audited": {
+          "type": "boolean",
+          "description": "Whether changes to the field are audited",
+          "nullable": true
+        }
+      },
+      "required": [
+        "label",
+        "fieldType"
+      ],
+      "description": "Create a field"
+    },
+    "DeleteFieldsRequest": {
+      "type": "object",
+      "properties": {
+        "fieldIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "fieldIds"
+      ],
+      "description": "Delete field(s)"
+    },
+    "UpdateFieldRequest": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "The label of the field"
+        },
+        "fieldType": {
+          "type": "string",
+          "description": "The type of the field",
+          "enum": [
+            "text",
+            "text-multiple-choice",
+            "text-multi-line",
+            "rich-text",
+            "numeric",
+            "currency",
+            "percent",
+            "rating",
+            "date",
+            "date-time",
+            "time-of-day",
+            "duration",
+            "checkbox",
+            "user",
+            "multi-user",
+            "address",
+            "email",
+            "phone",
+            "url",
+            "file",
+            "record-id"
+          ]
+        },
+        "fieldHelp": {
+          "type": "string",
+          "description": "Help text for the field",
+          "nullable": true
+        },
+        "addToForms": {
+          "type": "boolean",
+          "description": "Whether to add the field to forms",
+          "nullable": true
+        },
+        "permissions": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Permission"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Custom permissions for the field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the field is required",
+          "nullable": true
+        },
+        "unique": {
+          "type": "boolean",
+          "description": "Whether the field must have unique values",
+          "nullable": true
+        },
+        "noWrap": {
+          "type": "boolean",
+          "description": "Whether text wrapping is disabled",
+          "nullable": true
+        },
+        "bold": {
+          "type": "boolean",
+          "description": "Whether the field is bolded",
+          "nullable": true
+        },
+        "appearsByDefault": {
+          "type": "boolean",
+          "description": "Whether the field appears by default in reports",
+          "nullable": true
+        },
+        "findEnabled": {
+          "type": "boolean",
+          "description": "Whether the field is searchable",
+          "nullable": true
+        },
+        "doesDataCopy": {
+          "type": "boolean",
+          "description": "Whether the field copies data",
+          "nullable": true
+        },
+        "audited": {
+          "type": "boolean",
+          "description": "Whether changes to the field are audited",
+          "nullable": true
+        }
+      },
+      "required": [
+        "label",
+        "fieldType"
+      ],
+      "description": "Update a field"
+    },
+    "UpsertRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
+        },
+        "to": {
+          "type": "string"
+        },
+        "fieldsToReturn": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "data",
+        "to"
+      ],
+      "description": "Insert/Update record(s)"
+    },
+    "DeleteRecordsRequest": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "where": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "where"
+      ],
+      "description": "Delete record(s)"
+    },
+    "RunQueryRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Record"
+          }
+        },
+        "to": {
+          "type": "string"
+        },
+        "fieldsToReturn": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "data",
+        "to"
+      ],
+      "description": "Query for data"
+    },
+    "GetUsersRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Get users"
+    },
+    "DenyUsersRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Deny users"
+    },
+    "DenyUsersAndGroupsRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Deny and remove users from groups"
+    },
+    "UndenyUsersRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Undeny users"
+    },
+    "AddMembersToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Add members"
+    },
+    "RemoveMembersFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Remove members"
+    },
+    "AddManagersToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Add managers"
+    },
+    "RemoveManagersFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Remove managers"
+    },
+    "AddSubgroupsToGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Add child groups"
+    },
+    "RemoveSubgroupsFromGroupRequest": {
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "userIds"
+      ],
+      "description": "Remove child groups"
+    },
     "Record": {
       "type": "object",
       "additionalProperties": {
@@ -2806,85 +3610,7 @@
       ],
       "description": "A single permission entry for a field"
     },
-    "CreateAppRequest": {
-      "type": "object",
-      "properties": {
-        "assignToken": {
-          "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
-          "example": false,
-          "type": "boolean"
-        },
-        "variables": {
-          "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "value"
-            ],
-            "properties": {
-              "name": {
-                "description": "The name for the variable.",
-                "type": "string"
-              },
-              "value": {
-                "description": "The value for the variable.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "name": {
-          "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
-          "type": "string"
-        },
-        "securityProperties": {
-          "description": "Application security properties.",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "hideFromPublic": {
-              "description": "Hide from public application searches",
-              "type": "boolean"
-            },
-            "mustBeRealmApproved": {
-              "description": "Only \"approved\" users may access this application",
-              "type": "boolean"
-            },
-            "allowClone": {
-              "description": "Allow users who are not administrators to copy",
-              "type": "boolean"
-            },
-            "useIPFilter": {
-              "description": "Only users logging in from \"approved\" IP addresses may access this application",
-              "type": "boolean"
-            },
-            "allowExport": {
-              "description": "Allow users who are not administrators to export data",
-              "type": "boolean"
-            },
-            "enableAppTokens": {
-              "description": "Require Application Tokens",
-              "type": "boolean"
-            }
-          }
-        },
-        "description": {
-          "description": "The description for the app. If this property is left out, the app description will be blank.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "assignToken",
-        "variables",
-        "name",
-        "securityProperties"
-      ],
-      "description": "Create an app"
-    },
-    "CreateApp200Response": {
+    "createApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "created": "2020-03-27T18:34:12Z",
@@ -3053,7 +3779,7 @@
         }
       }
     },
-    "GetApp200Response": {
+    "getApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "ancestorId": "bqhskthaq",
@@ -3228,79 +3954,7 @@
         }
       }
     },
-    "UpdateAppRequest": {
-      "type": "object",
-      "properties": {
-        "variables": {
-          "description": "The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "name",
-              "value"
-            ],
-            "properties": {
-              "name": {
-                "description": "The name for the variable.",
-                "type": "string"
-              },
-              "value": {
-                "description": "The value for the variable.",
-                "type": "string"
-              }
-            }
-          }
-        },
-        "name": {
-          "description": "The name for the app.",
-          "type": "string"
-        },
-        "securityProperties": {
-          "description": "Security properties of the application",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "hideFromPublic": {
-              "description": "Hide from public application searches",
-              "type": "boolean"
-            },
-            "mustBeRealmApproved": {
-              "description": "Only \"approved\" users may access this application",
-              "type": "boolean"
-            },
-            "allowClone": {
-              "description": "Allow users who are not administrators to copy",
-              "type": "boolean"
-            },
-            "useIPFilter": {
-              "description": "Only users logging in from \"approved\" IP addresses may access this application",
-              "type": "boolean"
-            },
-            "allowExport": {
-              "description": "Allow users who are not administrators to export data",
-              "type": "boolean"
-            },
-            "enableAppTokens": {
-              "description": "Require Application Tokens",
-              "type": "boolean"
-            }
-          }
-        },
-        "description": {
-          "description": "The description for the app.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "variables",
-        "name",
-        "securityProperties"
-      ],
-      "description": "Update an app"
-    },
-    "UpdateApp200Response": {
+    "updateApp200Response": {
       "x-amf-examples": {
         "Simple Application": {
           "ancestorId": "bqhskthaq",
@@ -3475,20 +4129,7 @@
         }
       }
     },
-    "DeleteAppRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "To confirm application deletion we ask for application name.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Delete an app"
-    },
-    "DeleteApp200Response": {
+    "deleteApp200Response": {
       "example": {
         "deletedAppId": "bqhskthaq"
       },
@@ -3501,7 +4142,7 @@
         }
       }
     },
-    "GetAppEvents200Response": {
+    "getAppEvents200Response": {
       "example": [
         {
           "type": "qb-action",
@@ -3635,46 +4276,7 @@
         }
       }
     },
-    "CopyAppRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the new app."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description for the new app."
-        },
-        "properties": {
-          "type": "object",
-          "properties": {
-            "keepData": {
-              "type": "boolean",
-              "description": "Whether to copy data."
-            },
-            "excludeFiles": {
-              "type": "boolean",
-              "description": "Whether to exclude files."
-            },
-            "usersAndRoles": {
-              "type": "boolean",
-              "description": "Whether to copy users and roles."
-            },
-            "assignUserToken": {
-              "type": "boolean",
-              "description": "Whether to assign the user token."
-            }
-          },
-          "description": "Options for customizing the app copy process."
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Copy an app"
-    },
-    "CopyApp200Response": {
+    "copyApp200Response": {
       "example": {
         "ancestorId": "bqhskthaq",
         "created": "2020-03-27T18:34:12Z",
@@ -3753,19 +4355,7 @@
         }
       }
     },
-    "CreateTableRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Create a table"
-    },
-    "CreateTable200Response": {
+    "createTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -3857,7 +4447,7 @@
         }
       }
     },
-    "GetAppTables200Response": {
+    "getAppTables200Response": {
       "example": [
         {
           "name": "Example Table #0",
@@ -3990,7 +4580,7 @@
         }
       }
     },
-    "GetTable200Response": {
+    "getTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -4082,19 +4672,7 @@
         }
       }
     },
-    "UpdateTableRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Update a table"
-    },
-    "UpdateTable200Response": {
+    "updateTable200Response": {
       "example": {
         "name": "Example Table",
         "created": "2020-03-27T18:34:40Z",
@@ -4186,7 +4764,7 @@
         }
       }
     },
-    "DeleteTable200Response": {
+    "deleteTable200Response": {
       "example": {
         "deletedTableId": "bck7gp3q2"
       },
@@ -4199,7 +4777,7 @@
         }
       }
     },
-    "GetRelationships200Response": {
+    "getRelationships200Response": {
       "example": {
         "metadata": {
           "numRelationships": 1,
@@ -4381,19 +4959,7 @@
         }
       }
     },
-    "CreateRelationshipRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Create a relationship"
-    },
-    "CreateRelationship200Response": {
+    "createRelationship200Response": {
       "example": {
         "id": 6,
         "foreignKeyField": {
@@ -4509,19 +5075,7 @@
         }
       }
     },
-    "UpdateRelationshipRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Update a relationship"
-    },
-    "UpdateRelationship200Response": {
+    "updateRelationship200Response": {
       "example": {
         "id": 6,
         "foreignKeyField": {
@@ -4637,7 +5191,7 @@
         }
       }
     },
-    "DeleteRelationship200Response": {
+    "deleteRelationship200Response": {
       "example": {
         "relationshipId": 6
       },
@@ -4653,7 +5207,7 @@
         }
       }
     },
-    "GetTableReports200Response": {
+    "getTableReports200Response": {
       "description": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)",
       "type": "array",
       "items": {
@@ -4810,7 +5364,7 @@
         }
       }
     },
-    "GetReport200Response": {
+    "getReport200Response": {
       "example": {
         "value": {
           "id": "5",
@@ -4963,22 +5517,7 @@
         }
       }
     },
-    "RunReportRequest": {
-      "type": "object",
-      "properties": {
-        "filters": {
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
-        }
-      },
-      "required": [
-        "filters"
-      ],
-      "description": "Run a report"
-    },
-    "RunReport200Response": {
+    "runReport200Response": {
       "example": {
         "value": {
           "data": [
@@ -5091,7 +5630,7 @@
         }
       }
     },
-    "GetFields200Response": {
+    "getFields200Response": {
       "example": [
         {
           "id": 1,
@@ -5625,123 +6164,7 @@
         }
       }
     },
-    "CreateFieldRequest": {
-      "type": "object",
-      "properties": {
-        "label": {
-          "type": "string",
-          "description": "The label of the field"
-        },
-        "fieldType": {
-          "type": "string",
-          "description": "The type of the field",
-          "enum": [
-            "text",
-            "text-multiple-choice",
-            "text-multi-line",
-            "rich-text",
-            "numeric",
-            "currency",
-            "percent",
-            "rating",
-            "date",
-            "date-time",
-            "time-of-day",
-            "duration",
-            "checkbox",
-            "user",
-            "multi-user",
-            "address",
-            "email",
-            "phone",
-            "url",
-            "file",
-            "record-id"
-          ]
-        },
-        "fieldHelp": {
-          "type": "string",
-          "description": "Help text for the field",
-          "nullable": true
-        },
-        "addToForms": {
-          "type": "boolean",
-          "description": "Whether to add the field to forms",
-          "nullable": true
-        },
-        "permissions": {
-          "anyOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Permission"
-              }
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Custom permissions for the field"
-        },
-        "required": {
-          "type": "boolean",
-          "description": "Whether the field is required",
-          "nullable": true
-        },
-        "unique": {
-          "type": "boolean",
-          "description": "Whether the field must have unique values",
-          "nullable": true
-        },
-        "noWrap": {
-          "type": "boolean",
-          "description": "Whether text wrapping is disabled",
-          "nullable": true
-        },
-        "bold": {
-          "type": "boolean",
-          "description": "Whether the field is bolded",
-          "nullable": true
-        },
-        "appearsByDefault": {
-          "type": "boolean",
-          "description": "Whether the field appears by default in reports",
-          "nullable": true
-        },
-        "findEnabled": {
-          "type": "boolean",
-          "description": "Whether the field is searchable",
-          "nullable": true
-        },
-        "doesDataCopy": {
-          "type": "boolean",
-          "description": "Whether the field copies data",
-          "nullable": true
-        },
-        "audited": {
-          "type": "boolean",
-          "description": "Whether changes to the field are audited",
-          "nullable": true
-        }
-      },
-      "required": [
-        "label",
-        "fieldType",
-        "fieldHelp",
-        "addToForms",
-        "permissions",
-        "required",
-        "unique",
-        "noWrap",
-        "bold",
-        "appearsByDefault",
-        "findEnabled",
-        "doesDataCopy",
-        "audited"
-      ],
-      "description": "Create a field"
-    },
-    "CreateField200Response": {
+    "createField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -6190,22 +6613,7 @@
         }
       }
     },
-    "DeleteFieldsRequest": {
-      "type": "object",
-      "properties": {
-        "fieldIds": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      },
-      "required": [
-        "fieldIds"
-      ],
-      "description": "Delete field(s)"
-    },
-    "DeleteFields200Response": {
+    "deleteFields200Response": {
       "example": {
         "deletedFieldIds": [
           6,
@@ -6238,7 +6646,7 @@
         }
       }
     },
-    "GetField200Response": {
+    "getField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -6687,123 +7095,7 @@
         }
       }
     },
-    "UpdateFieldRequest": {
-      "type": "object",
-      "properties": {
-        "label": {
-          "type": "string",
-          "description": "The label of the field"
-        },
-        "fieldType": {
-          "type": "string",
-          "description": "The type of the field",
-          "enum": [
-            "text",
-            "text-multiple-choice",
-            "text-multi-line",
-            "rich-text",
-            "numeric",
-            "currency",
-            "percent",
-            "rating",
-            "date",
-            "date-time",
-            "time-of-day",
-            "duration",
-            "checkbox",
-            "user",
-            "multi-user",
-            "address",
-            "email",
-            "phone",
-            "url",
-            "file",
-            "record-id"
-          ]
-        },
-        "fieldHelp": {
-          "type": "string",
-          "description": "Help text for the field",
-          "nullable": true
-        },
-        "addToForms": {
-          "type": "boolean",
-          "description": "Whether to add the field to forms",
-          "nullable": true
-        },
-        "permissions": {
-          "anyOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Permission"
-              }
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "Custom permissions for the field"
-        },
-        "required": {
-          "type": "boolean",
-          "description": "Whether the field is required",
-          "nullable": true
-        },
-        "unique": {
-          "type": "boolean",
-          "description": "Whether the field must have unique values",
-          "nullable": true
-        },
-        "noWrap": {
-          "type": "boolean",
-          "description": "Whether text wrapping is disabled",
-          "nullable": true
-        },
-        "bold": {
-          "type": "boolean",
-          "description": "Whether the field is bolded",
-          "nullable": true
-        },
-        "appearsByDefault": {
-          "type": "boolean",
-          "description": "Whether the field appears by default in reports",
-          "nullable": true
-        },
-        "findEnabled": {
-          "type": "boolean",
-          "description": "Whether the field is searchable",
-          "nullable": true
-        },
-        "doesDataCopy": {
-          "type": "boolean",
-          "description": "Whether the field copies data",
-          "nullable": true
-        },
-        "audited": {
-          "type": "boolean",
-          "description": "Whether changes to the field are audited",
-          "nullable": true
-        }
-      },
-      "required": [
-        "label",
-        "fieldType",
-        "fieldHelp",
-        "addToForms",
-        "permissions",
-        "required",
-        "unique",
-        "noWrap",
-        "bold",
-        "appearsByDefault",
-        "findEnabled",
-        "doesDataCopy",
-        "audited"
-      ],
-      "description": "Update a field"
-    },
-    "UpdateField200Response": {
+    "updateField200Response": {
       "example": {
         "id": 123,
         "label": "Field1",
@@ -7252,7 +7544,7 @@
         }
       }
     },
-    "GetFieldsUsage200Response": {
+    "getFieldsUsage200Response": {
       "example": [
         {
           "field": {
@@ -7612,7 +7904,7 @@
         }
       }
     },
-    "GetFieldUsage200Response": {
+    "getFieldUsage200Response": {
       "example": [
         {
           "field": {
@@ -7972,19 +8264,7 @@
         }
       }
     },
-    "RunFormulaRequest": {
-      "type": "object",
-      "properties": {
-        "formula": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "formula"
-      ],
-      "description": "Run a formula"
-    },
-    "RunFormula200Response": {
+    "runFormula200Response": {
       "example": {
         "result": "30"
       },
@@ -7997,32 +8277,7 @@
         }
       }
     },
-    "UpsertRequest": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Record"
-          }
-        },
-        "to": {
-          "type": "string"
-        },
-        "fieldsToReturn": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      },
-      "required": [
-        "data",
-        "to"
-      ],
-      "description": "Insert/Update record(s)"
-    },
-    "Upsert200Response": {
+    "upsert200Response": {
       "description": "A successful response that includes details on the records added, updated or unchanged. In the example below, the table previously had ten records with IDs from 1 through 10. The user posts an upsert that updates the value of record 1 and adds two new records, all successfully.",
       "example": {
         "value": {
@@ -8132,7 +8387,7 @@
         }
       }
     },
-    "Upsert207Response": {
+    "upsert207Response": {
       "description": "Receiving this status code indicates that some (or all) of the individual records being handled had problems and were not processed successfully. The response will be reported under the 'lineErrors' element and indicate the total number of records processed and the errors that occurred with each record. The record IDs of records created, updated, and referenced but unchanged, will be returned in the 'createdRecordIds', 'updatedRecordIds', and 'unchangedRecordIds' elements respectively.  \nIn the example below, a user tries to add three records to a table that previously had ten records with IDs from 1 through 10. The first and third records of the request are valid and create the 11th and 12th records in the table; the second record has a problem that prevents it from being processed.",
       "example": {
         "value": {
@@ -8202,7 +8457,7 @@
         }
       }
     },
-    "Upsert400Response": {
+    "upsert400Response": {
       "description": "There was problem in the format of the request. This prevented the entire request from processing any records. The error response will be in the [standard format](../errors).",
       "example": {
         "message": "Bad request",
@@ -8221,23 +8476,7 @@
         }
       }
     },
-    "DeleteRecordsRequest": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "type": "string"
-        },
-        "where": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "from",
-        "where"
-      ],
-      "description": "Delete record(s)"
-    },
-    "DeleteRecords200Response": {
+    "deleteRecords200Response": {
       "example": {
         "numberDeleted": 1
       },
@@ -8251,32 +8490,7 @@
         }
       }
     },
-    "RunQueryRequest": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Record"
-          }
-        },
-        "to": {
-          "type": "string"
-        },
-        "fieldsToReturn": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      },
-      "required": [
-        "data",
-        "to"
-      ],
-      "description": "Query for data"
-    },
-    "RunQuery200Response": {
+    "runQuery200Response": {
       "example": {
         "value": {
           "data": [
@@ -8383,7 +8597,7 @@
         }
       }
     },
-    "GetTempTokenDBID200Response": {
+    "getTempTokenDBID200Response": {
       "example": {
         "temporaryAuthorization": "token"
       },
@@ -8396,19 +8610,7 @@
         }
       }
     },
-    "ExchangeSsoTokenRequest": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "token"
-      ],
-      "description": "Exchange an SSO token"
-    },
-    "ExchangeSsoToken200Response": {
+    "exchangeSsoToken200Response": {
       "example": {
         "access_token": "example_token_1NiIsImtpZCI6IjllciJ9w",
         "issued_token_type": "urn:quickbase:params:oauth:token-type:temp_ticket",
@@ -8438,19 +8640,7 @@
         }
       }
     },
-    "CloneUserTokenRequest": {
-      "type": "object",
-      "properties": {
-        "userToken": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "userToken"
-      ],
-      "description": "Clone a user token"
-    },
-    "CloneUserToken200Response": {
+    "cloneUserToken200Response": {
       "example": {
         "active": true,
         "apps": [
@@ -8516,23 +8706,7 @@
         }
       }
     },
-    "TransferUserTokenRequest": {
-      "type": "object",
-      "properties": {
-        "userToken": {
-          "type": "string"
-        },
-        "toUserId": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "userToken",
-        "toUserId"
-      ],
-      "description": "Transfer a user token"
-    },
-    "TransferUserToken200Response": {
+    "transferUserToken200Response": {
       "example": {
         "active": true,
         "apps": [
@@ -8593,7 +8767,7 @@
         }
       }
     },
-    "DeactivateUserToken200Response": {
+    "deactivateUserToken200Response": {
       "example": {
         "id": 5
       },
@@ -8606,7 +8780,7 @@
         }
       }
     },
-    "DeleteUserToken200Response": {
+    "deleteUserToken200Response": {
       "example": {
         "id": 5
       },
@@ -8619,7 +8793,7 @@
         }
       }
     },
-    "DownloadFile200Response": {
+    "downloadFile200Response": {
       "type": "object",
       "properties": {
         "data": {
@@ -8629,7 +8803,7 @@
       },
       "description": "Base64 encoded file content."
     },
-    "DeleteFile200Response": {
+    "deleteFile200Response": {
       "example": {
         "versionNumber": 1,
         "fileName": "file.pdf",
@@ -8681,22 +8855,7 @@
         }
       }
     },
-    "GetUsersRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Get users"
-    },
-    "GetUsers200Response": {
+    "getUsers200Response": {
       "x-amf-examples": {
         "All results example": {
           "users": [
@@ -8802,22 +8961,7 @@
         }
       }
     },
-    "DenyUsersRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Deny users"
-    },
-    "DenyUsers200Response": {
+    "denyUsers200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -8857,22 +9001,7 @@
         }
       }
     },
-    "DenyUsersAndGroupsRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Deny and remove users from groups"
-    },
-    "DenyUsersAndGroups200Response": {
+    "denyUsersAndGroups200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -8912,22 +9041,7 @@
         }
       }
     },
-    "UndenyUsersRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Undeny users"
-    },
-    "UndenyUsers200Response": {
+    "undenyUsers200Response": {
       "example": {
         "failure": [
           "423123.vc2d",
@@ -8967,22 +9081,7 @@
         }
       }
     },
-    "AddMembersToGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Add members"
-    },
-    "AddMembersToGroup200Response": {
+    "addMembersToGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -9022,22 +9121,7 @@
         }
       }
     },
-    "RemoveMembersFromGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Remove members"
-    },
-    "RemoveMembersFromGroup200Response": {
+    "removeMembersFromGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -9077,22 +9161,7 @@
         }
       }
     },
-    "AddManagersToGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Add managers"
-    },
-    "AddManagersToGroup200Response": {
+    "addManagersToGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -9132,22 +9201,7 @@
         }
       }
     },
-    "RemoveManagersFromGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Remove managers"
-    },
-    "RemoveManagersFromGroup200Response": {
+    "removeManagersFromGroup200Response": {
       "example": {
         "failure": [
           "123456.ryyw",
@@ -9187,22 +9241,7 @@
         }
       }
     },
-    "AddSubgroupsToGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Add child groups"
-    },
-    "AddSubgroupsToGroup200Response": {
+    "addSubgroupsToGroup200Response": {
       "example": {
         "failure": [
           "1002.czm8"
@@ -9240,22 +9279,7 @@
         }
       }
     },
-    "RemoveSubgroupsFromGroupRequest": {
-      "type": "object",
-      "properties": {
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "userIds"
-      ],
-      "description": "Remove child groups"
-    },
-    "RemoveSubgroupsFromGroup200Response": {
+    "removeSubgroupsFromGroup200Response": {
       "example": {
         "failure": [
           "1002.czm8"
@@ -9293,22 +9317,7 @@
         }
       }
     },
-    "AuditRequest": {
-      "type": "object",
-      "properties": {
-        "events": {
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
-        }
-      },
-      "required": [
-        "events"
-      ],
-      "description": "Get audit logs"
-    },
-    "Audit200Response": {
+    "audit200Response": {
       "example": {
         "events": [
           {
@@ -9456,7 +9465,7 @@
         }
       }
     },
-    "Audit202Response": {
+    "audit202Response": {
       "example": {
         "queryId": "797c0726-f8f4-4df9-883f-c7e8cbdf2f77.ALtInpuyQeBoW+fWrAqLrjPGqDqPl++IMb3bOxlmoF4="
       },
@@ -9472,7 +9481,7 @@
         }
       }
     },
-    "PlatformAnalyticReads200Response": {
+    "platformAnalyticReads200Response": {
       "example": {
         "date": "2022-01-01",
         "reads": {
@@ -9537,22 +9546,7 @@
         }
       }
     },
-    "PlatformAnalyticEventSummariesRequest": {
-      "type": "object",
-      "properties": {
-        "items": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "items"
-      ],
-      "description": "Get event summaries"
-    },
-    "PlatformAnalyticEventSummaries200Response": {
+    "platformAnalyticEventSummaries200Response": {
       "example": {
         "accountId": "1234",
         "start": "2023-12-01T05:00:00Z",
@@ -9774,7 +9768,7 @@
       ],
       "type": "object"
     },
-    "ExportSolution200Response": {
+    "exportSolution200Response": {
       "type": "object",
       "properties": {
         "content": {
@@ -9784,7 +9778,7 @@
       },
       "description": "YAML-formatted data"
     },
-    "ExportSolution400Response": {
+    "exportSolution400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9796,7 +9790,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "ExportSolution404Response": {
+    "exportSolution404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9808,7 +9802,7 @@
       },
       "description": "Solution does not exist. The supplied solution ID was not found."
     },
-    "ExportSolution401_403Response": {
+    "exportSolution401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9820,7 +9814,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "ExportSolution4xx_5xxResponse": {
+    "exportSolution4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -9832,19 +9826,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "UpdateSolutionRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Update a solution"
-    },
-    "UpdateSolution200Response": {
+    "updateSolution200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -9880,7 +9862,7 @@
       },
       "description": "Success"
     },
-    "UpdateSolution400Response": {
+    "updateSolution400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9892,7 +9874,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "UpdateSolution401_403Response": {
+    "updateSolution401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9904,7 +9886,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "UpdateSolution4xx_5xxResponse": {
+    "updateSolution4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -9916,19 +9898,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "CreateSolutionRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Create a solution"
-    },
-    "CreateSolution200Response": {
+    "createSolution200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -9964,7 +9934,7 @@
       },
       "description": "Success"
     },
-    "CreateSolution400Response": {
+    "createSolution400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9976,7 +9946,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "CreateSolution401_403Response": {
+    "createSolution401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -9988,7 +9958,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "CreateSolution4xx_5xxResponse": {
+    "createSolution4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10000,7 +9970,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "ExportSolutionToRecord200Response": {
+    "exportSolutionToRecord200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10015,7 +9985,7 @@
       },
       "description": "Success"
     },
-    "ExportSolutionToRecord400Response": {
+    "exportSolutionToRecord400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10027,7 +9997,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "ExportSolutionToRecord404Response": {
+    "exportSolutionToRecord404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10039,7 +10009,7 @@
       },
       "description": "A resource is missing. For example: The supplied solution or field does not exist."
     },
-    "ExportSolutionToRecord401_403Response": {
+    "exportSolutionToRecord401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10051,7 +10021,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "ExportSolutionToRecord4xx_5xxResponse": {
+    "exportSolutionToRecord4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10063,7 +10033,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "CreateSolutionFromRecord200Response": {
+    "createSolutionFromRecord200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10110,7 +10080,7 @@
       },
       "description": "Success"
     },
-    "CreateSolutionFromRecord400Response": {
+    "createSolutionFromRecord400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10122,7 +10092,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "CreateSolutionFromRecord404Response": {
+    "createSolutionFromRecord404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10134,7 +10104,7 @@
       },
       "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
-    "CreateSolutionFromRecord401_403Response": {
+    "createSolutionFromRecord401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10146,7 +10116,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "CreateSolutionFromRecord4xx_5xxResponse": {
+    "createSolutionFromRecord4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10158,7 +10128,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "UpdateSolutionToRecord200Response": {
+    "updateSolutionToRecord200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10205,7 +10175,7 @@
       },
       "description": "Success"
     },
-    "UpdateSolutionToRecord400Response": {
+    "updateSolutionToRecord400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10217,7 +10187,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "UpdateSolutionToRecord404Response": {
+    "updateSolutionToRecord404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10229,7 +10199,7 @@
       },
       "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
-    "UpdateSolutionToRecord401_403Response": {
+    "updateSolutionToRecord401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10241,7 +10211,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "UpdateSolutionToRecord4xx_5xxResponse": {
+    "updateSolutionToRecord4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10253,19 +10223,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "ChangesetSolutionRequest": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "List solution changes"
-    },
-    "ChangesetSolution200Response": {
+    "changesetSolution200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10303,7 +10261,7 @@
       },
       "description": "Success"
     },
-    "ChangesetSolution400Response": {
+    "changesetSolution400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10315,7 +10273,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "ChangesetSolution404Response": {
+    "changesetSolution404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10327,7 +10285,7 @@
       },
       "description": "Solution does not exist. The supplied solution ID was not found."
     },
-    "ChangesetSolution401_403Response": {
+    "changesetSolution401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10339,7 +10297,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "ChangesetSolution4xx_5xxResponse": {
+    "changesetSolution4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10351,7 +10309,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "ChangesetSolutionFromRecord200Response": {
+    "changesetSolutionFromRecord200Response": {
       "type": "array",
       "items": {
         "type": "object",
@@ -10389,7 +10347,7 @@
       },
       "description": "Success"
     },
-    "ChangesetSolutionFromRecord400Response": {
+    "changesetSolutionFromRecord400Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10401,7 +10359,7 @@
       },
       "description": "Bad request. For example: Missing required headers, Missing required parameters, Malformed QBL and others. Message should provide more information, reach out to support if there’s lack of clarity."
     },
-    "ChangesetSolutionFromRecord404Response": {
+    "changesetSolutionFromRecord404Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10413,7 +10371,7 @@
       },
       "description": "A resource is missing. For example: The supplied solution, field or record does not exist."
     },
-    "ChangesetSolutionFromRecord401_403Response": {
+    "changesetSolutionFromRecord401_403Response": {
       "type": "object",
       "properties": {
         "message": {
@@ -10425,7 +10383,7 @@
       },
       "description": "Insufficient access. This could be for many reasons such as: User doesn’t have SolutionHub access, User is not the owner or a contributor for the solution, User cannot create apps and others.  Message should provide more information."
     },
-    "ChangesetSolutionFromRecord4xx_5xxResponse": {
+    "changesetSolutionFromRecord4xx_5xxResponse": {
       "type": "object",
       "properties": {
         "message": {
@@ -10437,7 +10395,7 @@
       },
       "description": "Non-common error, reach out to support if there’s lack of clarity."
     },
-    "GenerateDocument200Response": {
+    "generateDocument200Response": {
       "example": {
         "fileName": "Document.pdf",
         "data": "data",

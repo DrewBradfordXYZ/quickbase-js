@@ -1,12 +1,14 @@
 #!/usr/bin/env node
+
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import * as glob from "glob";
-import { enhanceRawSpec } from "./fix-spec-schema-enhancer.ts";
-import { fixArraySchemas } from "./fix-spec-array-fixer.ts";
-import { FixSpecConfig, Spec } from "./fix-spec-types.ts";
-import { toCamelCase } from "./fix-spec-utils.ts";
+import { enhanceTags } from "./schema/tags/index.ts"; // Updated import
+import { enhanceGeneral } from "./schema/enhance-general.ts";
+import { fixArrays } from "./schema/fix-arrays.ts";
+import { FixSpecConfig, Spec } from "./types/spec.ts";
+import { toCamelCase } from "./utils/naming.ts";
 
 async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
   try {
@@ -60,11 +62,13 @@ async function fixQuickBaseSpec(config: FixSpecConfig = {}): Promise<void> {
     if (!config.applyOverrides) {
       console.log("Running with no overrides, using raw spec only...");
     }
-    console.log("Enhancing raw spec...");
-    enhanceRawSpec(spec);
+    console.log("Enhancing raw spec with tags...");
+    enhanceTags(spec); // Updated call
+    console.log("Enhancing raw spec with general enhancements...");
+    enhanceGeneral(spec);
 
     console.log("Fixing array schemas...");
-    fixArraySchemas(spec);
+    fixArrays(spec);
 
     console.log("Removing unexpected top-level attributes...");
     delete spec.operations;
