@@ -3122,9 +3122,7 @@
           "description": "The updated description for the table."
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": [],
       "additionalProperties": true,
       "description": "Update a table"
     },
@@ -3133,23 +3131,70 @@
       "properties": {
         "parentTableId": {
           "type": "string",
-          "description": "The ID of the parent table."
+          "description": "The parent table id for the relationship."
         },
-        "childTableId": {
-          "type": "string",
-          "description": "The ID of the child table."
+        "foreignKeyField": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "The label for the foreign key field."
+            }
+          },
+          "additionalProperties": true
         },
-        "foreignKeyFieldId": {
-          "type": "integer",
-          "description": "The field ID to use as the foreign key."
+        "lookupFieldIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Array of field ids..."
+        },
+        "summaryFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "summaryFid": {
+                "type": "number",
+                "description": "The field id to summarize."
+              },
+              "label": {
+                "type": "string",
+                "description": "The label for the summary field."
+              },
+              "accumulationType": {
+                "type": "string",
+                "enum": [
+                  "AVG",
+                  "SUM",
+                  "MAX",
+                  "MIN",
+                  "STD-DEV",
+                  "COUNT",
+                  "COMBINED-TEXT",
+                  "COMBINED-USER",
+                  "DISTINCT-COUNT"
+                ],
+                "description": "The accumulation type..."
+              },
+              "where": {
+                "type": "string",
+                "description": "The filter..."
+              }
+            },
+            "required": [
+              "accumulationType"
+            ],
+            "additionalProperties": true
+          },
+          "description": "Array of summary field objects..."
         }
       },
       "required": [
-        "parentTableId",
-        "childTableId",
-        "foreignKeyFieldId"
+        "parentTableId"
       ],
-      "additionalProperties": true,
+      "additionalProperties": false,
       "description": "Create a relationship"
     },
     "UpdateRelationshipRequest": {
@@ -3157,23 +3202,63 @@
       "properties": {
         "parentTableId": {
           "type": "string",
-          "description": "The updated ID of the parent table."
+          "description": "The updated parent table id..."
         },
-        "childTableId": {
-          "type": "string",
-          "description": "The updated ID of the child table."
+        "foreignKeyField": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "description": "The updated label..."
+            }
+          },
+          "additionalProperties": true
         },
-        "foreignKeyFieldId": {
-          "type": "integer",
-          "description": "The updated field ID to use as the foreign key."
+        "lookupFieldIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Updated array of field ids..."
+        },
+        "summaryFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "summaryFid": {
+                "type": "number"
+              },
+              "label": {
+                "type": "string"
+              },
+              "accumulationType": {
+                "type": "string",
+                "enum": [
+                  "AVG",
+                  "SUM",
+                  "MAX",
+                  "MIN",
+                  "STD-DEV",
+                  "COUNT",
+                  "COMBINED-TEXT",
+                  "COMBINED-USER",
+                  "DISTINCT-COUNT"
+                ]
+              },
+              "where": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "accumulationType"
+            ],
+            "additionalProperties": true
+          }
         }
       },
-      "required": [
-        "parentTableId",
-        "childTableId",
-        "foreignKeyFieldId"
-      ],
-      "additionalProperties": true,
+      "required": [],
+      "additionalProperties": false,
       "description": "Update a relationship"
     },
     "CreateFieldRequest": {

@@ -28,8 +28,9 @@ export function enhanceTables(
             `Defining schema for ${requestName} in ${pathKey}(${method})`
           );
           let properties;
+
+          // Existing logic for other endpoints remains unchanged
           if (pathKey === "/tables" && method === "post") {
-            // Create Table
             properties = {
               name: {
                 type: "string",
@@ -50,7 +51,6 @@ export function enhanceTables(
               },
             };
           } else if (pathKey === "/tables/{tableId}" && method === "post") {
-            // Update Table
             properties = {
               name: {
                 type: "string",
@@ -61,53 +61,142 @@ export function enhanceTables(
                 description: "The updated description for the table.",
               },
             };
-          } else if (
+          }
+          // Add minimal fix for relationship endpoints
+          else if (
             pathKey === "/tables/{tableId}/relationship" &&
             method === "post"
           ) {
-            // Create Relationship
-            properties = {
-              parentTableId: {
-                type: "string",
-                description: "The ID of the parent table.",
-              },
-              childTableId: {
-                type: "string",
-                description: "The ID of the child table.",
-              },
-              foreignKeyFieldId: {
-                type: "integer",
-                description: "The field ID to use as the foreign key.",
-              },
-            };
+            requestName = "CreateRelationshipRequest"; // Force correct name
+            if (!spec.definitions[requestName]) {
+              properties = {
+                parentTableId: {
+                  type: "string",
+                  description: "The parent table id for the relationship.",
+                },
+                foreignKeyField: {
+                  type: "object",
+                  properties: {
+                    label: {
+                      type: "string",
+                      description: "The label for the foreign key field.",
+                    },
+                  },
+                  additionalProperties: true,
+                },
+                lookupFieldIds: {
+                  type: "array",
+                  items: { type: "integer" },
+                  description: "Array of field ids...",
+                },
+                summaryFields: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      summaryFid: {
+                        type: "number",
+                        description: "The field id to summarize.",
+                      },
+                      label: {
+                        type: "string",
+                        description: "The label for the summary field.",
+                      },
+                      accumulationType: {
+                        type: "string",
+                        enum: [
+                          "AVG",
+                          "SUM",
+                          "MAX",
+                          "MIN",
+                          "STD-DEV",
+                          "COUNT",
+                          "COMBINED-TEXT",
+                          "COMBINED-USER",
+                          "DISTINCT-COUNT",
+                        ],
+                        description: "The accumulation type...",
+                      },
+                      where: { type: "string", description: "The filter..." },
+                    },
+                    required: ["accumulationType"],
+                    additionalProperties: true,
+                  },
+                  description: "Array of summary field objects...",
+                },
+              };
+            }
           } else if (
             pathKey === "/tables/{tableId}/relationship/{relationshipId}" &&
             method === "post"
           ) {
-            // Update Relationship
-            properties = {
-              parentTableId: {
-                type: "string",
-                description: "The updated ID of the parent table.",
-              },
-              childTableId: {
-                type: "string",
-                description: "The updated ID of the child table.",
-              },
-              foreignKeyFieldId: {
-                type: "integer",
-                description: "The updated field ID to use as the foreign key.",
-              },
-            };
+            requestName = "UpdateRelationshipRequest"; // Force correct name
+            if (!spec.definitions[requestName]) {
+              properties = {
+                parentTableId: {
+                  type: "string",
+                  description: "The updated parent table id...",
+                },
+                foreignKeyField: {
+                  type: "object",
+                  properties: {
+                    label: {
+                      type: "string",
+                      description: "The updated label...",
+                    },
+                  },
+                  additionalProperties: true,
+                },
+                lookupFieldIds: {
+                  type: "array",
+                  items: { type: "integer" },
+                  description: "Updated array of field ids...",
+                },
+                summaryFields: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      summaryFid: { type: "number" },
+                      label: { type: "string" },
+                      accumulationType: {
+                        type: "string",
+                        enum: [
+                          "AVG",
+                          "SUM",
+                          "MAX",
+                          "MIN",
+                          "STD-DEV",
+                          "COUNT",
+                          "COMBINED-TEXT",
+                          "COMBINED-USER",
+                          "DISTINCT-COUNT",
+                        ],
+                      },
+                      where: { type: "string" },
+                    },
+                    required: ["accumulationType"],
+                    additionalProperties: true,
+                  },
+                },
+              };
+            }
           }
+
           if (properties) {
             spec.definitions[requestName] = {
               type: "object",
               properties,
-              required: pathKey.includes("relationship")
-                ? ["parentTableId", "childTableId", "foreignKeyFieldId"]
-                : ["name"],
-              additionalProperties: true,
+              required:
+                pathKey.includes("relationship") &&
+                pathKey.endsWith("/relationship")
+                  ? ["parentTableId"]
+                  : pathKey === "/tables"
+                  ? ["name"]
+                  : [],
+              additionalProperties: pathKey.includes("relationship")
+                ? false
+                : true, // Match raw spec
               description: operation.summary || `Request body for ${opId}`,
             };
           }
