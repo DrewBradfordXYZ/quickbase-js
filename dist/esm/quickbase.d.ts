@@ -1244,11 +1244,35 @@ declare function CreateApp200ResponseToJSONTyped(value?: CreateApp200Response | 
  */
 interface CreateAppRequest {
     /**
-     *
+     * Set to true if you would like to assign the app to the user token you used to create the application. The default is false.
+     * @type {boolean}
+     * @memberof CreateAppRequest
+     */
+    assignToken: boolean;
+    /**
+     * The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)
+     * @type {Array<object>}
+     * @memberof CreateAppRequest
+     */
+    variables: Array<object>;
+    /**
+     * The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.
      * @type {string}
      * @memberof CreateAppRequest
      */
     name: string;
+    /**
+     * Application security properties.
+     * @type {object}
+     * @memberof CreateAppRequest
+     */
+    securityProperties: object;
+    /**
+     * The description for the app. If this property is left out, the app description will be blank.
+     * @type {string}
+     * @memberof CreateAppRequest
+     */
+    description?: string;
 }
 /**
  * Check if a given object implements the CreateAppRequest interface.
@@ -2350,7 +2374,7 @@ declare function DeleteApp200ResponseToJSONTyped(value?: DeleteApp200Response | 
  */
 interface DeleteAppRequest {
     /**
-     *
+     * To confirm application deletion we ask for application name.
      * @type {string}
      * @memberof DeleteAppRequest
      */
@@ -5430,11 +5454,29 @@ declare function UpdateApp200ResponseToJSONTyped(value?: UpdateApp200Response | 
  */
 interface UpdateAppRequest {
     /**
-     *
+     * The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)
+     * @type {Array<object>}
+     * @memberof UpdateAppRequest
+     */
+    variables: Array<object>;
+    /**
+     * The name for the app.
      * @type {string}
      * @memberof UpdateAppRequest
      */
     name: string;
+    /**
+     * Security properties of the application
+     * @type {object}
+     * @memberof UpdateAppRequest
+     */
+    securityProperties: object;
+    /**
+     * The description for the app.
+     * @type {string}
+     * @memberof UpdateAppRequest
+     */
+    description?: string;
 }
 /**
  * Check if a given object implements the UpdateAppRequest interface.
@@ -7021,6 +7063,7 @@ interface QuickbaseConfig {
     useTempTokens?: boolean;
     debug?: boolean;
     fetchApi?: typeof fetch;
+    convertDates?: boolean;
 }
 interface TempTokenParams {
     appId?: string;

@@ -1598,7 +1598,13 @@ function CreateApp200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
  * Check if a given object implements the CreateAppRequest interface.
  */
 function instanceOfCreateAppRequest(value) {
+    if (!('assignToken' in value) || value['assignToken'] === undefined)
+        return false;
+    if (!('variables' in value) || value['variables'] === undefined)
+        return false;
     if (!('name' in value) || value['name'] === undefined)
+        return false;
+    if (!('securityProperties' in value) || value['securityProperties'] === undefined)
         return false;
     return true;
 }
@@ -1610,7 +1616,11 @@ function CreateAppRequestFromJSONTyped(json, ignoreDiscriminator) {
         return json;
     }
     return {
+        'assignToken': json['assignToken'],
+        'variables': json['variables'],
         'name': json['name'],
+        'securityProperties': json['securityProperties'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 function CreateAppRequestToJSON(json) {
@@ -1621,7 +1631,11 @@ function CreateAppRequestToJSONTyped(value, ignoreDiscriminator = false) {
         return value;
     }
     return {
+        'assignToken': value['assignToken'],
+        'variables': value['variables'],
         'name': value['name'],
+        'securityProperties': value['securityProperties'],
+        'description': value['description'],
     };
 }
 
@@ -5936,7 +5950,11 @@ function UpdateApp200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
  * Check if a given object implements the UpdateAppRequest interface.
  */
 function instanceOfUpdateAppRequest(value) {
+    if (!('variables' in value) || value['variables'] === undefined)
+        return false;
     if (!('name' in value) || value['name'] === undefined)
+        return false;
+    if (!('securityProperties' in value) || value['securityProperties'] === undefined)
         return false;
     return true;
 }
@@ -5948,7 +5966,10 @@ function UpdateAppRequestFromJSONTyped(json, ignoreDiscriminator) {
         return json;
     }
     return {
+        'variables': json['variables'],
         'name': json['name'],
+        'securityProperties': json['securityProperties'],
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 function UpdateAppRequestToJSON(json) {
@@ -5959,7 +5980,10 @@ function UpdateAppRequestToJSONTyped(value, ignoreDiscriminator = false) {
         return value;
     }
     return {
+        'variables': value['variables'],
         'name': value['name'],
+        'securityProperties': value['securityProperties'],
+        'description': value['description'],
     };
 }
 
@@ -9222,8 +9246,33 @@ const extractDbid = (params, errorMessage) => {
     }
     return dbid;
 };
+// Utility to convert ISO date strings to Date objects recursively, with optional conversion
+function transformDates(obj, convertStringsToDates = true) {
+    if (obj === null || obj === undefined)
+        return obj;
+    // If it's already a Date object, return it as-is
+    if (obj instanceof Date)
+        return obj;
+    // Convert strings to Date objects if enabled
+    if (convertStringsToDates &&
+        typeof obj === "string" &&
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(obj)) {
+        return new Date(obj);
+    }
+    if (Array.isArray(obj)) {
+        return obj.map((item) => transformDates(item, convertStringsToDates));
+    }
+    if (typeof obj === "object") {
+        return Object.fromEntries(Object.entries(obj).map(([key, value]) => [
+            key,
+            transformDates(value, convertStringsToDates),
+        ]));
+    }
+    return obj;
+}
 function quickbase(config) {
-    const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, } = config;
+    const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, // Default to true for backward compatibility
+     } = config;
     const baseUrl = `https://api.quickbase.com/v1`;
     const tokenCache = new TokenCache();
     const baseHeaders = {
@@ -9309,14 +9358,12 @@ function quickbase(config) {
         if (!methodInfo) {
             throw new Error(`Method ${methodName} not found`);
         }
-        // Structure requestParameters to match AppsApi expectation
         const requestParameters = {
             ...params,
             generated: "body" in params ? { ...params.body } : undefined,
         };
         let requestOptions = {
             credentials: "omit",
-            method: "GET", // Default method
         };
         const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
         if (methodName === "getTempTokenDBID" && useTempTokens) {
@@ -9345,19 +9392,20 @@ function quickbase(config) {
                 Authorization: `QB-USER-TOKEN ${authorizationToken}`,
             };
         }
-        // Set method and body explicitly to ensure full object is sent
-        if ("generated" in requestParameters && requestParameters.generated) {
-            requestOptions.method = "POST";
-            requestOptions.body = JSON.stringify(requestParameters.generated); // Set full body here
-        }
         if (debug) {
             console.log(`[${methodName}] requestParameters:`, requestParameters);
             console.log(`[${methodName}] requestOptions:`, requestOptions);
         }
         try {
             const response = await methodInfo.method(requestParameters, requestOptions);
+            if (debug) {
+                console.log(`[${methodName}] rawResponse:`, response);
+            }
             if (response instanceof Response) {
                 const contentType = response.headers.get("Content-Type")?.toLowerCase();
+                if (debug) {
+                    console.log(`[${methodName}] contentType:`, contentType);
+                }
                 if (contentType?.includes("application/octet-stream")) {
                     return (await response.arrayBuffer());
                 }
@@ -9366,11 +9414,29 @@ function quickbase(config) {
                     return (await response.text());
                 }
                 else if (contentType?.includes("application/json")) {
-                    return (await response.json());
+                    const jsonResponse = await response.json();
+                    if (debug) {
+                        console.log(`[${methodName}] jsonResponse:`, jsonResponse);
+                    }
+                    const transformedResponse = transformDates(jsonResponse, convertDates);
+                    if (debug) {
+                        console.log(`[${methodName}] transformedResponse:`, transformedResponse);
+                    }
+                    return transformedResponse;
                 }
                 return response;
             }
-            return response;
+            else {
+                if (debug) {
+                    console.log(`[${methodName}] non-Response return, applying transform:`, response);
+                }
+                // Handle case where the generated API returns a pre-parsed object
+                const transformedResponse = transformDates(response, convertDates);
+                if (debug) {
+                    console.log(`[${methodName}] transformedNonResponse:`, transformedResponse);
+                }
+                return transformedResponse;
+            }
         }
         catch (error) {
             if (error instanceof ResponseError &&

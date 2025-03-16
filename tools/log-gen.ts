@@ -12,7 +12,7 @@ const excludeDirs: string[] = ["node_modules", ".git", "specs"];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "open-api",
+  // "open-api",
   // "open-api/definitions",
   // "open-api/paths",
 ];
@@ -20,7 +20,7 @@ const includeFolders: string[] = [
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
   // "tests",
-  // "tests/vitest/unit",
+  "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
@@ -35,8 +35,9 @@ const includeFiles: string[] = [
   // "build-umd.js",
   // "build-esm.js",
   // "src/tokenCache.ts",
-  // "src/quickbaseClient.ts",
-  // "src/generated-unified/QuickbaseClient.ts",
+  "src/generated/runtime.ts",
+  "src/quickbaseClient.ts",
+  "src/generated-unified/QuickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [

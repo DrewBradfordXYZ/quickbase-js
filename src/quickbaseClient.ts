@@ -17,6 +17,7 @@ export interface QuickbaseConfig {
   useTempTokens?: boolean;
   debug?: boolean;
   fetchApi?: typeof fetch;
+  convertDates?: boolean; // New flag to control date string conversion, defaults to true
 }
 
 export interface TempTokenParams {
@@ -36,7 +37,9 @@ interface MethodInfo<K extends keyof QuickbaseClient> {
   paramMap: string[];
 }
 
-type MethodMap = { [K in keyof QuickbaseClient]: MethodInfo<K> };
+type MethodMap = {
+  [K in keyof QuickbaseClient]: MethodInfo<K>;
+};
 
 const getParamNames = (fn: (...args: any[]) => any): string[] =>
   fn
@@ -57,6 +60,35 @@ const extractDbid = (
   return dbid;
 };
 
+// Utility to convert ISO date strings to Date objects recursively, with optional conversion
+function transformDates(obj: any, convertStringsToDates: boolean = true): any {
+  if (obj === null || obj === undefined) return obj;
+  // If it's already a Date object, return it as-is
+  if (obj instanceof Date) return obj;
+  // Convert strings to Date objects if enabled
+  if (
+    convertStringsToDates &&
+    typeof obj === "string" &&
+    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(
+      obj
+    )
+  ) {
+    return new Date(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map((item) => transformDates(item, convertStringsToDates));
+  }
+  if (typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        transformDates(value, convertStringsToDates),
+      ])
+    );
+  }
+  return obj;
+}
+
 export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
@@ -65,6 +97,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     useTempTokens,
     fetchApi,
     debug,
+    convertDates = true, // Default to true for backward compatibility
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
@@ -196,7 +229,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
     let requestOptions: RequestInit = {
       credentials: "omit",
-      // Remove default method; let the generated API method set it
     };
 
     const selectedToken =
@@ -236,11 +268,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       };
     }
 
-    // Remove method override; rely on generated method's HTTP method
-    if ("generated" in requestParameters && requestParameters.generated) {
-      // Do not set method here; let AppsApi.ts define it
-    }
-
     if (debug) {
       console.log(`[${methodName}] requestParameters:`, requestParameters);
       console.log(`[${methodName}] requestOptions:`, requestOptions);
@@ -251,8 +278,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         requestParameters,
         requestOptions
       );
+      if (debug) {
+        console.log(`[${methodName}] rawResponse:`, response);
+      }
       if (response instanceof Response) {
         const contentType = response.headers.get("Content-Type")?.toLowerCase();
+        if (debug) {
+          console.log(`[${methodName}] contentType:`, contentType);
+        }
         if (contentType?.includes("application/octet-stream")) {
           return (await response.arrayBuffer()) as ReturnType<
             QuickbaseClient[K]
@@ -263,11 +296,40 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         ) {
           return (await response.text()) as ReturnType<QuickbaseClient[K]>;
         } else if (contentType?.includes("application/json")) {
-          return (await response.json()) as ReturnType<QuickbaseClient[K]>;
+          const jsonResponse = await response.json();
+          if (debug) {
+            console.log(`[${methodName}] jsonResponse:`, jsonResponse);
+          }
+          const transformedResponse = transformDates(
+            jsonResponse,
+            convertDates
+          );
+          if (debug) {
+            console.log(
+              `[${methodName}] transformedResponse:`,
+              transformedResponse
+            );
+          }
+          return transformedResponse as ReturnType<QuickbaseClient[K]>;
         }
         return response as ReturnType<QuickbaseClient[K]>;
+      } else {
+        if (debug) {
+          console.log(
+            `[${methodName}] non-Response return, applying transform:`,
+            response
+          );
+        }
+        // Handle case where the generated API returns a pre-parsed object
+        const transformedResponse = transformDates(response, convertDates);
+        if (debug) {
+          console.log(
+            `[${methodName}] transformedNonResponse:`,
+            transformedResponse
+          );
+        }
+        return transformedResponse as ReturnType<QuickbaseClient[K]>;
       }
-      return response;
     } catch (error) {
       if (
         error instanceof ResponseError &&

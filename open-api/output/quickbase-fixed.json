@@ -2786,12 +2786,78 @@
     "CreateAppRequest": {
       "type": "object",
       "properties": {
+        "assignToken": {
+          "description": "Set to true if you would like to assign the app to the user token you used to create the application. The default is false.",
+          "example": false,
+          "type": "boolean"
+        },
+        "variables": {
+          "description": "The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "description": "The name for the variable.",
+                "type": "string"
+              },
+              "value": {
+                "description": "The value for the variable.",
+                "type": "string"
+              }
+            }
+          }
+        },
         "name": {
+          "description": "The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.",
+          "type": "string"
+        },
+        "securityProperties": {
+          "description": "Application security properties.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hideFromPublic": {
+              "description": "Hide from public application searches",
+              "type": "boolean"
+            },
+            "mustBeRealmApproved": {
+              "description": "Only \"approved\" users may access this application",
+              "type": "boolean"
+            },
+            "allowClone": {
+              "description": "Allow users who are not administrators to copy",
+              "type": "boolean"
+            },
+            "useIPFilter": {
+              "description": "Only users logging in from \"approved\" IP addresses may access this application",
+              "type": "boolean"
+            },
+            "allowExport": {
+              "description": "Allow users who are not administrators to export data",
+              "type": "boolean"
+            },
+            "enableAppTokens": {
+              "description": "Require Application Tokens",
+              "type": "boolean"
+            }
+          }
+        },
+        "description": {
+          "description": "The description for the app. If this property is left out, the app description will be blank.",
           "type": "string"
         }
       },
       "required": [
-        "name"
+        "assignToken",
+        "variables",
+        "name",
+        "securityProperties"
       ],
       "description": "Create an app"
     },
@@ -3142,12 +3208,72 @@
     "UpdateAppRequest": {
       "type": "object",
       "properties": {
+        "variables": {
+          "description": "The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "value"
+            ],
+            "properties": {
+              "name": {
+                "description": "The name for the variable.",
+                "type": "string"
+              },
+              "value": {
+                "description": "The value for the variable.",
+                "type": "string"
+              }
+            }
+          }
+        },
         "name": {
+          "description": "The name for the app.",
+          "type": "string"
+        },
+        "securityProperties": {
+          "description": "Security properties of the application",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hideFromPublic": {
+              "description": "Hide from public application searches",
+              "type": "boolean"
+            },
+            "mustBeRealmApproved": {
+              "description": "Only \"approved\" users may access this application",
+              "type": "boolean"
+            },
+            "allowClone": {
+              "description": "Allow users who are not administrators to copy",
+              "type": "boolean"
+            },
+            "useIPFilter": {
+              "description": "Only users logging in from \"approved\" IP addresses may access this application",
+              "type": "boolean"
+            },
+            "allowExport": {
+              "description": "Allow users who are not administrators to export data",
+              "type": "boolean"
+            },
+            "enableAppTokens": {
+              "description": "Require Application Tokens",
+              "type": "boolean"
+            }
+          }
+        },
+        "description": {
+          "description": "The description for the app.",
           "type": "string"
         }
       },
       "required": [
-        "name"
+        "variables",
+        "name",
+        "securityProperties"
       ],
       "description": "Update an app"
     },
@@ -3330,6 +3456,7 @@
       "type": "object",
       "properties": {
         "name": {
+          "description": "To confirm application deletion we ask for application name.",
           "type": "string"
         }
       },

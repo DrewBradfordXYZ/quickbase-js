@@ -185,9 +185,41 @@ export function enhanceRawSpec(spec: Spec): void {
                           "Options for customizing the app copy process.",
                       },
                     };
+                  } else if (
+                    !param.schema ||
+                    !param.schema.properties ||
+                    Object.keys(param.schema.properties).length === 0
+                  ) {
+                    // Only define if no schema exists or it’s empty in the raw spec
+                    console.log(
+                      `No schema found for ${pathKey}(${method}), defining default`
+                    );
+                    properties = {
+                      name: {
+                        type: "string",
+                        description: "The name of the app.",
+                      },
+                      description: {
+                        type: "string",
+                        description: "A description for the app.",
+                      },
+                      assignToken: {
+                        type: "boolean",
+                        description: "Whether to assign the user token.",
+                      },
+                    };
                   } else {
-                    properties = { name: { type: "string" } };
+                    // Preserve the existing schema from the raw spec
+                    console.log(
+                      `Preserving existing schema for ${pathKey}(${method})`
+                    );
+                    properties = param.schema.properties;
                   }
+                  // Original logic kept as a comment for easy revert if needed
+                  // Note: This was likely added to enforce a minimal schema or fix missing types in older specs
+                  // } else {
+                  //   properties = { name: { type: "string" } };
+                  // }
                 } else if (operation.tags?.includes("Tables")) {
                   properties = { name: { type: "string" } };
                 } else if (operation.tags?.includes("Fields")) {

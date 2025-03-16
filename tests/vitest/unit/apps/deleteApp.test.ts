@@ -1,4 +1,5 @@
 // tests/vitest/unit/apps/deleteApp.test.ts
+
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -186,7 +187,7 @@ describe("QuickbaseClient Unit - deleteApp", () => {
     client = createClient(mockFetch, { debug: true });
 
     const request: DeleteAppRequest = {
-      name: "Wrong Name", // Assuming this doesn’t match the app’s actual name
+      name: "Wrong Name",
     };
 
     mockFetch.mockResolvedValueOnce({
