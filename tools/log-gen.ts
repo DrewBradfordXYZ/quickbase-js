@@ -8,17 +8,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const rootDir: string = "./";
-const excludeDirs: string[] = ["node_modules", ".git", "specs"];
+const excludeDirs: string[] = [
+  "node_modules",
+  ".git",
+  "specs",
+  "open-api/output",
+];
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "open-api",
+  // "open-api",
   // "open-api/definitions",
   // "open-api/paths",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
+  "open-api"
   // "tests",
   // "tests/vitest/unit",
   // "tests/vitest/qb"
@@ -145,7 +151,7 @@ function buildTree(dir: string): TreeNode {
       .relative(rootDir, filePath)
       .replace(/\\/g, "/");
 
-    if (file.isDirectory() && excludeDirs.includes(file.name)) return;
+    if (file.isDirectory() && excludeDirs.includes(relativePath)) return;
 
     const childNode: TreeNode = {
       name: file.name,
@@ -174,12 +180,21 @@ function buildTree(dir: string): TreeNode {
         isInIncludeRecursiveFolder;
 
       if (shouldInclude) {
-        try {
-          childNode.contents = fs.readFileSync(filePath, "utf8"); // Changed from utf7 to utf8
-        } catch (err: unknown) {
-          childNode.contents = `[Error reading file: ${
-            (err as Error).message
-          }]`;
+        // Check if the file is in open-api/output
+        const isInOutputDir = relativePath.startsWith("open-api/output/");
+
+        if (!isInOutputDir) {
+          // Only read contents if not in output directory
+          try {
+            childNode.contents = fs.readFileSync(filePath, "utf8");
+          } catch (err: unknown) {
+            childNode.contents = `[Error reading file: ${
+              (err as Error).message
+            }]`;
+          }
+        } else {
+          // For files in output directory, just mark their existence
+          childNode.contents = "[File contents excluded - output directory]";
         }
       }
     }
@@ -205,9 +220,8 @@ function generateTreeSnapshot(): string {
 
 try {
   const output: string = generateTreeSnapshot();
-  // Use __dirname to get the directory of the script
   const outputPath: string = path.join(__dirname, "log-gen.yaml");
-  fs.writeFileSync(outputPath, output, "utf8"); // Changed from utf7 to utf8
+  fs.writeFileSync(outputPath, output, "utf8");
   const lineCount: number = output.split("\n").length - 0;
   console.log("log-gen.yaml");
   console.log(`Lines: ${lineCount}`);

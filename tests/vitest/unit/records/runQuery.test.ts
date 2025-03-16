@@ -70,10 +70,10 @@ describe("QuickbaseClient Unit - runQuery", () => {
   });
 
   test("handles API error with invalid query", async () => {
-    const invalidQueryRequest = {
+    const invalidQueryRequest: RunQueryRequest = {
       from: QB_TABLE_ID_1,
       select: [3],
-      where: "{999.EX.'Invalid'}", // Invalid field ID
+      where: "{999.EX.'Invalid'}",
     };
 
     mockFetch.mockResolvedValueOnce({

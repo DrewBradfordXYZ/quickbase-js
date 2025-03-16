@@ -1,6 +1,6 @@
-// schema/tags/records.ts
+// open-api/schema/tags/records.ts
 import { Operation, Parameter, Spec } from "../../types/spec.ts";
-import { normalizeDefinitionName } from "../../utils/naming.ts";
+import { normalizeDefinitionName } from "../../utils/naming.ts"; // Ensure this import is present
 
 export function enhanceRecords(
   spec: Spec,
@@ -28,21 +28,71 @@ export function enhanceRecords(
             `Defining schema for ${requestName} in ${pathKey}(${method})`
           );
           let properties;
-          if (method === "post") {
+          // Upsert endpoint (/records)
+          if (pathKey === "/records" && method === "post") {
             properties = {
               data: { type: "array", items: { $ref: "#/definitions/Record" } },
               to: { type: "string" },
               fieldsToReturn: { type: "array", items: { type: "integer" } },
             };
-          } else if (method === "delete") {
+          }
+          // Query endpoint (/records/query)
+          else if (pathKey === "/records/query" && method === "post") {
             properties = {
-              from: { type: "string" },
-              where: { type: "string" },
+              from: { type: "string", description: "The table identifier." },
+              select: {
+                type: "array",
+                items: { type: "integer" },
+                description: "An array of field ids...",
+              },
+              where: {
+                type: "string",
+                description:
+                  "The filter, using the Quickbase query language...",
+              },
+              sortBy: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    fieldId: { type: "integer" },
+                    order: {
+                      type: "string",
+                      enum: ["ASC", "DESC", "equal-values"],
+                    },
+                  },
+                  required: ["fieldId", "order"],
+                },
+                description: "An array of field IDs and sort directions...",
+              },
+              groupBy: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    fieldId: { type: "integer" },
+                    grouping: { type: "string", enum: ["equal-values"] },
+                  },
+                  required: ["fieldId", "grouping"],
+                },
+                description:
+                  "An array that contains the fields to group the records by.",
+              },
+              options: {
+                type: "object",
+                properties: {
+                  skip: { type: "integer" },
+                  top: { type: "integer" },
+                  compareWithAppLocalTime: { type: "boolean" },
+                },
+                description: "Additional query options.",
+              },
             };
-          } else if (operation.summary?.toLowerCase().includes("query")) {
+          }
+          // Delete endpoint (/records)
+          else if (method === "delete") {
             properties = {
               from: { type: "string" },
-              select: { type: "array", items: { type: "integer" } },
               where: { type: "string" },
             };
           }
@@ -50,9 +100,7 @@ export function enhanceRecords(
             spec.definitions[requestName] = {
               type: "object",
               properties,
-              required: Object.keys(properties).filter(
-                (key) => key !== "fieldsToReturn"
-              ),
+              required: ["from"], // Only 'from' is required per the spec
               description: operation.summary || `Request body for ${opId}`,
             };
           }

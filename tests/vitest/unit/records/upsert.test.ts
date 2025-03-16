@@ -51,12 +51,16 @@ describe("QuickbaseClient Unit - upsert", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify({
-          to: QB_TABLE_ID_1,
-          data: [{ "6": { value: "value1" } }],
-        }),
+        body: expect.any(String), // Allow any string, check content below
+        credentials: "omit",
       })
     );
+    const callArgs = mockFetch.mock.calls[0];
+    const receivedBody = JSON.parse(callArgs[1].body as string);
+    expect(receivedBody).toEqual({
+      to: QB_TABLE_ID_1,
+      data: [{ "6": { value: "value1" } }],
+    });
 
     expect(result).toEqual({
       data: [{ id: 1, "6": { value: "value1" } }],
@@ -93,12 +97,16 @@ describe("QuickbaseClient Unit - upsert", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify({
-          to: QB_TABLE_ID_1,
-          data: [{ "999": { value: "invalid" } }],
-        }),
+        body: expect.any(String),
+        credentials: "omit",
       })
     );
+    const callArgs = mockFetch.mock.calls[0];
+    const receivedBody = JSON.parse(callArgs[1].body as string);
+    expect(receivedBody).toEqual({
+      to: QB_TABLE_ID_1,
+      data: [{ "999": { value: "invalid" } }],
+    });
   });
 
   test("handles upsert with temp token", async () => {
@@ -153,12 +161,16 @@ describe("QuickbaseClient Unit - upsert", () => {
           Authorization: "QB-TEMP-TOKEN temp-token",
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify({
-          to: QB_TABLE_ID_1,
-          data: [{ "7": { value: "value2" } }],
-        }),
+        body: expect.any(String),
+        credentials: "omit",
       })
     );
+    const callArgs = mockFetch.mock.calls[1];
+    const receivedBody = JSON.parse(callArgs[1].body as string);
+    expect(receivedBody).toEqual({
+      to: QB_TABLE_ID_1,
+      data: [{ "7": { value: "value2" } }],
+    });
 
     expect(result).toEqual({
       data: [{ id: 2, "7": { value: "value2" } }],
@@ -202,12 +214,16 @@ describe("QuickbaseClient Unit - upsert", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify({
-          to: QB_TABLE_ID_1,
-          data: [{ "6": { value: "value1" } }],
-        }),
+        body: expect.any(String),
+        credentials: "omit",
       })
     );
+    const callArgs = mockFetch.mock.calls[0];
+    const receivedBody = JSON.parse(callArgs[1].body as string);
+    expect(receivedBody).toEqual({
+      to: QB_TABLE_ID_1,
+      data: [{ "6": { value: "value1" } }],
+    });
 
     if (result.data && result.data.length > 0) {
       expect((result.data[0]["6"] as { value: any }).value).toBe("value1");

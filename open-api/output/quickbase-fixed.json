@@ -3376,8 +3376,7 @@
         }
       },
       "required": [
-        "data",
-        "to"
+        "from"
       ],
       "description": "Insert/Update record(s)"
     },
@@ -3392,33 +3391,92 @@
         }
       },
       "required": [
-        "from",
-        "where"
+        "from"
       ],
       "description": "Delete record(s)"
     },
     "RunQueryRequest": {
       "type": "object",
       "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Record"
-          }
+        "from": {
+          "type": "string",
+          "description": "The table identifier."
         },
-        "to": {
-          "type": "string"
-        },
-        "fieldsToReturn": {
+        "select": {
           "type": "array",
           "items": {
             "type": "integer"
-          }
+          },
+          "description": "An array of field ids..."
+        },
+        "where": {
+          "type": "string",
+          "description": "The filter, using the Quickbase query language..."
+        },
+        "sortBy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fieldId": {
+                "type": "integer"
+              },
+              "order": {
+                "type": "string",
+                "enum": [
+                  "ASC",
+                  "DESC",
+                  "equal-values"
+                ]
+              }
+            },
+            "required": [
+              "fieldId",
+              "order"
+            ]
+          },
+          "description": "An array of field IDs and sort directions..."
+        },
+        "groupBy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fieldId": {
+                "type": "integer"
+              },
+              "grouping": {
+                "type": "string",
+                "enum": [
+                  "equal-values"
+                ]
+              }
+            },
+            "required": [
+              "fieldId",
+              "grouping"
+            ]
+          },
+          "description": "An array that contains the fields to group the records by."
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "skip": {
+              "type": "integer"
+            },
+            "top": {
+              "type": "integer"
+            },
+            "compareWithAppLocalTime": {
+              "type": "boolean"
+            }
+          },
+          "description": "Additional query options."
         }
       },
       "required": [
-        "data",
-        "to"
+        "from"
       ],
       "description": "Query for data"
     },
