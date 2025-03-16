@@ -1733,12 +1733,60 @@
      * Do not edit the class manually.
      */
     /**
+     * @export
+     */
+    const CreateFieldRequestFieldTypeEnum = {
+        Text: 'text',
+        TextMultipleChoice: 'text-multiple-choice',
+        TextMultiLine: 'text-multi-line',
+        RichText: 'rich-text',
+        Numeric: 'numeric',
+        Currency: 'currency',
+        Percent: 'percent',
+        Rating: 'rating',
+        Date: 'date',
+        DateTime: 'date-time',
+        TimeOfDay: 'time-of-day',
+        Duration: 'duration',
+        Checkbox: 'checkbox',
+        User: 'user',
+        MultiUser: 'multi-user',
+        Address: 'address',
+        Email: 'email',
+        Phone: 'phone',
+        Url: 'url',
+        File: 'file',
+        RecordId: 'record-id'
+    };
+    /**
      * Check if a given object implements the CreateFieldRequest interface.
      */
     function instanceOfCreateFieldRequest(value) {
         if (!('label' in value) || value['label'] === undefined)
             return false;
         if (!('fieldType' in value) || value['fieldType'] === undefined)
+            return false;
+        if (!('fieldHelp' in value) || value['fieldHelp'] === undefined)
+            return false;
+        if (!('addToForms' in value) || value['addToForms'] === undefined)
+            return false;
+        if (!('permissions' in value) || value['permissions'] === undefined)
+            return false;
+        if (!('required' in value) || value['required'] === undefined)
+            return false;
+        if (!('unique' in value) || value['unique'] === undefined)
+            return false;
+        if (!('noWrap' in value) || value['noWrap'] === undefined)
+            return false;
+        if (!('bold' in value) || value['bold'] === undefined)
+            return false;
+        if (!('appearsByDefault' in value) || value['appearsByDefault'] === undefined)
+            return false;
+        if (!('findEnabled' in value) || value['findEnabled'] === undefined)
+            return false;
+        if (!('doesDataCopy' in value) || value['doesDataCopy'] === undefined)
+            return false;
+        if (!('audited' in value) || value['audited'] === undefined)
             return false;
         return true;
     }
@@ -1752,6 +1800,17 @@
         return {
             'label': json['label'],
             'fieldType': json['fieldType'],
+            'fieldHelp': json['fieldHelp'],
+            'addToForms': json['addToForms'],
+            'permissions': json['permissions'],
+            'required': json['required'],
+            'unique': json['unique'],
+            'noWrap': json['noWrap'],
+            'bold': json['bold'],
+            'appearsByDefault': json['appearsByDefault'],
+            'findEnabled': json['findEnabled'],
+            'doesDataCopy': json['doesDataCopy'],
+            'audited': json['audited'],
         };
     }
     function CreateFieldRequestToJSON(json) {
@@ -1764,6 +1823,17 @@
         return {
             'label': value['label'],
             'fieldType': value['fieldType'],
+            'fieldHelp': value['fieldHelp'],
+            'addToForms': value['addToForms'],
+            'permissions': value['permissions'],
+            'required': value['required'],
+            'unique': value['unique'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'doesDataCopy': value['doesDataCopy'],
+            'audited': value['audited'],
         };
     }
 
@@ -4582,6 +4652,58 @@
      * Do not edit the class manually.
      */
     /**
+     * Check if a given object implements the Permission interface.
+     */
+    function instanceOfPermission(value) {
+        if (!('role' in value) || value['role'] === undefined)
+            return false;
+        if (!('permissionType' in value) || value['permissionType'] === undefined)
+            return false;
+        if (!('roleId' in value) || value['roleId'] === undefined)
+            return false;
+        return true;
+    }
+    function PermissionFromJSON(json) {
+        return PermissionFromJSONTyped(json);
+    }
+    function PermissionFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'role': json['role'],
+            'permissionType': json['permissionType'],
+            'roleId': json['roleId'],
+        };
+    }
+    function PermissionToJSON(json) {
+        return PermissionToJSONTyped(json, false);
+    }
+    function PermissionToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'role': value['role'],
+            'permissionType': value['permissionType'],
+            'roleId': value['roleId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
      * @export
      */
     const PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum = {
@@ -6081,12 +6203,60 @@
      * Do not edit the class manually.
      */
     /**
+     * @export
+     */
+    const UpdateFieldRequestFieldTypeEnum = {
+        Text: 'text',
+        TextMultipleChoice: 'text-multiple-choice',
+        TextMultiLine: 'text-multi-line',
+        RichText: 'rich-text',
+        Numeric: 'numeric',
+        Currency: 'currency',
+        Percent: 'percent',
+        Rating: 'rating',
+        Date: 'date',
+        DateTime: 'date-time',
+        TimeOfDay: 'time-of-day',
+        Duration: 'duration',
+        Checkbox: 'checkbox',
+        User: 'user',
+        MultiUser: 'multi-user',
+        Address: 'address',
+        Email: 'email',
+        Phone: 'phone',
+        Url: 'url',
+        File: 'file',
+        RecordId: 'record-id'
+    };
+    /**
      * Check if a given object implements the UpdateFieldRequest interface.
      */
     function instanceOfUpdateFieldRequest(value) {
         if (!('label' in value) || value['label'] === undefined)
             return false;
         if (!('fieldType' in value) || value['fieldType'] === undefined)
+            return false;
+        if (!('fieldHelp' in value) || value['fieldHelp'] === undefined)
+            return false;
+        if (!('addToForms' in value) || value['addToForms'] === undefined)
+            return false;
+        if (!('permissions' in value) || value['permissions'] === undefined)
+            return false;
+        if (!('required' in value) || value['required'] === undefined)
+            return false;
+        if (!('unique' in value) || value['unique'] === undefined)
+            return false;
+        if (!('noWrap' in value) || value['noWrap'] === undefined)
+            return false;
+        if (!('bold' in value) || value['bold'] === undefined)
+            return false;
+        if (!('appearsByDefault' in value) || value['appearsByDefault'] === undefined)
+            return false;
+        if (!('findEnabled' in value) || value['findEnabled'] === undefined)
+            return false;
+        if (!('doesDataCopy' in value) || value['doesDataCopy'] === undefined)
+            return false;
+        if (!('audited' in value) || value['audited'] === undefined)
             return false;
         return true;
     }
@@ -6100,6 +6270,17 @@
         return {
             'label': json['label'],
             'fieldType': json['fieldType'],
+            'fieldHelp': json['fieldHelp'],
+            'addToForms': json['addToForms'],
+            'permissions': json['permissions'],
+            'required': json['required'],
+            'unique': json['unique'],
+            'noWrap': json['noWrap'],
+            'bold': json['bold'],
+            'appearsByDefault': json['appearsByDefault'],
+            'findEnabled': json['findEnabled'],
+            'doesDataCopy': json['doesDataCopy'],
+            'audited': json['audited'],
         };
     }
     function UpdateFieldRequestToJSON(json) {
@@ -6112,6 +6293,17 @@
         return {
             'label': value['label'],
             'fieldType': value['fieldType'],
+            'fieldHelp': value['fieldHelp'],
+            'addToForms': value['addToForms'],
+            'permissions': value['permissions'],
+            'required': value['required'],
+            'unique': value['unique'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'doesDataCopy': value['doesDataCopy'],
+            'audited': value['audited'],
         };
     }
 
@@ -9238,7 +9430,6 @@
             .replace(/^(\w)/, (_, c) => c.toLowerCase());
     }
 
-    // src/quickbaseClient.ts
     const getParamNames = (fn) => fn
         .toString()
         .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
@@ -9256,10 +9447,8 @@
     function transformDates(obj, convertStringsToDates = true) {
         if (obj === null || obj === undefined)
             return obj;
-        // If it's already a Date object, return it as-is
         if (obj instanceof Date)
             return obj;
-        // Convert strings to Date objects if enabled
         if (convertStringsToDates &&
             typeof obj === "string" &&
             /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(obj)) {
@@ -9364,9 +9553,16 @@
             if (!methodInfo) {
                 throw new Error(`Method ${methodName} not found`);
             }
+            // Safely handle body extraction
+            const hasBody = "body" in params && params.body !== undefined;
+            const body = hasBody ? params.body : undefined;
+            const restParams = hasBody
+                ? Object.fromEntries(Object.entries(params).filter(([key]) => key !== "body"))
+                : { ...params };
+            // Construct requestParameters with 'generated' for body
             const requestParameters = {
-                ...params,
-                generated: "body" in params ? { ...params.body } : undefined,
+                ...restParams,
+                ...(body ? { generated: { ...body } } : {}),
             };
             let requestOptions = {
                 credentials: "omit",
@@ -9436,7 +9632,6 @@
                     if (debug) {
                         console.log(`[${methodName}] non-Response return, applying transform:`, response);
                     }
-                    // Handle case where the generated API returns a pre-parsed object
                     const transformedResponse = transformDates(response, convertDates);
                     if (debug) {
                         console.log(`[${methodName}] transformedNonResponse:`, transformedResponse);
@@ -9489,6 +9684,10 @@
                 return undefined;
             },
         });
+        if (debug) {
+            console.log("[createClient] Config:", config);
+            console.log("[createClient] Returning:", proxy);
+        }
         return proxy;
     }
 
@@ -9612,6 +9811,7 @@
     exports.CreateField200ResponseFromJSONTyped = CreateField200ResponseFromJSONTyped;
     exports.CreateField200ResponseToJSON = CreateField200ResponseToJSON;
     exports.CreateField200ResponseToJSONTyped = CreateField200ResponseToJSONTyped;
+    exports.CreateFieldRequestFieldTypeEnum = CreateFieldRequestFieldTypeEnum;
     exports.CreateFieldRequestFromJSON = CreateFieldRequestFromJSON;
     exports.CreateFieldRequestFromJSONTyped = CreateFieldRequestFromJSONTyped;
     exports.CreateFieldRequestToJSON = CreateFieldRequestToJSON;
@@ -9864,6 +10064,10 @@
     exports.GetUsersRequestFromJSONTyped = GetUsersRequestFromJSONTyped;
     exports.GetUsersRequestToJSON = GetUsersRequestToJSON;
     exports.GetUsersRequestToJSONTyped = GetUsersRequestToJSONTyped;
+    exports.PermissionFromJSON = PermissionFromJSON;
+    exports.PermissionFromJSONTyped = PermissionFromJSONTyped;
+    exports.PermissionToJSON = PermissionToJSON;
+    exports.PermissionToJSONTyped = PermissionToJSONTyped;
     exports.PlatformAnalyticEventSummaries200ResponseFromJSON = PlatformAnalyticEventSummaries200ResponseFromJSON;
     exports.PlatformAnalyticEventSummaries200ResponseFromJSONTyped = PlatformAnalyticEventSummaries200ResponseFromJSONTyped;
     exports.PlatformAnalyticEventSummaries200ResponseGroupByEnum = PlatformAnalyticEventSummaries200ResponseGroupByEnum;
@@ -9987,6 +10191,7 @@
     exports.UpdateField200ResponseFromJSONTyped = UpdateField200ResponseFromJSONTyped;
     exports.UpdateField200ResponseToJSON = UpdateField200ResponseToJSON;
     exports.UpdateField200ResponseToJSONTyped = UpdateField200ResponseToJSONTyped;
+    exports.UpdateFieldRequestFieldTypeEnum = UpdateFieldRequestFieldTypeEnum;
     exports.UpdateFieldRequestFromJSON = UpdateFieldRequestFromJSON;
     exports.UpdateFieldRequestFromJSONTyped = UpdateFieldRequestFromJSONTyped;
     exports.UpdateFieldRequestToJSON = UpdateFieldRequestToJSON;
@@ -10168,6 +10373,7 @@
     exports.instanceOfGetTempTokenDBID200Response = instanceOfGetTempTokenDBID200Response;
     exports.instanceOfGetUsers200Response = instanceOfGetUsers200Response;
     exports.instanceOfGetUsersRequest = instanceOfGetUsersRequest;
+    exports.instanceOfPermission = instanceOfPermission;
     exports.instanceOfPlatformAnalyticEventSummaries200Response = instanceOfPlatformAnalyticEventSummaries200Response;
     exports.instanceOfPlatformAnalyticEventSummaries200ResponseMetadata = instanceOfPlatformAnalyticEventSummaries200ResponseMetadata;
     exports.instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner = instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner;

@@ -3,7 +3,7 @@ import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/Quickba
 import { Configuration, HTTPHeaders, ResponseError } from "./generated/runtime";
 import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
-import { simplifyName } from "./utils.ts";
+import { simplifyName } from "./utils";
 
 export * from "./generated/models/index";
 
@@ -219,13 +219,19 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
-    // Separate body and non-body parameters
-    const { body, ...restParams } = params;
+    // Safely handle body extraction
+    const hasBody = "body" in params && params.body !== undefined;
+    const body = hasBody ? (params as any).body : undefined;
+    const restParams: any = hasBody
+      ? Object.fromEntries(
+          Object.entries(params).filter(([key]) => key !== "body")
+        )
+      : { ...params };
 
-    // Construct requestParameters with 'generated' for body (matches FieldsApi signature)
+    // Construct requestParameters with 'generated' for body
     const requestParameters: any = {
-      ...restParams, // e.g., tableId, fieldId, etc.
-      ...(body ? { generated: { ...body } } : {}), // Rename 'body' to 'generated'
+      ...restParams,
+      ...(body ? { generated: { ...body } } : {}),
     };
 
     let requestOptions: RequestInit = {
