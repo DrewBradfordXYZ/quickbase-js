@@ -34,7 +34,7 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "Field1",
-      fieldType: "text", // Required
+      fieldType: "text",
       noWrap: false,
       bold: false,
       required: true,
@@ -43,6 +43,17 @@ describe("QuickbaseClient Unit - updateField", () => {
       unique: true,
       fieldHelp: "field help",
       addToForms: true,
+      properties: {
+        numLines: 1,
+        maxLength: 50,
+        appendOnly: true,
+        sortAsGiven: false,
+        allowMentions: false,
+        comments: "Updated field settings",
+        doesTotal: false,
+        defaultValue: "Initial text",
+        choices: ["Option1", "Option2"], // Added for multi-choice fields
+      },
       permissions: [
         { role: "Viewer", permissionType: "View", roleId: 10 },
         { role: "Participant", permissionType: "None", roleId: 11 },
@@ -64,6 +75,21 @@ describe("QuickbaseClient Unit - updateField", () => {
       doesDataCopy: false,
       fieldHelp: "field help",
       audited: false,
+      properties: {
+        numLines: 1,
+        maxLength: 50,
+        appendOnly: true,
+        sortAsGiven: false,
+        allowMentions: false,
+        comments: "Updated field settings",
+        doesTotal: false,
+        defaultValue: "Initial text",
+        choices: ["Option1", "Option2"],
+        allowHTML: false,
+        carryChoices: true,
+        allowNewChoices: false,
+        formula: "",
+      },
       permissions: [
         { permissionType: "View", role: "Viewer", roleId: 10 },
         { permissionType: "None", role: "Participant", roleId: 11 },
@@ -111,15 +137,22 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "Field1",
-      fieldType: "text", // Required
+      fieldType: "text-multiple-choice",
       required: true,
       unique: true,
+      properties: {
+        numLines: 1,
+        maxLength: 0,
+        choices: ["Yes", "No"],
+        allowNewChoices: true,
+        defaultValue: "No",
+      },
     };
 
     const mockResponse: UpdateField200Response = {
       id: fieldId,
       label: "Field1",
-      fieldType: "text",
+      fieldType: "text-multiple-choice",
       mode: "",
       noWrap: false,
       bold: false,
@@ -130,6 +163,19 @@ describe("QuickbaseClient Unit - updateField", () => {
       doesDataCopy: false,
       fieldHelp: "",
       audited: false,
+      properties: {
+        numLines: 1,
+        maxLength: 0,
+        choices: ["Yes", "No"],
+        allowNewChoices: true,
+        defaultValue: "No",
+        appendOnly: false,
+        allowHTML: false,
+        allowMentions: false,
+        sortAsGiven: false,
+        carryChoices: true,
+        formula: "",
+      },
       permissions: [
         { permissionType: "View", role: "Viewer", roleId: 10 },
         { permissionType: "None", role: "Participant", roleId: 11 },
@@ -197,8 +243,13 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "InvalidField",
-      fieldType: "text", // Required
+      fieldType: "numeric",
       required: true,
+      properties: {
+        numLines: 1,
+        decimalPlaces: 2,
+        currencySymbol: "$",
+      },
     };
 
     mockFetch.mockResolvedValueOnce({
