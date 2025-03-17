@@ -7264,8 +7264,7 @@
           }
         },
         "required": [
-          "label",
-          "fieldType"
+          "label"
         ],
         "description": "Update a field"
       },

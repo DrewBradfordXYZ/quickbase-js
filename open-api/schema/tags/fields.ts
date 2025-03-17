@@ -1,5 +1,4 @@
 // schema/tags/fields.ts
-
 import { Operation, Parameter, Spec } from "../../types/spec.ts";
 import { normalizeDefinitionName } from "../../utils/naming.ts";
 
@@ -29,11 +28,16 @@ export function enhanceFields(
             `Defining schema for ${requestName} in ${pathKey}(${method})`
           );
           let properties;
+          let requiredFields: string[];
+
           if (method === "delete") {
+            // DELETE /fields (deleteFields)
             properties = {
               fieldIds: { type: "array", items: { type: "integer" } },
             };
+            requiredFields = ["fieldIds"];
           } else {
+            // Common properties for createField and updateField
             properties = {
               label: { type: "string", description: "The label of the field" },
               fieldType: {
@@ -439,27 +443,21 @@ export function enhanceFields(
                 nullable: true,
               },
             };
+
+            // Adjust required fields based on operation
+            if (pathKey.includes("{fieldId}") && method === "post") {
+              // UpdateField (POST /fields/{fieldId})
+              requiredFields = ["label"]; // fieldType is not allowed in updates
+            } else {
+              // CreateField (POST /fields)
+              requiredFields = ["label", "fieldType"];
+            }
           }
+
           spec.definitions[requestName] = {
             type: "object",
             properties,
-            required: Object.keys(properties).filter(
-              (key) =>
-                ![
-                  "fieldHelp",
-                  "addToForms",
-                  "permissions",
-                  "required",
-                  "unique",
-                  "noWrap",
-                  "bold",
-                  "appearsByDefault",
-                  "findEnabled",
-                  "doesDataCopy",
-                  "audited",
-                  "properties",
-                ].includes(key)
-            ),
+            required: requiredFields,
             description: operation.summary || `Request body for ${opId}`,
           };
         }

@@ -1,3 +1,4 @@
+// tests/vitest/unit/fields/updateField.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -34,7 +35,7 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "Field1",
-      fieldType: "text",
+      // fieldType omitted as it’s not allowed in updates
       noWrap: false,
       bold: false,
       required: true,
@@ -52,7 +53,7 @@ describe("QuickbaseClient Unit - updateField", () => {
         comments: "Updated field settings",
         doesTotal: false,
         defaultValue: "Initial text",
-        choices: ["Option1", "Option2"], // Added for multi-choice fields
+        choices: ["Option1", "Option2"], // Still valid for properties
       },
       permissions: [
         { role: "Viewer", permissionType: "View", roleId: 10 },
@@ -64,7 +65,7 @@ describe("QuickbaseClient Unit - updateField", () => {
     const mockResponse: UpdateField200Response = {
       id: fieldId,
       label: "Field1",
-      fieldType: "text",
+      fieldType: "text", // Returned by API, not updated
       mode: "",
       noWrap: false,
       bold: false,
@@ -137,7 +138,7 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "Field1",
-      fieldType: "text-multiple-choice",
+      // fieldType omitted as it’s not allowed in updates
       required: true,
       unique: true,
       properties: {
@@ -152,7 +153,7 @@ describe("QuickbaseClient Unit - updateField", () => {
     const mockResponse: UpdateField200Response = {
       id: fieldId,
       label: "Field1",
-      fieldType: "text-multiple-choice",
+      fieldType: "text-multiple-choice", // Returned by API, not updated
       mode: "",
       noWrap: false,
       bold: false,
@@ -243,7 +244,7 @@ describe("QuickbaseClient Unit - updateField", () => {
 
     const request: UpdateFieldRequest = {
       label: "InvalidField",
-      fieldType: "numeric",
+      // fieldType omitted as it’s not allowed in updates
       required: true,
       properties: {
         numLines: 1,
