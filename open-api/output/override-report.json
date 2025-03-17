@@ -3,56 +3,997 @@
     "/apps",
     "/apps/{appId}",
     "/apps/{appId}/copy",
-    "/auth/temporary/{dbid}",
-    "/fields",
-    "/fields/{fieldId}",
-    "/fields/usage",
-    "/fields/usage/{fieldId}",
-    "/records",
-    "/records/query",
-    "/tables/{tableId}/relationships",
-    "/reports/{reportId}/run",
     "/tables",
     "/tables/{tableId}",
-    "/apps/{appId}/events"
+    "/tables/{tableId}/relationship",
+    "/tables/{tableId}/relationship/{relationshipId}",
+    "/fields",
+    "/fields/{fieldId}",
+    "/records",
+    "/records/query",
+    "/users",
+    "/users/deny",
+    "/users/deny/{shouldDeleteFromGroups}",
+    "/users/undeny",
+    "/groups/{gid}/members",
+    "/groups/{gid}/managers",
+    "/groups/{gid}/subgroups"
   ],
   "overriddenDefinitions": [
-    "App",
-    "AppMemoryInfo",
-    "AppSecurityProperties",
     "CreateAppRequest",
-    "CreateApp200Response",
-    "CopyAppRequest",
-    "CopyApp200Response",
+    "UpdateAppRequest",
     "DeleteAppRequest",
-    "DeleteApp200Response",
-    "GetTempTokenDBID200Response",
-    "Field",
-    "FieldProperties",
-    "FieldPermissionsInner",
-    "CreateFieldRequest",
-    "CreateField200Response",
-    "DeleteFieldsRequest",
-    "DeleteFields200Response",
-    "FieldUsage",
-    "UsageCount",
-    "Record",
-    "UpsertRequest",
-    "Upsert200Response",
-    "Upsert207Response",
-    "DeleteRecordsRequest",
-    "DeleteRecords200Response",
-    "RunQueryRequest",
-    "RunQueryResponse",
-    "GetRelationships200Response",
-    "Relationship",
-    "RelationshipField",
-    "ReportRunResponse",
-    "Table",
+    "CopyAppRequest",
+    "CreateTableRequest",
     "UpdateTableRequest",
-    "DeleteTableResponse",
-    "AppEvent",
-    "EventOwner"
+    "CreateRelationshipRequest",
+    "UpdateRelationshipRequest",
+    "CreateFieldRequest",
+    "DeleteFieldsRequest",
+    "UpdateFieldRequest",
+    "UpsertRequest",
+    "DeleteRecordsRequest",
+    "RunQueryRequest",
+    "GetUsersRequest",
+    "DenyUsersRequest",
+    "DenyUsersAndGroupsRequest",
+    "UndenyUsersRequest",
+    "AddMembersToGroupRequest",
+    "RemoveMembersFromGroupRequest",
+    "AddManagersToGroupRequest",
+    "RemoveManagersFromGroupRequest",
+    "AddSubgroupsToGroupRequest",
+    "RemoveSubgroupsFromGroupRequest",
+    "Record",
+    "Permission",
+    "createApp200Response",
+    "getApp200Response",
+    "updateApp200Response",
+    "deleteApp200Response",
+    "getAppEvents200Response",
+    "copyApp200Response",
+    "createTable200Response",
+    "getAppTables200Response",
+    "getTable200Response",
+    "updateTable200Response",
+    "deleteTable200Response",
+    "getRelationships200Response",
+    "createRelationship200Response",
+    "updateRelationship200Response",
+    "deleteRelationship200Response",
+    "getTableReports200Response",
+    "getReport200Response",
+    "runReport200Response",
+    "getFields200Response",
+    "createField200Response",
+    "deleteFields200Response",
+    "getField200Response",
+    "updateField200Response",
+    "getFieldsUsage200Response",
+    "getFieldUsage200Response",
+    "runFormula200Response",
+    "upsert200Response",
+    "upsert207Response",
+    "upsert400Response",
+    "deleteRecords200Response",
+    "runQuery200Response",
+    "getTempTokenDBID200Response",
+    "exchangeSsoToken200Response",
+    "cloneUserToken200Response",
+    "transferUserToken200Response",
+    "deactivateUserToken200Response",
+    "deleteUserToken200Response",
+    "downloadFile200Response",
+    "deleteFile200Response",
+    "getUsers200Response",
+    "denyUsers200Response",
+    "denyUsersAndGroups200Response",
+    "undenyUsers200Response",
+    "addMembersToGroup200Response",
+    "removeMembersFromGroup200Response",
+    "addManagersToGroup200Response",
+    "removeManagersFromGroup200Response",
+    "addSubgroupsToGroup200Response",
+    "removeSubgroupsFromGroup200Response",
+    "audit200Response",
+    "audit202Response",
+    "platformAnalyticReads200Response",
+    "platformAnalyticEventSummaries200Response",
+    "exportSolution200Response",
+    "exportSolution400Response",
+    "exportSolution404Response",
+    "exportSolution401_403Response",
+    "exportSolution4xx_5xxResponse",
+    "updateSolution200Response",
+    "updateSolution400Response",
+    "updateSolution401_403Response",
+    "updateSolution4xx_5xxResponse",
+    "createSolution200Response",
+    "createSolution400Response",
+    "createSolution401_403Response",
+    "createSolution4xx_5xxResponse",
+    "exportSolutionToRecord200Response",
+    "exportSolutionToRecord400Response",
+    "exportSolutionToRecord404Response",
+    "exportSolutionToRecord401_403Response",
+    "exportSolutionToRecord4xx_5xxResponse",
+    "createSolutionFromRecord200Response",
+    "createSolutionFromRecord400Response",
+    "createSolutionFromRecord404Response",
+    "createSolutionFromRecord401_403Response",
+    "createSolutionFromRecord4xx_5xxResponse",
+    "updateSolutionToRecord200Response",
+    "updateSolutionToRecord400Response",
+    "updateSolutionToRecord404Response",
+    "updateSolutionToRecord401_403Response",
+    "updateSolutionToRecord4xx_5xxResponse",
+    "changesetSolution200Response",
+    "changesetSolution400Response",
+    "changesetSolution404Response",
+    "changesetSolution401_403Response",
+    "changesetSolution4xx_5xxResponse",
+    "changesetSolutionFromRecord200Response",
+    "changesetSolutionFromRecord400Response",
+    "changesetSolutionFromRecord404Response",
+    "changesetSolutionFromRecord401_403Response",
+    "changesetSolutionFromRecord4xx_5xxResponse",
+    "generateDocument200Response"
   ],
-  "conflicts": []
+  "conflicts": [],
+  "diff": {
+    "paths": {
+      "/apps": {
+        "post": {
+          "rawSummary": "type: object, properties: assignToken, variables, name, securityProperties, description",
+          "fixedRef": "#/definitions/CreateAppRequest"
+        }
+      },
+      "/apps/{appId}": {
+        "post": {
+          "rawSummary": "type: object, properties: variables, name, securityProperties, description",
+          "fixedRef": "#/definitions/UpdateAppRequest"
+        },
+        "delete": {
+          "rawSummary": "type: object, properties: name",
+          "fixedRef": "#/definitions/DeleteAppRequest"
+        }
+      },
+      "/apps/{appId}/copy": {
+        "post": {
+          "rawSummary": "type: object, properties: name, description, properties",
+          "fixedRef": "#/definitions/CopyAppRequest"
+        }
+      },
+      "/tables": {
+        "post": {
+          "rawSummary": "type: object, properties: name, pluralRecordName, singleRecordName, description",
+          "fixedRef": "#/definitions/CreateTableRequest"
+        }
+      },
+      "/tables/{tableId}": {
+        "post": {
+          "rawSummary": "type: object, properties: name, pluralRecordName, singleRecordName, description",
+          "fixedRef": "#/definitions/UpdateTableRequest"
+        }
+      },
+      "/tables/{tableId}/relationship": {
+        "post": {
+          "rawSummary": "type: object, properties: summaryFields, lookupFieldIds, parentTableId, foreignKeyField",
+          "fixedRef": "#/definitions/CreateRelationshipRequest"
+        }
+      },
+      "/tables/{tableId}/relationship/{relationshipId}": {
+        "post": {
+          "rawSummary": "type: object, properties: summaryFields, lookupFieldIds",
+          "fixedRef": "#/definitions/UpdateRelationshipRequest"
+        }
+      },
+      "/fields": {
+        "post": {
+          "rawSummary": "type: object, properties: audited, fieldHelp, bold, properties, appearsByDefault, fieldType, permissions, addToForms, label, findEnabled, noWrap",
+          "fixedRef": "#/definitions/CreateFieldRequest"
+        },
+        "delete": {
+          "rawSummary": "type: object, properties: fieldIds",
+          "fixedRef": "#/definitions/DeleteFieldsRequest"
+        }
+      },
+      "/fields/{fieldId}": {
+        "post": {
+          "rawSummary": "type: object, properties: audited, fieldHelp, bold, required, properties, appearsByDefault, unique, permissions, addToForms, label, findEnabled, noWrap",
+          "fixedRef": "#/definitions/UpdateFieldRequest"
+        }
+      },
+      "/records": {
+        "post": {
+          "rawSummary": "type: object, properties: to, data, mergeFieldId, fieldsToReturn",
+          "fixedRef": "#/definitions/UpsertRequest"
+        },
+        "delete": {
+          "rawSummary": "type: object, properties: from, where",
+          "fixedRef": "#/definitions/DeleteRecordsRequest"
+        }
+      },
+      "/records/query": {
+        "post": {
+          "rawSummary": "type: object, properties: options, where, groupBy, sortBy, select, from",
+          "fixedRef": "#/definitions/RunQueryRequest"
+        }
+      },
+      "/users": {
+        "post": {
+          "rawSummary": "type: object, properties: emails, appIds, nextPageToken",
+          "fixedRef": "#/definitions/GetUsersRequest"
+        }
+      },
+      "/users/deny": {
+        "put": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/DenyUsersRequest"
+        }
+      },
+      "/users/deny/{shouldDeleteFromGroups}": {
+        "put": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/DenyUsersAndGroupsRequest"
+        }
+      },
+      "/users/undeny": {
+        "put": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/UndenyUsersRequest"
+        }
+      },
+      "/groups/{gid}/members": {
+        "post": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/AddMembersToGroupRequest"
+        },
+        "delete": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/RemoveMembersFromGroupRequest"
+        }
+      },
+      "/groups/{gid}/managers": {
+        "post": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/AddManagersToGroupRequest"
+        },
+        "delete": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/RemoveManagersFromGroupRequest"
+        }
+      },
+      "/groups/{gid}/subgroups": {
+        "post": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/AddSubgroupsToGroupRequest"
+        },
+        "delete": {
+          "rawSummary": "type: array, properties: ",
+          "fixedRef": "#/definitions/RemoveSubgroupsFromGroupRequest"
+        }
+      }
+    },
+    "definitions": {
+      "CreateAppRequest": {
+        "added": {
+          "required": [
+            "name",
+            "assignToken"
+          ]
+        }
+      },
+      "UpdateAppRequest": {
+        "added": {
+          "required": [
+            "name",
+            "assignToken"
+          ]
+        }
+      },
+      "DeleteAppRequest": {
+        "added": {
+          "required": [
+            "name",
+            "assignToken"
+          ]
+        }
+      },
+      "CopyAppRequest": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "CreateTableRequest": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "UpdateTableRequest": {
+        "added": {
+          "required": []
+        }
+      },
+      "CreateRelationshipRequest": {
+        "added": {
+          "required": [
+            "parentTableId"
+          ]
+        }
+      },
+      "UpdateRelationshipRequest": {
+        "added": {
+          "required": []
+        }
+      },
+      "CreateFieldRequest": {
+        "added": {
+          "required": [
+            "label",
+            "fieldType"
+          ]
+        }
+      },
+      "DeleteFieldsRequest": {
+        "added": {
+          "required": [
+            "fieldIds"
+          ]
+        }
+      },
+      "UpdateFieldRequest": {
+        "added": {
+          "required": [
+            "label",
+            "fieldType"
+          ]
+        }
+      },
+      "UpsertRequest": {
+        "added": {
+          "required": [
+            "from"
+          ]
+        }
+      },
+      "DeleteRecordsRequest": {
+        "added": {
+          "required": [
+            "from"
+          ]
+        }
+      },
+      "RunQueryRequest": {
+        "added": {
+          "required": [
+            "from"
+          ]
+        }
+      },
+      "GetUsersRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "DenyUsersRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "DenyUsersAndGroupsRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "UndenyUsersRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "AddMembersToGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "RemoveMembersFromGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "AddManagersToGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "RemoveManagersFromGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "AddSubgroupsToGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "RemoveSubgroupsFromGroupRequest": {
+        "added": {
+          "required": [
+            "userIds"
+          ]
+        }
+      },
+      "Record": {
+        "added": {
+          "required": []
+        }
+      },
+      "Permission": {
+        "added": {
+          "required": [
+            "role",
+            "permissionType",
+            "roleId"
+          ]
+        }
+      },
+      "createApp200Response": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "getApp200Response": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "updateApp200Response": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "deleteApp200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getAppEvents200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "copyApp200Response": {
+        "added": {
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "createTable200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getAppTables200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getTable200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateTable200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "deleteTable200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getRelationships200Response": {
+        "added": {
+          "required": [
+            "relationships"
+          ]
+        }
+      },
+      "createRelationship200Response": {
+        "added": {
+          "required": [
+            "id",
+            "parentTableId",
+            "childTableId",
+            "isCrossApp"
+          ]
+        }
+      },
+      "updateRelationship200Response": {
+        "added": {
+          "required": [
+            "id",
+            "parentTableId",
+            "childTableId",
+            "isCrossApp"
+          ]
+        }
+      },
+      "deleteRelationship200Response": {
+        "added": {
+          "required": [
+            "relationshipId"
+          ]
+        }
+      },
+      "getTableReports200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getReport200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "runReport200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getFields200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createField200Response": {
+        "added": {
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "deleteFields200Response": {
+        "added": {
+          "required": [
+            "deletedFieldIds",
+            "errors"
+          ]
+        }
+      },
+      "getField200Response": {
+        "added": {
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "updateField200Response": {
+        "added": {
+          "required": [
+            "id"
+          ]
+        }
+      },
+      "getFieldsUsage200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getFieldUsage200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "runFormula200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "upsert200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "upsert207Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "upsert400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "deleteRecords200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "runQuery200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getTempTokenDBID200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exchangeSsoToken200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "cloneUserToken200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "transferUserToken200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "deactivateUserToken200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "deleteUserToken200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "downloadFile200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "deleteFile200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "getUsers200Response": {
+        "added": {
+          "required": [
+            "users",
+            "metadata"
+          ]
+        }
+      },
+      "denyUsers200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "denyUsersAndGroups200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "undenyUsers200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "addMembersToGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "removeMembersFromGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "addManagersToGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "removeManagersFromGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "addSubgroupsToGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "removeSubgroupsFromGroup200Response": {
+        "added": {
+          "required": [
+            "failure",
+            "success"
+          ]
+        }
+      },
+      "audit200Response": {
+        "added": {
+          "required": [
+            "queryId"
+          ]
+        }
+      },
+      "audit202Response": {
+        "added": {
+          "required": [
+            "queryId"
+          ]
+        }
+      },
+      "platformAnalyticReads200Response": {
+        "added": {
+          "required": [
+            "date",
+            "reads"
+          ]
+        }
+      },
+      "platformAnalyticEventSummaries200Response": {
+        "added": {
+          "required": [
+            "accountId",
+            "start",
+            "end",
+            "groupBy",
+            "where",
+            "results"
+          ]
+        }
+      },
+      "exportSolution200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolution400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolution404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolution401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolution4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolution200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolution400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolution401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolution4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolution200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolution400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolution401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolution4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolutionToRecord200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolutionToRecord400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolutionToRecord404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolutionToRecord401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "exportSolutionToRecord4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolutionFromRecord200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolutionFromRecord400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolutionFromRecord404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolutionFromRecord401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "createSolutionFromRecord4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolutionToRecord200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolutionToRecord400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolutionToRecord404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolutionToRecord401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "updateSolutionToRecord4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolution200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolution400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolution404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolution401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolution4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolutionFromRecord200Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolutionFromRecord400Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolutionFromRecord404Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolutionFromRecord401_403Response": {
+        "added": {
+          "required": []
+        }
+      },
+      "changesetSolutionFromRecord4xx_5xxResponse": {
+        "added": {
+          "required": []
+        }
+      },
+      "generateDocument200Response": {
+        "added": {
+          "required": []
+        }
+      }
+    }
+  }
 }

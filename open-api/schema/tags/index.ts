@@ -1,4 +1,4 @@
-// schema/tags/index.ts
+// open-api/schema/tags/index.ts
 import { Operation, Parameter, Spec } from "../../types/spec.ts";
 import { normalizeDefinitionName } from "../../utils/naming.ts";
 import { enhanceUsers } from "./users.ts";
@@ -9,7 +9,7 @@ import { enhanceFields } from "./fields.ts";
 import { enhanceTables } from "./tables.ts";
 
 export function enhanceTags(spec: Spec): void {
-  spec.definitions = spec.definitions || {};
+  console.log("enhanceTags version: 2025-03-16-fix-applied"); // Confirmation log
 
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
@@ -17,7 +17,6 @@ export function enhanceTags(spec: Spec): void {
       const opId =
         operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
 
-      // Handle array schemas
       if (operation.parameters) {
         operation.parameters.forEach((param: Parameter) => {
           if (param.in === "body") {
@@ -56,7 +55,6 @@ export function enhanceTags(spec: Spec): void {
         });
       }
 
-      // Apply tag-specific enhancements
       enhanceUsers(spec, pathKey, method, operation);
       enhanceGroups(spec, pathKey, method, operation);
       enhanceRecords(spec, pathKey, method, operation);

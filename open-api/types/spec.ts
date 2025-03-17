@@ -1,3 +1,4 @@
+// open-api/types/spec.ts
 export interface Parameter {
   name: string;
   in: string;
@@ -26,7 +27,7 @@ export interface Operation {
 
 export interface Spec {
   paths: Record<string, Record<string, Operation>>;
-  definitions?: Record<string, any>;
+  definitions: Record<string, any>; // Required, no longer optional
   swagger: string;
   info: any;
   operations?: any;
