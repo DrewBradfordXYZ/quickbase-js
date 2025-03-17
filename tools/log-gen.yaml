@@ -832,7 +832,6 @@ tree:
             #!/usr/bin/env
             node
 
-
             import
             {
             promises
@@ -863,27 +862,6 @@ tree:
 
             import
             {
-            enhanceTags
-            }
-            from
-            "./schema/tags/index.ts";
-
-            import
-            {
-            enhanceGeneral
-            }
-            from
-            "./schema/enhance-general.ts";
-
-            import
-            {
-            fixArrays
-            }
-            from
-            "./schema/fix-arrays.ts";
-
-            import
-            {
             Spec
             }
             from
@@ -897,89 +875,336 @@ tree:
             "./utils/naming.ts";
 
 
-            //
-            Removed
-            FixSpecConfig
-            since
-            applyOverrides
-            is
-            no
-            longer
-            needed
-
             async
             function
             fixQuickBaseSpec():
+            Promise<void>
+            {
+              const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
+              const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
+              const OUTPUT_DIR = path.join(CODEGEN_DIR, "output");
+              console.log("Finding latest QuickBase RESTful API spec...");
+              const specFiles = glob.sync(path.join(SPECS_DIR, "QuickBase_RESTful_*.json"));
+              console.log("Spec files:", specFiles);
+
+              if (specFiles.length === 0) {
+                throw new Error(
+                  "No QuickBase_RESTful_*.json files found in specs/ folder."
+                );
+              }
+
+              const inputFile = specFiles.sort().pop() as string;
+              const outputFile = path.join(OUTPUT_DIR, "quickbase-fixed.json");
+
+              console.log(`Reading ${path.basename(inputFile)} from specs/...`);
+              const specContent = await fs.readFile(inputFile, "utf8");
+              console.log("File read successfully");
+              const spec: Spec = JSON.parse(specContent);
+              console.log("JSON parsed successfully");
+
+              if (!spec.definitions || typeof spec.definitions !== "object") {
+                spec.definitions = {};
+              }
+              console.log("Spec definitions after initialization:", spec.definitions);
+
+              console.log("Fixing parameters...");
+              for (const pathKey in spec.paths) {
+                for (const method in spec.paths[pathKey]) {
+                  const operation = spec.paths[pathKey][method];
+                  if (operation.parameters) {
+                    operation.parameters = operation.parameters
+                      .filter(
+                        (param) =>
+                          !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+                            param.name
+                          )
+                      )
+                      .map((param) => {
+                        param.name = toCamelCase(param.name);
+                        if ("example" in param) delete param.example;
+                        if ("schema" in param && param.in !== "body") delete param.schema;
+                        if (!param.type && param.in !== "body") {
+                          param.type = param.name.includes("Id") ? "string" : "string";
+                          console.log(
+                            `Set default type 'string' for ${pathKey}(${method}).${param.name}`
+                          );
+                        }
+                        return param;
+                      });
+                  }
+                }
+              }
+
+              console.log("Spec definitions before enhanceTags:", spec.definitions);
+              console.log("Enhancing raw spec with tags...");
+              const { enhanceTags } = await import("./schema/tags/index_new.ts"); // No cache buster
+              enhanceTags(spec);
+              console.log("Enhancing raw spec with general enhancements...");
+              const { enhanceGeneral } = await import("./schema/enhance-general.ts");
+              enhanceGeneral(spec);
+              console.log("Fixing array schemas...");
+              const { fixArrays } = await import("./schema/fix-arrays.ts");
+              fixArrays(spec);
+
+              console.log("Removing unexpected top-level attributes...");
+              delete spec.operations;
+              delete spec.groups;
+              delete spec.components;
+
+              console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+              await fs.mkdir(OUTPUT_DIR, { recursive: true });
+              await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
+              console.log("Spec fixed successfully! Output written to:", outputFile);
+            }
+
+
+            async
+            function
+            main()
+            {
+              try {
+                console.log("Starting...");
+                await fixQuickBaseSpec();
+              } catch (error) {
+                console.error("Error:", error);
+                process.exit(1);
+              }
+            }
+
+
+            main();
+        - name: >-
+            generate-override-report.ts
+          type: >-
+            file
+          contents: >
+            #!/usr/bin/env
+            node
+
+
+            import
+            {
+            promises
+            as
+            fs
+            }
+            from
+            "fs";
+
+            import
+            path
+            from
+            "path";
+
+            import
+            {
+            fileURLToPath
+            }
+            from
+            "url";
+
+            import
+            {
+            diff,
+            formatters
+            }
+            from
+            "jsondiffpatch";
+
+            import
+            {
+            Spec
+            }
+            from
+            "./types/spec.ts";
+
+
+            //
+            Basic
+            CSS
+            for
+            readability
+
+            const
+            HTML_STYLE
+            =
+            `
+              <style>
+                .jsondiffpatch-delta { font-family: monospace; }
+                .jsondiffpatch-added { background-color: #e6ffe6; color: #006400; }
+                .jsondiffpatch-deleted { background-color: #ffe6e6; color: #8b0000; text-decoration: line-through; }
+                .jsondiffpatch-modified { background-color: #fff3e6; }
+                .jsondiffpatch-unchanged { color: #666; }
+                .jsondiffpatch-key { font-weight: bold; }
+              </style>
+            `;
+
+
+            async
+            function
+            generateOverrideReport():
             Promise<void>
             {
               try {
                 const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
                 const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
                 const OUTPUT_DIR = path.join(CODEGEN_DIR, "output");
-                console.log("Finding latest QuickBase RESTful API spec...");
-                const specFiles = glob.sync(
-                  path.join(SPECS_DIR, "QuickBase_RESTful_*.json")
+                const RAW_SPEC = path.join(
+                  SPECS_DIR,
+                  "QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json"
                 );
-                if (specFiles.length === 0) {
-                  throw new Error(
-                    "No QuickBase_RESTful_*.json files found in specs/ folder."
-                  );
+                const FIXED_SPEC = path.join(OUTPUT_DIR, "quickbase-fixed.json");
+                const JSON_OUTPUT_FILE = path.join(OUTPUT_DIR, "override-report.json");
+                const HTML_OUTPUT_FILE = path.join(OUTPUT_DIR, "override-report.html");
+
+                console.log("Cleaning up old override report...");
+                if (
+                  await fs
+                    .stat(JSON_OUTPUT_FILE)
+                    .then(() => true)
+                    .catch(() => false)
+                ) {
+                  await fs.unlink(JSON_OUTPUT_FILE);
+                  console.log(`Removed ${JSON_OUTPUT_FILE}`);
                 }
-                const inputFile = specFiles.sort().pop() as string;
-                const outputFile = path.join(OUTPUT_DIR, "quickbase-fixed.json");
+                if (
+                  await fs
+                    .stat(HTML_OUTPUT_FILE)
+                    .then(() => true)
+                    .catch(() => false)
+                ) {
+                  await fs.unlink(HTML_OUTPUT_FILE);
+                  console.log(`Removed ${HTML_OUTPUT_FILE}`);
+                } else {
+                  console.log("No old override reports found to remove.");
+                }
 
-                console.log(`Reading ${path.basename(inputFile)} from specs/...`);
-                const specContent = await fs.readFile(inputFile, "utf8");
-                const spec: Spec = JSON.parse(specContent);
+                if (
+                  !(await fs
+                    .stat(RAW_SPEC)
+                    .then(() => true)
+                    .catch(() => false))
+                ) {
+                  console.error(`Raw spec ${RAW_SPEC} not found.`);
+                  process.exit(1);
+                }
+                if (
+                  !(await fs
+                    .stat(FIXED_SPEC)
+                    .then(() => true)
+                    .catch(() => false))
+                ) {
+                  console.error(
+                    `Fixed spec ${FIXED_SPEC} not found. Run 'npm run fix-spec' first.`
+                  );
+                  process.exit(1);
+                }
 
-                console.log("Fixing parameters...");
-                for (const pathKey in spec.paths) {
-                  for (const method in spec.paths[pathKey]) {
-                    const operation = spec.paths[pathKey][method];
-                    if (operation.parameters) {
-                      operation.parameters = operation.parameters
-                        .filter(
-                          (param) =>
-                            !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
-                              param.name
-                            )
-                        )
-                        .map((param) => {
-                          param.name = toCamelCase(param.name);
-                          if ("example" in param) delete param.example;
-                          if ("schema" in param && param.in !== "body") delete param.schema;
-                          if (!param.type && param.in !== "body") {
-                            param.type = param.name.includes("Id") ? "string" : "string";
-                            console.log(
-                              `Set default type 'string' for ${pathKey}(${method}).${param.name} in initial pass`
-                            );
-                          }
-                          return param;
-                        });
+                console.log(`Reading raw spec from ${RAW_SPEC}...`);
+                const rawContent = await fs.readFile(RAW_SPEC, "utf8");
+                const rawSpec: Spec = JSON.parse(rawContent);
+
+                console.log(`Reading fixed spec from ${FIXED_SPEC}...`);
+                const fixedContent = await fs.readFile(FIXED_SPEC, "utf8");
+                const fixedSpec: Spec = JSON.parse(fixedContent);
+
+                const overrides = {
+                  overriddenPaths: [] as string[],
+                  overriddenDefinitions: [] as string[],
+                  conflicts: [] as string[],
+                  diff: {
+                    paths: {} as Record<string, Record<string, any>>,
+                    definitions: {} as Record<string, any>,
+                  },
+                };
+                let htmlContent = `<html><head><title>Override Report Diff</title>${HTML_STYLE}</head><body><h1>Override Report Diff</h1>`;
+
+                console.log("Analyzing overridden paths and diffs...");
+                for (const pathKey in fixedSpec.paths) {
+                  const fixedPath = fixedSpec.paths[pathKey];
+                  const rawPath = rawSpec.paths[pathKey] || {};
+
+                  for (const method in fixedPath) {
+                    const fixedOp = fixedPath[method];
+                    const rawOp = rawPath[method] || {};
+
+                    const fixedBodyParam = fixedOp.parameters?.find(
+                      (p) => "in" in p && p.in === "body"
+                    );
+                    const rawBodyParam = rawOp.parameters?.find(
+                      (p) => "in" in p && p.in === "body"
+                    );
+
+                    if (
+                      fixedBodyParam?.schema?.$ref &&
+                      (!rawBodyParam ||
+                        fixedBodyParam.schema.$ref !== rawBodyParam?.schema?.$ref)
+                    ) {
+                      if (!overrides.overriddenPaths.includes(pathKey)) {
+                        overrides.overriddenPaths.push(pathKey);
+                      }
+                      if (!overrides.diff.paths[pathKey]) {
+                        overrides.diff.paths[pathKey] = {};
+                      }
+                      const bodyDiff = diff(
+                        rawBodyParam ? rawBodyParam.schema || {} : {},
+                        fixedBodyParam.schema
+                      );
+                      if (bodyDiff) {
+                        overrides.diff.paths[pathKey][method] = bodyDiff;
+                        htmlContent += `<h2>Path: ${pathKey} (${method})</h2>`;
+                        htmlContent += formatters.html.format(
+                          bodyDiff,
+                          rawBodyParam?.schema || {}
+                        );
+                      }
                     }
                   }
                 }
 
-                // Removed applyOverrides conditional logic
-                console.log("Enhancing raw spec with tags...");
-                enhanceTags(spec);
-                console.log("Enhancing raw spec with general enhancements...");
-                enhanceGeneral(spec);
+                console.log("Analyzing overridden definitions and diffs...");
+                for (const defKey in fixedSpec.definitions) {
+                  const rawDef = rawSpec.definitions?.[defKey] || null;
+                  const fixedDef = fixedSpec.definitions[defKey];
+                  const defDiff = diff(rawDef, fixedDef);
+                  if (defDiff) {
+                    overrides.overriddenDefinitions.push(defKey);
+                    overrides.diff.definitions[defKey] = defDiff;
+                    htmlContent += `<h2>Definition: ${defKey}</h2>`;
+                    htmlContent += formatters.html.format(defDiff, rawDef);
+                  }
+                }
 
-                console.log("Fixing array schemas...");
-                fixArrays(spec);
+                console.log("Checking for conflicts...");
+                for (const pathKey in rawSpec.paths) {
+                  if (!fixedSpec.paths[pathKey]) {
+                    overrides.conflicts.push(`Path ${pathKey} removed in fixed spec`);
+                    htmlContent += `<h2>Conflict: Path ${pathKey}</h2><p>Removed in fixed spec</p>`;
+                  }
+                }
+                for (const defKey in rawSpec.definitions) {
+                  if (!fixedSpec.definitions[defKey]) {
+                    overrides.conflicts.push(`Definition ${defKey} removed in fixed spec`);
+                    htmlContent += `<h2>Conflict: Definition ${defKey}</h2><p>Removed in fixed spec</p>`;
+                  }
+                }
 
-                console.log("Removing unexpected top-level attributes...");
-                delete spec.operations;
-                delete spec.groups;
-                delete spec.components;
+                htmlContent += "</body></html>";
 
-                console.log(`Writing fixed spec to ${path.basename(outputFile)}...`);
+                console.log(`Writing JSON override report to ${JSON_OUTPUT_FILE}...`);
                 await fs.mkdir(OUTPUT_DIR, { recursive: true });
-                await fs.writeFile(outputFile, JSON.stringify(spec, null, 2), "utf8");
-                console.log("Spec fixed successfully! Output written to:", outputFile);
+                await fs.writeFile(
+                  JSON_OUTPUT_FILE,
+                  JSON.stringify(overrides, null, 2),
+                  "utf8"
+                );
+
+                console.log(`Writing HTML override report to ${HTML_OUTPUT_FILE}...`);
+                await fs.writeFile(HTML_OUTPUT_FILE, htmlContent, "utf8");
+
+                console.log("Override report with enhanced diffs generated successfully!");
               } catch (error) {
-                console.error("Failed to fix spec:", error);
+                console.error("Failed to generate override report:", error);
                 process.exit(1);
               }
             }
@@ -989,12 +1214,7 @@ tree:
             function
             main()
             {
-              try {
-                await fixQuickBaseSpec();
-              } catch (error) {
-                console.error("Fatal error in script execution:", error);
-                process.exit(1);
-              }
+              await generateOverrideReport();
             }
 
 
@@ -2185,12 +2405,12 @@ tree:
                       }
                     }
                 - name: >-
-                    index.ts
+                    index_new.ts
                   type: >-
                     file
                   contents: >
                     //
-                    schema/tags/index.ts
+                    open-api/schema/tags/index.ts
 
                     import
                     {
@@ -2257,7 +2477,10 @@ tree:
                     Spec):
                     void
                     {
-                      spec.definitions = spec.definitions || {};
+                      console.log("enhanceTags version: 2025-03-16-fix-applied"); // Confirmation log
+                      if (!spec.definitions || typeof spec.definitions !== "object") {
+                        spec.definitions = {};
+                      }
 
                       for (const pathKey in spec.paths) {
                         for (const method in spec.paths[pathKey]) {
@@ -2265,7 +2488,6 @@ tree:
                           const opId =
                             operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
 
-                          // Handle array schemas
                           if (operation.parameters) {
                             operation.parameters.forEach((param: Parameter) => {
                               if (param.in === "body") {
@@ -2304,7 +2526,6 @@ tree:
                             });
                           }
 
-                          // Apply tag-specific enhancements
                           enhanceUsers(spec, pathKey, method, operation);
                           enhanceGroups(spec, pathKey, method, operation);
                           enhanceRecords(spec, pathKey, method, operation);
@@ -2320,7 +2541,7 @@ tree:
                     file
                   contents: >
                     //
-                    schema/tags/records.ts
+                    open-api/schema/tags/records.ts
 
                     import
                     {
@@ -2337,6 +2558,12 @@ tree:
                     }
                     from
                     "../../utils/naming.ts";
+                    //
+                    Ensure
+                    this
+                    import
+                    is
+                    present
 
 
                     export
@@ -2369,21 +2596,71 @@ tree:
                                 `Defining schema for ${requestName} in ${pathKey}(${method})`
                               );
                               let properties;
-                              if (method === "post") {
+                              // Upsert endpoint (/records)
+                              if (pathKey === "/records" && method === "post") {
                                 properties = {
                                   data: { type: "array", items: { $ref: "#/definitions/Record" } },
                                   to: { type: "string" },
                                   fieldsToReturn: { type: "array", items: { type: "integer" } },
                                 };
-                              } else if (method === "delete") {
+                              }
+                              // Query endpoint (/records/query)
+                              else if (pathKey === "/records/query" && method === "post") {
                                 properties = {
-                                  from: { type: "string" },
-                                  where: { type: "string" },
+                                  from: { type: "string", description: "The table identifier." },
+                                  select: {
+                                    type: "array",
+                                    items: { type: "integer" },
+                                    description: "An array of field ids...",
+                                  },
+                                  where: {
+                                    type: "string",
+                                    description:
+                                      "The filter, using the Quickbase query language...",
+                                  },
+                                  sortBy: {
+                                    type: "array",
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        fieldId: { type: "integer" },
+                                        order: {
+                                          type: "string",
+                                          enum: ["ASC", "DESC", "equal-values"],
+                                        },
+                                      },
+                                      required: ["fieldId", "order"],
+                                    },
+                                    description: "An array of field IDs and sort directions...",
+                                  },
+                                  groupBy: {
+                                    type: "array",
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        fieldId: { type: "integer" },
+                                        grouping: { type: "string", enum: ["equal-values"] },
+                                      },
+                                      required: ["fieldId", "grouping"],
+                                    },
+                                    description:
+                                      "An array that contains the fields to group the records by.",
+                                  },
+                                  options: {
+                                    type: "object",
+                                    properties: {
+                                      skip: { type: "integer" },
+                                      top: { type: "integer" },
+                                      compareWithAppLocalTime: { type: "boolean" },
+                                    },
+                                    description: "Additional query options.",
+                                  },
                                 };
-                              } else if (operation.summary?.toLowerCase().includes("query")) {
+                              }
+                              // Delete endpoint (/records)
+                              else if (method === "delete") {
                                 properties = {
                                   from: { type: "string" },
-                                  select: { type: "array", items: { type: "integer" } },
                                   where: { type: "string" },
                                 };
                               }
@@ -2391,9 +2668,7 @@ tree:
                                 spec.definitions[requestName] = {
                                   type: "object",
                                   properties,
-                                  required: Object.keys(properties).filter(
-                                    (key) => key !== "fieldsToReturn"
-                                  ),
+                                  required: ["from"], // Only 'from' is required per the spec
                                   description: operation.summary || `Request body for ${opId}`,
                                 };
                               }
@@ -2460,15 +2735,179 @@ tree:
                               console.log(
                                 `Defining schema for ${requestName} in ${pathKey}(${method})`
                               );
-                              const properties = {
-                                name: { type: "string" },
-                              };
-                              spec.definitions[requestName] = {
-                                type: "object",
-                                properties,
-                                required: Object.keys(properties),
-                                description: operation.summary || `Request body for ${opId}`,
-                              };
+                              let properties;
+
+                              // Existing logic for other endpoints remains unchanged
+                              if (pathKey === "/tables" && method === "post") {
+                                properties = {
+                                  name: {
+                                    type: "string",
+                                    description: "The name for the table.",
+                                    minLength: 1,
+                                  },
+                                  description: {
+                                    type: "string",
+                                    description: "The description for the table...",
+                                  },
+                                  singleRecordName: {
+                                    type: "string",
+                                    description: "The singular noun for records...",
+                                  },
+                                  pluralRecordName: {
+                                    type: "string",
+                                    description: "The plural noun for records...",
+                                  },
+                                };
+                              } else if (pathKey === "/tables/{tableId}" && method === "post") {
+                                properties = {
+                                  name: {
+                                    type: "string",
+                                    description: "The updated name of the table.",
+                                  },
+                                  description: {
+                                    type: "string",
+                                    description: "The updated description for the table.",
+                                  },
+                                };
+                              }
+                              // Add minimal fix for relationship endpoints
+                              else if (
+                                pathKey === "/tables/{tableId}/relationship" &&
+                                method === "post"
+                              ) {
+                                requestName = "CreateRelationshipRequest"; // Force correct name
+                                if (!spec.definitions[requestName]) {
+                                  properties = {
+                                    parentTableId: {
+                                      type: "string",
+                                      description: "The parent table id for the relationship.",
+                                    },
+                                    foreignKeyField: {
+                                      type: "object",
+                                      properties: {
+                                        label: {
+                                          type: "string",
+                                          description: "The label for the foreign key field.",
+                                        },
+                                      },
+                                      additionalProperties: true,
+                                    },
+                                    lookupFieldIds: {
+                                      type: "array",
+                                      items: { type: "integer" },
+                                      description: "Array of field ids...",
+                                    },
+                                    summaryFields: {
+                                      type: "array",
+                                      items: {
+                                        type: "object",
+                                        properties: {
+                                          summaryFid: {
+                                            type: "number",
+                                            description: "The field id to summarize.",
+                                          },
+                                          label: {
+                                            type: "string",
+                                            description: "The label for the summary field.",
+                                          },
+                                          accumulationType: {
+                                            type: "string",
+                                            enum: [
+                                              "AVG",
+                                              "SUM",
+                                              "MAX",
+                                              "MIN",
+                                              "STD-DEV",
+                                              "COUNT",
+                                              "COMBINED-TEXT",
+                                              "COMBINED-USER",
+                                              "DISTINCT-COUNT",
+                                            ],
+                                            description: "The accumulation type...",
+                                          },
+                                          where: { type: "string", description: "The filter..." },
+                                        },
+                                        required: ["accumulationType"],
+                                        additionalProperties: true,
+                                      },
+                                      description: "Array of summary field objects...",
+                                    },
+                                  };
+                                }
+                              } else if (
+                                pathKey === "/tables/{tableId}/relationship/{relationshipId}" &&
+                                method === "post"
+                              ) {
+                                requestName = "UpdateRelationshipRequest"; // Force correct name
+                                if (!spec.definitions[requestName]) {
+                                  properties = {
+                                    parentTableId: {
+                                      type: "string",
+                                      description: "The updated parent table id...",
+                                    },
+                                    foreignKeyField: {
+                                      type: "object",
+                                      properties: {
+                                        label: {
+                                          type: "string",
+                                          description: "The updated label...",
+                                        },
+                                      },
+                                      additionalProperties: true,
+                                    },
+                                    lookupFieldIds: {
+                                      type: "array",
+                                      items: { type: "integer" },
+                                      description: "Updated array of field ids...",
+                                    },
+                                    summaryFields: {
+                                      type: "array",
+                                      items: {
+                                        type: "object",
+                                        properties: {
+                                          summaryFid: { type: "number" },
+                                          label: { type: "string" },
+                                          accumulationType: {
+                                            type: "string",
+                                            enum: [
+                                              "AVG",
+                                              "SUM",
+                                              "MAX",
+                                              "MIN",
+                                              "STD-DEV",
+                                              "COUNT",
+                                              "COMBINED-TEXT",
+                                              "COMBINED-USER",
+                                              "DISTINCT-COUNT",
+                                            ],
+                                          },
+                                          where: { type: "string" },
+                                        },
+                                        required: ["accumulationType"],
+                                        additionalProperties: true,
+                                      },
+                                    },
+                                  };
+                                }
+                              }
+
+                              if (properties) {
+                                spec.definitions[requestName] = {
+                                  type: "object",
+                                  properties,
+                                  required:
+                                    pathKey.includes("relationship") &&
+                                    pathKey.endsWith("/relationship")
+                                      ? ["parentTableId"]
+                                      : pathKey === "/tables"
+                                      ? ["name"]
+                                      : [],
+                                  additionalProperties: pathKey.includes("relationship")
+                                    ? false
+                                    : true, // Match raw spec
+                                  description: operation.summary || `Request body for ${opId}`,
+                                };
+                              }
                             }
                             param.schema = { $ref: `#/definitions/${requestName}` };
                             console.log(
@@ -2719,6 +3158,99 @@ tree:
         package.json
       type: >-
         file
+      contents: >
+        {
+          "name": "quickbase-js",
+          "version": "0.1.0-beta.7",
+          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+          "type": "module",
+          "main": "dist/esm/quickbase.js",
+          "module": "dist/esm/quickbase.js",
+          "types": "dist/esm/quickbase.d.ts",
+          "publishConfig": {
+            "access": "public"
+          },
+          "exports": {
+            ".": {
+              "types": "./dist/esm/quickbase.d.ts",
+              "import": {
+                "minified": "./dist/esm/quickbase.min.js",
+                "default": "./dist/esm/quickbase.js"
+              },
+              "require": {
+                "minified": "./dist/umd/quickbase.umd.min.js",
+                "default": "./dist/umd/quickbase.umd.js"
+              },
+              "umd:types": "./dist/umd/quickbase.umd.d.ts"
+            }
+          },
+          "scripts": {
+            "build": "npm run build:esm && npm run build:umd",
+            "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-esm.js",
+            "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-umd.js",
+            "release": "standard-version",
+            "release:beta": "standard-version --prerelease beta",
+            "release:alpha": "standard-version --prerelease alpha",
+            "release:push": "npm run release:beta && git push --follow-tags origin main",
+            "release:publish": "npm run release:push && npm publish --tag beta",
+            "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
+            "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
+            "fix-spec-old": "node --loader ts-node/esm open-api/fix-spec-main.ts",
+            "generate-report": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-override-report.ts",
+            "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
+            "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
+            "gen:all": "npm run validate-spec && npm run fix-spec && npm run generate-report && npm run gen:openapi && npm run gen:unified",
+            "split-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/split-spec.ts",
+            "validate-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/validate-spec.ts",
+            "generate-types": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/generate-types.ts",
+            "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
+            "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
+            "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
+            "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
+            "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
+            "test:vitest:unit": "vitest run tests/vitest/unit/**/*.test.ts",
+            "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/*.test.ts",
+            "test:vitest:qb:auth": "vitest run tests/vitest/qb/auth/*.test.ts",
+            "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/*.test.ts",
+            "test:vitest:qb:records": "vitest run tests/vitest/qb/records/*.test.ts",
+            "test:vitest:qb:tables": "vitest run tests/vitest/qb/tables/*.test.ts",
+            "test:vitest:unit:apps": "vitest run tests/vitest/unit/apps/*.test.ts",
+            "test:vitest:unit:auth": "vitest run tests/vitest/unit/auth/*.test.ts",
+            "test:vitest:unit:fields": "vitest run tests/vitest/unit/fields/*.test.ts",
+            "test:vitest:unit:records": "vitest run tests/vitest/unit/records/*.test.ts",
+            "test:vitest:unit:tables": "vitest run tests/vitest/unit/tables/*.test.ts",
+            "test:pw:qb:auth": "playwright test tests/playwright/qb/auth"
+          },
+          "devDependencies": {
+            "@openapitools/openapi-generator-cli": "^2.18.4",
+            "@playwright/test": "^1.51.0",
+            "@rollup/plugin-commonjs": "^28.0.3",
+            "@rollup/plugin-node-resolve": "^16.0.1",
+            "@rollup/plugin-terser": "^0.4.4",
+            "@rollup/plugin-typescript": "^12.1.2",
+            "@types/js-yaml": "^4.0.9",
+            "@types/node": "^22.13.10",
+            "dotenv": "^16.4.7",
+            "glob": "^10.4.5",
+            "js-yaml": "^4.1.0",
+            "jsdom": "^26.0.0",
+            "jsondiffpatch": "^0.6.0",
+            "node-fetch": "^3.3.2",
+            "openapi-schema-validator": "^12.1.3",
+            "openapi-types": "^12.1.3",
+            "openapi-typescript": "^7.6.1",
+            "rimraf": "^5.0.10",
+            "rollup": "^4.35.0",
+            "rollup-plugin-dts": "^6.1.1",
+            "standard-version": "^9.5.0",
+            "ts-morph": "^25.0.1",
+            "ts-node": "^10.9.2",
+            "tslib": "^2.8.1",
+            "typescript": "^5.8.2",
+            "undici-types": "^7.5.0",
+            "vitest": "^3.0.8"
+          }
+        }
     - name: >-
         playwright.config.ts
       type: >-
@@ -3285,6 +3817,18 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    RunQueryRequestGroupByInner.ts
+                  type: >-
+                    file
+                - name: >-
+                    RunQueryRequestOptions.ts
+                  type: >-
+                    file
+                - name: >-
+                    RunQueryRequestSortByInner.ts
+                  type: >-
+                    file
+                - name: >-
                     RunReport200Response.ts
                   type: >-
                     file
@@ -3816,6 +4360,36 @@ tree:
         tsconfig.json
       type: >-
         file
+      contents: >
+        {
+          "compilerOptions": {
+            "target": "ESNext",
+            "module": "ESNext",
+            "moduleResolution": "bundler",
+            "strict": true,
+            "lib": ["ES2015", "ESNext", "DOM"],
+            "types": ["node", "playwright/test", "undici-types"],
+            "esModuleInterop": true,
+            "resolveJsonModule": true,
+            "allowImportingTsExtensions": true,
+            "noEmit": true,
+            "outDir": "dist",
+            "rootDir": ".",
+            "declaration": true,
+            "sourceMap": true,
+            "baseUrl": ".",
+            "paths": {
+              "@/*": ["src/*"],
+              "@tests/*": ["tests/*"]
+            }
+          },
+          "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
+          "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
+          "ts-node": {
+            "esm": true,
+            "experimentalResolver": true // Helps with bundler resolution
+          }
+        }
     - name: >-
         versionrc.json
       type: >-

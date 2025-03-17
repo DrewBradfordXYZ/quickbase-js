@@ -17,13 +17,16 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@tests/*": ["tests/*"]
+      "@tests/*": ["tests/*"],
+      "undici-types": ["node_modules/undici-types/index.d.ts"],
+      "openapi-types": ["node_modules/openapi-types/index.d.ts"],
+      "jsondiffpatch": ["node_modules/jsondiffpatch/lib/index.d.ts"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
   "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
   "ts-node": {
     "esm": true,
-    "transpileOnly": true
+    "experimentalResolver": true
   }
 }

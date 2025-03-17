@@ -32,7 +32,7 @@ const includeRecursiveFolders: string[] = [
 
 // prettier-ignore
 const includeFiles: string[] = [
-  // "package.json",
+  "package.json",
   // "tsconfig.json",
   // "tsconfig.build.json",
   // "rollup.config.js",

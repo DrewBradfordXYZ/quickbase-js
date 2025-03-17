@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import { promises as fs } from "fs";
-import path from "path";
+import * as path from "path";
 import { fileURLToPath } from "url";
-import jsondiffpatch from "jsondiffpatch"; // Default import
-import { Spec } from "./types/spec.ts";
+import fastJsonPatch from "fast-json-patch"; // Default import
+import { Spec } from "./types/spec";
 
-const { diff, formatters } = jsondiffpatch; // Destructure from default
+const { compare } = fastJsonPatch; // Destructure from default
 
 // Basic CSS for readability
 const HTML_STYLE = `
@@ -20,7 +20,36 @@ const HTML_STYLE = `
   </style>
 `;
 
-// Rest of the script remains unchanged...
+// Simple HTML formatter for JSON Patch
+function formatPatchToHtml(patch: any[]): string {
+  let html = `<html><head><title>Override Report Diff</title>${HTML_STYLE}</head><body><h1>Override Report Diff</h1>`;
+  patch.forEach((op) => {
+    if (op.op === "replace") {
+      html += `<h2>Path: ${
+        op.path
+      }</h2><p>Modified: <span class="jsondiffpatch-deleted">${JSON.stringify(
+        op.value
+      )}</span> → <span class="jsondiffpatch-added">${JSON.stringify(
+        op.value
+      )}</span></p>`;
+    } else if (op.op === "add") {
+      html += `<h2>Path: ${
+        op.path
+      }</h2><p>Added: <span class="jsondiffpatch-added">${JSON.stringify(
+        op.value
+      )}</span></p>`;
+    } else if (op.op === "remove") {
+      html += `<h2>Path: ${
+        op.path
+      }</h2><p>Removed: <span class="jsondiffpatch-deleted">${JSON.stringify(
+        op.value
+      )}</span></p>`;
+    }
+  });
+  html += "</body></html>";
+  return html;
+}
+
 async function generateOverrideReport(): Promise<void> {
   try {
     const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -85,101 +114,22 @@ async function generateOverrideReport(): Promise<void> {
     const fixedContent = await fs.readFile(FIXED_SPEC, "utf8");
     const fixedSpec: Spec = JSON.parse(fixedContent);
 
-    const overrides = {
-      overriddenPaths: [] as string[],
-      overriddenDefinitions: [] as string[],
-      conflicts: [] as string[],
-      diff: {
-        paths: {} as Record<string, Record<string, any>>,
-        definitions: {} as Record<string, any>,
-      },
-    };
-    let htmlContent = `<html><head><title>Override Report Diff</title>${HTML_STYLE}</head><body><h1>Override Report Diff</h1>`;
+    console.log("Generating patch...");
+    const patch = compare(rawSpec, fixedSpec);
 
-    console.log("Analyzing overridden paths and diffs...");
-    for (const pathKey in fixedSpec.paths) {
-      const fixedPath = fixedSpec.paths[pathKey];
-      const rawPath = rawSpec.paths[pathKey] || {};
-
-      for (const method in fixedPath) {
-        const fixedOp = fixedPath[method];
-        const rawOp = rawPath[method] || {};
-
-        const fixedBodyParam = fixedOp.parameters?.find(
-          (p) => "in" in p && p.in === "body"
-        );
-        const rawBodyParam = rawOp.parameters?.find(
-          (p) => "in" in p && p.in === "body"
-        );
-
-        if (
-          fixedBodyParam?.schema?.$ref &&
-          (!rawBodyParam ||
-            fixedBodyParam.schema.$ref !== rawBodyParam?.schema?.$ref)
-        ) {
-          if (!overrides.overriddenPaths.includes(pathKey)) {
-            overrides.overriddenPaths.push(pathKey);
-          }
-          if (!overrides.diff.paths[pathKey]) {
-            overrides.diff.paths[pathKey] = {};
-          }
-          const bodyDiff = diff(
-            rawBodyParam ? rawBodyParam.schema || {} : {},
-            fixedBodyParam.schema
-          );
-          if (bodyDiff) {
-            overrides.diff.paths[pathKey][method] = bodyDiff;
-            htmlContent += `<h2>Path: ${pathKey} (${method})</h2>`;
-            htmlContent += formatters.html.format(
-              bodyDiff,
-              rawBodyParam?.schema || {}
-            );
-          }
-        }
-      }
-    }
-
-    console.log("Analyzing overridden definitions and diffs...");
-    for (const defKey in fixedSpec.definitions) {
-      const rawDef = rawSpec.definitions?.[defKey] || null;
-      const fixedDef = fixedSpec.definitions[defKey];
-      const defDiff = diff(rawDef, fixedDef);
-      if (defDiff) {
-        overrides.overriddenDefinitions.push(defKey);
-        overrides.diff.definitions[defKey] = defDiff;
-        htmlContent += `<h2>Definition: ${defKey}</h2>`;
-        htmlContent += formatters.html.format(defDiff, rawDef);
-      }
-    }
-
-    console.log("Checking for conflicts...");
-    for (const pathKey in rawSpec.paths) {
-      if (!fixedSpec.paths[pathKey]) {
-        overrides.conflicts.push(`Path ${pathKey} removed in fixed spec`);
-        htmlContent += `<h2>Conflict: Path ${pathKey}</h2><p>Removed in fixed spec</p>`;
-      }
-    }
-    for (const defKey in rawSpec.definitions) {
-      if (!fixedSpec.definitions[defKey]) {
-        overrides.conflicts.push(`Definition ${defKey} removed in fixed spec`);
-        htmlContent += `<h2>Conflict: Definition ${defKey}</h2><p>Removed in fixed spec</p>`;
-      }
-    }
-
-    htmlContent += "</body></html>";
-
-    console.log(`Writing JSON override report to ${JSON_OUTPUT_FILE}...`);
+    console.log("Writing JSON override report...");
     await fs.mkdir(OUTPUT_DIR, { recursive: true });
     await fs.writeFile(
       JSON_OUTPUT_FILE,
-      JSON.stringify(overrides, null, 2),
+      JSON.stringify(patch, null, 2),
       "utf8"
     );
 
-    console.log(`Writing HTML override report to ${HTML_OUTPUT_FILE}...`);
+    console.log("Writing HTML override report...");
+    const htmlContent = formatPatchToHtml(patch);
     await fs.writeFile(HTML_OUTPUT_FILE, htmlContent, "utf8");
 
-    console.log("Override report with enhanced diffs generated successfully!");
+    console.log("Override report generated successfully!");
   } catch (error) {
     console.error("Failed to generate override report:", error);
     process.exit(1);
