@@ -43,6 +43,7 @@ const includeFiles: string[] = [
   // "src/tokenCache.ts",
   // "src/generated/runtime.ts",
   "src/quickbaseClient.ts",
+  "src/invokeMethod.ts",
   "src/generated-unified/QuickbaseClient.ts",
 ];
 
