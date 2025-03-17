@@ -1,7 +1,7 @@
 // src/invokeMethod.ts
 import { QuickbaseClient } from "./quickbaseClient";
 import { ResponseError } from "./generated/runtime";
-import { TokenBucket } from "./TokenBucket";
+import { ThrottleBucket } from "./ThrottleBucket"; // Updated import
 import { RateLimitError } from "./RateLimitError";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -41,7 +41,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   debug: boolean | undefined,
   convertDates: boolean,
   retryCount: number = 0,
-  throttleBucket: TokenBucket | null = null,
+  throttleBucket: ThrottleBucket | null = null, // Updated type
   maxRetries: number = 3,
   retryDelay: number = 1000
 ): Promise<ReturnType<QuickbaseClient[K]>> {

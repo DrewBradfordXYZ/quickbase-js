@@ -5,7 +5,7 @@ import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
 import { simplifyName } from "./utils";
 import { invokeMethod, MethodInfo } from "./invokeMethod"; // Added import
-import { TokenBucket } from "./TokenBucket";
+import { ThrottleBucket } from "./ThrottleBucket";
 
 export * from "./generated/models/index";
 
@@ -91,7 +91,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const tokenCache = new TokenCache(tokenLifespan);
   const throttleBucket = throttle
-    ? new TokenBucket(throttle.rate, throttle.burst)
+    ? new ThrottleBucket(throttle.rate, throttle.burst)
     : null;
 
   const baseHeaders: HTTPHeaders = {

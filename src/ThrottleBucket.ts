@@ -1,5 +1,5 @@
 // src/TokenBucket.ts
-export class TokenBucket {
+export class ThrottleBucket {
   private tokens: number;
   private maxTokens: number;
   private refillRate: number; // Tokens per second
