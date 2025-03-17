@@ -32,6 +32,8 @@ const includeRecursiveFolders: string[] = [
 
 // prettier-ignore
 const includeFiles: string[] = [
+  "tests/setup.ts"
+
   // "package.json",
   // "tsconfig.json",
   // "tsconfig.build.json",

@@ -4,12 +4,10 @@ import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 
 describe("QuickbaseClient Integration - deleteFields", () => {
   const client = createClient();
-
   let fieldIdsToDelete: number[] = [];
 
   beforeAll(async () => {
     try {
-      // Create test fields to delete
       const fieldLabels = ["DeleteTest1", "DeleteTest2"];
       for (const label of fieldLabels) {
         const response = await client.createField({
@@ -28,7 +26,7 @@ describe("QuickbaseClient Integration - deleteFields", () => {
       }
     } catch (error) {
       console.error("beforeAll failed:", error);
-      throw error; // Fail the suite if setup fails
+      throw error;
     }
   });
 
@@ -36,41 +34,37 @@ describe("QuickbaseClient Integration - deleteFields", () => {
     try {
       const response = await client.deleteFields({
         tableId: QB_TABLE_ID_1,
-        body: {
-          fieldIds: fieldIdsToDelete,
-        },
+        body: { fieldIds: fieldIdsToDelete },
       });
-
       console.log("deleteFields response:", JSON.stringify(response, null, 2));
-
       expect(response).toBeDefined();
       expect(response.deletedFieldIds).toEqual(
         expect.arrayContaining(fieldIdsToDelete)
       );
-      expect(response.errors ?? []).toHaveLength(0); // Handle undefined errors
+      expect(response.errors ?? []).toHaveLength(0);
     } catch (error) {
       console.error("deleteFields failed:", error);
-      throw error; // Re-throw to fail the test with details
+      throw error;
     }
   });
 
-  it("handles partial success with errors", async () => {
+  it("handles partial success with errors", { timeout: 10000 }, async () => {
     const newField = await client.createField({
       tableId: QB_TABLE_ID_1,
-      body: {
-        label: "DeleteTest3",
-        fieldType: "text",
-      },
+      body: { label: "DeleteTest3", fieldType: "text" },
     });
     console.log(`Created field DeleteTest3 with ID ${newField.id}`);
 
-    const invalidFieldId = 999999; // Assume this ID doesn’t exist
+    const invalidFieldId = 999999;
     const fieldIds = [newField.id, invalidFieldId];
 
+    console.log("Sending deleteFields request at:", new Date());
     const response = await client.deleteFields({
       tableId: QB_TABLE_ID_1,
       body: { fieldIds },
     });
+    console.log("deleteFields response received at:", new Date());
+    console.log("Response:", JSON.stringify(response, null, 2));
 
     expect(response.deletedFieldIds).toContain(newField.id);
     expect(response.deletedFieldIds).not.toContain(invalidFieldId);

@@ -1,3 +1,4 @@
+// tests/vitest/qb/apps/getApp.test.ts
 import { test, expect } from "vitest";
 import { quickbase } from "../../../../src/quickbaseClient";
 
@@ -20,8 +21,8 @@ test(
     expect(result).toEqual({
       id: getAppId,
       name: "qb-copy",
-      created: expect.any(Date), // Matches Date object from client
-      updated: expect.any(Date), // Matches Date object from client
+      created: expect.any(Date),
+      updated: expect.any(Date),
       description: "",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       dateFormat: "MM-DD-YYYY",
@@ -35,6 +36,9 @@ test(
         mustBeRealmApproved: false,
         useIPFilter: false,
       },
+      ancestorId: undefined,
+      dataClassification: undefined,
+      variables: [{ name: "TestVar", value: "TestValue" }],
     });
   }
 );
