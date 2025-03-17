@@ -24,7 +24,7 @@ const includeFolders: string[] = [
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  "open-api"
+  // "open-api"
   // "tests",
   // "tests/vitest/unit",
   // "tests/vitest/qb"
@@ -37,14 +37,14 @@ const includeFiles: string[] = [
   // "tsconfig.build.json",
   // "rollup.config.js",
   // "vitest.config.ts",
-  // "build-common.js",
-  // "build-umd.js",
-  // "build-esm.js",
+  "build-common.js",
+  "build-umd.js",
+  "build-esm.js",
   // "src/tokenCache.ts",
   // "src/generated/runtime.ts",
-  // "src/quickbaseClient.ts",
-  // "src/invokeMethod.ts",
-  // "src/generated-unified/QuickbaseClient.ts",
+  "src/quickbaseClient.ts",
+  "src/invokeMethod.ts",
+  "src/generated-unified/QuickbaseClient.ts",
 ];
 
 const projectGoals: string[] = [

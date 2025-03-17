@@ -1689,6 +1689,209 @@
     /**
      * @export
      */
+    const CreateFieldRequestPropertiesOpenTargetInEnum = {
+        SameWindow: 'sameWindow',
+        NewWindow: 'newWindow',
+        Popup: 'popup'
+    };
+    /**
+     * @export
+     */
+    const CreateFieldRequestPropertiesSummaryFunctionEnum = {
+        Avg: 'AVG',
+        Sum: 'SUM',
+        Max: 'MAX',
+        Min: 'MIN',
+        StdDev: 'STD-DEV',
+        Count: 'COUNT',
+        CombinedText: 'COMBINED-TEXT',
+        CombinedUser: 'COMBINED-USER',
+        DistinctCount: 'DISTINCT-COUNT'
+    };
+    /**
+     * @export
+     */
+    const CreateFieldRequestPropertiesCurrencyFormatEnum = {
+        Left: 'left',
+        Right: 'right',
+        Middle: 'middle'
+    };
+    /**
+     * @export
+     */
+    const CreateFieldRequestPropertiesVersionModeEnum = {
+        Keepallversions: 'keepallversions',
+        Keeplastversions: 'keeplastversions'
+    };
+    /**
+     * Check if a given object implements the CreateFieldRequestProperties interface.
+     */
+    function instanceOfCreateFieldRequestProperties(value) {
+        return true;
+    }
+    function CreateFieldRequestPropertiesFromJSON(json) {
+        return CreateFieldRequestPropertiesFromJSONTyped(json);
+    }
+    function CreateFieldRequestPropertiesFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'numLines': json['numLines'] == null ? undefined : json['numLines'],
+            'maxLength': json['maxLength'] == null ? undefined : json['maxLength'],
+            'appendOnly': json['appendOnly'] == null ? undefined : json['appendOnly'],
+            'sortAsGiven': json['sortAsGiven'] == null ? undefined : json['sortAsGiven'],
+            'allowMentions': json['allowMentions'] == null ? undefined : json['allowMentions'],
+            'comments': json['comments'] == null ? undefined : json['comments'],
+            'doesTotal': json['doesTotal'] == null ? undefined : json['doesTotal'],
+            'autoSave': json['autoSave'] == null ? undefined : json['autoSave'],
+            'defaultValueLuid': json['defaultValueLuid'] == null ? undefined : json['defaultValueLuid'],
+            'useI18NFormat': json['useI18NFormat'] == null ? undefined : json['useI18NFormat'],
+            'maxVersions': json['maxVersions'] == null ? undefined : json['maxVersions'],
+            'format': json['format'] == null ? undefined : json['format'],
+            'carryChoices': json['carryChoices'] == null ? undefined : json['carryChoices'],
+            'linkText': json['linkText'] == null ? undefined : json['linkText'],
+            'parentFieldId': json['parentFieldId'] == null ? undefined : json['parentFieldId'],
+            'displayTimezone': json['displayTimezone'] == null ? undefined : json['displayTimezone'],
+            'summaryTargetFieldId': json['summaryTargetFieldId'] == null ? undefined : json['summaryTargetFieldId'],
+            'allowNewChoices': json['allowNewChoices'] == null ? undefined : json['allowNewChoices'],
+            'defaultToday': json['defaultToday'] == null ? undefined : json['defaultToday'],
+            'units': json['units'] == null ? undefined : json['units'],
+            'openTargetIn': json['openTargetIn'] == null ? undefined : json['openTargetIn'],
+            'lookupTargetFieldId': json['lookupTargetFieldId'] == null ? undefined : json['lookupTargetFieldId'],
+            'summaryFunction': json['summaryFunction'] == null ? undefined : json['summaryFunction'],
+            'sourceFieldId': json['sourceFieldId'] == null ? undefined : json['sourceFieldId'],
+            'doesAverage': json['doesAverage'] == null ? undefined : json['doesAverage'],
+            'formula': json['formula'] == null ? undefined : json['formula'],
+            'decimalPlaces': json['decimalPlaces'] == null ? undefined : json['decimalPlaces'],
+            'defaultCountryCode': json['defaultCountryCode'] == null ? undefined : json['defaultCountryCode'],
+            'displayMonth': json['displayMonth'] == null ? undefined : json['displayMonth'],
+            'seeVersions': json['seeVersions'] == null ? undefined : json['seeVersions'],
+            'defaultKind': json['defaultKind'] == null ? undefined : json['defaultKind'],
+            'displayEmail': json['displayEmail'] == null ? undefined : json['displayEmail'],
+            'coverText': json['coverText'] == null ? undefined : json['coverText'],
+            'currencySymbol': json['currencySymbol'] == null ? undefined : json['currencySymbol'],
+            'summaryQuery': json['summaryQuery'] == null ? undefined : json['summaryQuery'],
+            'targetFieldId': json['targetFieldId'] == null ? undefined : json['targetFieldId'],
+            'displayUser': json['displayUser'] == null ? undefined : json['displayUser'],
+            'blankIsZero': json['blankIsZero'] == null ? undefined : json['blankIsZero'],
+            'exact': json['exact'] == null ? undefined : json['exact'],
+            'defaultDomain': json['defaultDomain'] == null ? undefined : json['defaultDomain'],
+            'defaultValue': json['defaultValue'] == null ? undefined : json['defaultValue'],
+            'abbreviate': json['abbreviate'] == null ? undefined : json['abbreviate'],
+            'numberFormat': json['numberFormat'] == null ? undefined : json['numberFormat'],
+            'targetTableName': json['targetTableName'] == null ? undefined : json['targetTableName'],
+            'appearsAs': json['appearsAs'] == null ? undefined : json['appearsAs'],
+            'width': json['width'] == null ? undefined : json['width'],
+            'currencyFormat': json['currencyFormat'] == null ? undefined : json['currencyFormat'],
+            'displayDayOfWeek': json['displayDayOfWeek'] == null ? undefined : json['displayDayOfWeek'],
+            'summaryReferenceFieldId': json['summaryReferenceFieldId'] == null ? undefined : json['summaryReferenceFieldId'],
+            'commaStart': json['commaStart'] == null ? undefined : json['commaStart'],
+            'choices': json['choices'] == null ? undefined : json['choices'],
+            'targetTableId': json['targetTableId'] == null ? undefined : json['targetTableId'],
+            'displayRelative': json['displayRelative'] == null ? undefined : json['displayRelative'],
+            'compositeFields': json['compositeFields'] == null ? undefined : json['compositeFields'],
+            'displayCheckboxAsText': json['displayCheckboxAsText'] == null ? undefined : json['displayCheckboxAsText'],
+            'versionMode': json['versionMode'] == null ? undefined : json['versionMode'],
+            'snapFieldId': json['snapFieldId'] == null ? undefined : json['snapFieldId'],
+            'hours24': json['hours24'] == null ? undefined : json['hours24'],
+            'sortAlpha': json['sortAlpha'] == null ? undefined : json['sortAlpha'],
+            'hasExtension': json['hasExtension'] == null ? undefined : json['hasExtension'],
+            'useNewWindow': json['useNewWindow'] == null ? undefined : json['useNewWindow'],
+            'displayAsLink': json['displayAsLink'] == null ? undefined : json['displayAsLink'],
+            'lookupReferenceFieldId': json['lookupReferenceFieldId'] == null ? undefined : json['lookupReferenceFieldId'],
+        };
+    }
+    function CreateFieldRequestPropertiesToJSON(json) {
+        return CreateFieldRequestPropertiesToJSONTyped(json, false);
+    }
+    function CreateFieldRequestPropertiesToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'numLines': value['numLines'],
+            'maxLength': value['maxLength'],
+            'appendOnly': value['appendOnly'],
+            'sortAsGiven': value['sortAsGiven'],
+            'allowMentions': value['allowMentions'],
+            'comments': value['comments'],
+            'doesTotal': value['doesTotal'],
+            'autoSave': value['autoSave'],
+            'defaultValueLuid': value['defaultValueLuid'],
+            'useI18NFormat': value['useI18NFormat'],
+            'maxVersions': value['maxVersions'],
+            'format': value['format'],
+            'carryChoices': value['carryChoices'],
+            'linkText': value['linkText'],
+            'parentFieldId': value['parentFieldId'],
+            'displayTimezone': value['displayTimezone'],
+            'summaryTargetFieldId': value['summaryTargetFieldId'],
+            'allowNewChoices': value['allowNewChoices'],
+            'defaultToday': value['defaultToday'],
+            'units': value['units'],
+            'openTargetIn': value['openTargetIn'],
+            'lookupTargetFieldId': value['lookupTargetFieldId'],
+            'summaryFunction': value['summaryFunction'],
+            'sourceFieldId': value['sourceFieldId'],
+            'doesAverage': value['doesAverage'],
+            'formula': value['formula'],
+            'decimalPlaces': value['decimalPlaces'],
+            'defaultCountryCode': value['defaultCountryCode'],
+            'displayMonth': value['displayMonth'],
+            'seeVersions': value['seeVersions'],
+            'defaultKind': value['defaultKind'],
+            'displayEmail': value['displayEmail'],
+            'coverText': value['coverText'],
+            'currencySymbol': value['currencySymbol'],
+            'summaryQuery': value['summaryQuery'],
+            'targetFieldId': value['targetFieldId'],
+            'displayUser': value['displayUser'],
+            'blankIsZero': value['blankIsZero'],
+            'exact': value['exact'],
+            'defaultDomain': value['defaultDomain'],
+            'defaultValue': value['defaultValue'],
+            'abbreviate': value['abbreviate'],
+            'numberFormat': value['numberFormat'],
+            'targetTableName': value['targetTableName'],
+            'appearsAs': value['appearsAs'],
+            'width': value['width'],
+            'currencyFormat': value['currencyFormat'],
+            'displayDayOfWeek': value['displayDayOfWeek'],
+            'summaryReferenceFieldId': value['summaryReferenceFieldId'],
+            'commaStart': value['commaStart'],
+            'choices': value['choices'],
+            'targetTableId': value['targetTableId'],
+            'displayRelative': value['displayRelative'],
+            'compositeFields': value['compositeFields'],
+            'displayCheckboxAsText': value['displayCheckboxAsText'],
+            'versionMode': value['versionMode'],
+            'snapFieldId': value['snapFieldId'],
+            'hours24': value['hours24'],
+            'sortAlpha': value['sortAlpha'],
+            'hasExtension': value['hasExtension'],
+            'useNewWindow': value['useNewWindow'],
+            'displayAsLink': value['displayAsLink'],
+            'lookupReferenceFieldId': value['lookupReferenceFieldId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
     const CreateFieldRequestFieldTypeEnum = {
         Text: 'text',
         TextMultipleChoice: 'text-multiple-choice',
@@ -1743,6 +1946,7 @@
             'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
             'doesDataCopy': json['doesDataCopy'] == null ? undefined : json['doesDataCopy'],
             'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : CreateFieldRequestPropertiesFromJSON(json['properties']),
         };
     }
     function CreateFieldRequestToJSON(json) {
@@ -1766,6 +1970,7 @@
             'findEnabled': value['findEnabled'],
             'doesDataCopy': value['doesDataCopy'],
             'audited': value['audited'],
+            'properties': CreateFieldRequestPropertiesToJSON(value['properties']),
         };
     }
 
@@ -6386,6 +6591,7 @@
             'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
             'doesDataCopy': json['doesDataCopy'] == null ? undefined : json['doesDataCopy'],
             'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : CreateFieldRequestPropertiesFromJSON(json['properties']),
         };
     }
     function UpdateFieldRequestToJSON(json) {
@@ -6409,6 +6615,7 @@
             'findEnabled': value['findEnabled'],
             'doesDataCopy': value['doesDataCopy'],
             'audited': value['audited'],
+            'properties': CreateFieldRequestPropertiesToJSON(value['properties']),
         };
     }
 
@@ -9493,19 +9700,153 @@
             .replace(/^(\w)/, (_, c) => c.toLowerCase());
     }
 
+    // Dependencies passed as parameters to avoid tight coupling
+    async function invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount = 0) {
+        const methodInfo = methodMap[methodName];
+        if (!methodInfo) {
+            throw new Error(`Method ${methodName} not found`);
+        }
+        const hasBody = "body" in params && params.body !== undefined;
+        const body = hasBody ? params.body : undefined;
+        const restParams = hasBody
+            ? Object.fromEntries(Object.entries(params).filter(([key]) => key !== "body"))
+            : { ...params };
+        const requestParameters = {
+            ...restParams,
+            ...(hasBody ? { generated: body } : {}),
+        };
+        let requestOptions = {
+            credentials: "omit",
+            method: methodInfo.httpMethod,
+        };
+        if (hasBody) {
+            requestOptions.body = body;
+        }
+        const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
+        if (methodName === "getTempTokenDBID" && useTempTokens) {
+            const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
+            const cachedToken = tokenCache.get(dbid);
+            if (cachedToken) {
+                return { temporaryAuthorization: cachedToken };
+            }
+        }
+        let authorizationToken = selectedToken;
+        if (useTempTokens && !authorizationToken) {
+            const dbid = extractDbid(params, `No dbid found in params for ${methodName} to fetch temp token`);
+            const cachedToken = tokenCache.get(dbid);
+            authorizationToken = cachedToken || (await fetchTempToken(dbid));
+            if (methodName === "getTempTokenDBID") {
+                return { temporaryAuthorization: authorizationToken };
+            }
+            requestOptions.headers = {
+                ...baseHeaders,
+                Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+            };
+        }
+        else if (authorizationToken) {
+            requestOptions.headers = {
+                ...baseHeaders,
+                Authorization: `QB-USER-TOKEN ${authorizationToken}`,
+            };
+        }
+        if (debug) {
+            console.log(`[${methodName}] requestParameters:`, requestParameters);
+            console.log(`[${methodName}] requestOptions:`, requestOptions);
+        }
+        try {
+            const rawResponse = await methodInfo.method(requestParameters, requestOptions);
+            let response;
+            if (debug) {
+                console.log(`[${methodName}] rawResponse:`, rawResponse);
+            }
+            if (rawResponse instanceof Response) {
+                const contentType = rawResponse.headers
+                    .get("Content-Type")
+                    ?.toLowerCase();
+                if (debug) {
+                    console.log(`[${methodName}] contentType:`, contentType);
+                }
+                if (contentType?.includes("application/octet-stream")) {
+                    response = (await rawResponse.arrayBuffer());
+                }
+                else if (contentType?.includes("application/x-yaml") ||
+                    contentType?.includes("text/yaml")) {
+                    response = (await rawResponse.text());
+                }
+                else if (contentType?.includes("application/json")) {
+                    const jsonResponse = await rawResponse.json();
+                    response = transformDates(jsonResponse, convertDates);
+                }
+                else {
+                    response = rawResponse;
+                }
+            }
+            else if (rawResponse && typeof rawResponse.value === "function") {
+                response = await rawResponse.value();
+                if (debug) {
+                    console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
+                }
+                response = transformDates(response, convertDates);
+            }
+            else {
+                response = transformDates(rawResponse, convertDates);
+                if (debug) {
+                    console.log(`[${methodName}] Transformed non-Response:`, response);
+                }
+            }
+            return response;
+        }
+        catch (error) {
+            if (error instanceof ResponseError &&
+                error.response.status === 401 &&
+                retryCount < 1 &&
+                useTempTokens) {
+                if (debug) {
+                    console.log(`Authorization error for ${methodName}, refreshing token:`, error.message);
+                }
+                const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
+                authorizationToken = await fetchTempToken(dbid);
+                requestOptions.headers = {
+                    ...baseHeaders,
+                    Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+                };
+                if (debug) {
+                    console.log(`Retrying ${methodName} with new token`);
+                }
+                return invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount + 1);
+            }
+            if (error instanceof ResponseError) {
+                let errorMessage = error.message;
+                try {
+                    const errorBody = await error.response.json();
+                    if (debug) {
+                        console.log(`Error response body for ${methodName}:`, errorBody);
+                    }
+                    errorMessage = errorBody.message || errorMessage;
+                }
+                catch (e) {
+                    // Silent fail on parse error
+                }
+                throw new Error(`API Error: ${errorMessage} (Status: ${error.response.status})`);
+            }
+            throw error;
+        }
+    }
+    // Utility function moved here to keep invokeMethod self-contained
+    function extractDbid(params, errorMessage) {
+        const dbid = params.dbid || params.tableId || params.appId;
+        if (!dbid) {
+            throw new Error(errorMessage);
+        }
+        return dbid;
+    }
+
     const getParamNames = (fn) => fn
         .toString()
         .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
         .split(",")
         .map((p) => p.trim().split("=")[0]?.trim())
         .filter((p) => p && !p.match(/^\{/) && p !== "options");
-    const extractDbid = (params, errorMessage) => {
-        const dbid = params.dbid || params.tableId || params.appId;
-        if (!dbid) {
-            throw new Error(errorMessage);
-        }
-        return dbid;
-    };
     function transformDates(obj, convertStringsToDates = true) {
         if (obj === null || obj === undefined)
             return obj;
@@ -9530,16 +9871,14 @@
     function inferHttpMethod(methodSource, debug) {
         const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
         const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
-        if (debug) {
-            console.log(`[inferHttpMethod] Source:`, methodSource);
-            console.log(`[inferHttpMethod] Extracted method:`, method);
-        }
         return method;
     }
     function quickbase(config) {
-        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, } = config;
+        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, tokenLifespan, // Added: Extracted from config
+         } = config;
         const baseUrl = `https://api.quickbase.com/v1`;
-        const tokenCache = new TokenCache();
+        // Use tokenLifespan if provided, otherwise let TokenCache use its default (4:50)
+        const tokenCache = new TokenCache(tokenLifespan);
         const baseHeaders = {
             "QB-Realm-Hostname": `${realm}.quickbase.com`,
             "Content-Type": "application/json",
@@ -9589,7 +9928,7 @@
                             api,
                             method: boundMethod,
                             paramMap: getParamNames(method),
-                            httpMethod: inferHttpMethod(methodSource, debug),
+                            httpMethod: inferHttpMethod(methodSource),
                         };
                     }
                 });
@@ -9621,152 +9960,15 @@
             }
             return token;
         };
-        async function invokeMethod(methodName, params, retryCount = 0) {
-            const methodInfo = methodMap[methodName];
-            if (!methodInfo) {
-                throw new Error(`Method ${methodName} not found`);
-            }
-            const hasBody = "body" in params && params.body !== undefined;
-            const body = hasBody ? params.body : undefined;
-            const restParams = hasBody
-                ? Object.fromEntries(Object.entries(params).filter(([key]) => key !== "body"))
-                : { ...params };
-            const requestParameters = {
-                ...restParams,
-                ...(hasBody ? { generated: body } : {}),
-            };
-            let requestOptions = {
-                credentials: "omit",
-                method: methodInfo.httpMethod,
-            };
-            // Pass the raw body object instead of stringifying it
-            if (hasBody) {
-                requestOptions.body = body;
-            }
-            const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
-            if (methodName === "getTempTokenDBID" && useTempTokens) {
-                const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
-                const cachedToken = tokenCache.get(dbid);
-                if (cachedToken) {
-                    return { temporaryAuthorization: cachedToken };
-                }
-            }
-            let authorizationToken = selectedToken;
-            if (useTempTokens && !authorizationToken) {
-                const dbid = extractDbid(params, `No dbid found in params for ${methodName} to fetch temp token`);
-                const cachedToken = tokenCache.get(dbid);
-                authorizationToken = cachedToken || (await fetchTempToken(dbid));
-                if (methodName === "getTempTokenDBID") {
-                    return { temporaryAuthorization: authorizationToken };
-                }
-                requestOptions.headers = {
-                    ...baseHeaders,
-                    Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-                };
-            }
-            else if (authorizationToken) {
-                requestOptions.headers = {
-                    ...baseHeaders,
-                    Authorization: `QB-USER-TOKEN ${authorizationToken}`,
-                };
-            }
-            if (debug) {
-                console.log(`[${methodName}] requestParameters:`, requestParameters);
-                console.log(`[${methodName}] requestOptions:`, requestOptions);
-            }
-            try {
-                const rawResponse = await methodInfo.method(requestParameters, requestOptions);
-                let response;
-                if (debug) {
-                    console.log(`[${methodName}] rawResponse:`, rawResponse);
-                }
-                if (rawResponse instanceof Response) {
-                    const contentType = rawResponse.headers
-                        .get("Content-Type")
-                        ?.toLowerCase();
-                    if (debug) {
-                        console.log(`[${methodName}] contentType:`, contentType);
-                    }
-                    if (contentType?.includes("application/octet-stream")) {
-                        response = (await rawResponse.arrayBuffer());
-                    }
-                    else if (contentType?.includes("application/x-yaml") ||
-                        contentType?.includes("text/yaml")) {
-                        response = (await rawResponse.text());
-                    }
-                    else if (contentType?.includes("application/json")) {
-                        const jsonResponse = await rawResponse.json();
-                        response = transformDates(jsonResponse, convertDates);
-                    }
-                    else {
-                        response = rawResponse;
-                    }
-                }
-                else if (rawResponse && typeof rawResponse.value === "function") {
-                    // Handle JSONApiResponse
-                    response = await rawResponse.value();
-                    if (debug) {
-                        console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
-                    }
-                    response = transformDates(response, convertDates);
-                }
-                else {
-                    response = transformDates(rawResponse, convertDates);
-                    if (debug) {
-                        console.log(`[${methodName}] Transformed non-Response:`, response);
-                    }
-                }
-                return response;
-            }
-            catch (error) {
-                if (error instanceof ResponseError &&
-                    error.response.status === 401 &&
-                    retryCount < 1 &&
-                    useTempTokens) {
-                    if (debug) {
-                        console.log(`Authorization error for ${methodName}, refreshing token:`, error.message);
-                    }
-                    const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
-                    authorizationToken = await fetchTempToken(dbid);
-                    requestOptions.headers = {
-                        ...baseHeaders,
-                        Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-                    };
-                    if (debug) {
-                        console.log(`Retrying ${methodName} with new token`);
-                    }
-                    return invokeMethod(methodName, params, retryCount + 1);
-                }
-                if (error instanceof ResponseError) {
-                    let errorMessage = error.message;
-                    try {
-                        const errorBody = await error.response.json();
-                        if (debug) {
-                            console.log(`Error response body for ${methodName}:`, errorBody);
-                        }
-                        errorMessage = errorBody.message || errorMessage;
-                    }
-                    catch (e) {
-                        // Silent fail on parse error
-                    }
-                    throw new Error(`API Error: ${errorMessage} (Status: ${error.response.status})`);
-                }
-                throw error;
-            }
-        }
         const proxy = new Proxy({}, {
             get: (_, prop) => {
                 if (prop in methodMap) {
                     const methodName = prop;
-                    return (params) => invokeMethod(methodName, params);
+                    return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates);
                 }
                 return undefined;
             },
         });
-        if (debug) {
-            console.log("[createClient] Config:", config);
-            console.log("[createClient] Returning:", proxy);
-        }
         return proxy;
     }
 
@@ -9889,6 +10091,14 @@
     exports.CreateFieldRequestFieldTypeEnum = CreateFieldRequestFieldTypeEnum;
     exports.CreateFieldRequestFromJSON = CreateFieldRequestFromJSON;
     exports.CreateFieldRequestFromJSONTyped = CreateFieldRequestFromJSONTyped;
+    exports.CreateFieldRequestPropertiesCurrencyFormatEnum = CreateFieldRequestPropertiesCurrencyFormatEnum;
+    exports.CreateFieldRequestPropertiesFromJSON = CreateFieldRequestPropertiesFromJSON;
+    exports.CreateFieldRequestPropertiesFromJSONTyped = CreateFieldRequestPropertiesFromJSONTyped;
+    exports.CreateFieldRequestPropertiesOpenTargetInEnum = CreateFieldRequestPropertiesOpenTargetInEnum;
+    exports.CreateFieldRequestPropertiesSummaryFunctionEnum = CreateFieldRequestPropertiesSummaryFunctionEnum;
+    exports.CreateFieldRequestPropertiesToJSON = CreateFieldRequestPropertiesToJSON;
+    exports.CreateFieldRequestPropertiesToJSONTyped = CreateFieldRequestPropertiesToJSONTyped;
+    exports.CreateFieldRequestPropertiesVersionModeEnum = CreateFieldRequestPropertiesVersionModeEnum;
     exports.CreateFieldRequestToJSON = CreateFieldRequestToJSON;
     exports.CreateFieldRequestToJSONTyped = CreateFieldRequestToJSONTyped;
     exports.CreateRelationship200ResponseFromJSON = CreateRelationship200ResponseFromJSON;
@@ -10397,6 +10607,7 @@
     exports.instanceOfCreateAppRequest = instanceOfCreateAppRequest;
     exports.instanceOfCreateField200Response = instanceOfCreateField200Response;
     exports.instanceOfCreateFieldRequest = instanceOfCreateFieldRequest;
+    exports.instanceOfCreateFieldRequestProperties = instanceOfCreateFieldRequestProperties;
     exports.instanceOfCreateRelationship200Response = instanceOfCreateRelationship200Response;
     exports.instanceOfCreateRelationshipRequest = instanceOfCreateRelationshipRequest;
     exports.instanceOfCreateSolution200Response = instanceOfCreateSolution200Response;

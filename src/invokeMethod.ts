@@ -1,3 +1,4 @@
+import { QuickbaseClient } from "./quickbaseClient"; // Import the real interface
 import { ResponseError } from "./generated/runtime";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -16,10 +17,6 @@ export interface TempTokenParams {
   appId?: string;
   tableId?: string;
   dbid?: string;
-}
-
-export interface QuickbaseClient {
-  // Placeholder interface; actual methods come from IQuickbaseClient
 }
 
 // Dependencies passed as parameters to avoid tight coupling
