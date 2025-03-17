@@ -16,7 +16,7 @@ export interface QuickbaseConfig {
   useTempTokens?: boolean;
   debug?: boolean;
   fetchApi?: typeof fetch;
-  convertDates?: boolean; // New flag to control date string conversion, defaults to true
+  convertDates?: boolean;
 }
 
 export interface TempTokenParams {
@@ -34,6 +34,7 @@ interface MethodInfo<K extends keyof QuickbaseClient> {
   api: any;
   method: ApiMethod<K>;
   paramMap: string[];
+  httpMethod: string;
 }
 
 type MethodMap = {
@@ -59,7 +60,6 @@ const extractDbid = (
   return dbid;
 };
 
-// Utility to convert ISO date strings to Date objects recursively, with optional conversion
 function transformDates(obj: any, convertStringsToDates: boolean = true): any {
   if (obj === null || obj === undefined) return obj;
   if (obj instanceof Date) return obj;
@@ -86,6 +86,16 @@ function transformDates(obj: any, convertStringsToDates: boolean = true): any {
   return obj;
 }
 
+function inferHttpMethod(methodSource: string, debug?: boolean): string {
+  const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
+  const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
+  if (debug) {
+    console.log(`[inferHttpMethod] Source:`, methodSource);
+    console.log(`[inferHttpMethod] Extracted method:`, method);
+  }
+  return method;
+}
+
 export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
@@ -94,7 +104,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     useTempTokens,
     fetchApi,
     debug,
-    convertDates = true, // Default to true for backward compatibility
+    convertDates = true,
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
@@ -157,13 +167,17 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           const simplifiedName = simplifyName(
             rawMethodName
           ) as keyof QuickbaseClient;
-          const method = api[rawMethodName as keyof typeof api];
+          const rawMethodKey = `${rawMethodName}Raw` as keyof typeof api;
+          const method =
+            api[rawMethodKey] || api[rawMethodName as keyof typeof api];
           const boundMethod = method.bind(api as any) as unknown;
           if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+            const methodSource = method.toString();
             methodMap[simplifiedName] = {
               api,
               method: boundMethod as ApiMethod<typeof simplifiedName>,
               paramMap: getParamNames(method),
+              httpMethod: inferHttpMethod(methodSource, debug),
             };
           }
         });
@@ -219,7 +233,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       throw new Error(`Method ${methodName} not found`);
     }
 
-    // Safely handle body extraction
     const hasBody = "body" in params && params.body !== undefined;
     const body = hasBody ? (params as any).body : undefined;
     const restParams: any = hasBody
@@ -228,15 +241,20 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         )
       : { ...params };
 
-    // Construct requestParameters with 'generated' for body
     const requestParameters: any = {
       ...restParams,
-      ...(body ? { generated: { ...body } } : {}),
+      ...(hasBody ? { generated: body } : {}),
     };
 
     let requestOptions: RequestInit = {
       credentials: "omit",
+      method: methodInfo.httpMethod,
     };
+
+    // Pass the raw body object instead of stringifying it
+    if (hasBody) {
+      requestOptions.body = body;
+    }
 
     const selectedToken =
       initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
@@ -281,61 +299,61 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
 
     try {
-      const response = await methodInfo.method(
+      const rawResponse: any = await methodInfo.method(
         requestParameters,
         requestOptions
       );
+      let response: Awaited<ReturnType<QuickbaseClient[K]>>;
+
       if (debug) {
-        console.log(`[${methodName}] rawResponse:`, response);
+        console.log(`[${methodName}] rawResponse:`, rawResponse);
       }
-      if (response instanceof Response) {
-        const contentType = response.headers.get("Content-Type")?.toLowerCase();
+
+      if (rawResponse instanceof Response) {
+        const contentType = rawResponse.headers
+          .get("Content-Type")
+          ?.toLowerCase();
         if (debug) {
           console.log(`[${methodName}] contentType:`, contentType);
         }
         if (contentType?.includes("application/octet-stream")) {
-          return (await response.arrayBuffer()) as ReturnType<
-            QuickbaseClient[K]
+          response = (await rawResponse.arrayBuffer()) as Awaited<
+            ReturnType<QuickbaseClient[K]>
           >;
         } else if (
           contentType?.includes("application/x-yaml") ||
           contentType?.includes("text/yaml")
         ) {
-          return (await response.text()) as ReturnType<QuickbaseClient[K]>;
+          response = (await rawResponse.text()) as Awaited<
+            ReturnType<QuickbaseClient[K]>
+          >;
         } else if (contentType?.includes("application/json")) {
-          const jsonResponse = await response.json();
-          if (debug) {
-            console.log(`[${methodName}] jsonResponse:`, jsonResponse);
-          }
-          const transformedResponse = transformDates(
-            jsonResponse,
-            convertDates
-          );
-          if (debug) {
-            console.log(
-              `[${methodName}] transformedResponse:`,
-              transformedResponse
-            );
-          }
-          return transformedResponse as ReturnType<QuickbaseClient[K]>;
+          const jsonResponse = await rawResponse.json();
+          response = transformDates(jsonResponse, convertDates) as Awaited<
+            ReturnType<QuickbaseClient[K]>
+          >;
+        } else {
+          response = rawResponse as Awaited<ReturnType<QuickbaseClient[K]>>;
         }
-        return response as ReturnType<QuickbaseClient[K]>;
+      } else if (rawResponse && typeof rawResponse.value === "function") {
+        // Handle JSONApiResponse
+        response = await rawResponse.value();
+        if (debug) {
+          console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
+        }
+        response = transformDates(response, convertDates) as Awaited<
+          ReturnType<QuickbaseClient[K]>
+        >;
       } else {
+        response = transformDates(rawResponse, convertDates) as Awaited<
+          ReturnType<QuickbaseClient[K]>
+        >;
         if (debug) {
-          console.log(
-            `[${methodName}] non-Response return, applying transform:`,
-            response
-          );
+          console.log(`[${methodName}] Transformed non-Response:`, response);
         }
-        const transformedResponse = transformDates(response, convertDates);
-        if (debug) {
-          console.log(
-            `[${methodName}] transformedNonResponse:`,
-            transformedResponse
-          );
-        }
-        return transformedResponse as ReturnType<QuickbaseClient[K]>;
       }
+
+      return response;
     } catch (error) {
       if (
         error instanceof ResponseError &&

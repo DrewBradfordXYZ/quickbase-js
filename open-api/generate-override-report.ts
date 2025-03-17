@@ -3,10 +3,10 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import fastJsonPatch from "fast-json-patch"; // Default import
+import fastJsonPatch, { AddOperation } from "fast-json-patch";
 import { Spec } from "./types/spec";
 
-const { compare } = fastJsonPatch; // Destructure from default
+const { compare, applyPatch } = fastJsonPatch;
 
 // Basic CSS for readability
 const HTML_STYLE = `
@@ -17,33 +17,64 @@ const HTML_STYLE = `
     .jsondiffpatch-modified { background-color: #fff3e6; }
     .jsondiffpatch-unchanged { color: #666; }
     .jsondiffpatch-key { font-weight: bold; }
+    .jsondiffpatch-tags { color: purple; font-style: italic; }
   </style>
 `;
 
-// Simple HTML formatter for JSON Patch
-function formatPatchToHtml(patch: any[]): string {
+// Helper to decode JSON Pointer paths
+function decodeJsonPointer(jsonPointerSegment: string): string {
+  // Split the full path and decode each segment
+  const segments = jsonPointerSegment.split("/").filter(Boolean);
+  const decodedSegments = segments.map((seg) =>
+    seg.replace("~1", "/").replace("~0", "~")
+  );
+  // Remove "paths" prefix and join with a single leading slash
+  const pathIndex = decodedSegments.indexOf("paths");
+  const relevantSegments =
+    pathIndex !== -1 && pathIndex + 1 < decodedSegments.length
+      ? decodedSegments.slice(pathIndex + 1)
+      : decodedSegments;
+  return "/" + relevantSegments.join("/"); // Ensure single leading slash
+}
+
+// Enhanced HTML formatter with clean paths, tags, and old vs. new values
+function formatPatchToHtml(patch: any[], spec: Spec): string {
   let html = `<html><head><title>Override Report Diff</title>${HTML_STYLE}</head><body><h1>Override Report Diff</h1>`;
   patch.forEach((op) => {
+    const pathParts = op.path.split("/").filter(Boolean);
+    const lastPart = pathParts[pathParts.length - 1];
+    let oldValue = "N/A";
+    let context = decodeJsonPointer(op.path);
+    let method = op.method ? op.method.toUpperCase() : "";
+
+    if (method) context = context.replace(`/${method}`, "") + ` [${method}]`;
+
+    if (op.op === "replace" || op.op === "remove") {
+      const reversePatch: AddOperation<any>[] = [
+        { op: "add", path: op.path, value: op.value },
+      ];
+      const tempSpec = JSON.parse(JSON.stringify(spec));
+      applyPatch(tempSpec, reversePatch);
+      const pathSegments = op.path.split("/").slice(1);
+      oldValue =
+        pathSegments.reduce((obj: any, key: string) => obj?.[key], tempSpec) ||
+        "N/A";
+      oldValue = JSON.stringify(oldValue);
+    }
+
+    const tagDisplay =
+      op.tags && op.tags.length > 0 ? ` (Tags: ${op.tags.join(", ")})` : "";
+
     if (op.op === "replace") {
-      html += `<h2>Path: ${
-        op.path
-      }</h2><p>Modified: <span class="jsondiffpatch-deleted">${JSON.stringify(
-        op.value
-      )}</span> → <span class="jsondiffpatch-added">${JSON.stringify(
+      html += `<h2>Path: ${context}${tagDisplay}</h2><p>Modified: <span class="jsondiffpatch-deleted">${oldValue}</span> → <span class="jsondiffpatch-added">${JSON.stringify(
         op.value
       )}</span></p>`;
     } else if (op.op === "add") {
-      html += `<h2>Path: ${
-        op.path
-      }</h2><p>Added: <span class="jsondiffpatch-added">${JSON.stringify(
+      html += `<h2>Path: ${context}${tagDisplay}</h2><p>Added: <span class="jsondiffpatch-added">${JSON.stringify(
         op.value
       )}</span></p>`;
     } else if (op.op === "remove") {
-      html += `<h2>Path: ${
-        op.path
-      }</h2><p>Removed: <span class="jsondiffpatch-deleted">${JSON.stringify(
-        op.value
-      )}</span></p>`;
+      html += `<h2>Path: ${context}${tagDisplay}</h2><p>Removed: <span class="jsondiffpatch-deleted">${oldValue}</span></p>`;
     }
   });
   html += "</body></html>";
@@ -52,16 +83,22 @@ function formatPatchToHtml(patch: any[]): string {
 
 async function generateOverrideReport(): Promise<void> {
   try {
-    const CODEGEN_DIR = path.dirname(fileURLToPath(import.meta.url));
-    const SPECS_DIR = path.join(CODEGEN_DIR, "..", "specs");
-    const OUTPUT_DIR = path.join(CODEGEN_DIR, "output");
-    const RAW_SPEC = path.join(
+    const CODEGEN_DIR: string = path.dirname(fileURLToPath(import.meta.url));
+    const SPECS_DIR: string = path.join(CODEGEN_DIR, "..", "specs");
+    const OUTPUT_DIR: string = path.join(CODEGEN_DIR, "output");
+    const RAW_SPEC: string = path.join(
       SPECS_DIR,
       "QuickBase_RESTful_API_2025-03-04T06_22_39.725Z.json"
     );
-    const FIXED_SPEC = path.join(OUTPUT_DIR, "quickbase-fixed.json");
-    const JSON_OUTPUT_FILE = path.join(OUTPUT_DIR, "override-report.json");
-    const HTML_OUTPUT_FILE = path.join(OUTPUT_DIR, "override-report.html");
+    const FIXED_SPEC: string = path.join(OUTPUT_DIR, "quickbase-fixed.json");
+    const JSON_OUTPUT_FILE: string = path.join(
+      OUTPUT_DIR,
+      "override-report.json"
+    );
+    const HTML_OUTPUT_FILE: string = path.join(
+      OUTPUT_DIR,
+      "override-report.html"
+    );
 
     console.log("Cleaning up old override report...");
     if (
@@ -117,16 +154,50 @@ async function generateOverrideReport(): Promise<void> {
     console.log("Generating patch...");
     const patch = compare(rawSpec, fixedSpec);
 
+    // Enhance patch with decoded paths and tags inferred from parent operation
+    const enhancedPatch = patch.map((op) => {
+      let decodedPath = decodeJsonPointer(op.path);
+      let tags: string[] = [];
+      let method: string = "";
+
+      if (op.path.startsWith("/paths")) {
+        const pathParts = op.path.split("/").filter(Boolean);
+        if (
+          pathParts.length >= 3 &&
+          ["get", "post", "put", "delete"].includes(pathParts[2].toLowerCase())
+        ) {
+          const fullPathSegment = "/paths/" + pathParts[1];
+          const basePath = decodeJsonPointer(fullPathSegment);
+          method = pathParts[2];
+          console.log(`Debug: basePath=${basePath}, method=${method}`); // Debug log
+          if (rawSpec.paths[basePath]?.[method]?.tags) {
+            tags = rawSpec.paths[basePath][method].tags || [];
+          } else if (rawSpec.paths[basePath]?.[method]) {
+            console.log(`No tags found for ${basePath} [${method}]`);
+          } else {
+            console.log(`Operation not found: ${basePath} [${method}]`);
+          }
+        }
+      }
+
+      return {
+        ...op,
+        decodedPath,
+        tags: tags.length > 0 ? tags : undefined,
+        method,
+      };
+    });
+
     console.log("Writing JSON override report...");
     await fs.mkdir(OUTPUT_DIR, { recursive: true });
     await fs.writeFile(
       JSON_OUTPUT_FILE,
-      JSON.stringify(patch, null, 2),
+      JSON.stringify(enhancedPatch, null, 2),
       "utf8"
     );
 
     console.log("Writing HTML override report...");
-    const htmlContent = formatPatchToHtml(patch);
+    const htmlContent = formatPatchToHtml(enhancedPatch, rawSpec);
     await fs.writeFile(HTML_OUTPUT_FILE, htmlContent, "utf8");
 
     console.log("Override report generated successfully!");

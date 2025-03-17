@@ -9506,7 +9506,6 @@
         }
         return dbid;
     };
-    // Utility to convert ISO date strings to Date objects recursively, with optional conversion
     function transformDates(obj, convertStringsToDates = true) {
         if (obj === null || obj === undefined)
             return obj;
@@ -9528,9 +9527,17 @@
         }
         return obj;
     }
+    function inferHttpMethod(methodSource, debug) {
+        const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
+        const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
+        if (debug) {
+            console.log(`[inferHttpMethod] Source:`, methodSource);
+            console.log(`[inferHttpMethod] Extracted method:`, method);
+        }
+        return method;
+    }
     function quickbase(config) {
-        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, // Default to true for backward compatibility
-         } = config;
+        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, } = config;
         const baseUrl = `https://api.quickbase.com/v1`;
         const tokenCache = new TokenCache();
         const baseHeaders = {
@@ -9573,13 +9580,16 @@
                     typeof api[name] === "function")
                     .forEach((rawMethodName) => {
                     const simplifiedName = simplifyName(rawMethodName);
-                    const method = api[rawMethodName];
+                    const rawMethodKey = `${rawMethodName}Raw`;
+                    const method = api[rawMethodKey] || api[rawMethodName];
                     const boundMethod = method.bind(api);
                     if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+                        const methodSource = method.toString();
                         methodMap[simplifiedName] = {
                             api,
                             method: boundMethod,
                             paramMap: getParamNames(method),
+                            httpMethod: inferHttpMethod(methodSource, debug),
                         };
                     }
                 });
@@ -9616,20 +9626,23 @@
             if (!methodInfo) {
                 throw new Error(`Method ${methodName} not found`);
             }
-            // Safely handle body extraction
             const hasBody = "body" in params && params.body !== undefined;
             const body = hasBody ? params.body : undefined;
             const restParams = hasBody
                 ? Object.fromEntries(Object.entries(params).filter(([key]) => key !== "body"))
                 : { ...params };
-            // Construct requestParameters with 'generated' for body
             const requestParameters = {
                 ...restParams,
-                ...(body ? { generated: { ...body } } : {}),
+                ...(hasBody ? { generated: body } : {}),
             };
             let requestOptions = {
                 credentials: "omit",
+                method: methodInfo.httpMethod,
             };
+            // Pass the raw body object instead of stringifying it
+            if (hasBody) {
+                requestOptions.body = body;
+            }
             const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
             if (methodName === "getTempTokenDBID" && useTempTokens) {
                 const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
@@ -9662,45 +9675,48 @@
                 console.log(`[${methodName}] requestOptions:`, requestOptions);
             }
             try {
-                const response = await methodInfo.method(requestParameters, requestOptions);
+                const rawResponse = await methodInfo.method(requestParameters, requestOptions);
+                let response;
                 if (debug) {
-                    console.log(`[${methodName}] rawResponse:`, response);
+                    console.log(`[${methodName}] rawResponse:`, rawResponse);
                 }
-                if (response instanceof Response) {
-                    const contentType = response.headers.get("Content-Type")?.toLowerCase();
+                if (rawResponse instanceof Response) {
+                    const contentType = rawResponse.headers
+                        .get("Content-Type")
+                        ?.toLowerCase();
                     if (debug) {
                         console.log(`[${methodName}] contentType:`, contentType);
                     }
                     if (contentType?.includes("application/octet-stream")) {
-                        return (await response.arrayBuffer());
+                        response = (await rawResponse.arrayBuffer());
                     }
                     else if (contentType?.includes("application/x-yaml") ||
                         contentType?.includes("text/yaml")) {
-                        return (await response.text());
+                        response = (await rawResponse.text());
                     }
                     else if (contentType?.includes("application/json")) {
-                        const jsonResponse = await response.json();
-                        if (debug) {
-                            console.log(`[${methodName}] jsonResponse:`, jsonResponse);
-                        }
-                        const transformedResponse = transformDates(jsonResponse, convertDates);
-                        if (debug) {
-                            console.log(`[${methodName}] transformedResponse:`, transformedResponse);
-                        }
-                        return transformedResponse;
+                        const jsonResponse = await rawResponse.json();
+                        response = transformDates(jsonResponse, convertDates);
                     }
-                    return response;
+                    else {
+                        response = rawResponse;
+                    }
+                }
+                else if (rawResponse && typeof rawResponse.value === "function") {
+                    // Handle JSONApiResponse
+                    response = await rawResponse.value();
+                    if (debug) {
+                        console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
+                    }
+                    response = transformDates(response, convertDates);
                 }
                 else {
+                    response = transformDates(rawResponse, convertDates);
                     if (debug) {
-                        console.log(`[${methodName}] non-Response return, applying transform:`, response);
+                        console.log(`[${methodName}] Transformed non-Response:`, response);
                     }
-                    const transformedResponse = transformDates(response, convertDates);
-                    if (debug) {
-                        console.log(`[${methodName}] transformedNonResponse:`, transformedResponse);
-                    }
-                    return transformedResponse;
                 }
+                return response;
             }
             catch (error) {
                 if (error instanceof ResponseError &&
