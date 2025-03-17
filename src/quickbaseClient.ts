@@ -67,8 +67,8 @@ function inferHttpMethod(methodSource: string, debug?: boolean): string {
   const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
   const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
   if (debug) {
-    console.log(`[inferHttpMethod] Source:`, methodSource);
-    console.log(`[inferHttpMethod] Extracted method:`, method);
+    // console.log(`[inferHttpMethod] Source:`, methodSource);
+    // console.log(`[inferHttpMethod] Extracted method:`, method);
   }
   return method;
 }
@@ -227,8 +227,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   });
 
   if (debug) {
-    console.log("[createClient] Config:", config);
-    console.log("[createClient] Returning:", proxy);
+    // console.log("[createClient] Config:", config);
+    // console.log("[createClient] Returning:", proxy);
   }
 
   return proxy;
