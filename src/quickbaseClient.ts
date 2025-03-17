@@ -1,3 +1,4 @@
+// src/quickbaseClient.ts
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -9,6 +10,7 @@ import {
   MethodInfo,
   TempTokenParams,
 } from "./invokeMethod";
+import { TokenBucket } from "./TokenBucket";
 
 export * from "./generated/models/index";
 
@@ -22,7 +24,10 @@ export interface QuickbaseConfig {
   debug?: boolean;
   fetchApi?: typeof fetch;
   convertDates?: boolean;
-  tokenLifespan?: number; // Added: Token lifespan in milliseconds
+  tokenLifespan?: number;
+  throttle?: { rate: number; burst: number };
+  maxRetries?: number; // New: Max retries for 429 errors
+  retryDelay?: number; // New: Base delay in ms for retries
 }
 
 type MethodMap = {
@@ -82,12 +87,17 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     fetchApi,
     debug,
     convertDates = true,
-    tokenLifespan, // Added: Extracted from config
+    tokenLifespan,
+    throttle = { rate: 10, burst: 10 },
+    maxRetries = 3, // Default: Retry up to 3 times on 429
+    retryDelay = 1000, // Default: 1s base delay for retries
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
-  // Use tokenLifespan if provided, otherwise let TokenCache use its default (4:50)
   const tokenCache = new TokenCache(tokenLifespan);
+  const throttleBucket = throttle
+    ? new TokenBucket(throttle.rate, throttle.burst)
+    : null;
 
   const baseHeaders: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
@@ -219,7 +229,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             userToken,
             useTempTokens,
             debug,
-            convertDates
+            convertDates,
+            0, // retryCount
+            throttleBucket,
+            maxRetries,
+            retryDelay
           );
       }
       return undefined;

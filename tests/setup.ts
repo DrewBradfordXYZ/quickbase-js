@@ -38,12 +38,14 @@ export const createClient = (
     userToken,
     debug: true,
     fetchApi,
+    throttle: { rate: 10, burst: 10 }, // Throttle at 10 req/s with 10 burst capacity
     ...config, // Allow overrides if provided
   });
   console.log("[createClient] Config:", {
     realm,
     userToken,
     debug: true,
+    throttle: { rate: 10, burst: 10 },
     ...config,
   });
   console.log("[createClient] Returning:", client);

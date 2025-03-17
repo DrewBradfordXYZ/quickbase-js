@@ -32,21 +32,24 @@ const includeRecursiveFolders: string[] = [
 
 // prettier-ignore
 const includeFiles: string[] = [
-  "tests/setup.ts"
+  "tests/setup.ts",
 
   // "package.json",
   // "tsconfig.json",
   // "tsconfig.build.json",
   // "rollup.config.js",
   // "vitest.config.ts",
-  "build-common.js",
-  "build-umd.js",
-  "build-esm.js",
+  // "build-common.js",
+  // "build-umd.js",
+  // "build-esm.js",
   // "src/tokenCache.ts",
   // "src/generated/runtime.ts",
   "src/quickbaseClient.ts",
   "src/invokeMethod.ts",
   "src/generated-unified/QuickbaseClient.ts",
+
+  "src/RateLimitError.ts",
+  "src/TokenBucket.ts"
 ];
 
 const projectGoals: string[] = [
