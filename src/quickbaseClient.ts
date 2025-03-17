@@ -4,12 +4,7 @@ import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
 import { simplifyName } from "./utils";
-import {
-  invokeMethod,
-  ApiMethod,
-  MethodInfo,
-  TempTokenParams,
-} from "./invokeMethod";
+import { invokeMethod, MethodInfo } from "./invokeMethod"; // Added import
 import { TokenBucket } from "./TokenBucket";
 
 export * from "./generated/models/index";
@@ -26,8 +21,8 @@ export interface QuickbaseConfig {
   convertDates?: boolean;
   tokenLifespan?: number;
   throttle?: { rate: number; burst: number };
-  maxRetries?: number; // New: Max retries for 429 errors
-  retryDelay?: number; // New: Base delay in ms for retries
+  maxRetries?: number;
+  retryDelay?: number;
 }
 
 type MethodMap = {
@@ -89,8 +84,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     convertDates = true,
     tokenLifespan,
     throttle = { rate: 10, burst: 10 },
-    maxRetries = 3, // Default: Retry up to 3 times on 429
-    retryDelay = 1000, // Default: 1s base delay for retries
+    maxRetries = 3,
+    retryDelay = 1000,
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
@@ -164,7 +159,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             const methodSource = method.toString();
             methodMap[simplifiedName] = {
               api,
-              method: boundMethod as ApiMethod<typeof simplifiedName>,
+              method: boundMethod as any, // Adjust typing as needed
               paramMap: getParamNames(method),
               httpMethod: inferHttpMethod(methodSource, debug),
             };
@@ -241,8 +236,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   });
 
   if (debug) {
-    // console.log("[createClient] Config:", config);
-    // console.log("[createClient] Returning:", proxy);
+    console.log("[createClient] Config:", config);
+    console.log("[createClient] Returning:", proxy);
   }
 
   return proxy;
