@@ -348,10 +348,14 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
 }
 
 function extractDbid(
-  params: Partial<TempTokenParams>,
+  params: Partial<TempTokenParams> & { body?: any },
   errorMessage: string
 ): string {
-  const dbid = params.dbid || params.tableId || params.appId;
+  const dbid =
+    params.dbid ||
+    params.tableId ||
+    params.appId ||
+    (params.body && "from" in params.body ? params.body.from : undefined);
   if (!dbid) throw new Error(errorMessage);
   return dbid;
 }
