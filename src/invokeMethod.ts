@@ -1,7 +1,7 @@
 // src/invokeMethod.ts
 import { QuickbaseClient } from "./quickbaseClient";
 import { ResponseError } from "./generated/runtime";
-import { ThrottleBucket } from "./ThrottleBucket"; // Updated import
+import { ThrottleBucket } from "./ThrottleBucket";
 import { RateLimitError } from "./RateLimitError";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -41,7 +41,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   debug: boolean | undefined,
   convertDates: boolean,
   retryCount: number = 0,
-  throttleBucket: ThrottleBucket | null = null, // Updated type
+  throttleBucket: ThrottleBucket | null = null,
   maxRetries: number = 3,
   retryDelay: number = 1000
 ): Promise<ReturnType<QuickbaseClient[K]>> {
@@ -153,7 +153,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     return transformed as ReturnType<QuickbaseClient[K]>;
   }
 
-  // Consolidated retry logic
   async function withRetries<T>(
     fn: () => Promise<T>,
     options: {
@@ -173,54 +172,68 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         }
         return await fn();
       } catch (error) {
+        console.log(`[${methodName}] Caught error:`, error);
+        console.log(
+          `[${methodName}] instanceof ResponseError:`,
+          error instanceof ResponseError
+        );
+        console.log(`[${methodName}] Response status:`, error.response?.status);
+        const effectiveError =
+          error.cause && error.cause instanceof ResponseError
+            ? error.cause
+            : error;
+        console.log(`[${methodName}] Effective error:`, effectiveError);
+        console.log(
+          `[${methodName}] Effective instanceof ResponseError:`,
+          effectiveError instanceof ResponseError
+        );
+        console.log(
+          `[${methodName}] Effective response status:`,
+          effectiveError.response?.status
+        );
+
         attempt++;
-        if (!options.shouldRetry(error) || attempt >= options.maxAttempts) {
+        if (
+          !options.shouldRetry(effectiveError) ||
+          attempt >= options.maxAttempts
+        ) {
           let errorMessage =
-            error instanceof ResponseError ? error.message : String(error);
-          if (error instanceof ResponseError && error.response) {
+            effectiveError instanceof ResponseError
+              ? effectiveError.message
+              : String(error);
+          console.log(`[${methodName}] No retry, throwing:`, errorMessage);
+          if (
+            effectiveError instanceof ResponseError &&
+            effectiveError.response
+          ) {
             try {
-              const errorBody = await error.response.json();
+              const errorBody = await effectiveError.response.json();
               if (debug)
-                console.log(
-                  `Error response body for ${methodName}:`,
-                  errorBody
-                );
+                console.log(`[${methodName}] Error response body:`, errorBody);
               errorMessage = errorBody?.message || errorMessage;
             } catch (e) {
               if (debug)
-                console.log(`Failed to parse error body for ${methodName}:`, e);
+                console.log(`[${methodName}] Failed to parse error body:`, e);
             }
-            if (error.response.status === 429) {
-              throw new RateLimitError(
-                `API Error: ${errorMessage} (Status: 429)`,
-                429,
-                undefined
-              );
-            }
+            throw new Error(
+              `API Error: ${errorMessage} (Status: ${effectiveError.response.status})`
+            );
           }
-          throw new Error(
-            `API Error: ${errorMessage} (Status: ${
-              error instanceof ResponseError && error.response
-                ? error.response.status
-                : "unknown"
-            })`
-          );
+          throw new Error(`API Error: ${errorMessage} (Status: unknown)`);
         }
-
         if (options.onRetry) {
-          await options.onRetry(error, attempt);
+          console.log(`[${methodName}] Retrying, attempt:`, attempt);
+          await options.onRetry(effectiveError, attempt);
         }
-
         const delayMs = options.delay
-          ? options.delay(attempt, error)
+          ? options.delay(attempt, effectiveError)
           : retryDelay * Math.pow(2, attempt - 1);
-        if (debug) {
+        if (debug)
           console.log(
             `[${methodName}] Retrying after ${delayMs}ms (attempt ${attempt}/${
               options.maxAttempts - 1
             })`
           );
-        }
         await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
     }
@@ -232,48 +245,85 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         .method(requestParameters, requestOptions)
         .then(processResponse),
     {
-      maxAttempts: useTempTokens ? 2 : 1, // 1 retry for 401s if using temp tokens
+      maxAttempts: (useTempTokens ?? false) || userToken ? 2 : 1,
       shouldRetry: (error) =>
         error instanceof ResponseError &&
         error.response?.status === 401 &&
-        (useTempTokens ?? false),
+        ((useTempTokens ?? false) ||
+          (!!userToken && !(useTempTokens ?? false))),
       onRetry: async (error) => {
         if (error instanceof ResponseError && error.response?.status === 401) {
+          if (useTempTokens ?? false) {
+            if (debug)
+              console.log(
+                `Authorization error for ${methodName} (temp token), refreshing token:`,
+                error.message
+              );
+            const dbid = extractDbid(
+              params,
+              `No dbid to refresh token after authorization error`
+            );
+            try {
+              authorizationToken = await fetchTempToken(dbid);
+            } catch (fetchError) {
+              const fetchErrorMessage =
+                fetchError instanceof ResponseError && fetchError.response
+                  ? (await fetchError.response.json())?.message ||
+                    "Unauthorized"
+                  : String(fetchError);
+              throw new Error(
+                `API Error: ${fetchErrorMessage} (Status: ${
+                  (fetchError instanceof ResponseError &&
+                    fetchError.response?.status) ||
+                  "unknown"
+                })`
+              );
+            }
+            requestOptions.headers = {
+              ...baseHeaders,
+              Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+            };
+          } else if (userToken) {
+            if (debug)
+              console.log(
+                `Authorization error for ${methodName} (user token), retrying with same token:`,
+                error.message
+              );
+          }
           if (debug)
             console.log(
-              `Authorization error for ${methodName}, refreshing token:`,
-              error.message
+              `Retrying ${methodName} with ${
+                useTempTokens ? "temp" : "user"
+              } token`
             );
-          const dbid = extractDbid(
-            params,
-            `No dbid to refresh token after authorization error`
-          );
-          authorizationToken = await fetchTempToken(dbid);
-          requestOptions.headers = {
-            ...baseHeaders,
-            Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-          };
-          if (debug) console.log(`Retrying ${methodName} with new token`);
         }
       },
     }
-  ).catch((error) =>
-    withRetries(() => Promise.reject(error), {
-      maxAttempts: maxRetries + 1, // Initial attempt + retries
-      shouldRetry: (err) =>
-        err instanceof ResponseError && err.response?.status === 429,
-      delay: (attempt, err) => {
-        const headers =
-          err instanceof ResponseError && err.response
-            ? err.response.headers
-            : new Headers();
-        const retryAfter = headers.get("Retry-After");
-        return retryAfter
-          ? parseInt(retryAfter, 10) * 1000
-          : retryDelay * Math.pow(2, attempt - 1);
-      },
-    })
-  );
+  ).catch((error) => {
+    const effectiveError =
+      error.cause && error.cause instanceof ResponseError ? error.cause : error;
+    if (
+      effectiveError instanceof ResponseError &&
+      effectiveError.response?.status === 429
+    ) {
+      return withRetries(() => Promise.reject(error), {
+        maxAttempts: maxRetries + 1,
+        shouldRetry: (err) =>
+          err instanceof ResponseError && err.response?.status === 429,
+        delay: (attempt, err) => {
+          const headers =
+            err instanceof ResponseError && err.response
+              ? err.response.headers
+              : new Headers();
+          const retryAfter = headers.get("Retry-After");
+          return retryAfter
+            ? parseInt(retryAfter, 10) * 1000
+            : retryDelay * Math.pow(2, attempt - 1);
+        },
+      });
+    }
+    throw effectiveError;
+  });
 }
 
 function extractDbid(

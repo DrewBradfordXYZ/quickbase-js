@@ -1,4 +1,3 @@
-// tests/vitest/unit/fields/createField.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
@@ -83,9 +82,9 @@ describe("QuickbaseClient Unit - createField", () => {
 
     expect(result).toEqual(mockResponse);
     const callArgs = mockFetch.mock.calls[0];
-    console.log("Raw fetch call (user token):", callArgs); // Debug raw call
+    console.log("Raw fetch call (user token):", callArgs);
     const receivedBody = JSON.parse(callArgs[1].body as string);
-    expect(receivedBody).toEqual(request); // Expect full body
+    expect(receivedBody).toEqual(request);
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
@@ -172,7 +171,7 @@ describe("QuickbaseClient Unit - createField", () => {
       })
     );
     const callArgs = mockFetch.mock.calls[1];
-    console.log("Raw fetch call (temp token):", callArgs); // Debug raw call
+    console.log("Raw fetch call (temp token):", callArgs);
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
@@ -287,11 +286,11 @@ describe("QuickbaseClient Unit - createField", () => {
       })
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for createField, refreshing token:",
+      "Authorization error for createField (temp token), refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying createField with new token"
+      "Retrying createField with temp token"
     );
     consoleSpy.mockRestore();
   });
@@ -351,16 +350,13 @@ describe("QuickbaseClient Unit - createField", () => {
       .mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: () =>
-          Promise.resolve({ message: "Unauthorized in fetchTempToken" }),
+        json: () => Promise.resolve({ message: "Temp token fetch failed" }),
       });
 
     const consoleSpy = vi.spyOn(console, "log");
     await expect(
       client.createField({ tableId: QB_TABLE_ID_1, body: request })
-    ).rejects.toThrow(
-      "API Error: Unauthorized in fetchTempToken (Status: 401)"
-    );
+    ).rejects.toThrow("API Error: Temp token fetch failed (Status: 401)");
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
     expect(mockFetch).toHaveBeenNthCalledWith(
@@ -383,7 +379,7 @@ describe("QuickbaseClient Unit - createField", () => {
       expect.any(Object)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for createField, refreshing token:",
+      "Authorization error for createField (temp token), refreshing token:",
       expect.any(String)
     );
     consoleSpy.mockRestore();

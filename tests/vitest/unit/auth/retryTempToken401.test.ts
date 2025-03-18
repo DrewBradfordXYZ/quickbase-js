@@ -1,4 +1,3 @@
-// tests/vitest/unit/auth/retryOn401.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
@@ -7,7 +6,7 @@ import {
   QB_TABLE_ID_1,
 } from "@tests/setup.ts";
 
-describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
+describe("QuickbaseClient Unit - Temp Token Retry on 401", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -20,7 +19,6 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     const mockFields = [{ id: 1, label: "Field1" }];
     let callCount = 0;
 
-    // Mock fetch without console.log interference
     mockFetch.mockImplementation((url) => {
       callCount++;
       if (url.includes("auth/temporary") && callCount === 1) {
@@ -90,7 +88,6 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
       })
     );
 
-    // Filter console logs to only those we care about
     const tokenLogs = consoleSpy.mock.calls.filter((call) =>
       call[0].includes("Fetched and cached new token")
     );
@@ -104,11 +101,11 @@ describe("QuickbaseClient Unit - 401 Retry Creates New Token", () => {
     ]);
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields, refreshing token:",
+      "Authorization error for getFields (temp token), refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying getFields with new token"
+      "Retrying getFields with temp token"
     );
 
     consoleSpy.mockRestore();

@@ -26,7 +26,7 @@ const includeFolders: string[] = [
 const includeRecursiveFolders: string[] = [
   // "open-api"
   // "tests",
-  // "tests/vitest/unit",
+  "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 

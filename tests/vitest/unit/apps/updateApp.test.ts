@@ -1,5 +1,3 @@
-// tests/vitest/unit/apps/updateApp.test.ts
-
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
@@ -71,7 +69,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST per your implementation
+        method: "POST",
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
@@ -151,7 +149,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
       2,
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp_token",
@@ -231,7 +229,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
       2,
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         headers: expect.objectContaining({
           Authorization: "QB-TEMP-TOKEN initial_token",
         }),
@@ -247,7 +245,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
       4,
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         headers: expect.objectContaining({
           Authorization: "QB-TEMP-TOKEN new_token",
         }),
@@ -255,11 +253,11 @@ describe("QuickbaseClient Unit - updateApp", () => {
       })
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for updateApp, refreshing token:",
+      "Authorization error for updateApp (temp token), refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying updateApp with new token"
+      "Retrying updateApp with temp token"
     );
     consoleSpy.mockRestore();
   });
@@ -284,7 +282,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         headers: expect.objectContaining({
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
@@ -323,7 +321,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         body: JSON.stringify(request),
       })
     );
@@ -375,7 +373,7 @@ describe("QuickbaseClient Unit - updateApp", () => {
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}`,
       expect.objectContaining({
-        method: "POST", // Adjusted to POST
+        method: "POST",
         body: JSON.stringify(request),
       })
     );

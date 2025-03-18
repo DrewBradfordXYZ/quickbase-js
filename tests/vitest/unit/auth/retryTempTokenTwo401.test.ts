@@ -1,8 +1,7 @@
-// tests/vitest/unit/auth/two401s.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createClient, mockFetch } from "@tests/setup.ts";
 
-describe("QuickbaseClient - Two 401s in a Row", () => {
+describe("QuickbaseClient - Two Temp Token 401s in a Row", () => {
   let client: ReturnType<typeof createClient>;
 
   beforeEach(() => {
@@ -28,7 +27,7 @@ describe("QuickbaseClient - Two 401s in a Row", () => {
         return Promise.resolve({
           ok: false,
           status: 401,
-          text: () => Promise.resolve("Unauthorized"),
+          json: () => Promise.resolve({ message: "Unauthorized" }),
         });
       }
       if (url.includes("auth/temporary") && callCount === 3) {
@@ -70,15 +69,11 @@ describe("QuickbaseClient - Two 401s in a Row", () => {
     ]);
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields, refreshing token:",
+      "Authorization error for getFields (temp token), refreshing token:",
       expect.any(String)
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying getFields with new token"
-    );
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Error response body for getFields:",
-      { message: "Unauthorized again" }
+      "Retrying getFields with temp token"
     );
 
     consoleSpy.mockRestore();

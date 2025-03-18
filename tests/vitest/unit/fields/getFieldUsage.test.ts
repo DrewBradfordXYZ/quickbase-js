@@ -1,4 +1,3 @@
-// tests/vitest/unit/fields/getFieldUsage.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -27,7 +26,7 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       field: {
         id: 6,
         name: "name",
-        type: "text", // Match QuickBase's lowercase response
+        type: "text",
       },
       usage: {
         actions: { count: 0 },
@@ -50,7 +49,6 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       },
     };
 
-    // Mock the response as an array to match the updated API behavior
     mockFetch.mockResolvedValueOnce(
       new Response(JSON.stringify([mockResponse]), {
         status: 200,
@@ -64,7 +62,6 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       tableId: QB_TABLE_ID_1,
     });
 
-    // Expect an array and unwrap the first item
     expect(result).toBeInstanceOf(Array);
     expect(result).toHaveLength(1);
     const fieldUsage = result[0];
@@ -115,14 +112,23 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
     );
   });
 
-  it("handles 401 error and does not retry with user token", async () => {
-    mockFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-        statusText: "Unauthorized",
-        headers: { "Content-Type": "application/json" },
-      })
-    );
+  it("handles persistent 401 error for field usage retrieval", async () => {
+    // Simulate a persistent 401 error (initial and retry attempts fail)
+    mockFetch
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: "Unauthorized" }), {
+          status: 401,
+          statusText: "Unauthorized",
+          headers: { "Content-Type": "application/json" },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: "Unauthorized" }), {
+          status: 401,
+          statusText: "Unauthorized",
+          headers: { "Content-Type": "application/json" },
+        })
+      );
 
     await expect(
       client.getFieldUsage({
@@ -131,8 +137,21 @@ describe("QuickbaseClient Unit - getFieldUsage", () => {
       })
     ).rejects.toThrow("API Error: Unauthorized (Status: 401)");
 
-    expect(mockFetch).toHaveBeenCalledTimes(1); // No retry with user token
-    expect(mockFetch).toHaveBeenCalledWith(
+    expect(mockFetch).toHaveBeenCalledTimes(2); // Initial call + 1 retry
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/fields/usage/6?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
+          "Content-Type": "application/json",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
       `https://api.quickbase.com/v1/fields/usage/6?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
         method: "GET",
