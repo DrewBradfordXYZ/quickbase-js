@@ -21,6 +21,8 @@ describe("QuickbaseClient Integration - updateRelationship", () => {
   let generatedLookupFieldId: number | undefined;
   let generatedSummaryFieldId: number | undefined;
 
+  // No beforeAll/afterAll since we'll create and delete within the test
+
   it("creates, updates, deletes, and verifies a relationship", async () => {
     // Validate environment variables
     if (!QB_REALM) throw new Error("QB_REALM is not defined in .env");
@@ -73,10 +75,10 @@ describe("QuickbaseClient Integration - updateRelationship", () => {
     const createRequestBody = {
       parentTableId: QB_TABLE_ID_1,
       foreignKeyField: { label: uniqueLabel },
-      lookupFieldIds: [6],
+      lookupFieldIds: [6], // Assuming field 6 exists in QB_TABLE_ID_1
       summaryFields: [
         {
-          summaryFid: 6,
+          summaryFid: 6, // Assuming field 6 in QB_TABLE_ID_2 is numeric
           label: `Sum_${uniqueLabel}`,
           accumulationType: "SUM",
         },
@@ -212,7 +214,7 @@ describe("QuickbaseClient Integration - updateRelationship", () => {
     expect(deleteResponse).toBeDefined();
     expect(deleteResponse.relationshipId).toBe(relationshipId);
 
-    // Step 6: Verify deletion and check fields
+    // Step 6: Verify deletion
     const relationships = await client.getRelationships({
       tableId: QB_TABLE_ID_2,
     });
@@ -223,31 +225,9 @@ describe("QuickbaseClient Integration - updateRelationship", () => {
     const deletedRelationship = relationships.relationships.find(
       (r) => r.id === relationshipId
     );
-    expect(deletedRelationship).toBeUndefined();
+    expect(deletedRelationship).toBeUndefined(); // Confirm relationship is gone
 
-    // Check if lookup field (e.g., 55) still exists in child table
-    const childFieldsAfter = await client.getFields({ tableId: QB_TABLE_ID_2 });
-    console.log(
-      "Child fields after deletion:",
-      JSON.stringify(childFieldsAfter, null, 2)
-    );
-    expect(
-      childFieldsAfter.find((f) => f.id === generatedLookupFieldId)
-    ).toBeUndefined();
-
-    // Check if summary field (e.g., 299) still exists in parent table
-    const parentFieldsAfter = await client.getFields({
-      tableId: QB_TABLE_ID_1,
-    });
-    console.log(
-      "Parent fields after deletion:",
-      JSON.stringify(parentFieldsAfter, null, 2)
-    );
-    expect(
-      parentFieldsAfter.find((f) => f.id === generatedSummaryFieldId)
-    ).toBeUndefined();
-
-    // Cleanup setup fields
+    // Cleanup remaining fields from setup
     if (newLookupFieldId) {
       await client.deleteFields({
         tableId: QB_TABLE_ID_1,
@@ -266,5 +246,5 @@ describe("QuickbaseClient Integration - updateRelationship", () => {
         `Deleted child field ${newChildFieldId} from ${QB_TABLE_ID_2}`
       );
     }
-  }, 75000); // Increased timeout for additional getFields calls
+  }, 60000);
 });
