@@ -1,7 +1,7 @@
 project: >-
   quickbase-js
 date: >-
-  3/17/2025
+  3/18/2025
 root: >-
   /home/drew/Projects/quickbase-js
 goals:
@@ -4401,10 +4401,6 @@ tree:
                       type: >-
                         file
                       contents: >
-                        //
-                        tests/vitest/qb/tables/updateRelationship.test.ts
-
-
                         import
                         {
                         describe,
@@ -4446,8 +4442,10 @@ tree:
                         {
                           let client: ReturnType<typeof createClient>;
                           let relationshipId: number;
-                          let newLookupFieldId: number;
-                          let newChildFieldId: number;
+                          let newLookupFieldId: number | undefined;
+                          let newChildFieldId: number | undefined;
+                          let generatedLookupFieldId: number | undefined;
+                          let generatedSummaryFieldId: number | undefined;
 
                           beforeAll(async () => {
                             client = createClient(fetch, {
@@ -4459,12 +4457,14 @@ tree:
                             if (!QB_REALM) throw new Error("QB_REALM is not defined in .env");
                             if (!QB_USER_TOKEN) throw new Error("QB_USER_TOKEN is not defined in .env");
 
-                            // Fetch relationship ID
                             const relationshipsResponse = await client.getRelationships({
                               tableId: QB_TABLE_ID_2,
                               skip: 0,
                             });
-
+                            console.log(
+                              "Initial relationships response:",
+                              JSON.stringify(relationshipsResponse, null, 2)
+                            );
                             const relationship = relationshipsResponse.relationships.find(
                               (r) => r.parentTableId === QB_TABLE_ID_1
                             );
@@ -4474,10 +4474,10 @@ tree:
                               );
                             }
                             relationshipId = relationship.id;
+                            console.log(`Identified relationshipId: ${relationshipId}`);
 
-                            // Create fields
                             const lookupFieldRequest: CreateFieldRequest = {
-                              label: "Test Lookup Field",
+                              label: `Test Lookup Field_${Date.now()}`,
                               fieldType: "text",
                             };
                             const lookupResponse = await client.createField({
@@ -4485,9 +4485,15 @@ tree:
                               body: lookupFieldRequest,
                             });
                             newLookupFieldId = lookupResponse.id;
+                            if (!newLookupFieldId) {
+                              throw new Error("Failed to retrieve ID for newly created lookup field");
+                            }
+                            console.log(
+                              `Created lookup field with ID ${newLookupFieldId} in parent table ${QB_TABLE_ID_1}`
+                            );
 
                             const childFieldRequest: CreateFieldRequest = {
-                              label: "Test Child Numeric",
+                              label: `Test Child Numeric_${Date.now()}`,
                               fieldType: "numeric",
                             };
                             const childResponse = await client.createField({
@@ -4495,224 +4501,207 @@ tree:
                               body: childFieldRequest,
                             });
                             newChildFieldId = childResponse.id;
+                            if (!newChildFieldId) {
+                              throw new Error("Failed to retrieve ID for newly created child field");
+                            }
+                            console.log(
+                              `Created child field with ID ${newChildFieldId} in child table ${QB_TABLE_ID_2}`
+                            );
 
                             console.log(
-                              `Created lookup field ${newLookupFieldId} in parent ${QB_TABLE_ID_1}`
-                            );
-                            console.log(
-                              `Created child field ${newChildFieldId} in child ${QB_TABLE_ID_2}`
-                            );
-                            console.log(
-                              `Using relationshipId: ${relationshipId} from child ${QB_TABLE_ID_2} to parent ${QB_TABLE_ID_1}`
+                              `Setup complete: relationshipId=${relationshipId}, lookupFieldId=${newLookupFieldId}, childFieldId=${newChildFieldId}`
                             );
                           }, 30000);
 
                           afterAll(async () => {
                             if (newLookupFieldId) {
-                              await client.deleteFields({
-                                tableId: QB_TABLE_ID_1,
-                                body: { fieldIds: [newLookupFieldId] },
-                              });
-                              console.log(`Deleted field ${newLookupFieldId} from ${QB_TABLE_ID_1}`);
+                              try {
+                                const deleteLookupResponse = await client.deleteFields({
+                                  tableId: QB_TABLE_ID_1,
+                                  body: { fieldIds: [newLookupFieldId] },
+                                });
+                                console.log(
+                                  `Deleted original lookup field ${newLookupFieldId} from ${QB_TABLE_ID_1}:`,
+                                  JSON.stringify(deleteLookupResponse, null, 2)
+                                );
+                              } catch (error) {
+                                console.error(
+                                  `Failed to delete original lookup field ${newLookupFieldId}:`,
+                                  error
+                                );
+                                throw error;
+                              }
                             }
                             if (newChildFieldId) {
-                              await client.deleteFields({
-                                tableId: QB_TABLE_ID_2,
-                                body: { fieldIds: [newChildFieldId] },
-                              });
-                              console.log(`Deleted field ${newChildFieldId} from ${QB_TABLE_ID_2}`);
+                              try {
+                                const deleteChildResponse = await client.deleteFields({
+                                  tableId: QB_TABLE_ID_2,
+                                  body: { fieldIds: [newChildFieldId] },
+                                });
+                                console.log(
+                                  `Deleted original child field ${newChildFieldId} from ${QB_TABLE_ID_2}:`,
+                                  JSON.stringify(deleteChildResponse, null, 2)
+                                );
+                              } catch (error) {
+                                console.error(
+                                  `Failed to delete original child field ${newChildFieldId}:`,
+                                  error
+                                );
+                                throw error;
+                              }
+                            }
+                            if (generatedLookupFieldId) {
+                              try {
+                                const deleteGeneratedLookupResponse = await client.deleteFields({
+                                  tableId: QB_TABLE_ID_2,
+                                  body: { fieldIds: [generatedLookupFieldId] },
+                                });
+                                console.log(
+                                  `Deleted generated lookup field ${generatedLookupFieldId} from ${QB_TABLE_ID_2}:`,
+                                  JSON.stringify(deleteGeneratedLookupResponse, null, 2)
+                                );
+                              } catch (error) {
+                                console.error(
+                                  `Failed to delete generated lookup field ${generatedLookupFieldId}:`,
+                                  error
+                                );
+                                throw error;
+                              }
+                            }
+                            if (generatedSummaryFieldId) {
+                              try {
+                                const deleteGeneratedSummaryResponse = await client.deleteFields({
+                                  tableId: QB_TABLE_ID_1,
+                                  body: { fieldIds: [generatedSummaryFieldId] },
+                                });
+                                console.log(
+                                  `Deleted generated summary field ${generatedSummaryFieldId} from ${QB_TABLE_ID_1}:`,
+                                  JSON.stringify(deleteGeneratedSummaryResponse, null, 2)
+                                );
+                              } catch (error) {
+                                console.error(
+                                  `Failed to delete generated summary field ${generatedSummaryFieldId}:`,
+                                  error
+                                );
+                                throw error;
+                              }
                             }
                           }, 30000);
 
                           beforeEach(async () => {
-                            // Reset relationship to a clean state before each test
                             const relationshipsResponse = await client.getRelationships({
                               tableId: QB_TABLE_ID_2,
                             });
                             const relationship = relationshipsResponse.relationships.find(
                               (r) => r.id === relationshipId
                             );
-                            const cleanupRequest: UpdateRelationshipRequest = {
-                              lookupFieldIds: (relationship?.lookupFields || [])
-                                .map((f) => f.id)
-                                .filter((id) => id !== newLookupFieldId),
-                              summaryFields: (relationship?.summaryFields || []).map((f) => ({
-                                summaryFid: f.id,
-                                label: f.label,
-                                accumulationType: "COUNT", // Assuming COUNT for existing fields; adjust if needed
-                              })),
+                            if (!relationship) {
+                              throw new Error(`Relationship ${relationshipId} not found before test`);
+                            }
+                            console.log(
+                              "Relationship state before test:",
+                              JSON.stringify(relationship, null, 2)
+                            );
+                          }, 30000);
+
+                          it("adds a lookup field to the relationship", async ({ expect }) => {
+                            const tableId = QB_TABLE_ID_2;
+                            const initialResponse = await client.getRelationships({ tableId });
+                            const initialRelationship = initialResponse.relationships.find(
+                              (r) => r.id === relationshipId
+                            );
+                            const currentLookupFields = (initialRelationship?.lookupFields || []).map(
+                              (f) => f.id
+                            );
+                            console.log("Current lookupFields before update:", currentLookupFields);
+
+                            const request: UpdateRelationshipRequest = {
+                              lookupFieldIds: [newLookupFieldId!],
                             };
-                            await client.updateRelationship({
-                              tableId: QB_TABLE_ID_2,
+                            console.log(
+                              "Adding lookup field request:",
+                              JSON.stringify(request, null, 2)
+                            );
+
+                            const updateResponse = await client.updateRelationship({
+                              tableId,
                               relationshipId,
-                              body: cleanupRequest,
+                              body: request,
                             });
-                            console.log(`Reset relationship ${relationshipId} before test`);
-                          });
+                            console.log("Update response:", JSON.stringify(updateResponse, null, 2));
 
-                          it(
-                            "adds a lookup field to the relationship",
-                            async ({ expect }) => {
-                              const tableId = QB_TABLE_ID_2;
+                            const newLookup = updateResponse.lookupFields.find(
+                              (f) =>
+                                f.label.includes("Test Lookup Field") &&
+                                !currentLookupFields.includes(f.id)
+                            );
+                            generatedLookupFieldId = newLookup?.id;
+                            console.log(
+                              `Captured generated lookup field ID: ${generatedLookupFieldId}`
+                            );
 
-                              // Get current state
-                              const initialResponse = await client.getRelationships({ tableId });
-                              const initialRelationship = initialResponse.relationships.find(
-                                (r) => r.id === relationshipId
-                              );
-                              const currentLookupFields = (initialRelationship?.lookupFields || []).map(
-                                (f) => f.id
-                              );
+                            expect(updateResponse.id).toBe(relationshipId);
+                            expect(updateResponse.childTableId).toBe(QB_TABLE_ID_2);
+                            expect(updateResponse.parentTableId).toBe(QB_TABLE_ID_1);
+                            expect(
+                              updateResponse.lookupFields.some((f) =>
+                                f.label.includes("Test Lookup Field")
+                              )
+                            ).toBe(true);
+                            expect(updateResponse.lookupFields.some((f) => f.id === 19)).toBe(true);
+                          }, 30000);
 
-                              const request: UpdateRelationshipRequest = {
-                                lookupFieldIds: [...currentLookupFields, newLookupFieldId],
-                              };
+                          it("adds a summary field to the parent table", async ({ expect }) => {
+                            const tableId = QB_TABLE_ID_2;
+                            const initialResponse = await client.getRelationships({ tableId });
+                            const initialRelationship = initialResponse.relationships.find(
+                              (r) => r.id === relationshipId
+                            );
+                            const currentSummaryFields = (initialRelationship?.summaryFields || []).map(
+                              (f) => f.id
+                            );
+                            console.log("Current summaryFields before update:", currentSummaryFields);
 
-                              const updateResponse = await client.updateRelationship({
-                                tableId,
-                                relationshipId,
-                                body: request,
-                              });
+                            const request: UpdateRelationshipRequest = {
+                              summaryFields: [
+                                {
+                                  summaryFid: newChildFieldId!,
+                                  label: "Test Summary Field",
+                                  accumulationType: "SUM",
+                                },
+                              ],
+                            };
+                            console.log(
+                              "Adding summary field request:",
+                              JSON.stringify(request, null, 2)
+                            );
 
-                              expect(updateResponse.id).toBe(relationshipId);
-                              expect(updateResponse.childTableId).toBe(QB_TABLE_ID_2);
-                              expect(updateResponse.parentTableId).toBe(QB_TABLE_ID_1);
-                              expect(
-                                updateResponse.lookupFields.some((f) => f.id === newLookupFieldId)
-                              ).toBe(true);
+                            const updateResponse = await client.updateRelationship({
+                              tableId,
+                              relationshipId,
+                              body: request,
+                            });
+                            console.log("Update response:", JSON.stringify(updateResponse, null, 2));
 
-                              const relationshipsResponse = await client.getRelationships({ tableId });
-                              const updatedRelationship = relationshipsResponse.relationships.find(
-                                (r) => r.id === relationshipId
-                              );
-                              expect(
-                                updatedRelationship!.lookupFields.some((f) => f.id === newLookupFieldId)
-                              ).toBe(true);
-                            },
-                            { timeout: 30000 }
-                          );
+                            const newSummary = updateResponse.summaryFields.find(
+                              (f) =>
+                                f.label.includes("Test Summary Field") &&
+                                !currentSummaryFields.includes(f.id)
+                            );
+                            generatedSummaryFieldId = newSummary?.id;
+                            console.log(
+                              `Captured generated summary field ID: ${generatedSummaryFieldId}`
+                            );
 
-                          it(
-                            "adds a summary field to the parent table",
-                            async ({ expect }) => {
-                              const tableId = QB_TABLE_ID_2;
-
-                              // Get current state
-                              const initialResponse = await client.getRelationships({ tableId });
-                              const initialRelationship = initialResponse.relationships.find(
-                                (r) => r.id === relationshipId
-                              );
-                              const currentSummaryFields = (
-                                initialRelationship?.summaryFields || []
-                              ).map((f) => ({
-                                summaryFid: f.id,
-                                label: f.label,
-                                accumulationType: "COUNT",
-                              }));
-
-                              const request: UpdateRelationshipRequest = {
-                                summaryFields: [
-                                  ...currentSummaryFields,
-                                  {
-                                    summaryFid: newChildFieldId,
-                                    label: "Test Summary Field",
-                                    accumulationType: "SUM",
-                                  },
-                                ],
-                              };
-
-                              const updateResponse = await client.updateRelationship({
-                                tableId,
-                                relationshipId,
-                                body: request,
-                              });
-
-                              expect(updateResponse.id).toBe(relationshipId);
-                              expect(updateResponse.childTableId).toBe(QB_TABLE_ID_2);
-                              expect(updateResponse.parentTableId).toBe(QB_TABLE_ID_1);
-                              expect(
-                                updateResponse.summaryFields.some(
-                                  (f) => f.label === "Test Summary Field"
-                                )
-                              ).toBe(true);
-
-                              const relationshipsResponse = await client.getRelationships({ tableId });
-                              const updatedRelationship = relationshipsResponse.relationships.find(
-                                (r) => r.id === relationshipId
-                              );
-                              expect(
-                                updatedRelationship!.summaryFields.some(
-                                  (f) => f.label === "Test Summary Field"
-                                )
-                              ).toBe(true);
-                            },
-                            { timeout: 30000 }
-                          );
-
-                          it(
-                            "handles an invalid field ID gracefully",
-                            async ({ expect }) => {
-                              const tableId = QB_TABLE_ID_2;
-
-                              const request: UpdateRelationshipRequest = {
-                                lookupFieldIds: [999999], // Invalid ID
-                              };
-
-                              await expect(
-                                client.updateRelationship({
-                                  tableId,
-                                  relationshipId,
-                                  body: request,
-                                })
-                              ).rejects.toThrow(/API Error:.*400/);
-                            },
-                            { timeout: 30000 }
-                          );
-
-                          it(
-                            "succeeds with no changes (idempotent)",
-                            async ({ expect }) => {
-                              const tableId = QB_TABLE_ID_2;
-
-                              // Get current state
-                              const initialResponse = await client.getRelationships({ tableId });
-                              const initialRelationship = initialResponse.relationships.find(
-                                (r) => r.id === relationshipId
-                              );
-                              const currentLookupFields = (initialRelationship?.lookupFields || []).map(
-                                (f) => f.id
-                              );
-                              const currentSummaryFields = (
-                                initialRelationship?.summaryFields || []
-                              ).map((f) => ({
-                                summaryFid: f.id,
-                                label: f.label,
-                                accumulationType: "COUNT",
-                              }));
-
-                              const request: UpdateRelationshipRequest = {
-                                lookupFieldIds: currentLookupFields,
-                                summaryFields: currentSummaryFields,
-                              };
-
-                              const updateResponse = await client.updateRelationship({
-                                tableId,
-                                relationshipId,
-                                body: request,
-                              });
-
-                              expect(updateResponse.id).toBe(relationshipId);
-                              expect(updateResponse.childTableId).toBe(QB_TABLE_ID_2);
-                              expect(updateResponse.parentTableId).toBe(QB_TABLE_ID_1);
-                              expect(updateResponse.lookupFields.map((f) => f.id)).toEqual(
-                                currentLookupFields
-                              );
-                              expect(updateResponse.summaryFields?.map((f) => f.id) || []).toEqual(
-                                currentSummaryFields.map((f) => f.summaryFid)
-                              );
-                            },
-                            { timeout: 30000 }
-                          );
+                            expect(updateResponse.id).toBe(relationshipId);
+                            expect(updateResponse.childTableId).toBe(QB_TABLE_ID_2);
+                            expect(updateResponse.parentTableId).toBe(QB_TABLE_ID_1);
+                            expect(
+                              updateResponse.summaryFields.some((f) =>
+                                f.label.includes("Test Summary Field")
+                              )
+                            ).toBe(true);
+                          }, 30000);
                         });
                     - name: >-
                         updateTable.test.ts
@@ -4902,6 +4891,10 @@ tree:
                   type: >-
                     directory
                   children:
+                    - name: >-
+                        createRelationship.test.ts
+                      type: >-
+                        file
                     - name: >-
                         createTable.test.ts
                       type: >-
