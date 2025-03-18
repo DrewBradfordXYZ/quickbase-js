@@ -16,11 +16,15 @@ console.log("Path modules imported");
 import { fileURLToPath } from "url";
 console.log("URL module imported");
 
-import { OpenAPIV2 } from "openapi-types"; // Use module name, not relative path
+import { OpenAPIV2 } from "openapi-types";
 console.log("openapi-types imported");
 
-// Temporary simplifyName fallback
-const simplifyName = (str: string) => str;
+import { Project } from "ts-morph";
+console.log("ts-morph imported");
+
+import { generateJsDoc } from "./utils/generateJsDoc.js";
+
+const simplifyName = (str: string): string => str;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 console.log("__dirname set:", __dirname);
@@ -110,7 +114,57 @@ function mapRefToType(
   return "any";
 }
 
-function generateInterface() {
+interface PropertyDetail {
+  name: string;
+  type: string;
+  required: boolean;
+  jsdoc?: string;
+}
+
+function parseInterfaceProperties(
+  modelName: string,
+  modelsDir: string
+): PropertyDetail[] {
+  const project = new Project();
+  const filePath = join(modelsDir, `${modelName}.ts`);
+  if (!existsSync(filePath)) {
+    console.warn(`Model file ${filePath} not found for ${modelName}`);
+    return [];
+  }
+
+  const sourceFile = project.addSourceFileAtPath(filePath);
+  const interfaceDec = sourceFile.getInterface(modelName);
+  if (!interfaceDec) {
+    console.warn(`Interface ${modelName} not found in ${filePath}`);
+    return [];
+  }
+
+  return interfaceDec.getProperties().map((prop) => {
+    const jsDocs = prop.getJsDocs();
+    const jsdocText =
+      jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
+    return {
+      name: prop.getName(),
+      type: prop.getType().getText(prop),
+      required: !prop.hasQuestionToken(),
+      jsdoc: jsdocText,
+    };
+  });
+}
+
+interface ParamDetail {
+  name: string;
+  type: string;
+  required: boolean;
+  properties: PropertyDetail[];
+}
+
+function generateInterface(includeResponseProperties: boolean = false): void {
+  console.log(
+    "Generating interface with includeResponseProperties:",
+    includeResponseProperties
+  );
+
   console.log("Checking spec file:", SPEC_FILE);
   if (!existsSync(SPEC_FILE)) {
     console.error(
@@ -121,7 +175,7 @@ function generateInterface() {
 
   console.log("Reading spec file...");
   const specContent = readFileSync(SPEC_FILE, "utf8");
-  const spec = JSON.parse(specContent) as OpenAPIV2.Document;
+  const spec: OpenAPIV2.Document = JSON.parse(specContent);
   console.log("Spec parsed, keys:", Object.keys(spec));
 
   const { paths } = spec;
@@ -158,7 +212,9 @@ function generateInterface() {
 
       const opId = simplifyName(op.operationId);
       const summary = op.summary || "No description.";
-      const params = (op.parameters || [])
+      const docLink = `https://developer.quickbase.com/operation/${op.operationId}`;
+
+      const paramDetails: ParamDetail[] = (op.parameters || [])
         .filter((p: OpenAPIV2.ParameterObject | OpenAPIV2.ReferenceObject) => {
           const param = p as OpenAPIV2.ParameterObject;
           return !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
@@ -167,8 +223,9 @@ function generateInterface() {
         })
         .map((param: OpenAPIV2.ParameterObject | OpenAPIV2.ReferenceObject) => {
           const p = param as OpenAPIV2.ParameterObject;
-          if (!p.name) return "";
+          if (!p.name) return null;
           let type = "any";
+          let properties: PropertyDetail[] = [];
           if ("schema" in p && p.schema) {
             type = mapRefToType(
               p.schema,
@@ -178,13 +235,28 @@ function generateInterface() {
               availableModels,
               missingTypes
             );
+            if ("$ref" in p.schema && p.schema.$ref) {
+              const refParts = p.schema.$ref.split("/");
+              const model = refParts[refParts.length - 1];
+              const pascalModel =
+                model.charAt(0).toUpperCase() + model.slice(1);
+              properties = parseInterfaceProperties(pascalModel, MODELS_DIR);
+            }
           } else if ("type" in p && p.type) {
             type = mapOpenApiTypeToTs(p.type);
           }
           const paramName = p.in === "body" ? "body" : p.name;
-          return `${paramName}${p.required ? "" : "?"}: ${type}`;
+          return {
+            name: paramName,
+            type,
+            required: p.required || false,
+            properties,
+          };
         })
-        .filter((param) => param !== "")
+        .filter((p): p is ParamDetail => p !== null);
+
+      const params = paramDetails
+        .map((p) => `${p.name}${p.required ? "" : "?"}: ${p.type}`)
         .join("; ");
 
       const returnTypes = ["200", "207"]
@@ -207,13 +279,21 @@ function generateInterface() {
           ? returnTypes.join(" | ")
           : returnTypes[0] || "void";
 
-      const jsDoc = [
-        `  /**`,
-        `   * ${summary}`,
-        `   * @param params - Parameters for ${opId}`,
-        `   * @returns Promise resolving to ${opId} response`,
-        `   */`,
-      ].join("\n");
+      const returnTypeDetails: PropertyDetail[] =
+        includeResponseProperties &&
+        returnTypes.length === 1 &&
+        returnTypes[0] !== "void"
+          ? parseInterfaceProperties(returnTypes[0], MODELS_DIR)
+          : [];
+
+      const jsDoc = generateJsDoc({
+        summary,
+        opId,
+        paramDetails,
+        returnType,
+        returnTypeDetails,
+        docLink,
+      });
 
       methods.push(
         `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
@@ -247,7 +327,7 @@ function generateInterface() {
 
 console.log("Entering try block");
 try {
-  generateInterface();
+  generateInterface(true); // Toggle response properties here
 } catch (error) {
   console.error("Error in generateInterface:", error);
   process.exit(1);
