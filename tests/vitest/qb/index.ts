@@ -26,3 +26,4 @@ export * from "./tables/getAppTables.test.ts";
 export * from "./tables/getRelationships.test.ts";
 export * from "./tables/getTable.test.ts";
 export * from "./tables/updateTable.test.ts";
+export * from "./tables/updateRelationship.test.ts";

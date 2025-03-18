@@ -22,10 +22,10 @@ const includeFolders: string[] = [
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  "open-api"
+  // "open-api"
   // "tests",
   // "tests/vitest/unit",
-  // "tests/vitest/qb"
+  "tests/vitest/qb"
 ];
 
 // prettier-ignore
