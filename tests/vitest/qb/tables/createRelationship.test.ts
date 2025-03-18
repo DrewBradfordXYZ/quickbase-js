@@ -11,7 +11,7 @@ import {
 
 test(
   "QuickbaseClient Integration - createRelationship > creates a new relationship in QuickBase",
-  { timeout: 30000 },
+  { timeout: 60000 }, // 60 seconds for create and delete
   async () => {
     // Validate environment variables
     if (!QB_REALM) throw new Error("QB_REALM is not defined in .env");
@@ -31,10 +31,10 @@ test(
     const requestBody = {
       parentTableId: QB_TABLE_ID_1,
       foreignKeyField: { label: uniqueLabel },
-      lookupFieldIds: [6], // Assuming field 6 exists in QB_TABLE_ID_1 (e.g., a numeric field)
+      lookupFieldIds: [6], // Assuming field 6 exists in QB_TABLE_ID_1
       summaryFields: [
         {
-          summaryFid: 6, // Assuming field 6 in QB_TABLE_ID_2 is numeric for a SUM
+          summaryFid: 6, // Assuming field 6 in QB_TABLE_ID_2 is numeric
           label: `Sum_${uniqueLabel}`,
           accumulationType: "SUM",
         },
@@ -57,16 +57,46 @@ test(
 
     console.log("Real API response:", JSON.stringify(response, null, 2));
 
-    // Assertions
+    // Assertions for creation
     expect(response).toBeDefined();
-    expect(response.id).toBeDefined(); // Relationship ID assigned by QuickBase
+    expect(response.id).toBeDefined();
     expect(response.parentTableId).toBe(QB_TABLE_ID_1);
     expect(response.childTableId).toBe(QB_TABLE_ID_2);
     expect(response.foreignKeyField).toBeDefined();
     expect(response.foreignKeyField?.label).toBe(uniqueLabel);
     expect(response.lookupFields).toHaveLength(1);
-    expect(response.lookupFields[0].id).toBeGreaterThan(0); // Generated lookup field ID
+    expect(response.lookupFields[0].id).toBeGreaterThan(0);
     expect(response.summaryFields).toHaveLength(1);
     expect(response.summaryFields[0].label).toBe(`Sum_${uniqueLabel}`);
+
+    // Cleanup: Delete the relationship
+    const relationshipId = response.id;
+    console.log("Deleting relationship with ID:", relationshipId);
+    const deleteResponse = await client.deleteRelationship({
+      tableId: QB_TABLE_ID_2,
+      relationshipId,
+    });
+
+    console.log(
+      "Delete relationship response:",
+      JSON.stringify(deleteResponse, null, 2)
+    );
+
+    // Verify deletion
+    expect(deleteResponse).toBeDefined();
+    expect(deleteResponse.relationshipId).toBe(relationshipId);
+
+    // Confirm relationship is gone
+    const relationships = await client.getRelationships({
+      tableId: QB_TABLE_ID_2,
+    });
+    console.log(
+      "Relationships after deletion:",
+      JSON.stringify(relationships, null, 2)
+    );
+    const deletedRelationship = relationships.relationships.find(
+      (r) => r.id === relationshipId
+    );
+    expect(deletedRelationship).toBeUndefined(); // Should no longer exist
   }
 );
