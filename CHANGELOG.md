@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.8](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2025-03-18)
+
+
+### Features
+
+* add updateField subfields that are not included in raw spec, test pass ([4481cff](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4481cff81d4e6205a90537d49bb596214c0e45bd))
+* build now works without error ([3f6ef2c](https://github.com/DrewBradfordXYZ/quickbase-js/commit/3f6ef2c1337f50b93bb937dd4de1d702c2eb984b))
+* dev dependencies reinstall, pipeline runs again ([91a8216](https://github.com/DrewBradfordXYZ/quickbase-js/commit/91a8216064a48708fbf598e9d7be6084052cd439))
+* generate-report for spec diff ([53ad6e7](https://github.com/DrewBradfordXYZ/quickbase-js/commit/53ad6e7d2f94683134dfa79e50022a8d2ab0b448))
+* integration getApp and deleteFields pass ([ba07e9a](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ba07e9a68d298ab6dbcf326c865261fcc46b51ba))
+* integration tests pass for getAppEvents and updateApp ([58f4d20](https://github.com/DrewBradfordXYZ/quickbase-js/commit/58f4d20b5e9d539e91ac29662cae4d2a5bb4eed0))
+* rename TokenBucket to ThrottleBucket ([3a3cdb4](https://github.com/DrewBradfordXYZ/quickbase-js/commit/3a3cdb4869856622e40ae3898f7fc66d50918b6c))
+* throttle limits and 429 retry ([a7aec4a](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a7aec4af37f0a74c0e42a938c97e6ce1df7c5250))
+* tokenLifespan and separate invokeMethod.ts ([2336bce](https://github.com/DrewBradfordXYZ/quickbase-js/commit/2336bce25a9a22b6f14f2e3915e58849d5cb64f3))
+* updateApp.test.ts unit test passes ([f2a3dcc](https://github.com/DrewBradfordXYZ/quickbase-js/commit/f2a3dcc904da07bbb1c363732df551da60430de1))
+* updateField unit test pass ([c6ad2d5](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c6ad2d53996bae3f7ed8a51a5795a6bfe0c293fd))
+* updateRelationship integration test passes, creates and cleans summary and lookup fields ([cc6645f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/cc6645f91be43b1e63dc8b3428a24af42b69ad1c))
+* updateRelationship unit test passes ([155defc](https://github.com/DrewBradfordXYZ/quickbase-js/commit/155defcb1f3a746ac2bb135ec09db39b64dd58e2))
+* user token 401 retry, all tests now passing ([a81a05d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a81a05d873f95d23f5721337854e2794be80ac64))
+
+
+### Bug Fixes
+
+* 429 retry logic now has all tests passing ([a2da0ad](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a2da0ad28c24c843d2bfd318f78827ba543e6833))
+* build runs and all tests pass ([b1cbfaf](https://github.com/DrewBradfordXYZ/quickbase-js/commit/b1cbfafb879d1325e60024e837e8c5602e027e47))
+
 ## [0.1.0-beta.7](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v1.1.0-beta.6...v0.1.0-beta.7) (2025-03-16)
 
 
