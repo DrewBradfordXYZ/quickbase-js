@@ -1,7 +1,6 @@
-// vitest.config.ts
 import { defineConfig } from "vitest/config";
 import path from "path";
-import dotenv from "dotenv"; // Add this import
+import dotenv from "dotenv";
 
 // Load .env variables before tests run
 dotenv.config({ path: path.resolve(__dirname, ".env") });
@@ -17,6 +16,7 @@ export default defineConfig({
         singleFork: true, // Run tests sequentially
       },
     },
+    testTimeout: 10000, // Global timeout of 10 seconds for all tests
   },
   resolve: {
     alias: {

@@ -6490,7 +6490,7 @@ interface UpdateFieldRequest {
      * @type {string}
      * @memberof UpdateFieldRequest
      */
-    fieldType: UpdateFieldRequestFieldTypeEnum;
+    fieldType?: UpdateFieldRequestFieldTypeEnum;
     /**
      * Help text for the field
      * @type {string}
@@ -8046,6 +8046,12 @@ interface QuickbaseConfig {
     fetchApi?: typeof fetch;
     convertDates?: boolean;
     tokenLifespan?: number;
+    throttle?: {
+        rate: number;
+        burst: number;
+    };
+    maxRetries?: number;
+    retryDelay?: number;
 }
 declare function quickbase(config: QuickbaseConfig): QuickbaseClient;
 

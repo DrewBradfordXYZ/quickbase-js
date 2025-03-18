@@ -6560,8 +6560,6 @@ const UpdateFieldRequestFieldTypeEnum = {
 function instanceOfUpdateFieldRequest(value) {
     if (!('label' in value) || value['label'] === undefined)
         return false;
-    if (!('fieldType' in value) || value['fieldType'] === undefined)
-        return false;
     return true;
 }
 function UpdateFieldRequestFromJSON(json) {
@@ -6573,7 +6571,7 @@ function UpdateFieldRequestFromJSONTyped(json, ignoreDiscriminator) {
     }
     return {
         'label': json['label'],
-        'fieldType': json['fieldType'],
+        'fieldType': json['fieldType'] == null ? undefined : json['fieldType'],
         'fieldHelp': json['fieldHelp'] == null ? undefined : json['fieldHelp'],
         'addToForms': json['addToForms'] == null ? undefined : json['addToForms'],
         'permissions': json['permissions'] == null ? undefined : json['permissions'],
@@ -9694,12 +9692,10 @@ function simplifyName(name) {
         .replace(/^(\w)/, (_, c) => c.toLowerCase());
 }
 
-// Dependencies passed as parameters to avoid tight coupling
-async function invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount = 0) {
+async function invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount = 0, throttleBucket = null, maxRetries = 3, retryDelay = 1000) {
     const methodInfo = methodMap[methodName];
-    if (!methodInfo) {
+    if (!methodInfo)
         throw new Error(`Method ${methodName} not found`);
-    }
     const hasBody = "body" in params && params.body !== undefined;
     const body = hasBody ? params.body : undefined;
     const restParams = hasBody
@@ -9712,127 +9708,246 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, tokenCac
     let requestOptions = {
         credentials: "omit",
         method: methodInfo.httpMethod,
+        ...(hasBody ? { body } : {}),
     };
-    if (hasBody) {
-        requestOptions.body = body;
-    }
     const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
+    let authorizationToken = selectedToken;
     if (methodName === "getTempTokenDBID" && useTempTokens) {
         const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
         const cachedToken = tokenCache.get(dbid);
         if (cachedToken) {
-            return { temporaryAuthorization: cachedToken };
+            return Promise.resolve({
+                temporaryAuthorization: cachedToken,
+            });
         }
     }
-    let authorizationToken = selectedToken;
     if (useTempTokens && !authorizationToken) {
         const dbid = extractDbid(params, `No dbid found in params for ${methodName} to fetch temp token`);
         const cachedToken = tokenCache.get(dbid);
         authorizationToken = cachedToken || (await fetchTempToken(dbid));
         if (methodName === "getTempTokenDBID") {
-            return { temporaryAuthorization: authorizationToken };
+            return Promise.resolve({
+                temporaryAuthorization: authorizationToken,
+            });
         }
-        requestOptions.headers = {
-            ...baseHeaders,
-            Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-        };
     }
-    else if (authorizationToken) {
-        requestOptions.headers = {
+    requestOptions.headers = authorizationToken
+        ? {
             ...baseHeaders,
-            Authorization: `QB-USER-TOKEN ${authorizationToken}`,
-        };
-    }
+            Authorization: useTempTokens
+                ? `QB-TEMP-TOKEN ${authorizationToken}`
+                : `QB-USER-TOKEN ${authorizationToken}`,
+        }
+        : baseHeaders;
     if (debug) {
         console.log(`[${methodName}] requestParameters:`, requestParameters);
         console.log(`[${methodName}] requestOptions:`, requestOptions);
     }
-    try {
-        const rawResponse = await methodInfo.method(requestParameters, requestOptions);
-        let response;
-        if (debug) {
+    async function processResponse(rawResponse) {
+        if (debug)
             console.log(`[${methodName}] rawResponse:`, rawResponse);
-        }
         if (rawResponse instanceof Response) {
             const contentType = rawResponse.headers
                 .get("Content-Type")
                 ?.toLowerCase();
-            if (debug) {
+            if (debug)
                 console.log(`[${methodName}] contentType:`, contentType);
-            }
             if (contentType?.includes("application/octet-stream")) {
-                response = (await rawResponse.arrayBuffer());
+                return (await rawResponse.arrayBuffer());
             }
-            else if (contentType?.includes("application/x-yaml") ||
+            if (contentType?.includes("application/x-yaml") ||
                 contentType?.includes("text/yaml")) {
-                response = (await rawResponse.text());
+                return (await rawResponse.text());
             }
-            else if (contentType?.includes("application/json")) {
+            if (contentType?.includes("application/json")) {
                 const jsonResponse = await rawResponse.json();
-                response = transformDates(jsonResponse, convertDates);
+                return transformDates(jsonResponse, convertDates);
             }
-            else {
-                response = rawResponse;
-            }
+            return rawResponse;
         }
-        else if (rawResponse && typeof rawResponse.value === "function") {
-            response = await rawResponse.value();
-            if (debug) {
+        if (rawResponse && typeof rawResponse.value === "function") {
+            const response = await rawResponse.value();
+            if (debug)
                 console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
-            }
-            response = transformDates(response, convertDates);
+            return transformDates(response, convertDates);
         }
-        else {
-            response = transformDates(rawResponse, convertDates);
-            if (debug) {
-                console.log(`[${methodName}] Transformed non-Response:`, response);
-            }
-        }
-        return response;
+        const transformed = transformDates(rawResponse, convertDates);
+        if (debug)
+            console.log(`[${methodName}] Transformed non-Response:`, transformed);
+        return transformed;
     }
-    catch (error) {
-        if (error instanceof ResponseError &&
-            error.response.status === 401 &&
-            retryCount < 1 &&
-            useTempTokens) {
-            if (debug) {
-                console.log(`Authorization error for ${methodName}, refreshing token:`, error.message);
-            }
-            const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
-            authorizationToken = await fetchTempToken(dbid);
-            requestOptions.headers = {
-                ...baseHeaders,
-                Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-            };
-            if (debug) {
-                console.log(`Retrying ${methodName} with new token`);
-            }
-            return invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount + 1);
-        }
-        if (error instanceof ResponseError) {
-            let errorMessage = error.message;
+    async function withRetries(fn, options) {
+        let attempt = 0;
+        while (true) {
             try {
-                const errorBody = await error.response.json();
-                if (debug) {
-                    console.log(`Error response body for ${methodName}:`, errorBody);
+                if (throttleBucket) {
+                    if (debug)
+                        console.log(`[${methodName}] Awaiting throttle bucket`);
+                    await throttleBucket.acquire();
+                    if (debug)
+                        console.log(`[${methodName}] Throttle bucket acquired`);
                 }
-                errorMessage = errorBody.message || errorMessage;
+                return await fn();
             }
-            catch (e) {
-                // Silent fail on parse error
+            catch (error) {
+                console.log(`[${methodName}] Caught error:`, error);
+                console.log(`[${methodName}] instanceof ResponseError:`, error instanceof ResponseError);
+                console.log(`[${methodName}] Response status:`, error.response?.status);
+                const effectiveError = error instanceof Object &&
+                    "cause" in error &&
+                    error.cause instanceof ResponseError
+                    ? error.cause
+                    : error instanceof ResponseError
+                        ? error
+                        : error;
+                console.log(`[${methodName}] Effective error:`, effectiveError);
+                console.log(`[${methodName}] Effective instanceof ResponseError:`, effectiveError instanceof ResponseError);
+                console.log(`[${methodName}] Effective response status:`, effectiveError.response?.status);
+                attempt++;
+                if (!options.shouldRetry(effectiveError) ||
+                    attempt >= options.maxAttempts) {
+                    let errorMessage = effectiveError instanceof ResponseError
+                        ? effectiveError.message
+                        : String(error);
+                    console.log(`[${methodName}] No retry, throwing:`, errorMessage);
+                    if (effectiveError instanceof ResponseError &&
+                        effectiveError.response) {
+                        try {
+                            const errorBody = await effectiveError.response.json();
+                            if (debug)
+                                console.log(`[${methodName}] Error response body:`, errorBody);
+                            errorMessage = errorBody?.message || errorMessage;
+                        }
+                        catch (e) {
+                            if (debug)
+                                console.log(`[${methodName}] Failed to parse error body:`, e);
+                        }
+                        throw new Error(`API Error: ${errorMessage} (Status: ${effectiveError.response.status})`);
+                    }
+                    throw new Error(`API Error: ${errorMessage} (Status: unknown)`);
+                }
+                if (options.onRetry) {
+                    console.log(`[${methodName}] Retrying, attempt:`, attempt);
+                    await options.onRetry(effectiveError, attempt);
+                }
+                const delayMs = options.delay
+                    ? options.delay(attempt, effectiveError)
+                    : retryDelay * Math.pow(2, attempt - 1);
+                if (debug)
+                    console.log(`[${methodName}] Retrying after ${delayMs}ms (attempt ${attempt}/${options.maxAttempts - 1})`);
+                await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
-            throw new Error(`API Error: ${errorMessage} (Status: ${error.response.status})`);
         }
-        throw error;
     }
+    const mainPromise = withRetries(() => methodInfo
+        .method(requestParameters, requestOptions)
+        .then(processResponse), {
+        maxAttempts: (useTempTokens ?? false) || userToken ? 2 : 1,
+        shouldRetry: (error) => error instanceof ResponseError &&
+            error.response?.status === 401 &&
+            ((useTempTokens ?? false) ||
+                (!!userToken && !(useTempTokens ?? false))),
+        onRetry: async (error) => {
+            if (error instanceof ResponseError && error.response?.status === 401) {
+                if (useTempTokens ?? false) {
+                    if (debug)
+                        console.log(`Authorization error for ${methodName} (temp token), refreshing token:`, error.message);
+                    const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
+                    try {
+                        authorizationToken = await fetchTempToken(dbid);
+                    }
+                    catch (fetchError) {
+                        const fetchErrorMessage = fetchError instanceof ResponseError && fetchError.response
+                            ? (await fetchError.response.json())?.message ||
+                                "Unauthorized"
+                            : String(fetchError);
+                        throw new Error(`API Error: ${fetchErrorMessage} (Status: ${fetchError instanceof ResponseError &&
+                            fetchError.response?.status
+                            ? fetchError.response.status
+                            : "unknown"})`);
+                    }
+                    requestOptions.headers = {
+                        ...baseHeaders,
+                        Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
+                    };
+                }
+                else if (userToken) {
+                    if (debug)
+                        console.log(`Authorization error for ${methodName} (user token), retrying with same token:`, error.message);
+                }
+                if (debug)
+                    console.log(`Retrying ${methodName} with ${useTempTokens ? "temp" : "user"} token`);
+            }
+        },
+    });
+    return mainPromise.catch((error) => {
+        let effectiveError = error;
+        if (error instanceof Object &&
+            "cause" in error &&
+            error.cause instanceof ResponseError) {
+            effectiveError = error.cause;
+        }
+        else if (error instanceof ResponseError) {
+            effectiveError = error;
+        }
+        if (effectiveError instanceof ResponseError &&
+            effectiveError.response?.status === 429) {
+            return withRetries(() => Promise.reject(error), {
+                maxAttempts: maxRetries + 1,
+                shouldRetry: (err) => err instanceof ResponseError && err.response?.status === 429,
+                delay: (attempt, err) => {
+                    const headers = err instanceof ResponseError && err.response
+                        ? err.response.headers
+                        : new Headers();
+                    const retryAfter = headers.get("Retry-After");
+                    return retryAfter
+                        ? parseInt(retryAfter, 10) * 1000
+                        : retryDelay * Math.pow(2, attempt - 1);
+                },
+            });
+        }
+        throw effectiveError;
+    });
 }
-// Utility function moved here to keep invokeMethod self-contained
 function extractDbid(params, errorMessage) {
     const dbid = params.dbid || params.tableId || params.appId;
-    if (!dbid) {
+    if (!dbid)
         throw new Error(errorMessage);
-    }
     return dbid;
+}
+
+// src/TokenBucket.ts
+class ThrottleBucket {
+    tokens;
+    maxTokens;
+    refillRate; // Tokens per second
+    lastRefill;
+    constructor(rate, burst) {
+        this.tokens = burst; // Start with full burst capacity
+        this.maxTokens = burst;
+        this.refillRate = rate;
+        this.lastRefill = Date.now();
+    }
+    // Refill tokens based on elapsed time
+    refill() {
+        const now = Date.now();
+        const elapsed = (now - this.lastRefill) / 1000; // Seconds elapsed
+        const newTokens = elapsed * this.refillRate;
+        this.tokens = Math.min(this.maxTokens, this.tokens + newTokens);
+        this.lastRefill = now;
+    }
+    // Acquire a token, waiting if necessary
+    async acquire() {
+        this.refill();
+        if (this.tokens >= 1) {
+            this.tokens -= 1;
+            return;
+        }
+        const waitTime = ((1 - this.tokens) / this.refillRate) * 1000; // ms until next token
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        this.refill();
+        this.tokens -= 1;
+    }
 }
 
 const getParamNames = (fn) => fn
@@ -9868,11 +9983,12 @@ function inferHttpMethod(methodSource, debug) {
     return method;
 }
 function quickbase(config) {
-    const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, tokenLifespan, // Added: Extracted from config
-     } = config;
+    const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, tokenLifespan, throttle = { rate: 10, burst: 10 }, maxRetries = 3, retryDelay = 1000, } = config;
     const baseUrl = `https://api.quickbase.com/v1`;
-    // Use tokenLifespan if provided, otherwise let TokenCache use its default (4:50)
     const tokenCache = new TokenCache(tokenLifespan);
+    const throttleBucket = throttle
+        ? new ThrottleBucket(throttle.rate, throttle.burst)
+        : null;
     const baseHeaders = {
         "QB-Realm-Hostname": `${realm}.quickbase.com`,
         "Content-Type": "application/json",
@@ -9920,7 +10036,7 @@ function quickbase(config) {
                     const methodSource = method.toString();
                     methodMap[simplifiedName] = {
                         api,
-                        method: boundMethod,
+                        method: boundMethod, // Adjust typing as needed
                         paramMap: getParamNames(method),
                         httpMethod: inferHttpMethod(methodSource),
                     };
@@ -9958,11 +10074,16 @@ function quickbase(config) {
         get: (_, prop) => {
             if (prop in methodMap) {
                 const methodName = prop;
-                return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates);
+                return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, 0, // retryCount
+                throttleBucket, maxRetries, retryDelay);
             }
             return undefined;
         },
     });
+    if (debug) {
+        console.log("[createClient] Config:", config);
+        console.log("[createClient] Returning:", proxy);
+    }
     return proxy;
 }
 

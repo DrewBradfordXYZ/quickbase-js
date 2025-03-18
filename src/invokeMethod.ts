@@ -3,6 +3,7 @@ import { QuickbaseClient } from "./quickbaseClient";
 import { ResponseError } from "./generated/runtime";
 import { ThrottleBucket } from "./ThrottleBucket";
 import { RateLimitError } from "./RateLimitError";
+import { GetTempTokenDBID200Response } from "./generated/models";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
   requestParameters: Parameters<QuickbaseClient[K]>[0],
@@ -74,10 +75,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   if (methodName === "getTempTokenDBID" && useTempTokens) {
     const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
     const cachedToken = tokenCache.get(dbid);
-    if (cachedToken)
-      return { temporaryAuthorization: cachedToken } as ReturnType<
-        QuickbaseClient[K]
-      >;
+    if (cachedToken) {
+      return Promise.resolve({
+        temporaryAuthorization: cachedToken,
+      } as GetTempTokenDBID200Response as ReturnType<QuickbaseClient[K]>);
+    }
   }
 
   if (useTempTokens && !authorizationToken) {
@@ -88,9 +90,9 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     const cachedToken = tokenCache.get(dbid);
     authorizationToken = cachedToken || (await fetchTempToken(dbid));
     if (methodName === "getTempTokenDBID") {
-      return { temporaryAuthorization: authorizationToken } as ReturnType<
-        QuickbaseClient[K]
-      >;
+      return Promise.resolve({
+        temporaryAuthorization: authorizationToken,
+      } as GetTempTokenDBID200Response as ReturnType<QuickbaseClient[K]>);
     }
   }
   requestOptions.headers = authorizationToken
@@ -153,15 +155,15 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     return transformed as ReturnType<QuickbaseClient[K]>;
   }
 
-  async function withRetries<T>(
-    fn: () => Promise<T>,
+  async function withRetries(
+    fn: () => Promise<ReturnType<QuickbaseClient[K]>>,
     options: {
       maxAttempts: number;
       shouldRetry: (error: any) => boolean;
       onRetry?: (error: any, attempt: number) => Promise<void>;
       delay?: (attempt: number, error: any) => number;
     }
-  ): Promise<T> {
+  ): Promise<ReturnType<QuickbaseClient[K]>> {
     let attempt = 0;
     while (true) {
       try {
@@ -177,10 +179,17 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
           `[${methodName}] instanceof ResponseError:`,
           error instanceof ResponseError
         );
-        console.log(`[${methodName}] Response status:`, error.response?.status);
+        console.log(
+          `[${methodName}] Response status:`,
+          (error as any).response?.status
+        );
         const effectiveError =
-          error.cause && error.cause instanceof ResponseError
+          error instanceof Object &&
+          "cause" in error &&
+          error.cause instanceof ResponseError
             ? error.cause
+            : error instanceof ResponseError
+            ? error
             : error;
         console.log(`[${methodName}] Effective error:`, effectiveError);
         console.log(
@@ -189,7 +198,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         );
         console.log(
           `[${methodName}] Effective response status:`,
-          effectiveError.response?.status
+          (effectiveError as any).response?.status
         );
 
         attempt++;
@@ -239,7 +248,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     }
   }
 
-  return withRetries(
+  const mainPromise = withRetries(
     () =>
       methodInfo
         .method(requestParameters, requestOptions)
@@ -273,9 +282,10 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
                   : String(fetchError);
               throw new Error(
                 `API Error: ${fetchErrorMessage} (Status: ${
-                  (fetchError instanceof ResponseError &&
-                    fetchError.response?.status) ||
-                  "unknown"
+                  fetchError instanceof ResponseError &&
+                  fetchError.response?.status
+                    ? fetchError.response.status
+                    : "unknown"
                 })`
               );
             }
@@ -299,9 +309,20 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         }
       },
     }
-  ).catch((error) => {
-    const effectiveError =
-      error.cause && error.cause instanceof ResponseError ? error.cause : error;
+  );
+
+  return mainPromise.catch((error: unknown) => {
+    let effectiveError: unknown = error;
+    if (
+      error instanceof Object &&
+      "cause" in error &&
+      error.cause instanceof ResponseError
+    ) {
+      effectiveError = error.cause;
+    } else if (error instanceof ResponseError) {
+      effectiveError = error;
+    }
+
     if (
       effectiveError instanceof ResponseError &&
       effectiveError.response?.status === 429

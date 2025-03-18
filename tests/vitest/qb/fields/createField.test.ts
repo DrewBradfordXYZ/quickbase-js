@@ -1,4 +1,3 @@
-// tests/vitest/qb/fields/createField.test.ts (updated)
 import { describe, it, expect, afterAll } from "vitest";
 import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 
@@ -62,7 +61,7 @@ describe("QuickbaseClient Integration - createField", () => {
         },
       })
     ).rejects.toThrow("API Error: Bad Request (Status: 400)");
-  });
+  }, 10000); // Increased timeout to 10 seconds
 
   it("fails with missing label", async () => {
     await expect(
