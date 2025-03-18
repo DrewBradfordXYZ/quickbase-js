@@ -18,21 +18,19 @@ const excludeDirs: string[] = [
 // prettier-ignore
 const includeFolders: string[] = [
   // "open-api",
-  // "open-api/definitions",
-  // "open-api/paths",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  // "open-api"
+  "open-api"
   // "tests",
-  "tests/vitest/unit",
+  // "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
 // prettier-ignore
 const includeFiles: string[] = [
-  "tests/setup.ts",
+  // "tests/setup.ts",
 
   // "package.json",
   // "tsconfig.json",
@@ -44,12 +42,12 @@ const includeFiles: string[] = [
   // "build-esm.js",
   // "src/tokenCache.ts",
   // "src/generated/runtime.ts",
-  "src/quickbaseClient.ts",
-  "src/invokeMethod.ts",
-  "src/generated-unified/QuickbaseClient.ts",
+  // "src/quickbaseClient.ts",
+  // "src/invokeMethod.ts",
+  // "src/generated-unified/QuickbaseClient.ts",
 
-  "src/RateLimitError.ts",
-  "src/TokenBucket.ts"
+  // "src/RateLimitError.ts",
+  // "src/TokenBucket.ts"
 ];
 
 const projectGoals: string[] = [
