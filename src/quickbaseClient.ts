@@ -72,10 +72,19 @@ function transformDates(obj: any, convertStringsToDates: boolean = true): any {
 }
 
 function inferHttpMethod(methodSource: string, debug?: boolean): string {
-  const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
-  const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
+  const methodMatches = [
+    ...methodSource.matchAll(/method:\s*['"]?(\w+)['"]?/gi),
+  ];
+  const method =
+    methodMatches.length > 0
+      ? methodMatches[methodMatches.length - 1][1].toUpperCase()
+      : "GET";
   if (debug) {
     console.log(`[inferHttpMethod] Source:`, methodSource);
+    console.log(
+      `[inferHttpMethod] All matches:`,
+      methodMatches.map((m) => m[0])
+    );
     console.log(`[inferHttpMethod] Extracted method:`, method);
   }
   return method;
@@ -90,7 +99,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     fetchApi,
     debug,
     convertDates = true,
-    tempTokenLifespan = 290000, // Default: 4:50 (290,000ms)
+    tempTokenLifespan = 290000,
     throttle = { rate: 10, burst: 10 },
     maxRetries = 3,
     retryDelay = 1000,
@@ -139,8 +148,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       ])
   );
 
-  const methodMap = buildMethodMap();
-
   function buildMethodMap(): MethodMap {
     const methodMap: Partial<MethodMap> = {};
     const isValidMethod = (name: string) =>
@@ -174,8 +181,13 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           }
         });
     }
+    if (debug) {
+      console.log("[buildMethodMap] Methods:", Object.keys(methodMap));
+    }
     return methodMap as MethodMap;
   }
+
+  const methodMap = buildMethodMap();
 
   const fetchTempToken = async (dbid: string): Promise<string> => {
     const effectiveFetch = fetchApi || defaultFetch;
@@ -216,8 +228,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     return token;
   };
 
-  const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, {
+  const proxyHandler: ProxyHandler<QuickbaseClient> = {
     get: (_, prop: string) => {
+      console.log(
+        "[proxy] Accessing:",
+        prop,
+        "in methodMap:",
+        prop in methodMap
+      );
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
         return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
@@ -234,13 +252,20 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             convertDates
           );
       }
+      console.log("[proxy] Method not found:", prop);
       return undefined;
     },
-  });
+  };
+
+  const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, proxyHandler);
 
   if (debug) {
     console.log("[createClient] Config:", config);
-    console.log("[createClient] Returning:", proxy);
+    console.log("[createClient] Proxy created:", proxy);
+    console.log(
+      "[createClient] Testing proxy:",
+      proxy.getApp ? "Works" : "Fails"
+    );
   }
 
   return proxy;

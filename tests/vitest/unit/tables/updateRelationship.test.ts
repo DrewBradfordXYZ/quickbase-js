@@ -1,5 +1,3 @@
-// tests/vitest/unit/tables/updateRelationship.test.ts
-
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
@@ -76,7 +74,7 @@ describe("QuickbaseClient Unit - updateRelationship", () => {
 
     expect(result).toEqual(mockResponse);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`, // Changed to singular
+      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`,
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
@@ -156,7 +154,7 @@ describe("QuickbaseClient Unit - updateRelationship", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`, // Changed to singular
+      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`,
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
@@ -233,7 +231,7 @@ describe("QuickbaseClient Unit - updateRelationship", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`, // Changed to singular
+      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "QB-TEMP-TOKEN initial_token",
@@ -247,20 +245,24 @@ describe("QuickbaseClient Unit - updateRelationship", () => {
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
-      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`, // Changed to singular
+      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: "QB-TEMP-TOKEN new_token",
         }),
       })
     );
+
+    // Updated log expectations
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for updateRelationship (temp token), refreshing token:",
-      expect.any(String)
+      "Authorization error for updateRelationship (temp token), refreshing token:"
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying updateRelationship with temp token"
+      expect.stringContaining(
+        "[updateRelationship] Retrying with token: new_tok"
+      )
     );
+
     consoleSpy.mockRestore();
   });
 
@@ -289,7 +291,7 @@ describe("QuickbaseClient Unit - updateRelationship", () => {
     ).rejects.toThrow("API Error: Invalid field ID (Status: 400)");
 
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`, // Changed to singular
+      `https://api.quickbase.com/v1/tables/${tableId}/relationship/${relationshipId}`,
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
