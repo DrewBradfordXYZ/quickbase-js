@@ -1,4 +1,3 @@
-// tests/vitest/unit/fields/updateField.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -53,7 +52,7 @@ describe("QuickbaseClient Unit - updateField", () => {
         comments: "Updated field settings",
         doesTotal: false,
         defaultValue: "Initial text",
-        choices: ["Option1", "Option2"], // Still valid for properties
+        choices: ["Option1", "Option2"],
       },
       permissions: [
         { role: "Viewer", permissionType: "View", roleId: 10 },
@@ -65,7 +64,7 @@ describe("QuickbaseClient Unit - updateField", () => {
     const mockResponse: UpdateField200Response = {
       id: fieldId,
       label: "Field1",
-      fieldType: "text", // Returned by API, not updated
+      fieldType: "text",
       mode: "",
       noWrap: false,
       bold: false,
@@ -120,10 +119,12 @@ describe("QuickbaseClient Unit - updateField", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
+        body: expect.any(String),
         credentials: "omit",
       })
     );
+    const [_, callOptions] = mockFetch.mock.calls[0];
+    expect(JSON.parse(callOptions.body)).toEqual(request);
   });
 
   it("updates field successfully with temp token", async () => {
@@ -153,7 +154,7 @@ describe("QuickbaseClient Unit - updateField", () => {
     const mockResponse: UpdateField200Response = {
       id: fieldId,
       label: "Field1",
-      fieldType: "text-multiple-choice", // Returned by API, not updated
+      fieldType: "text-multiple-choice",
       mode: "",
       noWrap: false,
       bold: false,
@@ -226,10 +227,12 @@ describe("QuickbaseClient Unit - updateField", () => {
           Authorization: "QB-TEMP-TOKEN temp_token",
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
+        body: expect.any(String),
         credentials: "omit",
       })
     );
+    const [_, callOptions] = mockFetch.mock.calls[1];
+    expect(JSON.parse(callOptions.body)).toEqual(request);
   });
 
   it("handles 400 error for invalid field update", async () => {
@@ -272,9 +275,11 @@ describe("QuickbaseClient Unit - updateField", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
+        body: expect.any(String),
         credentials: "omit",
       })
     );
+    const [_, callOptions] = mockFetch.mock.calls[0];
+    expect(JSON.parse(callOptions.body)).toEqual(request);
   });
 });
