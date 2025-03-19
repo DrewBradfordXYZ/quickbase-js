@@ -160,7 +160,7 @@ describe("QuickbaseClient Unit - createField", () => {
         headers: {
           Authorization: "QB-TEMP-TOKEN temp_token",
           "Content-Type": "application/json",
-          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
         },
         credentials: "omit",
       }
@@ -252,7 +252,7 @@ describe("QuickbaseClient Unit - createField", () => {
         headers: {
           Authorization: "QB-TEMP-TOKEN initial_token",
           "Content-Type": "application/json",
-          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
         },
         credentials: "omit",
       }
@@ -271,13 +271,13 @@ describe("QuickbaseClient Unit - createField", () => {
         headers: {
           Authorization: "QB-TEMP-TOKEN new_token",
           "Content-Type": "application/json",
-          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
         },
         credentials: "omit",
       }
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "[createField] 401 error, attempt 1/2"
+      "Authorization error for createField (temp token), refreshing token:"
     );
     expect(consoleSpy).toHaveBeenCalledWith(
       "[createField] Retrying with token: new_token..."
@@ -341,6 +341,33 @@ describe("QuickbaseClient Unit - createField", () => {
         text: () => Promise.resolve("Unauthorized"),
       })
       .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_2" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized again" }),
+        text: () => Promise.resolve("Unauthorized again"),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_3" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized again" }),
+        text: () => Promise.resolve("Unauthorized again"),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_4" }),
+      })
+      .mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: () => Promise.resolve({ message: "Unauthorized again" }),
@@ -353,7 +380,7 @@ describe("QuickbaseClient Unit - createField", () => {
       client.createField({ tableId: QB_TABLE_ID_1, body: request })
     ).rejects.toThrow("API Error: Unauthorized again (Status: 401)");
 
-    expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(mockFetch).toHaveBeenCalledTimes(8);
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
@@ -362,16 +389,61 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.any(Object)
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN initial_token",
+        }),
+      })
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       3,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
       expect.any(Object)
     );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      4,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_2",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      5,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      6,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_3",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      7,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      8,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_4",
+        }),
+      })
+    );
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "[createField] 401 error, attempt 1/2"
+      "Authorization error for createField (temp token), refreshing token:"
     );
 
     consoleSpy.mockRestore();
