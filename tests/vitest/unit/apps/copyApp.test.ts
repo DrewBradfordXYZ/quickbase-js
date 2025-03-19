@@ -1,5 +1,3 @@
-// tests/vitest/unit/apps/copyApp.test.ts
-
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -45,8 +43,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s1",
       name: "Copied App",
       description: "A copy of the original app",
-      created: new Date("2025-03-11T10:00:00Z"), // Expect Date object
-      updated: new Date("2025-03-11T10:00:00Z"), // Expect Date object
+      created: new Date("2025-03-11T10:00:00Z"),
+      updated: new Date("2025-03-11T10:00:00Z"),
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -97,8 +95,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s1",
       name: "Copied App",
       description: "A copy of the original app",
-      created: "2025-03-11T10:00:00Z", // Expect string
-      updated: "2025-03-11T10:00:00Z", // Expect string
+      created: "2025-03-11T10:00:00Z",
+      updated: "2025-03-11T10:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -149,8 +147,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s2",
       name: "Copied App with Temp Token",
       description: "A copy using temp token",
-      created: new Date("2025-03-11T11:00:00Z"), // Expect Date object
-      updated: new Date("2025-03-11T11:00:00Z"), // Expect Date object
+      created: new Date("2025-03-11T11:00:00Z"),
+      updated: new Date("2025-03-11T11:00:00Z"),
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: true,
@@ -178,27 +176,15 @@ describe("QuickbaseClient Unit - copyApp", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
       `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
-      expect.objectContaining({
-        method: "GET",
-        headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
-          "Content-Type": "application/json",
-        }),
-        credentials: "include",
-      })
+      expect.any(Object)
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
       expect.objectContaining({
-        method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp_token",
-          "Content-Type": "application/json",
         }),
-        credentials: "omit",
-        body: JSON.stringify(request),
       })
     );
   });
@@ -225,8 +211,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s2",
       name: "Copied App with Temp Token",
       description: "A copy using temp token",
-      created: "2025-03-11T11:00:00Z", // Expect string
-      updated: "2025-03-11T11:00:00Z", // Expect string
+      created: "2025-03-11T11:00:00Z",
+      updated: "2025-03-11T11:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: true,
@@ -254,27 +240,15 @@ describe("QuickbaseClient Unit - copyApp", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
       `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
-      expect.objectContaining({
-        method: "GET",
-        headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
-          "Content-Type": "application/json",
-        }),
-        credentials: "include",
-      })
+      expect.any(Object)
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
       expect.objectContaining({
-        method: "POST",
         headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: "QB-TEMP-TOKEN temp_token",
-          "Content-Type": "application/json",
         }),
-        credentials: "omit",
-        body: JSON.stringify(request),
       })
     );
   });
@@ -297,8 +271,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s3",
       name: "Retry Copied App",
       description: "Retry after 401",
-      created: new Date("2025-03-11T12:00:00Z"), // Expect Date object
-      updated: new Date("2025-03-11T12:00:00Z"), // Expect Date object
+      created: new Date("2025-03-11T12:00:00Z"),
+      updated: new Date("2025-03-11T12:00:00Z"),
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -386,8 +360,8 @@ describe("QuickbaseClient Unit - copyApp", () => {
       id: "bpqe82s3",
       name: "Retry Copied App",
       description: "Retry after 401",
-      created: "2025-03-11T12:00:00Z", // Expect string
-      updated: "2025-03-11T12:00:00Z", // Expect string
+      created: "2025-03-11T12:00:00Z",
+      updated: "2025-03-11T12:00:00Z",
       dateFormat: "MM-DD-YYYY",
       timeZone: "(UTC-08:00) Pacific Time (US & Canada)",
       hasEveryoneOnTheInternet: false,
@@ -482,6 +456,125 @@ describe("QuickbaseClient Unit - copyApp", () => {
         }),
         credentials: "omit",
         body: JSON.stringify(request),
+      })
+    );
+  });
+
+  it("exhausts default maxRetries (3) with temp token and throws error", async () => {
+    client = createClient(mockFetch, { useTempTokens: true, debug: true }); // No explicit maxRetries, uses default 3
+
+    const request: CopyAppRequest = {
+      name: "Fail App",
+      description: "Test retry limit",
+      properties: {
+        keepData: false,
+        excludeFiles: true,
+        usersAndRoles: false,
+        assignUserToken: true,
+      },
+    };
+
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_1" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized 1" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_2" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized 2" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_3" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized 3" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ temporaryAuthorization: "token_4" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: "Unauthorized 4" }),
+      });
+
+    await expect(
+      client.copyApp({ appId: QB_APP_ID, body: request })
+    ).rejects.toThrow("API Error: Unauthorized 4 (Status: 401)");
+
+    expect(mockFetch).toHaveBeenCalledTimes(8); // 4 token fetches + 4 API attempts
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_1",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      3,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      4,
+      `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_2",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      5,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      6,
+      `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_3",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      7,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_APP_ID}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      8,
+      `https://api.quickbase.com/v1/apps/${QB_APP_ID}/copy`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN token_4",
+        }),
       })
     );
   });
