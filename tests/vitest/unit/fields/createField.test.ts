@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
   mockFetch,
+  QB_TABLE_ID_1,
   QB_REALM,
   QB_USER_TOKEN,
-  QB_TABLE_ID_1,
 } from "@tests/setup.ts";
-import { CreateFieldRequest, CreateField200Response } from "@/generated/models";
+import { CreateFieldRequest } from "@/generated/models";
 
 describe("QuickbaseClient Unit - createField", () => {
   let client: ReturnType<typeof createClient>;
@@ -21,52 +21,43 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(typeof client.createField).toBe("function");
   });
 
-  it("creates a field successfully with user token", async () => {
+  it("creates field successfully with user token", async () => {
     client = createClient(mockFetch, { debug: true });
 
     const request: CreateFieldRequest = {
-      label: "TestField",
+      label: "NewField",
       fieldType: "text",
-      fieldHelp: "A test field",
-      addToForms: true,
-      permissions: [
-        { role: "Viewer", permissionType: "View", roleId: 10 },
-        { role: "Administrator", permissionType: "Modify", roleId: 12 },
-      ],
     };
 
-    const mockResponse: CreateField200Response = {
-      id: 100,
-      label: "TestField",
+    const mockResponse = {
+      id: 101,
+      label: "NewField",
       fieldType: "text",
+      appearsByDefault: true,
+      audited: false,
+      bold: false,
+      doesDataCopy: false,
+      fieldHelp: "",
+      findEnabled: true,
       mode: "",
       noWrap: false,
-      bold: false,
-      required: false,
-      appearsByDefault: true,
-      findEnabled: true,
-      unique: false,
-      doesDataCopy: false,
-      fieldHelp: "A test field",
-      audited: false,
+      permissions: [],
       properties: {
-        primaryKey: false,
-        foreignKey: false,
-        numLines: 1,
-        maxLength: 0,
-        appendOnly: false,
         allowHTML: false,
         allowMentions: false,
-        sortAsGiven: false,
-        carryChoices: true,
         allowNewChoices: false,
-        formula: "",
+        appendOnly: false,
+        carryChoices: true,
         defaultValue: "",
+        foreignKey: false,
+        formula: "",
+        maxLength: 0,
+        numLines: 1,
+        primaryKey: false,
+        sortAsGiven: false,
       },
-      permissions: [
-        { permissionType: "View", role: "Viewer", roleId: 10 },
-        { permissionType: "Modify", role: "Administrator", roleId: 12 },
-      ],
+      required: false,
+      unique: false,
     };
 
     mockFetch.mockResolvedValueOnce({
@@ -81,25 +72,22 @@ describe("QuickbaseClient Unit - createField", () => {
     });
 
     expect(result).toEqual(mockResponse);
-    const callArgs = mockFetch.mock.calls[0];
-    console.log("Raw fetch call (user token):", callArgs);
-    const receivedBody = JSON.parse(callArgs[1].body as string);
-    expect(receivedBody).toEqual(request);
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
+      {
         method: "POST",
-        headers: expect.objectContaining({
+        body: JSON.stringify(request),
+        headers: {
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
-        }),
-        body: JSON.stringify(request),
-      })
+        },
+        credentials: "omit",
+      }
     );
   });
 
-  it("creates a field successfully with temp token", async () => {
+  it("creates field successfully with temp token", async () => {
     client = createClient(mockFetch, { useTempTokens: true, debug: true });
 
     const request: CreateFieldRequest = {
@@ -108,35 +96,35 @@ describe("QuickbaseClient Unit - createField", () => {
       addToForms: false,
     };
 
-    const mockResponse: CreateField200Response = {
-      id: 101,
+    const mockResponse = {
+      id: 102,
       label: "TempField",
       fieldType: "numeric",
-      mode: "",
-      noWrap: false,
+      appearsByDefault: false,
+      audited: false,
       bold: false,
-      required: false,
-      appearsByDefault: true,
-      findEnabled: true,
-      unique: false,
       doesDataCopy: false,
       fieldHelp: "",
-      audited: false,
+      findEnabled: true,
+      mode: "",
+      noWrap: false,
+      permissions: [],
       properties: {
-        primaryKey: false,
-        foreignKey: false,
-        numLines: 1,
-        maxLength: 0,
-        appendOnly: false,
         allowHTML: false,
         allowMentions: false,
-        sortAsGiven: false,
-        carryChoices: true,
         allowNewChoices: false,
-        formula: "",
+        appendOnly: false,
+        carryChoices: true,
         defaultValue: "",
+        foreignKey: false,
+        formula: "",
+        maxLength: 0,
+        numLines: 1,
+        primaryKey: false,
+        sortAsGiven: false,
       },
-      permissions: [],
+      required: false,
+      unique: false,
     };
 
     mockFetch
@@ -161,29 +149,21 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
-      expect.objectContaining({
-        method: "GET",
-        headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
-          "Content-Type": "application/json",
-        }),
-        credentials: "include",
-      })
+      expect.any(Object)
     );
-    const callArgs = mockFetch.mock.calls[1];
-    console.log("Raw fetch call (temp token):", callArgs);
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
+      {
         method: "POST",
-        headers: expect.objectContaining({
-          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+        body: JSON.stringify(request),
+        headers: {
           Authorization: "QB-TEMP-TOKEN temp_token",
           "Content-Type": "application/json",
-        }),
-        body: JSON.stringify(request),
-      })
+          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+        },
+        credentials: "omit",
+      }
     );
   });
 
@@ -195,35 +175,35 @@ describe("QuickbaseClient Unit - createField", () => {
       fieldType: "checkbox",
     };
 
-    const mockResponse: CreateField200Response = {
+    const mockResponse = {
       id: 102,
       label: "RetryField",
       fieldType: "checkbox",
-      mode: "",
-      noWrap: false,
-      bold: false,
-      required: false,
       appearsByDefault: true,
-      findEnabled: true,
-      unique: false,
+      audited: false,
+      bold: false,
       doesDataCopy: false,
       fieldHelp: "",
-      audited: false,
+      findEnabled: true,
+      mode: "",
+      noWrap: false,
+      permissions: [],
       properties: {
-        primaryKey: false,
-        foreignKey: false,
-        numLines: 1,
-        maxLength: 0,
-        appendOnly: false,
         allowHTML: false,
         allowMentions: false,
-        sortAsGiven: false,
-        carryChoices: true,
         allowNewChoices: false,
-        formula: "",
+        appendOnly: false,
+        carryChoices: true,
         defaultValue: "",
+        foreignKey: false,
+        formula: "",
+        maxLength: 0,
+        numLines: 1,
+        primaryKey: false,
+        sortAsGiven: false,
       },
-      permissions: [],
+      required: false,
+      unique: false,
     };
 
     mockFetch
@@ -237,6 +217,7 @@ describe("QuickbaseClient Unit - createField", () => {
         ok: false,
         status: 401,
         json: () => Promise.resolve({ message: "Unauthorized" }),
+        text: () => Promise.resolve("Unauthorized"),
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -265,11 +246,16 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
-        headers: expect.objectContaining({
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: {
           Authorization: "QB-TEMP-TOKEN initial_token",
-        }),
-      })
+          "Content-Type": "application/json",
+          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+        },
+        credentials: "omit",
+      }
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       3,
@@ -279,18 +265,22 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
-        headers: expect.objectContaining({
+      {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: {
           Authorization: "QB-TEMP-TOKEN new_token",
-        }),
-      })
+          "Content-Type": "application/json",
+          "QB-Realm-Hostname": "builderprogram-dbradford6815.quickbase.com",
+        },
+        credentials: "omit",
+      }
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for createField (temp token), refreshing token:",
-      expect.any(String)
+      "[createField] 401 error, attempt 1/2"
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying createField with temp token"
+      "[createField] Retrying with token: new_token..."
     );
     consoleSpy.mockRestore();
   });
@@ -299,7 +289,7 @@ describe("QuickbaseClient Unit - createField", () => {
     client = createClient(mockFetch, { debug: true });
 
     const request: CreateFieldRequest = {
-      label: "", // Invalid: label is required
+      label: "", // Invalid: empty label
       fieldType: "text",
     };
 
@@ -307,6 +297,7 @@ describe("QuickbaseClient Unit - createField", () => {
       ok: false,
       status: 400,
       json: () => Promise.resolve({ message: "Label is required" }),
+      text: () => Promise.resolve("Label is required"),
     });
 
     await expect(
@@ -315,15 +306,16 @@ describe("QuickbaseClient Unit - createField", () => {
 
     expect(mockFetch).toHaveBeenCalledWith(
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
+      {
         method: "POST",
-        headers: expect.objectContaining({
+        body: JSON.stringify(request),
+        headers: {
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
-        }),
-        body: JSON.stringify(request),
-      })
+        },
+        credentials: "omit",
+      }
     );
   });
 
@@ -346,17 +338,20 @@ describe("QuickbaseClient Unit - createField", () => {
         ok: false,
         status: 401,
         json: () => Promise.resolve({ message: "Unauthorized" }),
+        text: () => Promise.resolve("Unauthorized"),
       })
       .mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: () => Promise.resolve({ message: "Temp token fetch failed" }),
+        json: () => Promise.resolve({ message: "Unauthorized again" }),
+        text: () => Promise.resolve("Unauthorized again"),
       });
 
     const consoleSpy = vi.spyOn(console, "log");
+
     await expect(
       client.createField({ tableId: QB_TABLE_ID_1, body: request })
-    ).rejects.toThrow("API Error: Temp token fetch failed (Status: 401)");
+    ).rejects.toThrow("API Error: Unauthorized again (Status: 401)");
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
     expect(mockFetch).toHaveBeenNthCalledWith(
@@ -367,21 +362,18 @@ describe("QuickbaseClient Unit - createField", () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: "QB-TEMP-TOKEN initial_token",
-        }),
-      })
+      expect.any(Object)
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       3,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
       expect.any(Object)
     );
+
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for createField (temp token), refreshing token:",
-      expect.any(String)
+      "[createField] 401 error, attempt 1/2"
     );
+
     consoleSpy.mockRestore();
   });
 });

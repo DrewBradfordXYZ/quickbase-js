@@ -1,3 +1,4 @@
+// tests/vitest/unit/auth/fetchTempToken401.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
@@ -52,9 +53,9 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
 
+    // Updated to match the single-argument log from handleError
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields (temp token), refreshing token:",
-      expect.any(String)
+      "Authorization error for getFields (temp token), refreshing token:"
     );
 
     consoleSpy.mockRestore();

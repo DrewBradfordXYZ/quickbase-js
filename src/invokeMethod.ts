@@ -1,8 +1,8 @@
 // src/invokeMethod.ts
-import { QuickbaseClient } from "./quickbaseClient";
+import { AuthorizationStrategy, extractDbid } from "./authorizationStrategy";
+import { RateLimiter } from "./rateLimiter";
 import { ResponseError } from "./generated/runtime";
-import { ThrottleBucket } from "./ThrottleBucket";
-import { RateLimitError } from "./RateLimitError";
+import { QuickbaseClient } from "./quickbaseClient";
 import { GetTempTokenDBID200Response } from "./generated/models";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
@@ -17,92 +17,73 @@ export interface MethodInfo<K extends keyof QuickbaseClient> {
   httpMethod: string;
 }
 
-export interface TempTokenParams {
-  appId?: string;
-  tableId?: string;
-  dbid?: string;
-}
-
-export interface TokenCache {
-  get: (dbid: string) => string | undefined;
-  set: (dbid: string, token: string) => void;
-}
-
 export async function invokeMethod<K extends keyof QuickbaseClient>(
   methodName: K,
-  params: Parameters<QuickbaseClient[K]>[0] & Partial<TempTokenParams>,
+  params: Parameters<QuickbaseClient[K]>[0] & {
+    dbid?: string;
+    tableId?: string;
+    appId?: string;
+  },
   methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
   baseHeaders: Record<string, string>,
-  tokenCache: TokenCache,
+  authStrategy: AuthorizationStrategy,
+  rateLimiter: RateLimiter,
   fetchTempToken: (dbid: string) => Promise<string>,
   transformDates: (obj: any, convertStringsToDates: boolean) => any,
-  initialTempToken: string | undefined,
-  userToken: string | undefined,
-  useTempTokens: boolean | undefined,
   debug: boolean | undefined,
-  convertDates: boolean,
-  retryCount: number = 0,
-  throttleBucket: ThrottleBucket | null = null,
-  maxRetries: number = 3,
-  retryDelay: number = 1000
+  convertDates: boolean
 ): Promise<ReturnType<QuickbaseClient[K]>> {
+  console.log("[invokeMethod] Starting for method:", methodName);
+
   const methodInfo = methodMap[methodName];
   if (!methodInfo) throw new Error(`Method ${methodName} not found`);
 
   const hasBody = "body" in params && params.body !== undefined;
-  const body = hasBody ? (params as any).body : undefined;
+  const body = hasBody ? params.body : undefined;
   const restParams: any = hasBody
     ? Object.fromEntries(
         Object.entries(params).filter(([key]) => key !== "body")
       )
     : { ...params };
-
   const requestParameters: any = {
     ...restParams,
     ...(hasBody ? { generated: body } : {}),
   };
 
-  let requestOptions: RequestInit = {
-    credentials: "omit",
+  const requestOptions: RequestInit = {
+    credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
     method: methodInfo.httpMethod,
-    ...(hasBody ? { body } : {}),
   };
 
-  const selectedToken =
-    initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
-  let authorizationToken = selectedToken;
+  let dbid: string | undefined = extractDbid(params, methodName);
+  console.log("[invokeMethod] Extracted dbid:", dbid);
 
-  if (methodName === "getTempTokenDBID" && useTempTokens) {
-    const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
-    const cachedToken = tokenCache.get(dbid);
-    if (cachedToken) {
-      return Promise.resolve({
-        temporaryAuthorization: cachedToken,
-      } as GetTempTokenDBID200Response as ReturnType<QuickbaseClient[K]>);
-    }
+  let token = dbid
+    ? await authStrategy.getToken(dbid)
+    : await authStrategy.getToken("");
+  console.log("[invokeMethod] Initial token:", token);
+
+  if (!token && dbid) {
+    token = await fetchTempToken(dbid);
+    authStrategy.applyHeaders(baseHeaders, token);
+    requestOptions.headers = { ...baseHeaders };
+    console.log("[invokeMethod] Fetched new token:", token);
   }
 
-  if (useTempTokens && !authorizationToken) {
-    const dbid = extractDbid(
-      params,
-      `No dbid found in params for ${methodName} to fetch temp token`
+  if (token) {
+    authStrategy.applyHeaders(baseHeaders, token);
+    requestOptions.headers = { ...baseHeaders };
+    console.log(
+      "[invokeMethod] Token found, headers set:",
+      requestOptions.headers
     );
-    const cachedToken = tokenCache.get(dbid);
-    authorizationToken = cachedToken || (await fetchTempToken(dbid));
     if (methodName === "getTempTokenDBID") {
-      return Promise.resolve({
-        temporaryAuthorization: authorizationToken,
-      } as GetTempTokenDBID200Response as ReturnType<QuickbaseClient[K]>);
+      console.log("[invokeMethod] Using cached token:", token);
+      return { temporaryAuthorization: token } as ReturnType<
+        QuickbaseClient[K]
+      >;
     }
   }
-  requestOptions.headers = authorizationToken
-    ? {
-        ...baseHeaders,
-        Authorization: useTempTokens
-          ? `QB-TEMP-TOKEN ${authorizationToken}`
-          : `QB-USER-TOKEN ${authorizationToken}`,
-      }
-    : baseHeaders;
 
   if (debug) {
     console.log(`[${methodName}] requestParameters:`, requestParameters);
@@ -113,24 +94,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     rawResponse: any
   ): Promise<ReturnType<QuickbaseClient[K]>> {
     if (debug) console.log(`[${methodName}] rawResponse:`, rawResponse);
-
     if (rawResponse instanceof Response) {
       const contentType = rawResponse.headers
         .get("Content-Type")
         ?.toLowerCase();
       if (debug) console.log(`[${methodName}] contentType:`, contentType);
-
-      if (contentType?.includes("application/octet-stream")) {
-        return (await rawResponse.arrayBuffer()) as ReturnType<
-          QuickbaseClient[K]
-        >;
-      }
-      if (
-        contentType?.includes("application/x-yaml") ||
-        contentType?.includes("text/yaml")
-      ) {
-        return (await rawResponse.text()) as ReturnType<QuickbaseClient[K]>;
-      }
       if (contentType?.includes("application/json")) {
         const jsonResponse = await rawResponse.json();
         return transformDates(jsonResponse, convertDates) as ReturnType<
@@ -139,7 +107,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       }
       return rawResponse as ReturnType<QuickbaseClient[K]>;
     }
-
     if (rawResponse && typeof rawResponse.value === "function") {
       const response = await rawResponse.value();
       if (debug)
@@ -148,214 +115,94 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         QuickbaseClient[K]
       >;
     }
-
-    const transformed = transformDates(rawResponse, convertDates);
-    if (debug)
-      console.log(`[${methodName}] Transformed non-Response:`, transformed);
-    return transformed as ReturnType<QuickbaseClient[K]>;
+    return transformDates(rawResponse, convertDates) as ReturnType<
+      QuickbaseClient[K]
+    >;
   }
 
-  async function withRetries(
-    fn: () => Promise<ReturnType<QuickbaseClient[K]>>,
-    options: {
-      maxAttempts: number;
-      shouldRetry: (error: any) => boolean;
-      onRetry?: (error: any, attempt: number) => Promise<void>;
-      delay?: (attempt: number, error: any) => number;
+  async function parseErrorResponse(
+    response: any
+  ): Promise<{ message: string; status: number }> {
+    let message = "Unknown error";
+    let status = response.status || 500;
+    try {
+      const contentType = response.headers?.get
+        ? response.headers.get("Content-Type")?.toLowerCase()
+        : "application/json";
+      if (
+        contentType?.includes("application/json") &&
+        typeof response.json === "function"
+      ) {
+        const errorBody = await response.json();
+        message = errorBody?.message || message;
+      } else if (typeof response.text === "function") {
+        message = (await response.text()) || message;
+      }
+    } catch (e) {
+      if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
     }
-  ): Promise<ReturnType<QuickbaseClient[K]>> {
-    let attempt = 0;
-    while (true) {
-      try {
-        if (throttleBucket) {
-          if (debug) console.log(`[${methodName}] Awaiting throttle bucket`);
-          await throttleBucket.acquire();
-          if (debug) console.log(`[${methodName}] Throttle bucket acquired`);
-        }
-        return await fn();
-      } catch (error) {
-        console.log(`[${methodName}] Caught error:`, error);
-        console.log(
-          `[${methodName}] instanceof ResponseError:`,
-          error instanceof ResponseError
-        );
-        console.log(
-          `[${methodName}] Response status:`,
-          (error as any).response?.status
-        );
-        const effectiveError =
-          error instanceof Object &&
-          "cause" in error &&
-          error.cause instanceof ResponseError
-            ? error.cause
-            : error instanceof ResponseError
-            ? error
-            : error;
-        console.log(`[${methodName}] Effective error:`, effectiveError);
-        console.log(
-          `[${methodName}] Effective instanceof ResponseError:`,
-          effectiveError instanceof ResponseError
-        );
-        console.log(
-          `[${methodName}] Effective response status:`,
-          (effectiveError as any).response?.status
-        );
+    console.log(
+      "[invokeMethod] Parsed error - status:",
+      status,
+      "message:",
+      message
+    );
+    return { message, status };
+  }
 
+  let attempt = 0;
+  const maxAttempts = 2;
+
+  while (attempt < maxAttempts) {
+    console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
+    try {
+      await rateLimiter.throttle();
+      console.log("[invokeMethod] About to call API for method:", methodName);
+      const response = await methodInfo.method(
+        requestParameters,
+        requestOptions
+      );
+      return await processResponse(response);
+    } catch (error) {
+      let status: number, message: string, response: any;
+
+      console.log("[invokeMethod] Caught error:", error);
+
+      if (error instanceof ResponseError && error.response) {
+        response = error.response;
+        ({ message, status } = await parseErrorResponse(response));
+      } else if (error instanceof Response) {
+        response = error;
+        ({ message, status } = await parseErrorResponse(response));
+      } else {
+        if (debug) console.log(`[${methodName}] Unexpected error:`, error);
+        throw error;
+      }
+
+      console.log("[invokeMethod] Handling error with status:", status);
+
+      const newToken = await authStrategy.handleError(
+        status,
+        params,
+        fetchTempToken,
+        attempt,
+        maxAttempts,
+        debug,
+        methodName
+      );
+      if (newToken) {
+        token = newToken;
+        authStrategy.applyHeaders(baseHeaders, token);
+        requestOptions.headers = { ...baseHeaders };
         attempt++;
-        if (
-          !options.shouldRetry(effectiveError) ||
-          attempt >= options.maxAttempts
-        ) {
-          let errorMessage =
-            effectiveError instanceof ResponseError
-              ? effectiveError.message
-              : String(error);
-          console.log(`[${methodName}] No retry, throwing:`, errorMessage);
-          if (
-            effectiveError instanceof ResponseError &&
-            effectiveError.response
-          ) {
-            try {
-              const errorBody = await effectiveError.response.json();
-              if (debug)
-                console.log(`[${methodName}] Error response body:`, errorBody);
-              errorMessage = errorBody?.message || errorMessage;
-            } catch (e) {
-              if (debug)
-                console.log(`[${methodName}] Failed to parse error body:`, e);
-            }
-            throw new Error(
-              `API Error: ${errorMessage} (Status: ${effectiveError.response.status})`
-            );
-          }
-          throw new Error(`API Error: ${errorMessage} (Status: unknown)`);
-        }
-        if (options.onRetry) {
-          console.log(`[${methodName}] Retrying, attempt:`, attempt);
-          await options.onRetry(effectiveError, attempt);
-        }
-        const delayMs = options.delay
-          ? options.delay(attempt, effectiveError)
-          : retryDelay * Math.pow(2, attempt - 1);
         if (debug)
           console.log(
-            `[${methodName}] Retrying after ${delayMs}ms (attempt ${attempt}/${
-              options.maxAttempts - 1
-            })`
+            `[${methodName}] Retrying with token: ${token.substring(0, 10)}...`
           );
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
       }
+      throw new Error(`API Error: ${message} (Status: ${status})`);
     }
   }
-
-  const mainPromise = withRetries(
-    () =>
-      methodInfo
-        .method(requestParameters, requestOptions)
-        .then(processResponse),
-    {
-      maxAttempts: (useTempTokens ?? false) || userToken ? 2 : 1,
-      shouldRetry: (error) =>
-        error instanceof ResponseError &&
-        error.response?.status === 401 &&
-        ((useTempTokens ?? false) ||
-          (!!userToken && !(useTempTokens ?? false))),
-      onRetry: async (error) => {
-        if (error instanceof ResponseError && error.response?.status === 401) {
-          if (useTempTokens ?? false) {
-            if (debug)
-              console.log(
-                `Authorization error for ${methodName} (temp token), refreshing token:`,
-                error.message
-              );
-            const dbid = extractDbid(
-              params,
-              `No dbid to refresh token after authorization error`
-            );
-            try {
-              authorizationToken = await fetchTempToken(dbid);
-            } catch (fetchError) {
-              const fetchErrorMessage =
-                fetchError instanceof ResponseError && fetchError.response
-                  ? (await fetchError.response.json())?.message ||
-                    "Unauthorized"
-                  : String(fetchError);
-              throw new Error(
-                `API Error: ${fetchErrorMessage} (Status: ${
-                  fetchError instanceof ResponseError &&
-                  fetchError.response?.status
-                    ? fetchError.response.status
-                    : "unknown"
-                })`
-              );
-            }
-            requestOptions.headers = {
-              ...baseHeaders,
-              Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-            };
-          } else if (userToken) {
-            if (debug)
-              console.log(
-                `Authorization error for ${methodName} (user token), retrying with same token:`,
-                error.message
-              );
-          }
-          if (debug)
-            console.log(
-              `Retrying ${methodName} with ${
-                useTempTokens ? "temp" : "user"
-              } token`
-            );
-        }
-      },
-    }
-  );
-
-  return mainPromise.catch((error: unknown) => {
-    let effectiveError: unknown = error;
-    if (
-      error instanceof Object &&
-      "cause" in error &&
-      error.cause instanceof ResponseError
-    ) {
-      effectiveError = error.cause;
-    } else if (error instanceof ResponseError) {
-      effectiveError = error;
-    }
-
-    if (
-      effectiveError instanceof ResponseError &&
-      effectiveError.response?.status === 429
-    ) {
-      return withRetries(() => Promise.reject(error), {
-        maxAttempts: maxRetries + 1,
-        shouldRetry: (err) =>
-          err instanceof ResponseError && err.response?.status === 429,
-        delay: (attempt, err) => {
-          const headers =
-            err instanceof ResponseError && err.response
-              ? err.response.headers
-              : new Headers();
-          const retryAfter = headers.get("Retry-After");
-          return retryAfter
-            ? parseInt(retryAfter, 10) * 1000
-            : retryDelay * Math.pow(2, attempt - 1);
-        },
-      });
-    }
-    throw effectiveError;
-  });
-}
-
-function extractDbid(
-  params: Partial<TempTokenParams> & { body?: any },
-  errorMessage: string
-): string {
-  const dbid =
-    params.dbid ||
-    params.tableId ||
-    params.appId ||
-    (params.body && "from" in params.body ? params.body.from : undefined);
-  if (!dbid) throw new Error(errorMessage);
-  return dbid;
+  throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
 }

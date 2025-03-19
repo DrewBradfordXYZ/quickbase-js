@@ -1,3 +1,4 @@
+// tests/vitest/unit/auth/retryTempTokenTwo401.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createClient, mockFetch } from "@tests/setup.ts";
 
@@ -69,12 +70,11 @@ describe("QuickbaseClient - Two Temp Token 401s in a Row", () => {
     ]);
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields (temp token), refreshing token:",
-      expect.any(String)
-    );
+      "Authorization error for getFields (temp token), refreshing token:"
+    ); // Single argument
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying getFields with temp token"
-    );
+      "[getFields] Retrying with token: new_token_..."
+    ); // Match actual log from invokeMethod.ts
 
     consoleSpy.mockRestore();
   });

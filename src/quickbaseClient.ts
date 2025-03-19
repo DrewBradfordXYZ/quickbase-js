@@ -1,11 +1,18 @@
 // src/quickbaseClient.ts
+
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
 import { TokenCache } from "./tokenCache";
 import { simplifyName } from "./utils";
-import { invokeMethod, MethodInfo } from "./invokeMethod"; // Added import
+import { invokeMethod, MethodInfo } from "./invokeMethod";
+import {
+  TempTokenStrategy,
+  UserTokenStrategy,
+  AuthorizationStrategy,
+} from "./authorizationStrategy";
 import { ThrottleBucket } from "./ThrottleBucket";
+import { RateLimiter } from "./rateLimiter";
 
 export * from "./generated/models/index";
 
@@ -19,10 +26,11 @@ export interface QuickbaseConfig {
   debug?: boolean;
   fetchApi?: typeof fetch;
   convertDates?: boolean;
-  tokenLifespan?: number;
+  tempTokenLifespan?: number;
   throttle?: { rate: number; burst: number };
   maxRetries?: number;
   retryDelay?: number;
+  tokenCache?: TokenCache;
 }
 
 type MethodMap = {
@@ -67,8 +75,8 @@ function inferHttpMethod(methodSource: string, debug?: boolean): string {
   const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
   const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
   if (debug) {
-    // console.log(`[inferHttpMethod] Source:`, methodSource);
-    // console.log(`[inferHttpMethod] Extracted method:`, method);
+    console.log(`[inferHttpMethod] Source:`, methodSource);
+    console.log(`[inferHttpMethod] Extracted method:`, method);
   }
   return method;
 }
@@ -77,33 +85,33 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
     userToken,
-    tempToken: initialTempToken,
+    tempToken,
     useTempTokens,
     fetchApi,
     debug,
     convertDates = true,
-    tokenLifespan,
+    tempTokenLifespan,
     throttle = { rate: 10, burst: 10 },
     maxRetries = 3,
     retryDelay = 1000,
+    tokenCache: providedTokenCache,
   } = config;
   const baseUrl = `https://api.quickbase.com/v1`;
 
-  const tokenCache = new TokenCache(tokenLifespan);
+  const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
   const throttleBucket = throttle
     ? new ThrottleBucket(throttle.rate, throttle.burst)
     : null;
+  const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
+
+  const authStrategy: AuthorizationStrategy = useTempTokens
+    ? new TempTokenStrategy(tokenCache, tempToken)
+    : new UserTokenStrategy(userToken || "");
 
   const baseHeaders: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
     "Content-Type": "application/json",
   };
-
-  if (initialTempToken) {
-    baseHeaders["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
-  } else if (userToken && !useTempTokens) {
-    baseHeaders["Authorization"] = `QB-USER-TOKEN ${userToken}`;
-  }
 
   const defaultFetch: typeof fetch | undefined =
     typeof globalThis.window !== "undefined"
@@ -159,7 +167,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             const methodSource = method.toString();
             methodMap[simplifiedName] = {
               api,
-              method: boundMethod as any, // Adjust typing as needed
+              method: boundMethod as any,
               paramMap: getParamNames(method),
               httpMethod: inferHttpMethod(methodSource, debug),
             };
@@ -200,7 +208,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     if (!token) {
       throw new Error("No temporary token returned from API");
     }
-    tokenCache.set(dbid, token);
+    tokenCache.set(dbid, token, tempTokenLifespan);
     if (debug) {
       console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
     }
@@ -208,7 +216,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   };
 
   const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, {
-    get: (_, prop: string): ((params: any) => Promise<any>) | undefined => {
+    get: (_, prop: string) => {
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
         return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
@@ -217,18 +225,12 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             params,
             methodMap,
             baseHeaders,
-            tokenCache,
+            authStrategy,
+            rateLimiter,
             fetchTempToken,
             transformDates,
-            initialTempToken,
-            userToken,
-            useTempTokens,
             debug,
-            convertDates,
-            0, // retryCount
-            throttleBucket,
-            maxRetries,
-            retryDelay
+            convertDates
           );
       }
       return undefined;

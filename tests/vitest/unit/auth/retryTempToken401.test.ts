@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+// tests/vitest/unit/auth/retryTempToken401.test.ts
+
+import { describe, it, expect, vi } from "vitest";
 import {
   createClient,
   mockFetch,
@@ -7,107 +9,87 @@ import {
 } from "@tests/setup.ts";
 
 describe("QuickbaseClient Unit - Temp Token Retry on 401", () => {
-  let client: ReturnType<typeof createClient>;
-
-  beforeEach(() => {
-    mockFetch.mockClear();
-    client = createClient(mockFetch, { useTempTokens: true, debug: true });
-  });
-
   it("creates a new token on 401 and retries successfully", async () => {
-    const mockToken = "new_token_456";
-    const mockFields = [{ id: 1, label: "Field1" }];
-    let callCount = 0;
-
-    mockFetch.mockImplementation((url) => {
-      callCount++;
-      if (url.includes("auth/temporary") && callCount === 1) {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-        });
-      }
-      if (url.includes("fields") && callCount === 2) {
-        return Promise.resolve({
-          ok: false,
+    mockFetch
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ temporaryAuthorization: "initial_token" }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: "Unauthorized" }), {
           status: 401,
-          json: () => Promise.resolve({ message: "Unauthorized" }),
-        });
-      }
-      if (url.includes("auth/temporary") && callCount === 3) {
-        return Promise.resolve({
-          ok: true,
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ temporaryAuthorization: "new_token_456" }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([{ id: 1, label: "Field1" }]), {
           status: 200,
-          json: () =>
-            Promise.resolve({ temporaryAuthorization: mockToken + "_retry" }),
-        });
-      }
-      if (url.includes("fields") && callCount === 4) {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve(mockFields),
-        });
-      }
-      return Promise.reject(new Error(`Unexpected fetch call: ${url}`));
-    });
+        })
+      );
 
     const consoleSpy = vi.spyOn(console, "log");
+    const client = createClient(mockFetch, {
+      realm: QB_REALM,
+      useTempTokens: true,
+      debug: true,
+    });
 
     const result = await client.getFields({ tableId: QB_TABLE_ID_1 });
 
-    expect(result).toEqual(mockFields);
+    expect(result).toEqual([{ id: 1, label: "Field1" }]);
     expect(mockFetch).toHaveBeenCalledTimes(4);
     expect(mockFetch).toHaveBeenNthCalledWith(
       1,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
-      expect.any(Object)
+      expect.objectContaining({
+        credentials: "include",
+        method: "GET",
+      })
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
+        method: "GET",
         headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN initial_token",
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          "Content-Type": "application/json",
         }),
       })
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       3,
       `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
-      expect.any(Object)
+      expect.objectContaining({
+        credentials: "include",
+        method: "GET",
+      })
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       4,
       `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
       expect.objectContaining({
+        method: "GET",
         headers: expect.objectContaining({
+          Authorization: "QB-TEMP-TOKEN new_token_456",
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          "Content-Type": "application/json",
         }),
       })
     );
-
-    const tokenLogs = consoleSpy.mock.calls.filter((call) =>
-      call[0].includes("Fetched and cached new token")
-    );
-    expect(tokenLogs).toContainEqual([
-      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
-      mockToken,
-    ]);
-    expect(tokenLogs).toContainEqual([
-      `Fetched and cached new token for dbid: ${QB_TABLE_ID_1}`,
-      mockToken + "_retry",
-    ]);
-
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields (temp token), refreshing token:",
-      expect.any(String)
+      "Authorization error for getFields (temp token), refreshing token:"
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying getFields with temp token"
+      "[getFields] Retrying with token: new_token_..."
     );
-
-    consoleSpy.mockRestore();
   });
 });

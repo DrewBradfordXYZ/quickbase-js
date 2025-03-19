@@ -1,50 +1,34 @@
+// src/tokenCache.ts
 interface CachedToken {
   token: string;
-  expiresAt: number; // Timestamp in milliseconds
+  expiresAt: number;
 }
 
 export class TokenCache {
   private cache: Map<string, CachedToken>;
-  private readonly lifespan: number; // Token lifespan in milliseconds
+  private readonly tempTokenLifespan: number;
 
-  constructor(lifespan: number = 4 * 60 * 1000 + 50 * 1000) {
-    // Default 4:50
+  constructor(tempTokenLifespan: number = 4 * 60 * 1000 + 50 * 1000) {
     this.cache = new Map<string, CachedToken>();
-    this.lifespan = lifespan;
+    this.tempTokenLifespan = tempTokenLifespan;
   }
 
   get(dbid: string): string | undefined {
     const entry = this.cache.get(dbid);
     const now = Date.now();
-    if (entry && entry.expiresAt > now) {
-      return entry.token;
-    }
-    return undefined; // Expired or not found
+    if (entry && entry.expiresAt > now) return entry.token;
+    if (entry) this.cache.delete(dbid); // Clean up expired temp tokens
+    return undefined;
   }
 
-  // New method to get full entry
-  getEntry(dbid: string): CachedToken | undefined {
-    const entry = this.cache.get(dbid);
-    const now = Date.now();
-    if (entry && entry.expiresAt > now) {
-      return entry;
-    }
-    return undefined; // Expired or not found
-  }
-
-  set(dbid: string, token: string): void {
+  set(dbid: string, token: string, lifespan?: number): void {
     const now = Date.now();
     this.cache.set(dbid, {
       token,
-      expiresAt: now + this.lifespan,
+      expiresAt: now + (lifespan || this.tempTokenLifespan),
     });
   }
 
-  dump(): [string, CachedToken][] {
-    return Array.from(this.cache.entries());
-  }
-
-  // New method to clear the cache
   clear(): void {
     this.cache.clear();
   }

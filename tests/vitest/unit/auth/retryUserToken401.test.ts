@@ -1,56 +1,69 @@
-import { describe, it, vi, expect, beforeEach } from "vitest";
-import { quickbase, QuickbaseClient } from "../../../../src/quickbaseClient";
-import { ResponseError } from "../../../../src/generated/runtime";
+// tests/vitest/unit/auth/retryUserToken401.test.ts
 
-describe("QuickbaseClient Integration - User Token Retry on 401", () => {
-  let client: QuickbaseClient;
-  const mockFetch = vi.fn();
+import { describe, it, expect, vi } from "vitest";
+import {
+  createClient,
+  mockFetch,
+  QB_REALM,
+  QB_TABLE_ID_1,
+} from "@tests/setup.ts";
 
-  beforeEach(() => {
-    const config = {
-      realm: process.env.QB_REALM || "builderprogram-dbradford6815",
-      userToken: "mock-user-token",
-      debug: true,
-      fetchApi: mockFetch,
-    };
-    console.log("[quickbaseTest] Config:", config);
-    client = quickbase(config);
-  });
-
-  it("retries on transient 401 with user token and succeeds", async () => {
-    const consoleSpy = vi.spyOn(console, "log");
-
+describe("QuickbaseClient Unit - User Token Retry on 401", () => {
+  it("retries with the same user token on 401 and succeeds", async () => {
+    const userToken = "b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3";
     mockFetch
-      .mockImplementationOnce(() => {
-        const response = new Response(null, {
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ message: "Unauthorized" }), {
           status: 401,
-          statusText: "Unauthorized",
-        });
-        console.log("[mockFetch] Throwing 401 ResponseError");
-        return Promise.reject(new ResponseError(response));
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => [{ id: 1, label: "Mock Field", fieldType: "text" }],
-      });
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([{ id: 1, label: "Field1" }]), {
+          status: 200,
+        })
+      );
 
-    const fields = await client.getFields({ tableId: "mock-table-id" });
+    const consoleSpy = vi.spyOn(console, "log");
+    const client = createClient(mockFetch, {
+      realm: QB_REALM,
+      userToken,
+      useTempTokens: false,
+      debug: true,
+    });
 
-    expect(fields).toBeInstanceOf(Array);
-    expect(fields.length).toBeGreaterThan(0);
-    expect(fields[0]).toHaveProperty("id");
-    expect(fields[0]).toHaveProperty("label");
+    const result = await client.getFields({ tableId: QB_TABLE_ID_1 });
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Authorization error for getFields (user token), retrying with same token:",
-      "" // Matches empty ResponseError message from mock
-    );
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Retrying getFields with user token"
-    );
+    expect(result).toEqual([{ id: 1, label: "Field1" }]);
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    consoleSpy.mockRestore();
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: `QB-USER-TOKEN ${userToken}`,
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          "Content-Type": "application/json",
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: `QB-USER-TOKEN ${userToken}`,
+          "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
+          "Content-Type": "application/json",
+        }),
+      })
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `Retrying getFields with existing user token: b9f3pk_q4j...`
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[getFields] Retrying with token: b9f3pk_q4j..."
+    );
   });
 });

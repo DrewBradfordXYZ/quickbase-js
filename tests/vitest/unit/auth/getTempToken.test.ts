@@ -1,18 +1,39 @@
-// tests/vitest/unit/auth/getTempTokenDBID.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
+// tests/vitest/unit/auth/getTempToken.test.ts
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
   mockFetch,
   QB_REALM,
   QB_TABLE_ID_1,
 } from "@tests/setup.ts";
+import { TokenCache } from "../../../../src/tokenCache"; // Corrected path
+import { AuthApi } from "../../../../src/generated/apis/AuthApi";
 
 describe("QuickbaseClient Unit - getTempTokenDBID", () => {
   let client: ReturnType<typeof createClient>;
+  let tokenCache: TokenCache;
+  let authApi: AuthApi;
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = createClient(mockFetch, { useTempTokens: true, debug: false });
+    tokenCache = new TokenCache();
+    client = createClient(mockFetch, {
+      useTempTokens: true,
+      debug: true,
+      tokenCache,
+    });
+    authApi = new AuthApi(client["configuration"]);
+    vi.spyOn(authApi, "getTempTokenDBIDRaw").mockImplementation(
+      async (params) => {
+        const mockToken = "b123xyz_temp_token";
+        if (params.dbid === QB_TABLE_ID_1) {
+          return {
+            value: () => Promise.resolve({ temporaryAuthorization: mockToken }),
+          } as any;
+        }
+        throw new Error("Unexpected dbid");
+      }
+    );
   });
 
   it("initializes without errors", () => {
@@ -26,11 +47,12 @@ describe("QuickbaseClient Unit - getTempTokenDBID", () => {
   it("fetches and caches temp token on first call", async () => {
     const mockToken = "b123xyz_temp_token";
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ temporaryAuthorization: mockToken }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
 
     const result = await client.getTempTokenDBID({ dbid: QB_TABLE_ID_1 });
     expect(result).toEqual({ temporaryAuthorization: mockToken });
@@ -50,11 +72,12 @@ describe("QuickbaseClient Unit - getTempTokenDBID", () => {
   it("reuses cached temp token on second call", async () => {
     const mockToken = "b123xyz_temp_token";
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: () => Promise.resolve({ temporaryAuthorization: mockToken }),
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ temporaryAuthorization: mockToken }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
 
     const firstResult = await client.getTempTokenDBID({ dbid: QB_TABLE_ID_1 });
     expect(firstResult).toEqual({ temporaryAuthorization: mockToken });
@@ -67,11 +90,12 @@ describe("QuickbaseClient Unit - getTempTokenDBID", () => {
   });
 
   it("handles API error", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      json: () => Promise.resolve({ message: "Unauthorized" }),
-    });
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
 
     await expect(
       client.getTempTokenDBID({ dbid: QB_TABLE_ID_1 })
