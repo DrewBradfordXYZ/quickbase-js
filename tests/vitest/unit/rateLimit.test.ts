@@ -140,6 +140,7 @@ describe("QuickbaseClient Unit - Rate Limit Handling", () => {
       userToken: QB_USER_TOKEN,
       debug: true,
       throttle: { rate: 5, burst: 5 },
+      maxRetries: 0, // Prevent retries for this test
     });
 
     const appId = QB_APP_ID;
@@ -177,13 +178,14 @@ describe("QuickbaseClient Unit - Rate Limit Handling", () => {
       client.getApp({ appId }),
       client.getApp({ appId }),
       client.getApp({ appId }),
-      client.getApp({ appId }), // 6th call triggers throttle
+      client.getApp({ appId }), // 6th call should be throttled
     ]);
     const endTime = Date.now();
     const durationMs = endTime - startTime;
 
+    console.log(`[Test Debug] mockFetch calls: ${mockFetch.mock.calls.length}`);
     expect(mockFetch).toHaveBeenCalledTimes(6);
-    expect(durationMs).toBeGreaterThanOrEqual(200);
+    expect(durationMs).toBeGreaterThanOrEqual(200); // 1/5 sec for 6th call
     expect(durationMs).toBeLessThan(1000);
   });
 });

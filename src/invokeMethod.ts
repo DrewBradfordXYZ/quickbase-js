@@ -1,6 +1,8 @@
 // src/invokeMethod.ts
+
 import { AuthorizationStrategy, extractDbid } from "./authorizationStrategy";
 import { RateLimiter } from "./rateLimiter";
+import { RateLimitError } from "./RateLimitError";
 import { ResponseError } from "./generated/runtime";
 import { QuickbaseClient } from "./quickbaseClient";
 import { GetTempTokenDBID200Response } from "./generated/models";
@@ -55,7 +57,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     method: methodInfo.httpMethod,
   };
 
-  let dbid: string | undefined = extractDbid(params, methodName);
+  let dbid: string | undefined = extractDbid(params);
   console.log("[invokeMethod] Extracted dbid:", dbid);
 
   let token = dbid
@@ -126,20 +128,29 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     let message = "Unknown error";
     let status = response.status || 500;
     try {
-      const contentType = response.headers?.get
-        ? response.headers.get("Content-Type")?.toLowerCase()
-        : "application/json";
+      const contentType =
+        response.headers?.get("Content-Type")?.toLowerCase() ||
+        "application/json";
       if (
-        contentType?.includes("application/json") &&
+        contentType.includes("application/json") &&
         typeof response.json === "function"
       ) {
         const errorBody = await response.json();
-        message = errorBody?.message || message;
+        if (
+          errorBody &&
+          typeof errorBody === "object" &&
+          "message" in errorBody
+        ) {
+          message = errorBody.message;
+        } else {
+          message = "Invalid error response format";
+        }
       } else if (typeof response.text === "function") {
         message = (await response.text()) || message;
       }
     } catch (e) {
       if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
+      message = "Failed to parse error response";
     }
     console.log(
       "[invokeMethod] Parsed error - status:",
@@ -151,7 +162,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   }
 
   let attempt = 0;
-  const maxAttempts = 2;
+  const maxAttempts = rateLimiter.maxRetries + 1;
 
   while (attempt < maxAttempts) {
     console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
@@ -180,6 +191,23 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       }
 
       console.log("[invokeMethod] Handling error with status:", status);
+
+      if (status === 429) {
+        const delay = await rateLimiter.handle429(error, attempt + 1);
+        if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
+        if (attempt + 1 === maxAttempts) {
+          throw new RateLimitError(
+            `API Error: ${message} (Status: ${status})`,
+            status,
+            response.headers.get("Retry-After")
+              ? parseInt(response.headers.get("Retry-After")!, 10)
+              : undefined
+          );
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        attempt++;
+        continue;
+      }
 
       const newToken = await authStrategy.handleError(
         status,
