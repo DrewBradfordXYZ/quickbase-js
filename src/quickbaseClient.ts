@@ -10,6 +10,7 @@ import {
   TempTokenStrategy,
   UserTokenStrategy,
   AuthorizationStrategy,
+  SsoTokenStrategy,
 } from "./authorizationStrategy";
 import { ThrottleBucket } from "./ThrottleBucket";
 import { RateLimiter } from "./rateLimiter";
@@ -23,6 +24,8 @@ export interface QuickbaseConfig {
   userToken?: string;
   tempToken?: string;
   useTempTokens?: boolean;
+  useSso?: boolean;
+  samlToken?: string;
   debug?: boolean;
   fetchApi?: typeof fetch;
   convertDates?: boolean;
@@ -96,6 +99,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     userToken,
     tempToken,
     useTempTokens,
+    useSso,
+    samlToken,
     fetchApi,
     debug,
     convertDates = true,
@@ -113,7 +118,19 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     : null;
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
-  const authStrategy: AuthorizationStrategy = useTempTokens
+  const defaultFetch: typeof fetch | undefined =
+    typeof globalThis.window !== "undefined"
+      ? globalThis.window.fetch.bind(globalThis.window)
+      : undefined;
+  const effectiveFetch = fetchApi || defaultFetch;
+
+  if (!effectiveFetch) {
+    throw new Error("No fetch implementation available");
+  }
+
+  const authStrategy: AuthorizationStrategy = useSso
+    ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch)
+    : useTempTokens
     ? new TempTokenStrategy(tokenCache, tempToken)
     : new UserTokenStrategy(userToken || "");
 
@@ -122,14 +139,10 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     "Content-Type": "application/json",
   };
 
-  const defaultFetch: typeof fetch | undefined =
-    typeof globalThis.window !== "undefined"
-      ? globalThis.window.fetch.bind(globalThis.window)
-      : undefined;
   const configuration = new Configuration({
     basePath: baseUrl,
     headers: { ...baseHeaders },
-    fetchApi: fetchApi || defaultFetch,
+    fetchApi: effectiveFetch,
     credentials: "omit",
   });
 
@@ -190,13 +203,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const methodMap = buildMethodMap();
 
   const fetchTempToken = async (dbid: string): Promise<string> => {
-    const effectiveFetch = fetchApi || defaultFetch;
-    if (!effectiveFetch) {
-      throw new Error(
-        "No fetch implementation available for fetching temp token"
-      );
-    }
-
     const response = await effectiveFetch(
       `https://api.quickbase.com/v1/auth/temporary/${dbid}`,
       {
