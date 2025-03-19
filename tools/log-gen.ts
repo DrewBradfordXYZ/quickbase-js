@@ -24,7 +24,7 @@ const includeFolders: string[] = [
 const includeRecursiveFolders: string[] = [
   // "open-api"
   // "tests",
-  "tests/vitest/unit",
+  // "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
@@ -47,11 +47,11 @@ const includeFiles: string[] = [
   "src/authorizationStrategy.ts",
   "src/rateLimiter.ts",
   "src/RateLimitError.ts",
-  // "src/ThrottleBucket.ts",
-  // "src/tokenCache.ts",
-  // "src/utils.ts",
+  "src/ThrottleBucket.ts",
+  "src/tokenCache.ts",
+  "src/utils.ts",
 
-  // "src/generated/runtime.ts",
+  "src/generated/runtime.ts",
   // "src/generated/apis/AuthApi.ts",
   // "src/generated/apis/FieldsApi.ts",
   // "src/generated/apis/AppsApi.ts",

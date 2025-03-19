@@ -173,6 +173,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         requestParameters,
         requestOptions
       );
+      console.log("[invokeMethod] API call completed for method:", methodName);
       return await processResponse(response);
     } catch (error) {
       let status: number, message: string, response: any;

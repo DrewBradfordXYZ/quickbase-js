@@ -90,7 +90,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     fetchApi,
     debug,
     convertDates = true,
-    tempTokenLifespan,
+    tempTokenLifespan = 290000, // Default: 4:50 (290,000ms)
     throttle = { rate: 10, burst: 10 },
     maxRetries = 3,
     retryDelay = 1000,
@@ -204,6 +204,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     }
 
     const tokenResult = await response.json();
+    console.log(`[fetchTempToken] Response:`, tokenResult);
     const token = tokenResult.temporaryAuthorization;
     if (!token) {
       throw new Error("No temporary token returned from API");
