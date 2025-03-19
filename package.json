@@ -52,6 +52,7 @@
     "test:vitest:unit:apps": "vitest run tests/vitest/unit/apps/*.test.ts",
     "test:vitest:unit:auth": "vitest run tests/vitest/unit/auth/*.test.ts",
     "test:vitest:unit:fields": "vitest run tests/vitest/unit/fields/*.test.ts",
+    "test:vitest:unit:formulas": "vitest run tests/vitest/unit/formulas/*.test.ts",
     "test:vitest:unit:records": "vitest run tests/vitest/unit/records/*.test.ts",
     "test:vitest:unit:tables": "vitest run tests/vitest/unit/tables/*.test.ts",
     "test:pw:qb:auth": "playwright test tests/playwright/qb/auth"

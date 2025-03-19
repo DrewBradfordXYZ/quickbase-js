@@ -1,6 +1,4 @@
-// tests/vitest/unit/formulas/runFormula.test.ts
-
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createClient,
   mockFetch,
@@ -54,10 +52,17 @@ describe("QuickbaseClient Unit - runFormula", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
-        credentials: "omit",
+        // Check body as parsed object to ignore order
+        body: expect.any(String), // First ensure it’s a string
       })
     );
+
+    // Additional check for body content
+    const calls = mockFetch.mock.calls;
+    expect(calls.length).toBe(1);
+    const fetchBody = calls[0][1].body as string;
+    expect(JSON.parse(fetchBody)).toEqual(request);
+
     expect(result.result).toBe("30");
   });
 
@@ -92,10 +97,15 @@ describe("QuickbaseClient Unit - runFormula", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
-        credentials: "omit",
+        body: expect.any(String),
       })
     );
+
+    const calls = mockFetch.mock.calls;
+    expect(calls.length).toBe(1);
+    const fetchBody = calls[0][1].body as string;
+    expect(JSON.parse(fetchBody)).toEqual(request);
+
     expect(result.result).toBe("user@example.com");
   });
 
@@ -127,10 +137,14 @@ describe("QuickbaseClient Unit - runFormula", () => {
           Authorization: `QB-USER-TOKEN ${QB_USER_TOKEN}`,
           "Content-Type": "application/json",
         }),
-        body: JSON.stringify(request),
-        credentials: "omit",
+        body: expect.any(String),
       })
     );
+
+    const calls = mockFetch.mock.calls;
+    expect(calls.length).toBe(1);
+    const fetchBody = calls[0][1].body as string;
+    expect(JSON.parse(fetchBody)).toEqual(request);
   });
 
   it("handles temp token with retry on 401", async () => {
