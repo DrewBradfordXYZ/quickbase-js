@@ -5,19 +5,10 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  contents: write # Required to write to the gh-pages branch
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,14 +25,11 @@ jobs:
       - name: Build VitePress site
         run: npm run docs:build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: docs/.vitepress/dist
+      - name: Disable Jekyll
+        run: touch docs/.vitepress/dist/.nojekyll # Prevents GitHub Pages from processing with Jekyll
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/.vitepress/dist # The folder containing the built site
+          branch: gh-pages # The branch to deploy to
