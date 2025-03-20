@@ -132,7 +132,13 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const authStrategy: AuthorizationStrategy = useSso
     ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
     : useTempTokens
-    ? new TempTokenStrategy(tokenCache, tempToken)
+    ? new TempTokenStrategy(
+        tokenCache,
+        tempToken,
+        effectiveFetch,
+        realm,
+        baseUrl
+      )
     : new UserTokenStrategy(userToken || "");
 
   const baseHeaders: HTTPHeaders = {
@@ -146,11 +152,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     fetchApi: effectiveFetch,
     credentials: "omit",
   });
-
-  // Removed redundant check:
-  // if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
-  //   throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
-  // }
 
   const apiInstances = Object.fromEntries(
     Object.entries(apis)
@@ -202,35 +203,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const methodMap = buildMethodMap();
 
-  const fetchTempToken = async (dbid: string): Promise<string> => {
-    const response = await effectiveFetch(`${baseUrl}/auth/temporary/${dbid}`, {
-      method: "GET",
-      headers: { ...baseHeaders },
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      const errorBody: { message?: string } = await response.json();
-      throw new Error(
-        `API Error: ${errorBody.message || "Unknown error"} (Status: ${
-          response.status
-        })`
-      );
-    }
-
-    const tokenResult = await response.json();
-    console.log(`[fetchTempToken] Response:`, tokenResult);
-    const token = tokenResult.temporaryAuthorization;
-    if (!token) {
-      throw new Error("No temporary token returned from API");
-    }
-    tokenCache.set(dbid, token, tempTokenLifespan);
-    if (debug) {
-      console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
-    }
-    return token;
-  };
-
   const proxyHandler: ProxyHandler<QuickbaseClient> = {
     get: (_, prop: string) => {
       console.log(
@@ -249,7 +221,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             baseHeaders,
             authStrategy,
             rateLimiter,
-            fetchTempToken,
             transformDates,
             debug,
             convertDates

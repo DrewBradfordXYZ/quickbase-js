@@ -8,7 +8,6 @@ export interface AuthorizationStrategy {
   handleError(
     status: number,
     params: any,
-    fetchTempToken: (dbid: string) => Promise<string>,
     attempt: number,
     maxAttempts: number,
     debug?: boolean,
@@ -16,14 +15,55 @@ export interface AuthorizationStrategy {
   ): Promise<string | null>;
 }
 
+// src/authorizationStrategy.ts (partial update)
+
 export class TempTokenStrategy implements AuthorizationStrategy {
   constructor(
     private tokenCache: TokenCache,
-    private initialTempToken?: string
+    private initialTempToken: string | undefined,
+    private fetchApi: typeof fetch,
+    private realm: string,
+    private baseUrl: string = "https://api.quickbase.com/v1"
   ) {}
 
+  async fetchTempToken(dbid: string): Promise<string> {
+    const headers = {
+      "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+      "Content-Type": "application/json",
+    };
+    const response = await this.fetchApi(
+      `${this.baseUrl}/auth/temporary/${dbid}`,
+      {
+        method: "GET",
+        headers,
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      const message = errorBody.message || "Unknown error";
+      throw new Error(`API Error: ${message} (Status: ${response.status})`);
+    }
+
+    const tokenResult = await response.json();
+    const token = tokenResult.temporaryAuthorization;
+    if (!token) {
+      throw new Error(
+        "API Error: No temporary token returned from API (Status: 200)"
+      );
+    }
+    this.tokenCache.set(dbid, token);
+    console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
+    return token;
+  }
+
   async getToken(dbid: string): Promise<string | undefined> {
-    return this.tokenCache.get(dbid) || this.initialTempToken;
+    let token = this.tokenCache.get(dbid) || this.initialTempToken;
+    if (!token && dbid) {
+      token = await this.fetchTempToken(dbid);
+    }
+    return token;
   }
 
   applyHeaders(headers: Record<string, string>, token: string): void {
@@ -33,7 +73,6 @@ export class TempTokenStrategy implements AuthorizationStrategy {
   async handleError(
     status: number,
     params: any,
-    fetchTempToken: (dbid: string) => Promise<string>,
     attempt: number,
     maxAttempts: number,
     debug?: boolean,
@@ -57,7 +96,7 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       return null;
     }
     if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-    const newToken = await fetchTempToken(dbid);
+    const newToken = await this.fetchTempToken(dbid);
     this.tokenCache.set(dbid, newToken);
     return newToken;
   }
@@ -77,7 +116,6 @@ export class UserTokenStrategy implements AuthorizationStrategy {
   async handleError(
     status: number,
     _params: any,
-    _fetchTempToken: (dbid: string) => Promise<string>,
     attempt: number,
     maxAttempts: number,
     debug?: boolean,
@@ -124,7 +162,6 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
   async handleError(
     status: number,
     _params: any,
-    _fetchTempToken: (dbid: string) => Promise<string>,
     attempt: number,
     maxAttempts: number,
     debug?: boolean,

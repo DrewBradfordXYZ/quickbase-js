@@ -34,7 +34,6 @@
     "release:publish": "npm run release:push && npm publish --tag beta",
     "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
     "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
-    "generate-report": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-override-report.ts",
     "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
     "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
     "gen:all": "npm run fix-spec && npm run generate-report && npm run gen:openapi && npm run gen:unified",

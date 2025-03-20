@@ -5,7 +5,6 @@ import { RateLimiter } from "./rateLimiter";
 import { RateLimitError } from "./RateLimitError";
 import { ResponseError } from "./generated/runtime";
 import { QuickbaseClient } from "./quickbaseClient";
-import { GetTempTokenDBID200Response } from "./generated/models";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
   requestParameters: Parameters<QuickbaseClient[K]>[0],
@@ -30,7 +29,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   baseHeaders: Record<string, string>,
   authStrategy: AuthorizationStrategy,
   rateLimiter: RateLimiter,
-  fetchTempToken: (dbid: string) => Promise<string>,
   transformDates: (obj: any, convertStringsToDates: boolean) => any,
   debug: boolean | undefined,
   convertDates: boolean
@@ -64,13 +62,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     ? await authStrategy.getToken(dbid)
     : await authStrategy.getToken("");
   console.log("[invokeMethod] Initial token:", token);
-
-  if (!token && dbid) {
-    token = await fetchTempToken(dbid);
-    authStrategy.applyHeaders(baseHeaders, token);
-    requestOptions.headers = { ...baseHeaders };
-    console.log("[invokeMethod] Fetched new token:", token);
-  }
 
   if (token) {
     authStrategy.applyHeaders(baseHeaders, token);
@@ -152,12 +143,13 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
       message = "Failed to parse error response";
     }
-    console.log(
-      "[invokeMethod] Parsed error - status:",
-      status,
-      "message:",
-      message
-    );
+    if (debug)
+      console.log(
+        "[invokeMethod] Parsed error - status:",
+        status,
+        "message:",
+        message
+      );
     return { message, status };
   }
 
@@ -176,11 +168,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       console.log("[invokeMethod] API call completed for method:", methodName);
       return await processResponse(response);
     } catch (error: unknown) {
+      if (debug) console.log("[invokeMethod] Caught error:", error);
+
       let status: number;
       let message: string;
-      let response: Response;
-
-      console.log("[invokeMethod] Caught error:", error);
+      let response: Response | undefined;
 
       if (error instanceof ResponseError && error.response) {
         response = error.response;
@@ -190,14 +182,25 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         ({ message, status } = await parseErrorResponse(response));
       } else {
         if (debug) console.log(`[${methodName}] Unexpected error:`, error);
-        throw error; // Rethrow non-response errors
+        // Attempt to handle as a fetch error with a response
+        if (error instanceof Error && "response" in error) {
+          response = (error as any).response;
+          if (response instanceof Response) {
+            ({ message, status } = await parseErrorResponse(response));
+          } else {
+            throw error; // Rethrow if no response
+          }
+        } else {
+          throw error; // Rethrow truly unexpected errors
+        }
       }
 
-      console.log("[invokeMethod] Handling error with status:", status);
+      if (debug)
+        console.log("[invokeMethod] Handling error with status:", status);
 
       if (status === 429) {
         if (!(error instanceof ResponseError)) {
-          throw new Error("Expected ResponseError for 429 handling"); // Shouldn't happen
+          throw new Error("Expected ResponseError for 429 handling");
         }
         const delay = await rateLimiter.handle429(error, attempt + 1);
         if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
@@ -205,7 +208,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
           throw new RateLimitError(
             `API Error: ${message} (Status: ${status})`,
             status,
-            response.headers.get("Retry-After")
+            response?.headers.get("Retry-After")
               ? parseInt(response.headers.get("Retry-After")!, 10)
               : undefined
           );
@@ -218,7 +221,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       const newToken = await authStrategy.handleError(
         status,
         params,
-        fetchTempToken,
         attempt,
         maxAttempts,
         debug,
@@ -235,6 +237,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
           );
         continue;
       }
+
       throw new Error(`API Error: ${message} (Status: ${status})`);
     }
   }
