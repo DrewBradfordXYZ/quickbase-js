@@ -1,6 +1,6 @@
 # quickbase-js
 
-This is a Typescript library using the QuickBase OpenAPI spec and the typescipt-fetch generator. This library is designed for both browser and Node.js environments. Code pages have first class support.
+A Typescript library using the QuickBase OpenAPI spec and the typescipt-fetch generator. This library is designed for both browser and Node.js environments. Code pages have first class support.
 
 Authentication methods: `Temporary Tokens`, `User Tokens`, `SSO`.
 
