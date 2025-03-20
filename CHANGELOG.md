@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.9](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.8...v0.1.0-beta.9) (2025-03-20)
+
+
+### Features
+
+* 429 and throttlebucket tests pass ([5591e19](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5591e19357c3c3232337ec4ede020530a635aa76))
+* add baseUrl with a default ([5c5829f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5c5829fcbe32e780efebea903db11a505bb9166c))
+* add SSO strategy ([501034d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/501034d363ffd7b4d5acdd9cf2932b5d97f249ee))
+* all relationship tests are passing ([5cdd0e9](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5cdd0e9aafe5d22e354f3915e45b3950eec98cdf))
+* auth refactor, auth tests pass, other tests still have errors ([47f353f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/47f353f0fdb38813b9c047ec06059c9ff6354225))
+* createField unit test passes ([676b6ab](https://github.com/DrewBradfordXYZ/quickbase-js/commit/676b6ab98379300b2d16e01c58b180bf1277ed86))
+* createRelationship unit and integration tests pass ([577e7bb](https://github.com/DrewBradfordXYZ/quickbase-js/commit/577e7bbce7f7fa3d6ffbe1f9f2b7cb00e1a5e486))
+* inferHttpMethod test and updateRelationship test pass ([1c6b342](https://github.com/DrewBradfordXYZ/quickbase-js/commit/1c6b34203a2100f17e9f626f547d426252922c67))
+* jsdoc documents type properties ([191d721](https://github.com/DrewBradfordXYZ/quickbase-js/commit/191d7211c5c1cecd55b2019237c132225cf2d461))
+* retryTempTokenMaxRetires unit test pass and update copyApp unit test is now more self contained ([8f38b1b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/8f38b1b81a525702c6a49db07c1ef5b70a686792))
+* retryUserToken401 integration test passes ([d78b0c6](https://github.com/DrewBradfordXYZ/quickbase-js/commit/d78b0c62cea3c1a35b9beca3db30d9fa1596c4e7))
+* runFormula integration test passes ([4e5927d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4e5927d51d10d44534430c58321580bc363a9496))
+* runFormula unit test passes ([871d6e9](https://github.com/DrewBradfordXYZ/quickbase-js/commit/871d6e97c4aa93bc8a206337f20b8ba325e16a64))
+* runFormula.test.ts unit test pass ([8fe27d8](https://github.com/DrewBradfordXYZ/quickbase-js/commit/8fe27d8401ac53f4da8e7a52ea4c8645c5a46508))
+* sso integration test passes ([c09a02c](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c09a02cd379efd935dd0c256d8cf6fb4a7402a7e))
+* sso unit test passes ([5e5baeb](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5e5baeb3fb0a00e7301183346ef49b6aee483a6a))
+* tokenLifespan unit test passes ([09a72a9](https://github.com/DrewBradfordXYZ/quickbase-js/commit/09a72a965a99bb6bd712cb705354c1904c72aebb))
+* updateField unit test passes ([9a2aae1](https://github.com/DrewBradfordXYZ/quickbase-js/commit/9a2aae1338c53eb92a82a6bff212c275705d027e))
+
+
+### Bug Fixes
+
+* updateRelationship integration test cleanup ([d27c030](https://github.com/DrewBradfordXYZ/quickbase-js/commit/d27c0303ec55162bea8d479064c5a93584cdef37))
+
 ## [0.1.0-beta.8](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.7...v0.1.0-beta.8) (2025-03-18)
 
 
