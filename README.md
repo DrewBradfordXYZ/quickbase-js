@@ -4,6 +4,10 @@ A Typescript library using the QuickBase OpenAPI spec and the typescipt-fetch ge
 
 Authentication methods: `Temporary Tokens`, `User Tokens`, `SSO`.
 
+### Method Documentation
+
+https://quickbase-js.netlify.app/
+
 # Installation
 
 ```bash
