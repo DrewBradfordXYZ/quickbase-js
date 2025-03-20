@@ -129,7 +129,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   }
 
   const authStrategy: AuthorizationStrategy = useSso
-    ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch)
+    ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
     : useTempTokens
     ? new TempTokenStrategy(tokenCache, tempToken)
     : new UserTokenStrategy(userToken || "");

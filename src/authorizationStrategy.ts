@@ -95,23 +95,30 @@ export class UserTokenStrategy implements AuthorizationStrategy {
 }
 
 export class SsoTokenStrategy implements AuthorizationStrategy {
-  private currentToken: string | undefined; // Current temp token from SSO exchange
+  private currentToken: string | undefined;
 
   constructor(
-    private samlToken: string, // Initial SAML2 token provided by the user
-    private realm: string, // Needed for the API endpoint
-    private fetchApi: typeof fetch // Fetch implementation for token refresh
+    private samlToken: string,
+    private realm: string,
+    private fetchApi: typeof fetch,
+    private debug: boolean = false
   ) {}
 
   async getToken(_dbid: string): Promise<string | undefined> {
     if (!this.currentToken) {
-      this.currentToken = await this.refreshSsoToken(); // Initialize token on first use
+      this.currentToken = await this.fetchSsoToken({
+        grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+        requested_token_type:
+          "urn:quickbase:params:oauth:token-type:temp_token",
+        subject_token: this.samlToken,
+        subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
+      });
     }
     return this.currentToken;
   }
 
   applyHeaders(headers: Record<string, string>, token: string): void {
-    headers["Authorization"] = `QB-TEMP-TOKEN ${token}`; // Use temp token format as per API response
+    headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
   }
 
   async handleError(
@@ -123,9 +130,9 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
     debug?: boolean,
     methodName?: string
   ): Promise<string | null> {
-    if (status !== 401 || attempt >= maxAttempts - 1) return null; // Respect maxRetries
+    if (status !== 401 || attempt >= maxAttempts - 1) return null;
 
-    if (debug) {
+    if (debug || this.debug) {
       console.log(
         `Authorization error for ${
           methodName || "method"
@@ -133,25 +140,24 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
       );
     }
 
-    // Refresh the SSO token directly
-    const newToken = await this.refreshSsoToken(debug);
+    const newToken = await this.refreshSsoToken(debug || this.debug);
     if (newToken) {
-      this.currentToken = newToken; // Update the current token
+      this.currentToken = newToken;
       return newToken;
     }
     return null;
   }
 
-  private async refreshSsoToken(debug?: boolean): Promise<string> {
+  private async refreshSsoToken(debug: boolean = false): Promise<string> {
     const payload = {
       grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-      requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token", // For RESTful API
-      subject_token: this.samlToken, // Base64url-encoded SAML2 assertion
+      requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
+      subject_token: this.samlToken,
       subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
     };
 
     const response = await this.fetchApi(
-      `https://api.quickbase.com/v1/auth/exchange`,
+      `https://api.quickbase.com/v1/auth/oauth/token`,
       {
         method: "POST",
         headers: {
@@ -164,7 +170,7 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
     );
 
     if (!response.ok) {
-      const errorBody = await response.json();
+      const errorBody = await response.json().catch(() => ({}));
       if (debug) {
         console.log(`[SSO Refresh] Failed: ${response.status}`, errorBody);
       }
@@ -181,6 +187,49 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
 
     if (debug) {
       console.log(`[SSO Refresh] New token: ${newToken.substring(0, 10)}...`);
+    }
+    return newToken;
+  }
+
+  private async fetchSsoToken(params: {
+    grant_type: string;
+    requested_token_type: string;
+    subject_token: string;
+    subject_token_type: string;
+  }): Promise<string> {
+    const response = await this.fetchApi(
+      `https://api.quickbase.com/v1/auth/oauth/token`,
+      {
+        method: "POST",
+        headers: {
+          "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+        credentials: "omit",
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      if (this.debug) {
+        console.log(`[fetchSsoToken] Failed: ${response.status}`, errorBody);
+      }
+      throw new Error(
+        `SSO token fetch failed: ${errorBody.message || "Unknown error"}`
+      );
+    }
+
+    const result = await response.json();
+    const newToken = result.access_token;
+    if (!newToken) {
+      throw new Error("No access token returned from SSO token exchange");
+    }
+
+    if (this.debug) {
+      console.log(
+        `[fetchSsoToken] Fetched token: ${newToken.substring(0, 10)}...`
+      );
     }
     return newToken;
   }
