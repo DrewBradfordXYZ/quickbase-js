@@ -5,16 +5,23 @@ on:
     branches: [main]
 
 permissions:
-  contents: write # Grants write access to repository contents
-  pages: write # Allows deployment to GitHub Pages
-  id-token: write # Required for Pages deployment
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Updated to v4 for latest features
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -27,9 +34,14 @@ jobs:
       - name: Build VitePress site
         run: npm run docs:build
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
         with:
-          folder: docs/.vitepress/dist # Deploy from this folder
-          branch: gh-pages # Target branch for GitHub Pages
-          github-token: ${{ secrets.GITHUB_TOKEN }} # Use built-in token
+          path: docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
