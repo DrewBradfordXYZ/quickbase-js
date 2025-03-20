@@ -39,7 +39,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docs",
+    "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run docs:build",
     "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",

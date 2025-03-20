@@ -1,8 +1,6 @@
 <!-- docs/index.md -->
 
-# Quickbase JS API Documentation
-
-Explore the methods available in the quickbase-js library.
+# Methods available in quickbase-js
 
 <script setup>
 import { ref } from 'vue';
@@ -15,6 +13,9 @@ const methods = ref(apiDocs);
   <h2>{{ method.name }}</h2>
   <code>{{ method.method }} {{ method.path }}</code>
   <p>{{ method.summary }}</p>
+  <p>
+    <a :href="method.docLink" target="_blank" rel="noopener noreferrer">{{ method.docLink }}</a>
+  </p>
   <h3 v-if="method.parameters.length">Parameters</h3>
   <ul v-if="method.parameters.length">
     <li v-for="param in method.parameters" :key="param.name">
@@ -33,7 +34,6 @@ const methods = ref(apiDocs);
       <strong>{{ prop.name }}</strong> ({{ prop.type }}, {{ prop.required ? 'required' : 'optional' }}): {{ prop.jsdoc || 'No description' }}
     </li>
   </ul>
-  <a :href="method.docLink" target="_blank">Official Docs</a>
 </div>
 
 <style>
