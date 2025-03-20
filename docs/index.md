@@ -1,7 +1,5 @@
 <!-- docs/index.md -->
 
-# Methods available in quickbase-js
-
 <script setup>
 import { ref } from 'vue';
 import apiDocs from '../docs-data/api-docs.json'; // ESM import from project root
