@@ -34,6 +34,7 @@ export interface QuickbaseConfig {
   maxRetries?: number;
   retryDelay?: number;
   tokenCache?: TokenCache;
+  baseUrl?: string; // Added configurable baseUrl
 }
 
 type MethodMap = {
@@ -109,8 +110,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
+    baseUrl = "https://api.quickbase.com/v1", // Default to production API
   } = config;
-  const baseUrl = `https://api.quickbase.com/v1`;
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
   const throttleBucket = throttle
@@ -140,7 +141,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   };
 
   const configuration = new Configuration({
-    basePath: baseUrl,
+    basePath: baseUrl, // Use configurable baseUrl
     headers: { ...baseHeaders },
     fetchApi: effectiveFetch,
     credentials: "omit",
@@ -203,14 +204,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const methodMap = buildMethodMap();
 
   const fetchTempToken = async (dbid: string): Promise<string> => {
-    const response = await effectiveFetch(
-      `https://api.quickbase.com/v1/auth/temporary/${dbid}`,
-      {
-        method: "GET",
-        headers: { ...baseHeaders },
-        credentials: "include",
-      }
-    );
+    const response = await effectiveFetch(`${baseUrl}/auth/temporary/${dbid}`, {
+      method: "GET",
+      headers: { ...baseHeaders },
+      credentials: "include",
+    });
 
     if (!response.ok) {
       const errorBody: { message?: string } = await response.json();
