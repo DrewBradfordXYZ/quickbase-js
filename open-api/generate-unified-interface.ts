@@ -33,6 +33,8 @@ const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 const MODELS_DIR = join(__dirname, "..", "src", "generated", "models");
+const DOCS_DATA_DIR = join(__dirname, "..", "docs-data");
+const DOCS_JSON_FILE = join(DOCS_DATA_DIR, "api-docs.json");
 
 function mapOpenApiTypeToTs(
   openApiType: string | string[] | undefined
@@ -241,6 +243,9 @@ function generateInterface(includeResponseProperties: boolean = false): void {
               const pascalModel =
                 model.charAt(0).toUpperCase() + model.slice(1);
               properties = parseInterfaceProperties(pascalModel, MODELS_DIR);
+            } else if (type !== "any" && availableModels.includes(type)) {
+              // Handle non-$ref types that are still models
+              properties = parseInterfaceProperties(type, MODELS_DIR);
             }
           } else if ("type" in p && p.type) {
             type = mapOpenApiTypeToTs(p.type);
@@ -280,10 +285,12 @@ function generateInterface(includeResponseProperties: boolean = false): void {
           : returnTypes[0] || "void";
 
       const returnTypeDetails: PropertyDetail[] =
-        includeResponseProperties &&
-        returnTypes.length === 1 &&
-        returnTypes[0] !== "void"
-          ? parseInterfaceProperties(returnTypes[0], MODELS_DIR)
+        includeResponseProperties && returnTypes.length > 0
+          ? returnTypes
+              .filter(
+                (type) => type !== "void" && availableModels.includes(type)
+              )
+              .flatMap((type) => parseInterfaceProperties(type, MODELS_DIR))
           : [];
 
       const jsDoc = generateJsDoc({
@@ -325,9 +332,122 @@ function generateInterface(includeResponseProperties: boolean = false): void {
   console.log("Generated:", OUTPUT_FILE);
 }
 
+function generateDocsJson(
+  specFile: string,
+  modelsDir: string,
+  outputFile: string
+): void {
+  console.log("Generating docs JSON...");
+  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
+  const availableModels = readdirSync(modelsDir)
+    .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
+    .map((file) => file.replace(".ts", ""));
+  const modelImports = new Set<string>();
+  const missingTypes = new Set<string>();
+  const docsData: any[] = [];
+
+  for (const [path, methodsObj] of Object.entries(
+    spec.paths as OpenAPIV2.PathsObject
+  )) {
+    if (!methodsObj) continue;
+    for (const [method, operation] of Object.entries(
+      methodsObj as OpenAPIV2.PathItemObject
+    )) {
+      const op = operation as OpenAPIV2.OperationObject | undefined;
+      if (!op || !op.operationId) continue;
+
+      const opId = simplifyName(op.operationId);
+      const paramDetails = (op.parameters || [])
+        .filter(
+          (p) =>
+            !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+              (p as OpenAPIV2.ParameterObject).name || ""
+            )
+        )
+        .map((p) => {
+          const param = p as OpenAPIV2.ParameterObject;
+          let type = "any";
+          let properties: PropertyDetail[] = [];
+          if ("schema" in p && p.schema) {
+            type = mapRefToType(
+              p.schema,
+              modelImports,
+              spec,
+              1,
+              availableModels,
+              missingTypes
+            );
+            if ("$ref" in p.schema && p.schema.$ref) {
+              const refParts = p.schema.$ref.split("/");
+              const model = refParts[refParts.length - 1];
+              const pascalModel =
+                model.charAt(0).toUpperCase() + model.slice(1);
+              properties = parseInterfaceProperties(pascalModel, MODELS_DIR);
+            } else if (type !== "any" && availableModels.includes(type)) {
+              properties = parseInterfaceProperties(type, MODELS_DIR);
+            }
+          } else if ("type" in p) {
+            type = mapOpenApiTypeToTs(p.type);
+          }
+          return {
+            name: param.in === "body" ? "body" : param.name,
+            type,
+            required: param.required || false,
+            description: param.description || "",
+            properties: properties.length > 0 ? properties : undefined,
+          };
+        });
+
+      const returnTypes = ["200", "207"]
+        .map(
+          (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
+        )
+        .filter(Boolean)
+        .map((schema) =>
+          mapRefToType(
+            schema!,
+            modelImports,
+            spec,
+            1,
+            availableModels,
+            missingTypes
+          )
+        );
+      const returnType =
+        returnTypes.length > 1
+          ? returnTypes.join(" | ")
+          : returnTypes[0] || "void";
+      const returnTypeDetails = returnTypes
+        .filter((type) => type !== "void" && availableModels.includes(type))
+        .flatMap((type) => parseInterfaceProperties(type, MODELS_DIR));
+
+      docsData.push({
+        name: opId,
+        summary: op.summary || "No description.",
+        method: method.toUpperCase(),
+        path,
+        parameters: paramDetails,
+        returns: returnType,
+        returnTypeDetails:
+          returnTypeDetails.length > 0 ? returnTypeDetails : undefined,
+        docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
+      });
+    }
+  }
+
+  writeFileSync(outputFile, JSON.stringify(docsData, null, 2), "utf8");
+  console.log("Generated docs JSON:", outputFile);
+}
+
 console.log("Entering try block");
 try {
-  generateInterface(true); // Toggle response properties here
+  generateInterface(true);
+  console.log("Ensuring docs data directory exists...");
+  if (!existsSync(DOCS_DATA_DIR)) {
+    mkdirSync(DOCS_DATA_DIR, { recursive: true });
+  }
+  console.log("Generating docs JSON for Docusaurus...");
+  generateDocsJson(SPEC_FILE, MODELS_DIR, DOCS_JSON_FILE);
 } catch (error) {
   console.error("Error in generateInterface:", error);
   process.exit(1);

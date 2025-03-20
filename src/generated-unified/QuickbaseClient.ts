@@ -1,4 +1,4 @@
-// Generated on 2025-03-20T04:14:08.516Z
+// Generated on 2025-03-20T17:07:38.167Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -556,7 +556,11 @@ export interface QuickbaseClient {
    *     - **to** (`string`, optional) _Type: string_
    *     - **fieldsToReturn** (`number[]`, optional) _Type: number[]_
    *
-   * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response_
+   * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response with properties_
+   *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
+   *   - **data** (`string[]`, optional) _The data that is expected to be returned._
+   *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
+   *   - **data** (`string[]`, optional) _The data that is expected to be returned._
    *
    * @see {@link https://developer.quickbase.com/operation/upsert} Official Quickbase API documentation
    */

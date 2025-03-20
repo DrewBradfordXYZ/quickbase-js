@@ -17,12 +17,12 @@ const excludeDirs: string[] = [
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "open-api",
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  // "open-api"
+  // "open-api",
+  // "tools"
   // "tests",
   // "tests/vitest/unit",
   // "tests/vitest/qb"
@@ -33,7 +33,10 @@ const includeFiles: string[] = [
   // "tests/setup.ts",
   // "vitest.config.ts",
 
-  // "package.json",
+  "package.json",
+  "open-api/generate-unified-interface.ts",
+  "open-api/utils/generateDocsJson.ts",
+  "tools/generate-docusaurus.ts",
   // "tsconfig.json",
   // "tsconfig.build.json",
   // "rollup.config.js",
@@ -41,15 +44,15 @@ const includeFiles: string[] = [
   // "build-umd.js",
   // "build-esm.js",
 
-  "src/quickbaseClient.ts",
-  "src/invokeMethod.ts",
-  "src/generated-unified/QuickbaseClient.ts",
-  "src/authorizationStrategy.ts",
-  "src/rateLimiter.ts",
-  "src/RateLimitError.ts",
-  "src/ThrottleBucket.ts",
-  "src/tokenCache.ts",
-  "src/utils.ts",
+  // "src/quickbaseClient.ts",
+  // "src/invokeMethod.ts",
+  // "src/generated-unified/QuickbaseClient.ts",
+  // "src/authorizationStrategy.ts",
+  // "src/rateLimiter.ts",
+  // "src/RateLimitError.ts",
+  // "src/ThrottleBucket.ts",
+  // "src/tokenCache.ts",
+  // "src/utils.ts",
 
   // "src/generated/runtime.ts",
   // "src/generated/apis/AuthApi.ts",

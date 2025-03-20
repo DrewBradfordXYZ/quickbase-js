@@ -36,7 +36,10 @@
     "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
     "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
     "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
-    "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs && rm -rf docs-dist && cp -r docs/.vitepress/dist docs-dist",
+    "docs:preview": "vitepress preview docs",
+    "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docs",
     "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
     "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
@@ -85,6 +88,7 @@
     "tslib": "^2.8.1",
     "typescript": "^5.8.2",
     "undici-types": "^7.5.0",
+    "vitepress": "^1.6.3",
     "vitest": "^3.0.8"
   }
 }

@@ -1,10 +1,11 @@
 // docs/.vitepress/config.mjs
 import { defineConfig } from "vitepress";
-import apiDocs from "../../docs-data/api-docs.json"; // ESM import from project root
+import apiDocs from "../../docs-data/api-docs.json";
 
 export default defineConfig({
   title: "Quickbase JS API Docs",
   description: "Documentation for quickbase-js library",
+  base: "/quickbase-js/", // Adjust to your repo name
   themeConfig: {
     nav: [
       {

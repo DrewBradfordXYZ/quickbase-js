@@ -820,6 +820,399 @@ tree:
             generate-unified-interface.ts
           type: >-
             file
+          contents: >
+            #!/usr/bin/env
+            node
+
+            console.log("Script
+            started");
+
+
+            import
+            {
+              readFileSync,
+              writeFileSync,
+              mkdirSync,
+              existsSync,
+              readdirSync,
+            }
+            from
+            "fs";
+
+            import
+            {
+            join,
+            dirname
+            }
+            from
+            "path";
+
+            import
+            {
+            fileURLToPath
+            }
+            from
+            "url";
+
+            import
+            {
+            OpenAPIV2
+            }
+            from
+            "openapi-types";
+
+            import
+            {
+            Project
+            }
+            from
+            "ts-morph";
+
+            import
+            {
+            generateJsDoc
+            }
+            from
+            "./utils/generateJsDoc.js";
+
+            import
+            {
+            generateDocsJson
+            }
+            from
+            "./utils/generateDocsJson.js";
+            //
+            Keep
+            in
+            utils/
+
+
+            const
+            simplifyName
+            =
+            (str:
+            string):
+            string
+            =>
+            str;
+
+
+            const
+            __dirname
+            =
+            dirname(fileURLToPath(import.meta.url));
+
+            const
+            SPEC_FILE
+            =
+            join(__dirname,
+            "output",
+            "quickbase-fixed.json");
+
+            const
+            OUTPUT_DIR
+            =
+            join(__dirname,
+            "..",
+            "src",
+            "generated-unified");
+
+            const
+            OUTPUT_FILE
+            =
+            join(OUTPUT_DIR,
+            "QuickbaseClient.ts");
+
+            const
+            MODELS_DIR
+            =
+            join(__dirname,
+            "..",
+            "src",
+            "generated",
+            "models");
+
+            const
+            DOCS_DATA_DIR
+            =
+            join(__dirname,
+            "..",
+            "docs-data");
+
+            const
+            DOCS_JSON_FILE
+            =
+            join(DOCS_DATA_DIR,
+            "api-docs.json");
+
+
+            function
+            mapOpenApiTypeToTs(
+              openApiType: string | string[] | undefined
+            ):
+            string
+            {
+              const type = Array.isArray(openApiType)
+                ? openApiType[0]
+                : openApiType || "any";
+              switch (type.toLowerCase()) {
+                case "integer":
+                case "int":
+                case "number":
+                  return "number";
+                case "string":
+                  return "string";
+                case "boolean":
+                  return "boolean";
+                default:
+                  return "any";
+              }
+            }
+
+
+            function
+            mapRefToType(
+              schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
+              modelImports: Set<string>,
+              spec: OpenAPIV2.Document,
+              depth: number = 0,
+              availableModels: string[],
+              missingTypes: Set<string>
+            ):
+            string
+            {
+              if (!schema) return "any";
+              if ("$ref" in schema && schema.$ref) {
+                const refParts = schema.$ref.split("/");
+                const model = refParts[refParts.length - 1];
+                const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
+                if (availableModels.includes(pascalModel)) {
+                  modelImports.add(pascalModel);
+                  return pascalModel;
+                }
+                missingTypes.add(pascalModel);
+                return "any";
+              }
+              if ("type" in schema) {
+                if (schema.type === "object" && schema.properties) {
+                  const props = Object.entries(schema.properties).map(([key, prop]) => {
+                    const propSchema = prop as OpenAPIV2.SchemaObject;
+                    const propType = mapRefToType(
+                      propSchema,
+                      modelImports,
+                      spec,
+                      depth + 1,
+                      availableModels,
+                      missingTypes
+                    );
+                    return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
+                  });
+                  return `{ ${props.join("; ")} }`;
+                }
+                if (schema.type === "array" && schema.items) {
+                  const itemType = mapRefToType(
+                    schema.items as OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject,
+                    modelImports,
+                    spec,
+                    depth + 1,
+                    availableModels,
+                    missingTypes
+                  );
+                  return `${itemType}[]`;
+                }
+                return mapOpenApiTypeToTs(schema.type);
+              }
+              return "any";
+            }
+
+
+            interface
+            PropertyDetail
+            {
+              name: string;
+              type: string;
+              required: boolean;
+              jsdoc?: string;
+            }
+
+
+            function
+            parseInterfaceProperties(
+              modelName: string,
+              modelsDir: string
+            ):
+            PropertyDetail[]
+            {
+              const project = new Project();
+              const filePath = join(modelsDir, `${modelName}.ts`);
+              if (!existsSync(filePath)) return [];
+              const sourceFile = project.addSourceFileAtPath(filePath);
+              const interfaceDec = sourceFile.getInterface(modelName);
+              if (!interfaceDec) return [];
+              return interfaceDec.getProperties().map((prop) => ({
+                name: prop.getName(),
+                type: prop.getType().getText(prop),
+                required: !prop.hasQuestionToken(),
+                jsdoc: prop.getJsDocs()[0]?.getDescription().trim(),
+              }));
+            }
+
+
+            interface
+            ParamDetail
+            {
+              name: string;
+              type: string;
+              required: boolean;
+              properties: PropertyDetail[];
+            }
+
+
+            function
+            generateInterface(includeResponseProperties:
+            boolean
+            =
+            false):
+            void
+            {
+              if (!existsSync(SPEC_FILE)) {
+                console.error(
+                  `Spec file ${SPEC_FILE} not found. Run 'npm run fix-spec' first.`
+                );
+                process.exit(1);
+              }
+              const spec: OpenAPIV2.Document = JSON.parse(readFileSync(SPEC_FILE, "utf8"));
+              const availableModels = readdirSync(MODELS_DIR)
+                .filter((f) => f.endsWith(".ts") && !f.startsWith("index"))
+                .map((f) => f.replace(".ts", ""));
+              const modelImports = new Set<string>();
+              const missingTypes = new Set<string>();
+              const methods: string[] = [];
+
+              for (const [path, methodsObj] of Object.entries(
+                spec.paths as OpenAPIV2.PathsObject
+              )) {
+                if (!methodsObj) continue;
+                for (const [method, operation] of Object.entries(
+                  methodsObj as OpenAPIV2.PathItemObject
+                )) {
+                  const op = operation as OpenAPIV2.OperationObject | undefined;
+                  if (!op || !op.operationId) continue;
+
+                  const opId = simplifyName(op.operationId);
+                  const paramDetails: ParamDetail[] = (op.parameters || [])
+                    .filter(
+                      (p) =>
+                        !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+                          (p as OpenAPIV2.ParameterObject).name || ""
+                        )
+                    )
+                    .map((p) => {
+                      const param = p as OpenAPIV2.ParameterObject;
+                      let type = "any";
+                      let properties: PropertyDetail[] = [];
+                      if ("schema" in p && p.schema) {
+                        type = mapRefToType(
+                          p.schema,
+                          modelImports,
+                          spec,
+                          1,
+                          availableModels,
+                          missingTypes
+                        );
+                        if ("$ref" in p.schema) {
+                          const model = p.schema.$ref.split("/").pop()!;
+                          properties = parseInterfaceProperties(
+                            model.charAt(0).toUpperCase() + model.slice(1),
+                            MODELS_DIR
+                          );
+                        }
+                      } else if ("type" in p) {
+                        type = mapOpenApiTypeToTs(p.type);
+                      }
+                      return {
+                        name: param.in === "body" ? "body" : param.name,
+                        type,
+                        required: param.required || false,
+                        properties,
+                      };
+                    });
+
+                  const params = paramDetails
+                    .map((p) => `${p.name}${p.required ? "" : "?"}: ${p.type}`)
+                    .join("; ");
+                  const returnTypes = ["200", "207"]
+                    .map(
+                      (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
+                    )
+                    .filter(Boolean)
+                    .map((schema) =>
+                      mapRefToType(
+                        schema!,
+                        modelImports,
+                        spec,
+                        1,
+                        availableModels,
+                        missingTypes
+                      )
+                    );
+                  const returnType =
+                    returnTypes.length > 1
+                      ? returnTypes.join(" | ")
+                      : returnTypes[0] || "void";
+                  const returnTypeDetails =
+                    includeResponseProperties &&
+                    returnTypes.length === 1 &&
+                    returnTypes[0] !== "void"
+                      ? parseInterfaceProperties(returnTypes[0], MODELS_DIR)
+                      : [];
+
+                  const jsDoc = generateJsDoc({
+                    summary: op.summary || "No description.",
+                    opId,
+                    paramDetails,
+                    returnType,
+                    returnTypeDetails,
+                    docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
+                  });
+
+                  methods.push(
+                    `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
+                  );
+                }
+              }
+
+              const importStatement =
+                modelImports.size > 0
+                  ? `import { ${Array.from(modelImports)
+                      .sort()
+                      .join(", ")} } from "../generated/models";`
+                  : "";
+              const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importStatement}\n\nexport interface QuickbaseClient {\n${methods.join(
+                "\n"
+              )}\n}\n`;
+              if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
+              writeFileSync(OUTPUT_FILE, interfaceContent, "utf8");
+              console.log("Generated interface:", OUTPUT_FILE);
+            }
+
+
+            try
+            {
+              generateInterface(true);
+              if (!existsSync(DOCS_DATA_DIR)) mkdirSync(DOCS_DATA_DIR, { recursive: true });
+              generateDocsJson(SPEC_FILE, MODELS_DIR, DOCS_JSON_FILE);
+            }
+            catch
+            (error)
+            {
+              console.error("Error:", error);
+              process.exit(1);
+            }
+
+
+            console.log("Script
+            completed");
         - name: >-
             regenerate-client.ts
           type: >-
@@ -885,7 +1278,203 @@ tree:
             directory
           children:
             - name: >-
-                generateJsDoc.ts
+                generateDocsJson.ts
+              type: >-
+                file
+              contents: >
+                //
+                open-api/utils/generateDocsJson.ts
+
+                import
+                {
+                readFileSync,
+                writeFileSync,
+                readdirSync
+                }
+                from
+                "fs";
+
+                import
+                {
+                OpenAPIV2
+                }
+                from
+                "openapi-types";
+
+
+                function
+                mapOpenApiTypeToTs(
+                  openApiType: string | string[] | undefined
+                ):
+                string
+                {
+                  const type = Array.isArray(openApiType)
+                    ? openApiType[0]
+                    : openApiType || "any";
+                  switch (type.toLowerCase()) {
+                    case "integer":
+                    case "int":
+                    case "number":
+                      return "number";
+                    case "string":
+                      return "string";
+                    case "boolean":
+                      return "boolean";
+                    default:
+                      return "any";
+                  }
+                }
+
+
+                function
+                mapRefToType(
+                  schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
+                  modelImports: Set<string>,
+                  spec: OpenAPIV2.Document,
+                  depth: number = 0,
+                  availableModels: string[],
+                  missingTypes: Set<string>
+                ):
+                string
+                {
+                  if (!schema) return "any";
+                  if ("$ref" in schema && schema.$ref) {
+                    const refParts = schema.$ref.split("/");
+                    const model = refParts[refParts.length - 1];
+                    const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
+                    if (availableModels.includes(pascalModel)) {
+                      modelImports.add(pascalModel);
+                      return pascalModel;
+                    }
+                    missingTypes.add(pascalModel);
+                    return "any";
+                  }
+                  if ("type" in schema) {
+                    if (schema.type === "object" && schema.properties) {
+                      const props = Object.entries(schema.properties).map(([key, prop]) => {
+                        const propSchema = prop as OpenAPIV2.SchemaObject;
+                        const propType = mapRefToType(
+                          propSchema,
+                          modelImports,
+                          spec,
+                          depth + 1,
+                          availableModels,
+                          missingTypes
+                        );
+                        return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
+                      });
+                      return `{ ${props.join("; ")} }`;
+                    }
+                    if (schema.type === "array" && schema.items) {
+                      const itemType = mapRefToType(
+                        schema.items as OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject,
+                        modelImports,
+                        spec,
+                        depth + 1,
+                        availableModels,
+                        missingTypes
+                      );
+                      return `${itemType}[]`;
+                    }
+                    return mapOpenApiTypeToTs(schema.type);
+                  }
+                  return "any";
+                }
+
+
+                export
+                function
+                generateDocsJson(
+                  specFile: string,
+                  modelsDir: string,
+                  outputFile: string
+                ):
+                void
+                {
+                  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
+                  const availableModels: string[] = readdirSync(modelsDir)
+                    .filter((f) => f.endsWith(".ts") && !f.startsWith("index"))
+                    .map((f) => f.replace(".ts", ""));
+                  const modelImports = new Set<string>();
+                  const missingTypes = new Set<string>();
+                  const docsData: any[] = [];
+
+                  for (const [path, methodsObj] of Object.entries(
+                    spec.paths as OpenAPIV2.PathsObject
+                  )) {
+                    if (!methodsObj) continue;
+                    for (const [method, operation] of Object.entries(
+                      methodsObj as OpenAPIV2.PathItemObject
+                    )) {
+                      const op = operation as OpenAPIV2.OperationObject | undefined;
+                      if (!op || !op.operationId) continue;
+
+                      const opId = op.operationId; // Using raw operationId since simplifyName is minimal
+                      const paramDetails = (op.parameters || [])
+                        .filter(
+                          (p) =>
+                            !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+                              (p as OpenAPIV2.ParameterObject).name || ""
+                            )
+                        )
+                        .map((p) => {
+                          const param = p as OpenAPIV2.ParameterObject;
+                          let type = "any";
+                          if ("schema" in p && p.schema)
+                            type = mapRefToType(
+                              p.schema,
+                              modelImports,
+                              spec,
+                              1,
+                              availableModels,
+                              missingTypes
+                            );
+                          else if ("type" in p) type = mapOpenApiTypeToTs(p.type);
+                          return {
+                            name: param.in === "body" ? "body" : param.name,
+                            type,
+                            required: param.required || false,
+                            description: param.description || "",
+                          };
+                        });
+
+                      const returnTypes = ["200", "207"]
+                        .map(
+                          (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
+                        )
+                        .filter(Boolean)
+                        .map((schema) =>
+                          mapRefToType(
+                            schema!,
+                            modelImports,
+                            spec,
+                            1,
+                            availableModels,
+                            missingTypes
+                          )
+                        );
+                      const returnType =
+                        returnTypes.length > 1
+                          ? returnTypes.join(" | ")
+                          : returnTypes[0] || "void";
+
+                      docsData.push({
+                        name: opId,
+                        summary: op.summary || "No description.",
+                        method: method.toUpperCase(),
+                        path,
+                        parameters: paramDetails,
+                        returns: returnType,
+                        docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
+                      });
+                    }
+                  }
+
+                  writeFileSync(outputFile, JSON.stringify(docsData, null, 2), "utf8");
+                  console.log("Generated docs JSON:", outputFile);
+                }
+            - name: >-
+                generateJsDoc.ts.bak
               type: >-
                 file
             - name: >-
@@ -908,6 +1497,98 @@ tree:
         package.json
       type: >-
         file
+      contents: >
+        {
+          "name": "quickbase-js",
+          "version": "0.1.0-beta.9",
+          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+          "type": "module",
+          "main": "dist/esm/quickbase.js",
+          "module": "dist/esm/quickbase.js",
+          "types": "dist/esm/quickbase.d.ts",
+          "publishConfig": {
+            "access": "public"
+          },
+          "exports": {
+            ".": {
+              "types": "./dist/esm/quickbase.d.ts",
+              "import": {
+                "minified": "./dist/esm/quickbase.min.js",
+                "default": "./dist/esm/quickbase.js"
+              },
+              "require": {
+                "minified": "./dist/umd/quickbase.umd.min.js",
+                "default": "./dist/umd/quickbase.umd.js"
+              },
+              "umd:types": "./dist/umd/quickbase.umd.d.ts"
+            }
+          },
+          "scripts": {
+            "build": "npm run build:esm && npm run build:umd",
+            "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-esm.js",
+            "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-umd.js",
+            "release": "standard-version",
+            "release:beta": "standard-version --prerelease beta",
+            "release:alpha": "standard-version --prerelease alpha",
+            "release:push": "npm run release:beta && git push --follow-tags origin main",
+            "release:publish": "npm run release:push && npm publish --tag beta",
+            "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
+            "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
+            "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
+            "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
+            "gen:docs": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/generate-docusaurus.ts",
+            "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docs",
+            "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
+            "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
+            "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
+            "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
+            "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
+            "test:vitest:unit": "vitest run tests/vitest/unit/**/*.test.ts",
+            "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/*.test.ts",
+            "test:vitest:qb:auth": "vitest run tests/vitest/qb/auth/*.test.ts",
+            "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/*.test.ts",
+            "test:vitest:qb:records": "vitest run tests/vitest/qb/records/*.test.ts",
+            "test:vitest:qb:tables": "vitest run tests/vitest/qb/tables/*.test.ts",
+            "test:vitest:unit:apps": "vitest run tests/vitest/unit/apps/*.test.ts",
+            "test:vitest:unit:auth": "vitest run tests/vitest/unit/auth/*.test.ts",
+            "test:vitest:unit:fields": "vitest run tests/vitest/unit/fields/*.test.ts",
+            "test:vitest:unit:formulas": "vitest run tests/vitest/unit/formulas/*.test.ts",
+            "test:vitest:unit:records": "vitest run tests/vitest/unit/records/*.test.ts",
+            "test:vitest:unit:tables": "vitest run tests/vitest/unit/tables/*.test.ts",
+            "test:pw:qb:auth": "playwright test tests/playwright/qb/auth"
+          },
+          "devDependencies": {
+            "@openapitools/openapi-generator-cli": "^2.18.4",
+            "@playwright/test": "^1.51.0",
+            "@rollup/plugin-commonjs": "^28.0.3",
+            "@rollup/plugin-node-resolve": "^16.0.1",
+            "@rollup/plugin-terser": "^0.4.4",
+            "@rollup/plugin-typescript": "^12.1.2",
+            "@types/fast-json-patch": "^1.0.4",
+            "@types/js-yaml": "^4.0.9",
+            "@types/node": "^22.13.10",
+            "dotenv": "^16.4.7",
+            "express": "^4.21.2",
+            "fast-json-patch": "^3.1.1",
+            "glob": "^10.4.5",
+            "js-yaml": "^4.1.0",
+            "jsdom": "^26.0.0",
+            "node-fetch": "^3.3.2",
+            "openapi-schema-validator": "^12.1.3",
+            "openapi-types": "^12.1.3",
+            "openapi-typescript": "^7.6.1",
+            "rimraf": "^5.0.10",
+            "rollup": "^4.35.0",
+            "rollup-plugin-dts": "^6.1.1",
+            "standard-version": "^9.5.0",
+            "ts-morph": "^25.0.1",
+            "ts-node": "^10.9.2",
+            "tslib": "^2.8.1",
+            "typescript": "^5.8.2",
+            "undici-types": "^7.5.0",
+            "vitest": "^3.0.8"
+          }
+        }
     - name: >-
         playwright.config.ts
       type: >-
@@ -925,365 +1606,14 @@ tree:
             RateLimitError.ts
           type: >-
             file
-          contents: >
-            //
-            src/RateLimitError.ts
-
-            export
-            class
-            RateLimitError
-            extends
-            Error
-            {
-              public readonly status: number;
-              public readonly retryAfter?: number;
-
-              constructor(message: string, status: number, retryAfter?: number) {
-                super(message);
-                this.name = "RateLimitError";
-                this.status = status;
-                this.retryAfter = retryAfter; // Seconds from Retry-After header, if present
-              }
-            }
         - name: >-
             ThrottleBucket.ts
           type: >-
             file
-          contents: >
-            //
-            src/ThrottleBucket.ts
-
-            export
-            class
-            ThrottleBucket
-            {
-              private tokens: number;
-              private maxTokens: number;
-              private refillRate: number; // Tokens per second
-              private lastRefill: number;
-              private pending: Promise<void> = Promise.resolve(); // Queue for sequential execution
-
-              constructor(rate: number, burst: number) {
-                this.tokens = burst;
-                this.maxTokens = burst;
-                this.refillRate = rate;
-                this.lastRefill = Date.now();
-              }
-
-              private refill(): void {
-                const now = Date.now();
-                const elapsed = (now - this.lastRefill) / 1000; // Seconds elapsed
-                const newTokens = elapsed * this.refillRate;
-                this.tokens = Math.min(this.maxTokens, this.tokens + newTokens);
-                this.lastRefill = now;
-              }
-
-              async acquire(): Promise<void> {
-                // Chain the new acquisition onto the pending queue
-                const previous = this.pending;
-                this.pending = (async () => {
-                  await previous; // Wait for prior calls to complete
-                  this.refill();
-                  if (this.tokens >= 1) {
-                    this.tokens -= 1;
-                    return;
-                  }
-                  const waitTime = ((1 - this.tokens) / this.refillRate) * 1000; // ms until next token
-                  await new Promise((resolve) => setTimeout(resolve, waitTime));
-                  this.refill();
-                  this.tokens -= 1;
-                })();
-                await this.pending;
-              }
-            }
         - name: >-
             authorizationStrategy.ts
           type: >-
             file
-          contents: >
-            //
-            src/authorizationStrategy.ts
-
-
-            import
-            {
-            TokenCache
-            }
-            from
-            "./tokenCache";
-
-
-            export
-            interface
-            AuthorizationStrategy
-            {
-              getToken(dbid: string): Promise<string | undefined>;
-              applyHeaders(headers: Record<string, string>, token: string): void;
-              handleError(
-                status: number,
-                params: any,
-                fetchTempToken: (dbid: string) => Promise<string>,
-                attempt: number,
-                maxAttempts: number,
-                debug?: boolean,
-                methodName?: string
-              ): Promise<string | null>;
-            }
-
-
-            export
-            class
-            TempTokenStrategy
-            implements
-            AuthorizationStrategy
-            {
-              constructor(
-                private tokenCache: TokenCache,
-                private initialTempToken?: string
-              ) {}
-
-              async getToken(dbid: string): Promise<string | undefined> {
-                return this.tokenCache.get(dbid) || this.initialTempToken;
-              }
-
-              applyHeaders(headers: Record<string, string>, token: string): void {
-                headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
-              }
-
-              async handleError(
-                status: number,
-                params: any,
-                fetchTempToken: (dbid: string) => Promise<string>,
-                attempt: number,
-                maxAttempts: number,
-                debug?: boolean,
-                methodName?: string
-              ): Promise<string | null> {
-                if (status !== 401 || attempt >= maxAttempts - 1) return null;
-                if (debug)
-                  console.log(
-                    `Authorization error for ${
-                      methodName || "method"
-                    } (temp token), refreshing token:`
-                  );
-                const dbid = extractDbid(params);
-                if (!dbid) {
-                  if (debug)
-                    console.log(
-                      `No dbid available for ${
-                        methodName || "method"
-                      }, skipping token refresh`
-                    );
-                  return null;
-                }
-                if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-                const newToken = await fetchTempToken(dbid);
-                this.tokenCache.set(dbid, newToken);
-                return newToken;
-              }
-            }
-
-
-            export
-            class
-            UserTokenStrategy
-            implements
-            AuthorizationStrategy
-            {
-              constructor(private userToken: string) {}
-
-              async getToken(_dbid: string): Promise<string> {
-                return this.userToken;
-              }
-
-              applyHeaders(headers: Record<string, string>, token: string): void {
-                headers["Authorization"] = `QB-USER-TOKEN ${token}`;
-              }
-
-              async handleError(
-                status: number,
-                _params: any,
-                _fetchTempToken: (dbid: string) => Promise<string>,
-                attempt: number,
-                maxAttempts: number,
-                debug?: boolean,
-                methodName?: string
-              ): Promise<string | null> {
-                if (status !== 401 || attempt >= maxAttempts - 1) return null;
-                if (debug)
-                  console.log(
-                    `Retrying ${
-                      methodName || "method"
-                    } with existing user token: ${this.userToken.substring(0, 10)}...`
-                  );
-                return this.userToken;
-              }
-            }
-
-
-            export
-            class
-            SsoTokenStrategy
-            implements
-            AuthorizationStrategy
-            {
-              private currentToken: string | undefined;
-
-              constructor(
-                private samlToken: string,
-                private realm: string,
-                private fetchApi: typeof fetch,
-                private debug: boolean = false
-              ) {}
-
-              async getToken(_dbid: string): Promise<string | undefined> {
-                if (!this.currentToken) {
-                  this.currentToken = await this.fetchSsoToken({
-                    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-                    requested_token_type:
-                      "urn:quickbase:params:oauth:token-type:temp_token",
-                    subject_token: this.samlToken,
-                    subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-                  });
-                }
-                return this.currentToken;
-              }
-
-              applyHeaders(headers: Record<string, string>, token: string): void {
-                headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
-              }
-
-              async handleError(
-                status: number,
-                _params: any,
-                _fetchTempToken: (dbid: string) => Promise<string>,
-                attempt: number,
-                maxAttempts: number,
-                debug?: boolean,
-                methodName?: string
-              ): Promise<string | null> {
-                if (status !== 401 || attempt >= maxAttempts - 1) return null;
-
-                if (debug || this.debug) {
-                  console.log(
-                    `Authorization error for ${
-                      methodName || "method"
-                    } (SSO), refreshing token`
-                  );
-                }
-
-                const newToken = await this.refreshSsoToken(debug || this.debug);
-                if (newToken) {
-                  this.currentToken = newToken;
-                  return newToken;
-                }
-                return null;
-              }
-
-              private async refreshSsoToken(debug: boolean = false): Promise<string> {
-                const payload = {
-                  grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-                  requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
-                  subject_token: this.samlToken,
-                  subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-                };
-
-                const response = await this.fetchApi(
-                  `https://api.quickbase.com/v1/auth/oauth/token`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                    credentials: "omit",
-                  }
-                );
-
-                if (!response.ok) {
-                  const errorBody = await response.json().catch(() => ({}));
-                  if (debug) {
-                    console.log(`[SSO Refresh] Failed: ${response.status}`, errorBody);
-                  }
-                  throw new Error(
-                    `SSO token refresh failed: ${errorBody.message || "Unknown error"}`
-                  );
-                }
-
-                const result = await response.json();
-                const newToken = result.access_token;
-                if (!newToken) {
-                  throw new Error("No access token returned from SSO token exchange");
-                }
-
-                if (debug) {
-                  console.log(`[SSO Refresh] New token: ${newToken.substring(0, 10)}...`);
-                }
-                return newToken;
-              }
-
-              private async fetchSsoToken(params: {
-                grant_type: string;
-                requested_token_type: string;
-                subject_token: string;
-                subject_token_type: string;
-              }): Promise<string> {
-                const response = await this.fetchApi(
-                  `https://api.quickbase.com/v1/auth/oauth/token`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(params),
-                    credentials: "omit",
-                  }
-                );
-
-                if (!response.ok) {
-                  const errorBody = await response.json().catch(() => ({}));
-                  if (this.debug) {
-                    console.log(`[fetchSsoToken] Failed: ${response.status}`, errorBody);
-                  }
-                  throw new Error(
-                    `SSO token fetch failed: ${errorBody.message || "Unknown error"}`
-                  );
-                }
-
-                const result = await response.json();
-                const newToken = result.access_token;
-                if (!newToken) {
-                  throw new Error("No access token returned from SSO token exchange");
-                }
-
-                if (this.debug) {
-                  console.log(
-                    `[fetchSsoToken] Fetched token: ${newToken.substring(0, 10)}...`
-                  );
-                }
-                return newToken;
-              }
-            }
-
-
-            export
-            function
-            extractDbid(params:
-            any):
-            string
-            |
-            undefined
-            {
-              return (
-                params.dbid ||
-                params.tableId ||
-                params.appId ||
-                params.body?.from ||
-                params.body?.to
-              );
-            }
         - name: >-
             generated
           type: >-
@@ -1981,1152 +2311,6 @@ tree:
                 QuickbaseClient.ts
               type: >-
                 file
-              contents: >
-                //
-                Generated
-                on
-                2025-03-20T04:14:08.516Z
-
-                import
-                {
-                AddManagersToGroup200Response,
-                AddManagersToGroupRequest,
-                AddMembersToGroup200Response,
-                AddMembersToGroupRequest,
-                AddSubgroupsToGroup200Response,
-                AddSubgroupsToGroupRequest,
-                Audit200Response,
-                ChangesetSolution200Response,
-                ChangesetSolutionFromRecord200Response,
-                CloneUserToken200Response,
-                CopyApp200Response,
-                CopyAppRequest,
-                CreateApp200Response,
-                CreateAppRequest,
-                CreateField200Response,
-                CreateFieldRequest,
-                CreateRelationship200Response,
-                CreateRelationshipRequest,
-                CreateSolution200Response,
-                CreateSolutionFromRecord200Response,
-                CreateTable200Response,
-                CreateTableRequest,
-                DeactivateUserToken200Response,
-                DeleteApp200Response,
-                DeleteAppRequest,
-                DeleteFields200Response,
-                DeleteFieldsRequest,
-                DeleteFile200Response,
-                DeleteRecords200Response,
-                DeleteRecordsRequest,
-                DeleteRelationship200Response,
-                DeleteTable200Response,
-                DeleteUserToken200Response,
-                DenyUsers200Response,
-                DenyUsersAndGroups200Response,
-                DenyUsersAndGroupsRequest,
-                DenyUsersRequest,
-                DownloadFile200Response,
-                ExchangeSsoToken200Response,
-                ExportSolution200Response,
-                ExportSolutionToRecord200Response,
-                GenerateDocument200Response,
-                GetApp200Response,
-                GetAppEvents200Response,
-                GetAppTables200Response,
-                GetField200Response,
-                GetFieldUsage200Response,
-                GetFields200Response,
-                GetFieldsUsage200Response,
-                GetRelationships200Response,
-                GetReport200Response,
-                GetTable200Response,
-                GetTableReports200Response,
-                GetTempTokenDBID200Response,
-                GetUsers200Response,
-                GetUsersRequest,
-                PlatformAnalyticEventSummaries200Response,
-                PlatformAnalyticReads200Response,
-                RemoveManagersFromGroup200Response,
-                RemoveManagersFromGroupRequest,
-                RemoveMembersFromGroup200Response,
-                RemoveMembersFromGroupRequest,
-                RemoveSubgroupsFromGroup200Response,
-                RemoveSubgroupsFromGroupRequest,
-                RunFormula200Response,
-                RunQuery200Response,
-                RunQueryRequest,
-                RunReport200Response,
-                TransferUserToken200Response,
-                UndenyUsers200Response,
-                UndenyUsersRequest,
-                UpdateApp200Response,
-                UpdateAppRequest,
-                UpdateField200Response,
-                UpdateFieldRequest,
-                UpdateRelationship200Response,
-                UpdateRelationshipRequest,
-                UpdateSolution200Response,
-                UpdateSolutionToRecord200Response,
-                UpdateTable200Response,
-                UpdateTableRequest,
-                Upsert200Response,
-                Upsert207Response,
-                UpsertRequest
-                }
-                from
-                "../generated/models";
-
-
-                export
-                interface
-                QuickbaseClient
-                {
-                  /**
-                   * Create an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createApp
-                   *   @param {CreateAppRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, required) _The name of the app._
-                   *     - **description** (`string`, optional) _A description for the app._
-                   *     - **assignToken** (`boolean`, required) _Whether to assign the user token._
-                   *
-                   * @returns {Promise<CreateApp200Response>} _Promise resolving to the createApp response with properties_
-                   *   - **name** (`string`, required) _The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this._
-                   *   - **description** (`string`, optional) _The description for the app. If this property is left out, the app description will be blank._
-                   *   - **created** (`string`, optional) _The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **dateFormat** (`string`, optional) _A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format._
-                   *   - **timeZone** (`string`, optional) _A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone._
-                   *   - **memoryInfo** (`object`, optional) _Application memory info_
-                   *   - **id** (`string`, optional) _The unique identifier for this application._
-                   *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-                   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
-                   *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-                   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createApp} Official Quickbase API documentation
-                   */
-                  createApp: (params: { body?: CreateAppRequest }) => Promise<CreateApp200Response>;
-                  /**
-                   * Get an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getApp
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetApp200Response>} _Promise resolving to the getApp response with properties_
-                   *   - **ancestorId** (`string`, optional) _The id of the app from which this app was copied_
-                   *   - **name** (`string`, required) _The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this._
-                   *   - **description** (`string`, optional) _The description for the app. If this property is left out, the app description will be blank._
-                   *   - **created** (`string`, optional) _The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **dateFormat** (`string`, optional) _A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format._
-                   *   - **timeZone** (`string`, optional) _A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone._
-                   *   - **memoryInfo** (`object`, optional) _Application memory info_
-                   *   - **id** (`string`, optional) _The unique identifier for this application._
-                   *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-                   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
-                   *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-                   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getApp} Official Quickbase API documentation
-                   */
-                  getApp: (params: { appId: string }) => Promise<GetApp200Response>;
-                  /**
-                   * Update an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateApp
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {UpdateAppRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, required) _The name of the app._
-                   *     - **description** (`string`, optional) _A description for the app._
-                   *     - **assignToken** (`boolean`, required) _Whether to assign the user token._
-                   *
-                   * @returns {Promise<UpdateApp200Response>} _Promise resolving to the updateApp response with properties_
-                   *   - **ancestorId** (`string`, optional) _The id of the app from which this app was copied_
-                   *   - **name** (`string`, required) _The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this._
-                   *   - **description** (`string`, optional) _The description for the app. If this property is left out, the app description will be blank._
-                   *   - **created** (`string`, optional) _The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **dateFormat** (`string`, optional) _A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format._
-                   *   - **timeZone** (`string`, optional) _A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone._
-                   *   - **memoryInfo** (`object`, optional) _Application memory info_
-                   *   - **id** (`string`, optional) _The unique identifier for this application._
-                   *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-                   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
-                   *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-                   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateApp} Official Quickbase API documentation
-                   */
-                  updateApp: (params: { appId: string; body?: UpdateAppRequest }) => Promise<UpdateApp200Response>;
-                  /**
-                   * Delete an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteApp
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {DeleteAppRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, required) _The name of the app._
-                   *     - **description** (`string`, optional) _A description for the app._
-                   *     - **assignToken** (`boolean`, required) _Whether to assign the user token._
-                   *
-                   * @returns {Promise<DeleteApp200Response>} _Promise resolving to the deleteApp response with properties_
-                   *   - **deletedAppId** (`string`, optional) _An ID of deleted application._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteApp} Official Quickbase API documentation
-                   */
-                  deleteApp: (params: { appId: string; body?: DeleteAppRequest }) => Promise<DeleteApp200Response>;
-                  /**
-                   * Get app events
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getAppEvents
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getAppEvents} Official Quickbase API documentation
-                   */
-                  getAppEvents: (params: { appId: string }) => Promise<GetAppEvents200Response>;
-                  /**
-                   * Copy an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ copyApp
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {CopyAppRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, required) _The name of the new app._
-                   *     - **description** (`string`, optional) _A description for the new app._
-                   *     - **properties** (`CopyAppRequestProperties`, optional) _Type: CopyAppRequestProperties_
-                   *
-                   * @returns {Promise<CopyApp200Response>} _Promise resolving to the copyApp response with properties_
-                   *   - **name** (`string`, required) _The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this._
-                   *   - **description** (`string`, optional) _The description for the app_
-                   *   - **created** (`string`, optional) _The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **dateFormat** (`string`, optional) _A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format._
-                   *   - **timeZone** (`string`, optional) _A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone._
-                   *   - **id** (`string`, optional) _The unique identifier for this application._
-                   *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-                   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
-                   *   - **ancestorId** (`string`, optional) _The id of the app from which this app was copied_
-                   *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/copyApp} Official Quickbase API documentation
-                   */
-                  copyApp: (params: { appId: string; body?: CopyAppRequest }) => Promise<CopyApp200Response>;
-                  /**
-                   * Create a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createTable
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {CreateTableRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, required) _The name for the table._
-                   *     - **description** (`string`, optional) _The description for the table..._
-                   *     - **singleRecordName** (`string`, optional) _The singular noun for records..._
-                   *     - **pluralRecordName** (`string`, optional) _The plural noun for records..._
-                   *
-                   * @returns {Promise<CreateTable200Response>} _Promise resolving to the createTable response with properties_
-                   *   - **name** (`string`, optional) _The name of the table._
-                   *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
-                   *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
-                   *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
-                   *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
-                   *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
-                   *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-                   *   - **defaultSortOrder** (`CreateTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
-                   *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
-                   *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
-                   *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
-                   *   - **sizeLimit** (`string`, optional) _The size limit for the table._
-                   *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
-                   *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createTable} Official Quickbase API documentation
-                   */
-                  createTable: (params: { appId: string; body?: CreateTableRequest }) => Promise<CreateTable200Response>;
-                  /**
-                   * Get tables for an app
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getAppTables
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getAppTables} Official Quickbase API documentation
-                   */
-                  getAppTables: (params: { appId: string }) => Promise<GetAppTables200Response>;
-                  /**
-                   * Get a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getTable
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetTable200Response>} _Promise resolving to the getTable response with properties_
-                   *   - **name** (`string`, optional) _The name of the table._
-                   *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
-                   *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
-                   *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
-                   *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
-                   *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
-                   *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-                   *   - **defaultSortOrder** (`GetTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
-                   *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
-                   *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
-                   *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
-                   *   - **sizeLimit** (`string`, optional) _The size limit for the table._
-                   *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
-                   *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getTable} Official Quickbase API documentation
-                   */
-                  getTable: (params: { appId: string; tableId: string }) => Promise<GetTable200Response>;
-                  /**
-                   * Update a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateTable
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {UpdateTableRequest} params.body _Optional parameter with properties_
-                   *     - **name** (`string`, optional) _The updated name of the table._
-                   *     - **description** (`string`, optional) _The updated description for the table._
-                   *
-                   * @returns {Promise<UpdateTable200Response>} _Promise resolving to the updateTable response with properties_
-                   *   - **name** (`string`, optional) _The name of the table._
-                   *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
-                   *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
-                   *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
-                   *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
-                   *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
-                   *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-                   *   - **defaultSortOrder** (`UpdateTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
-                   *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
-                   *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
-                   *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
-                   *   - **sizeLimit** (`string`, optional) _The size limit for the table._
-                   *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
-                   *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateTable} Official Quickbase API documentation
-                   */
-                  updateTable: (params: { appId: string; tableId: string; body?: UpdateTableRequest }) => Promise<UpdateTable200Response>;
-                  /**
-                   * Delete a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteTable
-                   *   @param {string} params.appId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *
-                   * @returns {Promise<DeleteTable200Response>} _Promise resolving to the deleteTable response with properties_
-                   *   - **deletedTableId** (`string`, optional) _The deleted table id._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteTable} Official Quickbase API documentation
-                   */
-                  deleteTable: (params: { appId: string; tableId: string }) => Promise<DeleteTable200Response>;
-                  /**
-                   * Get all relationships
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getRelationships
-                   *   @param {number} params.skip _Optional parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetRelationships200Response>} _Promise resolving to the getRelationships response with properties_
-                   *   - **relationships** (`{ [key: string]: any; }[]`, required) _The relationships in a table._
-                   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getRelationships} Official Quickbase API documentation
-                   */
-                  getRelationships: (params: { skip?: number; tableId: string }) => Promise<GetRelationships200Response>;
-                  /**
-                   * Create a relationship
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createRelationship
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {CreateRelationshipRequest} params.body _Optional parameter with properties_
-                   *     - **parentTableId** (`string`, required) _The parent table id for the relationship._
-                   *     - **foreignKeyField** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
-                   *     - **lookupFieldIds** (`number[]`, optional) _Array of field ids..._
-                   *     - **summaryFields** (`{ [key: string]: any; }[]`, optional) _Array of summary field objects..._
-                   *
-                   * @returns {Promise<CreateRelationship200Response>} _Promise resolving to the createRelationship response with properties_
-                   *   - **id** (`number`, required) _The relationship id (foreign key field id)._
-                   *   - **parentTableId** (`string`, required) _The parent table id of the relationship._
-                   *   - **childTableId** (`string`, required) _The child table id of the relationship._
-                   *   - **foreignKeyField** (`{ [key: string]: any; }`, optional) _The foreign key field information._
-                   *   - **isCrossApp** (`boolean`, required) _Whether this is a cross-app relationship._
-                   *   - **lookupFields** (`{ [key: string]: any; }[]`, optional) _The lookup fields array._
-                   *   - **summaryFields** (`{ [key: string]: any; }[]`, optional) _The summary fields array._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createRelationship} Official Quickbase API documentation
-                   */
-                  createRelationship: (params: { tableId: string; body?: CreateRelationshipRequest }) => Promise<CreateRelationship200Response>;
-                  /**
-                   * Update a relationship
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateRelationship
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.relationshipId _Required parameter with properties_
-                   *   @param {UpdateRelationshipRequest} params.body _Optional parameter with properties_
-                   *     - **parentTableId** (`string`, optional) _The updated parent table id..._
-                   *     - **foreignKeyField** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
-                   *     - **lookupFieldIds** (`number[]`, optional) _Updated array of field ids..._
-                   *     - **summaryFields** (`{ [key: string]: any; }[]`, optional) _Type: { [key: string]: any; }[]_
-                   *
-                   * @returns {Promise<UpdateRelationship200Response>} _Promise resolving to the updateRelationship response with properties_
-                   *   - **id** (`number`, required) _The relationship id (foreign key field id)._
-                   *   - **parentTableId** (`string`, required) _The parent table id of the relationship._
-                   *   - **childTableId** (`string`, required) _The child table id of the relationship._
-                   *   - **foreignKeyField** (`{ [key: string]: any; }`, optional) _The foreign key field information._
-                   *   - **isCrossApp** (`boolean`, required) _Whether this is a cross-app relationship._
-                   *   - **lookupFields** (`{ [key: string]: any; }[]`, optional) _The lookup fields array._
-                   *   - **summaryFields** (`{ [key: string]: any; }[]`, optional) _The summary fields array._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateRelationship} Official Quickbase API documentation
-                   */
-                  updateRelationship: (params: { tableId: string; relationshipId: number; body?: UpdateRelationshipRequest }) => Promise<UpdateRelationship200Response>;
-                  /**
-                   * Delete a relationship
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteRelationship
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.relationshipId _Required parameter with properties_
-                   *
-                   * @returns {Promise<DeleteRelationship200Response>} _Promise resolving to the deleteRelationship response with properties_
-                   *   - **relationshipId** (`number`, required) _The relationship id._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteRelationship} Official Quickbase API documentation
-                   */
-                  deleteRelationship: (params: { tableId: string; relationshipId: number }) => Promise<DeleteRelationship200Response>;
-                  /**
-                   * Get reports for a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getTableReports
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getTableReports} Official Quickbase API documentation
-                   */
-                  getTableReports: (params: { tableId: string }) => Promise<GetTableReports200Response>;
-                  /**
-                   * Get a report
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getReport
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {string} params.reportId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetReport200Response>} _Promise resolving to the getReport response with properties_
-                   *   - **id** (`string`, optional) _The identifier of the report, unique to the table._
-                   *   - **name** (`string`, optional) _The configured name of the report._
-                   *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
-                   *   - **description** (`string`, optional) _The configured description of a report._
-                   *   - **ownerId** (`number`, optional) _Optional, showed only for personal reports. The user ID of report owner._
-                   *   - **query** (`{ [key: string]: any; }`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
-                   *   - **properties** (`{ [key: string]: any; }`, optional) _A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)_
-                   *   - **usedLast** (`string`, optional) _The instant at which a report was last used._
-                   *   - **usedCount** (`number`, optional) _The number of times a report has been used._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getReport} Official Quickbase API documentation
-                   */
-                  getReport: (params: { tableId: string; reportId: string }) => Promise<GetReport200Response>;
-                  /**
-                   * Run a report
-                   *
-                   * @param {Object} params _Object containing the parameters for_ runReport
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.skip _Optional parameter with properties_
-                   *   @param {number} params.top _Optional parameter with properties_
-                   *   @param {string} params.reportId _Required parameter with properties_
-                   *   @param {any} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<RunReport200Response>} _Promise resolving to the runReport response with properties_
-                   *   - **fields** (`{ [key: string]: any; }[]`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
-                   *   - **data** (`string[]`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
-                   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/runReport} Official Quickbase API documentation
-                   */
-                  runReport: (params: { tableId: string; skip?: number; top?: number; reportId: string; body?: any }) => Promise<RunReport200Response>;
-                  /**
-                   * Get fields for a table
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getFields
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
-                   *
-                   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
-                   */
-                  getFields: (params: { tableId: string; includeFieldPerms?: boolean }) => Promise<GetFields200Response>;
-                  /**
-                   * Create a field
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createField
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {CreateFieldRequest} params.body _Optional parameter with properties_
-                   *     - **label** (`string`, required) _The label of the field_
-                   *     - **fieldType** (`CreateFieldRequestFieldTypeEnum`, required) _The type of the field_
-                   *     - **fieldHelp** (`string`, optional) _Help text for the field_
-                   *     - **addToForms** (`boolean`, optional) _Whether to add the field to forms_
-                   *     - **permissions** (`object`, optional) _Custom permissions for the field_
-                   *     - **required** (`boolean`, optional) _Whether the field is required_
-                   *     - **unique** (`boolean`, optional) _Whether the field must have unique values_
-                   *     - **noWrap** (`boolean`, optional) _Whether text wrapping is disabled_
-                   *     - **bold** (`boolean`, optional) _Whether the field is bolded_
-                   *     - **appearsByDefault** (`boolean`, optional) _Whether the field appears by default in reports_
-                   *     - **findEnabled** (`boolean`, optional) _Whether the field is searchable_
-                   *     - **doesDataCopy** (`boolean`, optional) _Whether the field copies data_
-                   *     - **audited** (`boolean`, optional) _Whether changes to the field are audited_
-                   *     - **properties** (`CreateFieldRequestProperties`, optional) _Type: CreateFieldRequestProperties_
-                   *
-                   * @returns {Promise<CreateField200Response>} _Promise resolving to the createField response with properties_
-                   *   - **id** (`number`, required) _The id of the field, unique to this table._
-                   *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
-                   *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
-                   *   - **label** (`string`, optional) _The label (name) of the field._
-                   *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
-                   *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
-                   *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
-                   *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
-                   *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
-                   *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
-                   *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
-                   *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
-                   *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
-                   *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-                   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createField} Official Quickbase API documentation
-                   */
-                  createField: (params: { tableId: string; body?: CreateFieldRequest }) => Promise<CreateField200Response>;
-                  /**
-                   * Delete field(s)
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteFields
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {DeleteFieldsRequest} params.body _Optional parameter with properties_
-                   *     - **fieldIds** (`number[]`, required) _Type: number[]_
-                   *
-                   * @returns {Promise<DeleteFields200Response>} _Promise resolving to the deleteFields response with properties_
-                   *   - **deletedFieldIds** (`number[]`, required) _List of field ids to were deleted._
-                   *   - **errors** (`string[]`, required) _List of errors found._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteFields} Official Quickbase API documentation
-                   */
-                  deleteFields: (params: { tableId: string; body?: DeleteFieldsRequest }) => Promise<DeleteFields200Response>;
-                  /**
-                   * Get field
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getField
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetField200Response>} _Promise resolving to the getField response with properties_
-                   *   - **id** (`number`, required) _The id of the field, unique to this table._
-                   *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
-                   *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
-                   *   - **label** (`string`, optional) _The label (name) of the field._
-                   *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
-                   *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
-                   *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
-                   *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
-                   *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
-                   *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
-                   *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
-                   *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
-                   *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
-                   *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-                   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getField} Official Quickbase API documentation
-                   */
-                  getField: (params: { tableId: string; includeFieldPerms?: boolean; fieldId: number }) => Promise<GetField200Response>;
-                  /**
-                   * Update a field
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateField
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {UpdateFieldRequest} params.body _Optional parameter with properties_
-                   *     - **label** (`string`, required) _The label of the field_
-                   *     - **fieldType** (`UpdateFieldRequestFieldTypeEnum`, optional) _The type of the field_
-                   *     - **fieldHelp** (`string`, optional) _Help text for the field_
-                   *     - **addToForms** (`boolean`, optional) _Whether to add the field to forms_
-                   *     - **permissions** (`object`, optional) _Custom permissions for the field_
-                   *     - **required** (`boolean`, optional) _Whether the field is required_
-                   *     - **unique** (`boolean`, optional) _Whether the field must have unique values_
-                   *     - **noWrap** (`boolean`, optional) _Whether text wrapping is disabled_
-                   *     - **bold** (`boolean`, optional) _Whether the field is bolded_
-                   *     - **appearsByDefault** (`boolean`, optional) _Whether the field appears by default in reports_
-                   *     - **findEnabled** (`boolean`, optional) _Whether the field is searchable_
-                   *     - **doesDataCopy** (`boolean`, optional) _Whether the field copies data_
-                   *     - **audited** (`boolean`, optional) _Whether changes to the field are audited_
-                   *     - **properties** (`CreateFieldRequestProperties`, optional) _Type: CreateFieldRequestProperties_
-                   *
-                   * @returns {Promise<UpdateField200Response>} _Promise resolving to the updateField response with properties_
-                   *   - **id** (`number`, required) _The id of the field, unique to this table._
-                   *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
-                   *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
-                   *   - **label** (`string`, optional) _The label (name) of the field._
-                   *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
-                   *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
-                   *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
-                   *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
-                   *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
-                   *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
-                   *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
-                   *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
-                   *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
-                   *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-                   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateField} Official Quickbase API documentation
-                   */
-                  updateField: (params: { tableId: string; fieldId: number; body?: UpdateFieldRequest }) => Promise<UpdateField200Response>;
-                  /**
-                   * Get usage for all fields
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getFieldsUsage
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.skip _Optional parameter with properties_
-                   *   @param {number} params.top _Optional parameter with properties_
-                   *
-                   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
-                   */
-                  getFieldsUsage: (params: { tableId: string; skip?: number; top?: number }) => Promise<GetFieldsUsage200Response>;
-                  /**
-                   * Get usage for a field
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getFieldUsage
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *
-                   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
-                   */
-                  getFieldUsage: (params: { tableId: string; fieldId: number }) => Promise<GetFieldUsage200Response>;
-                  /**
-                   * Run a formula
-                   *
-                   * @param {Object} params _Object containing the parameters for_ runFormula
-                   *   @param {{ formula?: string; rid?: number; from?: string }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<RunFormula200Response>} _Promise resolving to the runFormula response with properties_
-                   *   - **result** (`string`, optional) _The formula execution result._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/runFormula} Official Quickbase API documentation
-                   */
-                  runFormula: (params: { body?: { formula?: string; rid?: number; from?: string } }) => Promise<RunFormula200Response>;
-                  /**
-                   * Insert/Update record(s)
-                   *
-                   * @param {Object} params _Object containing the parameters for_ upsert
-                   *   @param {UpsertRequest} params.body _Optional parameter with properties_
-                   *     - **data** (`Record[]`, optional) _Type: Record[]_
-                   *     - **to** (`string`, optional) _Type: string_
-                   *     - **fieldsToReturn** (`number[]`, optional) _Type: number[]_
-                   *
-                   * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/upsert} Official Quickbase API documentation
-                   */
-                  upsert: (params: { body?: UpsertRequest }) => Promise<Upsert200Response | Upsert207Response>;
-                  /**
-                   * Delete record(s)
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteRecords
-                   *   @param {DeleteRecordsRequest} params.body _Optional parameter with properties_
-                   *     - **from** (`string`, required) _Type: string_
-                   *     - **where** (`string`, optional) _Type: string_
-                   *
-                   * @returns {Promise<DeleteRecords200Response>} _Promise resolving to the deleteRecords response with properties_
-                   *   - **numberDeleted** (`number`, optional) _The number of records deleted._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteRecords} Official Quickbase API documentation
-                   */
-                  deleteRecords: (params: { body?: DeleteRecordsRequest }) => Promise<DeleteRecords200Response>;
-                  /**
-                   * Query for data
-                   *
-                   * @param {Object} params _Object containing the parameters for_ runQuery
-                   *   @param {RunQueryRequest} params.body _Optional parameter with properties_
-                   *     - **from** (`string`, required) _The table identifier._
-                   *     - **select** (`number[]`, optional) _An array of field ids..._
-                   *     - **where** (`string`, optional) _The filter, using the Quickbase query language..._
-                   *     - **sortBy** (`RunQueryRequestSortByInner[]`, optional) _An array of field IDs and sort directions..._
-                   *     - **groupBy** (`RunQueryRequestGroupByInner[]`, optional) _An array that contains the fields to group the records by._
-                   *     - **options** (`RunQueryRequestOptions`, optional) _Type: RunQueryRequestOptions_
-                   *
-                   * @returns {Promise<RunQuery200Response>} _Promise resolving to the runQuery response with properties_
-                   *   - **fields** (`{ [key: string]: any; }[]`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
-                   *   - **data** (`string[]`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
-                   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/runQuery} Official Quickbase API documentation
-                   */
-                  runQuery: (params: { body?: RunQueryRequest }) => Promise<RunQuery200Response>;
-                  /**
-                   * Get a temporary token for a dbid
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getTempTokenDBID
-                   *   @param {string} params.dbid _Required parameter with properties_
-                   *   @param {string} params.qBAppToken _Optional parameter with properties_
-                   *
-                   * @returns {Promise<GetTempTokenDBID200Response>} _Promise resolving to the getTempTokenDBID response with properties_
-                   *   - **temporaryAuthorization** (`string`, optional) _Temporary authorization token._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getTempTokenDBID} Official Quickbase API documentation
-                   */
-                  getTempTokenDBID: (params: { dbid: string; qBAppToken?: string }) => Promise<GetTempTokenDBID200Response>;
-                  /**
-                   * Exchange an SSO token
-                   *
-                   * @param {Object} params _Object containing the parameters for_ exchangeSsoToken
-                   *   @param {{ grant_type?: string; requested_token_type?: string; subject_token?: string; subject_token_type?: string }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<ExchangeSsoToken200Response>} _Promise resolving to the exchangeSsoToken response with properties_
-                   *   - **accessToken** (`string`, optional) _The security token issued by the authorization server in response to the token exchange request. The identifier `access_token` is used for historical reasons and the issued token need not be an OAuth access token._
-                   *   - **issuedTokenType** (`ExchangeSsoToken200ResponseIssuedTokenTypeEnum`, optional) _An identifier for the representation of the issued security token._
-                   *   - **tokenType** (`"N_A"`, optional) _Will always return `N_A`_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/exchangeSsoToken} Official Quickbase API documentation
-                   */
-                  exchangeSsoToken: (params: { body?: { grant_type?: string; requested_token_type?: string; subject_token?: string; subject_token_type?: string } }) => Promise<ExchangeSsoToken200Response>;
-                  /**
-                   * Clone a user token
-                   *
-                   * @param {Object} params _Object containing the parameters for_ cloneUserToken
-                   *   @param {{ name?: string; description?: string }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<CloneUserToken200Response>} _Promise resolving to the cloneUserToken response with properties_
-                   *   - **active** (`boolean`, optional) _Whether the user token is active._
-                   *   - **apps** (`{ [key: string]: any; }[]`, optional) _The list of apps this user token is assigned to._
-                   *   - **lastUsed** (`string`, optional) _The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **description** (`string`, optional) _User Token description._
-                   *   - **id** (`number`, optional) _User Token id._
-                   *   - **name** (`string`, optional) _User Token name._
-                   *   - **token** (`string`, optional) _User Token value._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/cloneUserToken} Official Quickbase API documentation
-                   */
-                  cloneUserToken: (params: { body?: { name?: string; description?: string } }) => Promise<CloneUserToken200Response>;
-                  /**
-                   * Transfer a user token
-                   *
-                   * @param {Object} params _Object containing the parameters for_ transferUserToken
-                   *   @param {{ id?: number; from?: string; to?: string }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<TransferUserToken200Response>} _Promise resolving to the transferUserToken response with properties_
-                   *   - **active** (`boolean`, optional) _Whether the user token is active._
-                   *   - **apps** (`{ [key: string]: any; }[]`, optional) _The list of apps this user token is assigned to._
-                   *   - **lastUsed** (`string`, optional) _The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-                   *   - **description** (`string`, optional) _User Token description._
-                   *   - **id** (`number`, optional) _User Token id._
-                   *   - **name** (`string`, optional) _User Token name._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/transferUserToken} Official Quickbase API documentation
-                   */
-                  transferUserToken: (params: { body?: { id?: number; from?: string; to?: string } }) => Promise<TransferUserToken200Response>;
-                  /**
-                   * Deactivate a user token
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deactivateUserToken
-                   *   No parameters
-                   *
-                   * @returns {Promise<DeactivateUserToken200Response>} _Promise resolving to the deactivateUserToken response with properties_
-                   *   - **id** (`number`, optional) _The user token id._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deactivateUserToken} Official Quickbase API documentation
-                   */
-                  deactivateUserToken: (params: {  }) => Promise<DeactivateUserToken200Response>;
-                  /**
-                   * Delete a user token
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteUserToken
-                   *   No parameters
-                   *
-                   * @returns {Promise<DeleteUserToken200Response>} _Promise resolving to the deleteUserToken response with properties_
-                   *   - **id** (`number`, optional) _The user token id._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteUserToken} Official Quickbase API documentation
-                   */
-                  deleteUserToken: (params: {  }) => Promise<DeleteUserToken200Response>;
-                  /**
-                   * Download file
-                   *
-                   * @param {Object} params _Object containing the parameters for_ downloadFile
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.recordId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {number} params.versionNumber _Required parameter with properties_
-                   *
-                   * @returns {Promise<DownloadFile200Response>} _Promise resolving to the downloadFile response with properties_
-                   *   - **data** (`Blob`, optional) _Type: Blob_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/downloadFile} Official Quickbase API documentation
-                   */
-                  downloadFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DownloadFile200Response>;
-                  /**
-                   * Delete file
-                   *
-                   * @param {Object} params _Object containing the parameters for_ deleteFile
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.recordId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {number} params.versionNumber _Required parameter with properties_
-                   *
-                   * @returns {Promise<DeleteFile200Response>} _Promise resolving to the deleteFile response with properties_
-                   *   - **versionNumber** (`number`, optional) _The number of deleted version._
-                   *   - **fileName** (`string`, optional) _The name of file associated with deleted version._
-                   *   - **uploaded** (`string`, optional) _The timestamp when the version was originally uploaded._
-                   *   - **creator** (`{ [key: string]: any; }`, optional) _The user that uploaded version._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/deleteFile} Official Quickbase API documentation
-                   */
-                  deleteFile: (params: { tableId: string; recordId: number; fieldId: number; versionNumber: number }) => Promise<DeleteFile200Response>;
-                  /**
-                   * Get users
-                   *
-                   * @param {Object} params _Object containing the parameters for_ getUsers
-                   *   @param {number} params.accountId _Optional parameter with properties_
-                   *   @param {GetUsersRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<GetUsers200Response>} _Promise resolving to the getUsers response with properties_
-                   *   - **users** (`{ [key: string]: any; }[]`, required) _A list of users found in an account with the given criterias_
-                   *   - **metadata** (`{ [key: string]: any; }`, required) _Additional request information_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/getUsers} Official Quickbase API documentation
-                   */
-                  getUsers: (params: { accountId?: number; body?: GetUsersRequest }) => Promise<GetUsers200Response>;
-                  /**
-                   * Deny users
-                   *
-                   * @param {Object} params _Object containing the parameters for_ denyUsers
-                   *   @param {number} params.accountId _Optional parameter with properties_
-                   *   @param {DenyUsersRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<DenyUsers200Response>} _Promise resolving to the denyUsers response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
-                   *   - **success** (`string[]`, required) _A list of users that have successfully been denied._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/denyUsers} Official Quickbase API documentation
-                   */
-                  denyUsers: (params: { accountId?: number; body?: DenyUsersRequest }) => Promise<DenyUsers200Response>;
-                  /**
-                   * Deny and remove users from groups
-                   *
-                   * @param {Object} params _Object containing the parameters for_ denyUsersAndGroups
-                   *   @param {number} params.accountId _Optional parameter with properties_
-                   *   @param {boolean} params.shouldDeleteFromGroups _Required parameter with properties_
-                   *   @param {DenyUsersAndGroupsRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<DenyUsersAndGroups200Response>} _Promise resolving to the denyUsersAndGroups response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
-                   *   - **success** (`string[]`, required) _A list of users that have successfully been denied._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/denyUsersAndGroups} Official Quickbase API documentation
-                   */
-                  denyUsersAndGroups: (params: { accountId?: number; shouldDeleteFromGroups: boolean; body?: DenyUsersAndGroupsRequest }) => Promise<DenyUsersAndGroups200Response>;
-                  /**
-                   * Undeny users
-                   *
-                   * @param {Object} params _Object containing the parameters for_ undenyUsers
-                   *   @param {number} params.accountId _Optional parameter with properties_
-                   *   @param {UndenyUsersRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<UndenyUsers200Response>} _Promise resolving to the undenyUsers response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn't be undenied. This also includes the ID's of users that are not valid._
-                   *   - **success** (`string[]`, required) _A list of users that have successfully been undenied._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/undenyUsers} Official Quickbase API documentation
-                   */
-                  undenyUsers: (params: { accountId?: number; body?: UndenyUsersRequest }) => Promise<UndenyUsers200Response>;
-                  /**
-                   * Add members
-                   *
-                   * @param {Object} params _Object containing the parameters for_ addMembersToGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {AddMembersToGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<AddMembersToGroup200Response>} _Promise resolving to the addMembersToGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
-                   *   - **success** (`string[]`, required) _A list of users that have been added to the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/addMembersToGroup} Official Quickbase API documentation
-                   */
-                  addMembersToGroup: (params: { gid: number; body?: AddMembersToGroupRequest }) => Promise<AddMembersToGroup200Response>;
-                  /**
-                   * Remove members
-                   *
-                   * @param {Object} params _Object containing the parameters for_ removeMembersFromGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {RemoveMembersFromGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<RemoveMembersFromGroup200Response>} _Promise resolving to the removeMembersFromGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
-                   *   - **success** (`string[]`, required) _A list of users that have been removed from the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/removeMembersFromGroup} Official Quickbase API documentation
-                   */
-                  removeMembersFromGroup: (params: { gid: number; body?: RemoveMembersFromGroupRequest }) => Promise<RemoveMembersFromGroup200Response>;
-                  /**
-                   * Add managers
-                   *
-                   * @param {Object} params _Object containing the parameters for_ addManagersToGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {AddManagersToGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<AddManagersToGroup200Response>} _Promise resolving to the addManagersToGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
-                   *   - **success** (`string[]`, required) _A list of users that have been added to the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/addManagersToGroup} Official Quickbase API documentation
-                   */
-                  addManagersToGroup: (params: { gid: number; body?: AddManagersToGroupRequest }) => Promise<AddManagersToGroup200Response>;
-                  /**
-                   * Remove managers
-                   *
-                   * @param {Object} params _Object containing the parameters for_ removeManagersFromGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {RemoveManagersFromGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<RemoveManagersFromGroup200Response>} _Promise resolving to the removeManagersFromGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
-                   *   - **success** (`string[]`, required) _A list of users that have been removed from the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/removeManagersFromGroup} Official Quickbase API documentation
-                   */
-                  removeManagersFromGroup: (params: { gid: number; body?: RemoveManagersFromGroupRequest }) => Promise<RemoveManagersFromGroup200Response>;
-                  /**
-                   * Add child groups
-                   *
-                   * @param {Object} params _Object containing the parameters for_ addSubgroupsToGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {AddSubgroupsToGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<AddSubgroupsToGroup200Response>} _Promise resolving to the addSubgroupsToGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of child groups that couldn’t be added to the group. This includes a list of IDs that represent invalid groups and groups that have already been added to the group._
-                   *   - **success** (`string[]`, required) _A list of child groups that have been added to the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/addSubgroupsToGroup} Official Quickbase API documentation
-                   */
-                  addSubgroupsToGroup: (params: { gid: number; body?: AddSubgroupsToGroupRequest }) => Promise<AddSubgroupsToGroup200Response>;
-                  /**
-                   * Remove child groups
-                   *
-                   * @param {Object} params _Object containing the parameters for_ removeSubgroupsFromGroup
-                   *   @param {number} params.gid _Required parameter with properties_
-                   *   @param {RemoveSubgroupsFromGroupRequest} params.body _Optional parameter with properties_
-                   *     - **userIds** (`string[]`, required) _Type: string[]_
-                   *
-                   * @returns {Promise<RemoveSubgroupsFromGroup200Response>} _Promise resolving to the removeSubgroupsFromGroup response with properties_
-                   *   - **failure** (`string[]`, required) _A list of child groups that couldn’t be removed from the group. This includes a list of IDs that represent invalid groups._
-                   *   - **success** (`string[]`, required) _A list of child groups that have been removed from the group successfully._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/removeSubgroupsFromGroup} Official Quickbase API documentation
-                   */
-                  removeSubgroupsFromGroup: (params: { gid: number; body?: RemoveSubgroupsFromGroupRequest }) => Promise<RemoveSubgroupsFromGroup200Response>;
-                  /**
-                   * Get audit logs
-                   *
-                   * @param {Object} params _Object containing the parameters for_ audit
-                   *   @param {{ nextToken?: string; numRows?: number; queryId?: string; date?: string; topics?: string[] }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<Audit200Response>} _Promise resolving to the audit response with properties_
-                   *   - **queryId** (`string`, required) _Query id of the requested audit log._
-                   *   - **events** (`{ [key: string]: any; }[]`, optional) _All events of the audit log._
-                   *   - **nextToken** (`string`, optional) _Token to fetch the next 1000 logs._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/audit} Official Quickbase API documentation
-                   */
-                  audit: (params: { body?: { nextToken?: string; numRows?: number; queryId?: string; date?: string; topics?: string[] } }) => Promise<Audit200Response>;
-                  /**
-                   * Get read summaries
-                   *
-                   * @param {Object} params _Object containing the parameters for_ platformAnalyticReads
-                   *   @param {string} params.day _Optional parameter with properties_
-                   *
-                   * @returns {Promise<PlatformAnalyticReads200Response>} _Promise resolving to the platformAnalyticReads response with properties_
-                   *   - **date** (`Date`, required) _The date of the requested summary._
-                   *   - **reads** (`{ [key: string]: any; }`, required) _Total reads for the specified date._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/platformAnalyticReads} Official Quickbase API documentation
-                   */
-                  platformAnalyticReads: (params: { day?: string }) => Promise<PlatformAnalyticReads200Response>;
-                  /**
-                   * Get event summaries
-                   *
-                   * @param {Object} params _Object containing the parameters for_ platformAnalyticEventSummaries
-                   *   @param {number} params.accountId _Optional parameter with properties_
-                   *   @param {{ start?: string; end?: string; groupBy?: string; nextToken?: string; where?: { id?: string; type?: string }[] }} params.body _Optional parameter with properties_
-                   *
-                   * @returns {Promise<PlatformAnalyticEventSummaries200Response>} _Promise resolving to the platformAnalyticEventSummaries response with properties_
-                   *   - **accountId** (`string`, required) _The ID of the account the events are associated with._
-                   *   - **start** (`Date`, required) _The start date and time of the requested summaries in ISO 8601 time format._
-                   *   - **end** (`Date`, required) _The end date and time of the requested summaries in ISO 8601 time format._
-                   *   - **groupBy** (`PlatformAnalyticEventSummaries200ResponseGroupByEnum`, required) _How the events should be grouped._
-                   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) _Type: PlatformAnalyticEventSummaries200ResponseWhereInner[]_
-                   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) _An array of objects that contains Application/User information and an events object with summaries by event type._
-                   *   - **metadata** (`PlatformAnalyticEventSummaries200ResponseMetadata`, optional) _Type: PlatformAnalyticEventSummaries200ResponseMetadata_
-                   *   - **totals** (`PlatformAnalyticEventSummaries200ResponseTotals`, optional) _Type: PlatformAnalyticEventSummaries200ResponseTotals_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/platformAnalyticEventSummaries} Official Quickbase API documentation
-                   */
-                  platformAnalyticEventSummaries: (params: { accountId?: number; body?: { start?: string; end?: string; groupBy?: string; nextToken?: string; where?: { id?: string; type?: string }[] } }) => Promise<PlatformAnalyticEventSummaries200Response>;
-                  /**
-                   * Export a solution
-                   *
-                   * @param {Object} params _Object containing the parameters for_ exportSolution
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {string} params.qBLVersion _Optional parameter with properties_
-                   *
-                   * @returns {Promise<ExportSolution200Response>} _Promise resolving to the exportSolution response with properties_
-                   *   - **content** (`string`, optional) _Type: string_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/exportSolution} Official Quickbase API documentation
-                   */
-                  exportSolution: (params: { solutionId: string; qBLVersion?: string }) => Promise<ExportSolution200Response>;
-                  /**
-                   * Update a solution
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateSolution
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {any} params.body _Optional parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<UpdateSolution200Response>} _Promise resolving to the updateSolution response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateSolution} Official Quickbase API documentation
-                   */
-                  updateSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolution200Response>;
-                  /**
-                   * Create a solution
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createSolution
-                   *   @param {any} params.body _Optional parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<CreateSolution200Response>} _Promise resolving to the createSolution response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createSolution} Official Quickbase API documentation
-                   */
-                  createSolution: (params: { body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolution200Response>;
-                  /**
-                   * Export solution to record
-                   *
-                   * @param {Object} params _Object containing the parameters for_ exportSolutionToRecord
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *   @param {string} params.qBLVersion _Optional parameter with properties_
-                   *
-                   * @returns {Promise<ExportSolutionToRecord200Response>} _Promise resolving to the exportSolutionToRecord response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/exportSolutionToRecord} Official Quickbase API documentation
-                   */
-                  exportSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; xQBLErrorsAsSuccess?: boolean; qBLVersion?: string }) => Promise<ExportSolutionToRecord200Response>;
-                  /**
-                   * Create solution from record
-                   *
-                   * @param {Object} params _Object containing the parameters for_ createSolutionFromRecord
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {number} params.recordId _Required parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<CreateSolutionFromRecord200Response>} _Promise resolving to the createSolutionFromRecord response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/createSolutionFromRecord} Official Quickbase API documentation
-                   */
-                  createSolutionFromRecord: (params: { tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<CreateSolutionFromRecord200Response>;
-                  /**
-                   * Update solution from record
-                   *
-                   * @param {Object} params _Object containing the parameters for_ updateSolutionToRecord
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {number} params.recordId _Required parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<UpdateSolutionToRecord200Response>} _Promise resolving to the updateSolutionToRecord response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/updateSolutionToRecord} Official Quickbase API documentation
-                   */
-                  updateSolutionToRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<UpdateSolutionToRecord200Response>;
-                  /**
-                   * List solution changes
-                   *
-                   * @param {Object} params _Object containing the parameters for_ changesetSolution
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {any} params.body _Optional parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<ChangesetSolution200Response>} _Promise resolving to the changesetSolution response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/changesetSolution} Official Quickbase API documentation
-                   */
-                  changesetSolution: (params: { solutionId: string; body?: any; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolution200Response>;
-                  /**
-                   * List solution changes from record
-                   *
-                   * @param {Object} params _Object containing the parameters for_ changesetSolutionFromRecord
-                   *   @param {string} params.solutionId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.fieldId _Required parameter with properties_
-                   *   @param {number} params.recordId _Required parameter with properties_
-                   *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
-                   *
-                   * @returns {Promise<ChangesetSolutionFromRecord200Response>} _Promise resolving to the changesetSolutionFromRecord response_
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/changesetSolutionFromRecord} Official Quickbase API documentation
-                   */
-                  changesetSolutionFromRecord: (params: { solutionId: string; tableId: string; fieldId: number; recordId: number; xQBLErrorsAsSuccess?: boolean }) => Promise<ChangesetSolutionFromRecord200Response>;
-                  /**
-                   * Generate a document
-                   *
-                   * @param {Object} params _Object containing the parameters for_ generateDocument
-                   *   @param {number} params.templateId _Required parameter with properties_
-                   *   @param {string} params.tableId _Required parameter with properties_
-                   *   @param {number} params.recordId _Optional parameter with properties_
-                   *   @param {string} params.filename _Required parameter with properties_
-                   *   @param {string} params.accept _Optional parameter with properties_
-                   *   @param {string} params.format _Optional parameter with properties_
-                   *   @param {string} params.margin _Optional parameter with properties_
-                   *   @param {string} params.unit _Optional parameter with properties_
-                   *   @param {string} params.pageSize _Optional parameter with properties_
-                   *   @param {string} params.orientation _Optional parameter with properties_
-                   *   @param {string} params.realm _Optional parameter with properties_
-                   *
-                   * @returns {Promise<GenerateDocument200Response>} _Promise resolving to the generateDocument response with properties_
-                   *   - **fileName** (`string`, optional) _The file name._
-                   *   - **data** (`string`, optional) _Base64 encoded file content._
-                   *   - **contentType** (`string`, optional) _The document content type._
-                   *
-                   * @see {@link https://developer.quickbase.com/operation/generateDocument} Official Quickbase API documentation
-                   */
-                  generateDocument: (params: { templateId: number; tableId: string; recordId?: number; filename: string; accept?: string; format?: string; margin?: string; unit?: string; pageSize?: string; orientation?: string; realm?: string }) => Promise<GenerateDocument200Response>;
-                }
             - name: >-
                 missing-types-report.json
               type: >-
@@ -3139,809 +2323,22 @@ tree:
             invokeMethod.ts
           type: >-
             file
-          contents: >
-            //
-            src/invokeMethod.ts
-
-
-            import
-            {
-            AuthorizationStrategy,
-            extractDbid
-            }
-            from
-            "./authorizationStrategy";
-
-            import
-            {
-            RateLimiter
-            }
-            from
-            "./rateLimiter";
-
-            import
-            {
-            RateLimitError
-            }
-            from
-            "./RateLimitError";
-
-            import
-            {
-            ResponseError
-            }
-            from
-            "./generated/runtime";
-
-            import
-            {
-            QuickbaseClient
-            }
-            from
-            "./quickbaseClient";
-
-            import
-            {
-            GetTempTokenDBID200Response
-            }
-            from
-            "./generated/models";
-
-
-            export
-            type
-            ApiMethod<K
-            extends
-            keyof
-            QuickbaseClient>
-            =
-            (
-              requestParameters: Parameters<QuickbaseClient[K]>[0],
-              initOverrides?: RequestInit
-            )
-            =>
-            Promise<ReturnType<QuickbaseClient[K]>>;
-
-
-            export
-            interface
-            MethodInfo<K
-            extends
-            keyof
-            QuickbaseClient>
-            {
-              api: any;
-              method: ApiMethod<K>;
-              paramMap: string[];
-              httpMethod: string;
-            }
-
-
-            export
-            async
-            function
-            invokeMethod<K
-            extends
-            keyof
-            QuickbaseClient>(
-              methodName: K,
-              params: Parameters<QuickbaseClient[K]>[0] & {
-                dbid?: string;
-                tableId?: string;
-                appId?: string;
-              },
-              methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
-              baseHeaders: Record<string, string>,
-              authStrategy: AuthorizationStrategy,
-              rateLimiter: RateLimiter,
-              fetchTempToken: (dbid: string) => Promise<string>,
-              transformDates: (obj: any, convertStringsToDates: boolean) => any,
-              debug: boolean | undefined,
-              convertDates: boolean
-            ):
-            Promise<ReturnType<QuickbaseClient[K]>>
-            {
-              console.log("[invokeMethod] Starting for method:", methodName);
-
-              const methodInfo = methodMap[methodName];
-              if (!methodInfo) throw new Error(`Method ${methodName} not found`);
-
-              const hasBody = "body" in params && params.body !== undefined;
-              const body = hasBody ? params.body : undefined;
-              const restParams: any = hasBody
-                ? Object.fromEntries(
-                    Object.entries(params).filter(([key]) => key !== "body")
-                  )
-                : { ...params };
-              const requestParameters: any = {
-                ...restParams,
-                ...(hasBody ? { generated: body } : {}),
-              };
-
-              const requestOptions: RequestInit = {
-                credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
-                method: methodInfo.httpMethod,
-              };
-
-              let dbid: string | undefined = extractDbid(params);
-              console.log("[invokeMethod] Extracted dbid:", dbid);
-
-              let token = dbid
-                ? await authStrategy.getToken(dbid)
-                : await authStrategy.getToken("");
-              console.log("[invokeMethod] Initial token:", token);
-
-              if (!token && dbid) {
-                token = await fetchTempToken(dbid);
-                authStrategy.applyHeaders(baseHeaders, token);
-                requestOptions.headers = { ...baseHeaders };
-                console.log("[invokeMethod] Fetched new token:", token);
-              }
-
-              if (token) {
-                authStrategy.applyHeaders(baseHeaders, token);
-                requestOptions.headers = { ...baseHeaders };
-                console.log(
-                  "[invokeMethod] Token found, headers set:",
-                  requestOptions.headers
-                );
-                if (methodName === "getTempTokenDBID") {
-                  console.log("[invokeMethod] Using cached token:", token);
-                  return { temporaryAuthorization: token } as ReturnType<
-                    QuickbaseClient[K]
-                  >;
-                }
-              }
-
-              if (debug) {
-                console.log(`[${methodName}] requestParameters:`, requestParameters);
-                console.log(`[${methodName}] requestOptions:`, requestOptions);
-              }
-
-              async function processResponse(
-                rawResponse: any
-              ): Promise<ReturnType<QuickbaseClient[K]>> {
-                if (debug) console.log(`[${methodName}] rawResponse:`, rawResponse);
-                if (rawResponse instanceof Response) {
-                  const contentType = rawResponse.headers
-                    .get("Content-Type")
-                    ?.toLowerCase();
-                  if (debug) console.log(`[${methodName}] contentType:`, contentType);
-                  if (contentType?.includes("application/json")) {
-                    const jsonResponse = await rawResponse.json();
-                    return transformDates(jsonResponse, convertDates) as ReturnType<
-                      QuickbaseClient[K]
-                    >;
-                  }
-                  return rawResponse as ReturnType<QuickbaseClient[K]>;
-                }
-                if (rawResponse && typeof rawResponse.value === "function") {
-                  const response = await rawResponse.value();
-                  if (debug)
-                    console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
-                  return transformDates(response, convertDates) as ReturnType<
-                    QuickbaseClient[K]
-                  >;
-                }
-                return transformDates(rawResponse, convertDates) as ReturnType<
-                  QuickbaseClient[K]
-                >;
-              }
-
-              async function parseErrorResponse(
-                response: Response
-              ): Promise<{ message: string; status: number }> {
-                let message = "Unknown error";
-                let status = response.status || 500;
-                try {
-                  const contentType =
-                    response.headers?.get("Content-Type")?.toLowerCase() ||
-                    "application/json";
-                  if (
-                    contentType.includes("application/json") &&
-                    typeof response.json === "function"
-                  ) {
-                    const errorBody = await response.json();
-                    if (
-                      errorBody &&
-                      typeof errorBody === "object" &&
-                      "message" in errorBody
-                    ) {
-                      message = errorBody.message;
-                    } else {
-                      message = "Invalid error response format";
-                    }
-                  } else if (typeof response.text === "function") {
-                    message = (await response.text()) || message;
-                  }
-                } catch (e) {
-                  if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
-                  message = "Failed to parse error response";
-                }
-                console.log(
-                  "[invokeMethod] Parsed error - status:",
-                  status,
-                  "message:",
-                  message
-                );
-                return { message, status };
-              }
-
-              let attempt = 0;
-              const maxAttempts = rateLimiter.maxRetries + 1;
-
-              while (attempt < maxAttempts) {
-                console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
-                try {
-                  await rateLimiter.throttle();
-                  console.log("[invokeMethod] About to call API for method:", methodName);
-                  const response = await methodInfo.method(
-                    requestParameters,
-                    requestOptions
-                  );
-                  console.log("[invokeMethod] API call completed for method:", methodName);
-                  return await processResponse(response);
-                } catch (error: unknown) {
-                  let status: number;
-                  let message: string;
-                  let response: Response;
-
-                  console.log("[invokeMethod] Caught error:", error);
-
-                  if (error instanceof ResponseError && error.response) {
-                    response = error.response;
-                    ({ message, status } = await parseErrorResponse(response));
-                  } else if (error instanceof Response) {
-                    response = error;
-                    ({ message, status } = await parseErrorResponse(response));
-                  } else {
-                    if (debug) console.log(`[${methodName}] Unexpected error:`, error);
-                    throw error; // Rethrow non-response errors
-                  }
-
-                  console.log("[invokeMethod] Handling error with status:", status);
-
-                  if (status === 429) {
-                    if (!(error instanceof ResponseError)) {
-                      throw new Error("Expected ResponseError for 429 handling"); // Shouldn't happen
-                    }
-                    const delay = await rateLimiter.handle429(error, attempt + 1);
-                    if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
-                    if (attempt + 1 === maxAttempts) {
-                      throw new RateLimitError(
-                        `API Error: ${message} (Status: ${status})`,
-                        status,
-                        response.headers.get("Retry-After")
-                          ? parseInt(response.headers.get("Retry-After")!, 10)
-                          : undefined
-                      );
-                    }
-                    await new Promise((resolve) => setTimeout(resolve, delay));
-                    attempt++;
-                    continue;
-                  }
-
-                  const newToken = await authStrategy.handleError(
-                    status,
-                    params,
-                    fetchTempToken,
-                    attempt,
-                    maxAttempts,
-                    debug,
-                    methodName
-                  );
-                  if (newToken) {
-                    token = newToken;
-                    authStrategy.applyHeaders(baseHeaders, token);
-                    requestOptions.headers = { ...baseHeaders };
-                    attempt++;
-                    if (debug)
-                      console.log(
-                        `[${methodName}] Retrying with token: ${token.substring(0, 10)}...`
-                      );
-                    continue;
-                  }
-                  throw new Error(`API Error: ${message} (Status: ${status})`);
-                }
-              }
-              throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
-            }
         - name: >-
             quickbaseClient.ts
           type: >-
             file
-          contents: >
-            //
-            src/quickbaseClient.ts
-
-
-            import
-            {
-            QuickbaseClient
-            as
-            IQuickbaseClient
-            }
-            from
-            "./generated-unified/QuickbaseClient";
-
-            import
-            {
-            Configuration,
-            HTTPHeaders
-            }
-            from
-            "./generated/runtime";
-
-            import
-            *
-            as
-            apis
-            from
-            "./generated/apis";
-
-            import
-            {
-            TokenCache
-            }
-            from
-            "./tokenCache";
-
-            import
-            {
-            simplifyName
-            }
-            from
-            "./utils";
-
-            import
-            {
-            invokeMethod,
-            MethodInfo
-            }
-            from
-            "./invokeMethod";
-
-            import
-            {
-              TempTokenStrategy,
-              UserTokenStrategy,
-              AuthorizationStrategy,
-              SsoTokenStrategy,
-            }
-            from
-            "./authorizationStrategy";
-
-            import
-            {
-            ThrottleBucket
-            }
-            from
-            "./ThrottleBucket";
-
-            import
-            {
-            RateLimiter
-            }
-            from
-            "./rateLimiter";
-
-
-            export
-            *
-            from
-            "./generated/models/index";
-
-
-            export
-            interface
-            QuickbaseClient
-            extends
-            IQuickbaseClient
-            {}
-
-
-            export
-            interface
-            QuickbaseConfig
-            {
-              realm: string;
-              userToken?: string;
-              tempToken?: string;
-              useTempTokens?: boolean;
-              useSso?: boolean;
-              samlToken?: string;
-              debug?: boolean;
-              fetchApi?: typeof fetch;
-              convertDates?: boolean;
-              tempTokenLifespan?: number;
-              throttle?: { rate: number; burst: number };
-              maxRetries?: number;
-              retryDelay?: number;
-              tokenCache?: TokenCache;
-              baseUrl?: string;
-            }
-
-
-            type
-            MethodMap
-            =
-            {
-              [K in keyof QuickbaseClient]: MethodInfo<K>;
-            };
-
-
-            const
-            getParamNames
-            =
-            (fn:
-            (...args:
-            any[])
-            =>
-            any):
-            string[]
-            =>
-              fn
-                .toString()
-                .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
-                .split(",")
-                .map((p) => p.trim().split("=")[0]?.trim())
-                .filter((p) => p && !p.match(/^\{/) && p !== "options");
-
-            function
-            transformDates(obj:
-            any,
-            convertStringsToDates:
-            boolean
-            =
-            true):
-            any
-            {
-              if (obj === null || obj === undefined) return obj;
-              if (obj instanceof Date) return obj;
-              if (
-                convertStringsToDates &&
-                typeof obj === "string" &&
-                /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(
-                  obj
-                )
-              ) {
-                return new Date(obj);
-              }
-              if (Array.isArray(obj)) {
-                return obj.map((item) => transformDates(item, convertStringsToDates));
-              }
-              if (typeof obj === "object") {
-                return Object.fromEntries(
-                  Object.entries(obj).map(([key, value]) => [
-                    key,
-                    transformDates(value, convertStringsToDates),
-                  ])
-                );
-              }
-              return obj;
-            }
-
-
-            function
-            inferHttpMethod(methodSource:
-            string,
-            debug?:
-            boolean):
-            string
-            {
-              const methodMatches = [
-                ...methodSource.matchAll(/method:\s*['"]?(\w+)['"]?/gi),
-              ];
-              const method =
-                methodMatches.length > 0
-                  ? methodMatches[methodMatches.length - 1][1].toUpperCase()
-                  : "GET";
-              if (debug) {
-                console.log(`[inferHttpMethod] Source:`, methodSource);
-                console.log(
-                  `[inferHttpMethod] All matches:`,
-                  methodMatches.map((m) => m[0])
-                );
-                console.log(`[inferHttpMethod] Extracted method:`, method);
-              }
-              return method;
-            }
-
-
-            export
-            function
-            quickbase(config:
-            QuickbaseConfig):
-            QuickbaseClient
-            {
-              const {
-                realm,
-                userToken,
-                tempToken,
-                useTempTokens,
-                useSso,
-                samlToken,
-                fetchApi,
-                debug,
-                convertDates = true,
-                tempTokenLifespan = 290000,
-                throttle = { rate: 10, burst: 10 },
-                maxRetries = 3,
-                retryDelay = 1000,
-                tokenCache: providedTokenCache,
-                baseUrl = "https://api.quickbase.com/v1",
-              } = config;
-
-              const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
-              const throttleBucket = throttle
-                ? new ThrottleBucket(throttle.rate, throttle.burst)
-                : null;
-              const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
-
-              const defaultFetch: typeof fetch | undefined =
-                typeof globalThis.window !== "undefined"
-                  ? globalThis.window.fetch.bind(globalThis.window)
-                  : undefined;
-              const effectiveFetch = fetchApi || defaultFetch;
-
-              if (!effectiveFetch) {
-                throw new Error("No fetch implementation available");
-              }
-
-              const authStrategy: AuthorizationStrategy = useSso
-                ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
-                : useTempTokens
-                ? new TempTokenStrategy(tokenCache, tempToken)
-                : new UserTokenStrategy(userToken || "");
-
-              const baseHeaders: HTTPHeaders = {
-                "QB-Realm-Hostname": `${realm}.quickbase.com`,
-                "Content-Type": "application/json",
-              };
-
-              const configuration = new Configuration({
-                basePath: baseUrl,
-                headers: { ...baseHeaders },
-                fetchApi: effectiveFetch,
-                credentials: "omit",
-              });
-
-              // Removed redundant check:
-              // if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
-              //   throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
-              // }
-
-              const apiInstances = Object.fromEntries(
-                Object.entries(apis)
-                  .filter(([name]) => name.endsWith("Api"))
-                  .map(([name, ApiClass]) => [
-                    name.replace("Api", "").toLowerCase(),
-                    new ApiClass(configuration),
-                  ])
-              );
-
-              function buildMethodMap(): MethodMap {
-                const methodMap: Partial<MethodMap> = {};
-                const isValidMethod = (name: string) =>
-                  !name.startsWith("_") &&
-                  name !== "constructor" &&
-                  !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
-
-                for (const [apiName, api] of Object.entries(apiInstances)) {
-                  Object.getOwnPropertyNames(Object.getPrototypeOf(api))
-                    .filter(
-                      (name) =>
-                        isValidMethod(name) &&
-                        typeof api[name as keyof typeof api] === "function"
-                    )
-                    .forEach((rawMethodName) => {
-                      const simplifiedName = simplifyName(
-                        rawMethodName
-                      ) as keyof QuickbaseClient;
-                      const rawMethodKey = `${rawMethodName}Raw` as keyof typeof api;
-                      const method =
-                        api[rawMethodKey] || api[rawMethodName as keyof typeof api];
-                      const boundMethod = method.bind(api as any) as unknown;
-                      if (typeof boundMethod === "function" && boundMethod.length <= 2) {
-                        const methodSource = method.toString();
-                        methodMap[simplifiedName] = {
-                          api,
-                          method: boundMethod as any,
-                          paramMap: getParamNames(method),
-                          httpMethod: inferHttpMethod(methodSource, debug),
-                        };
-                      }
-                    });
-                }
-                if (debug) {
-                  console.log("[buildMethodMap] Methods:", Object.keys(methodMap));
-                }
-                return methodMap as MethodMap;
-              }
-
-              const methodMap = buildMethodMap();
-
-              const fetchTempToken = async (dbid: string): Promise<string> => {
-                const response = await effectiveFetch(`${baseUrl}/auth/temporary/${dbid}`, {
-                  method: "GET",
-                  headers: { ...baseHeaders },
-                  credentials: "include",
-                });
-
-                if (!response.ok) {
-                  const errorBody: { message?: string } = await response.json();
-                  throw new Error(
-                    `API Error: ${errorBody.message || "Unknown error"} (Status: ${
-                      response.status
-                    })`
-                  );
-                }
-
-                const tokenResult = await response.json();
-                console.log(`[fetchTempToken] Response:`, tokenResult);
-                const token = tokenResult.temporaryAuthorization;
-                if (!token) {
-                  throw new Error("No temporary token returned from API");
-                }
-                tokenCache.set(dbid, token, tempTokenLifespan);
-                if (debug) {
-                  console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
-                }
-                return token;
-              };
-
-              const proxyHandler: ProxyHandler<QuickbaseClient> = {
-                get: (_, prop: string) => {
-                  console.log(
-                    "[proxy] Accessing:",
-                    prop,
-                    "in methodMap:",
-                    prop in methodMap
-                  );
-                  if (prop in methodMap) {
-                    const methodName = prop as keyof QuickbaseClient;
-                    return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
-                      invokeMethod(
-                        methodName,
-                        params,
-                        methodMap,
-                        baseHeaders,
-                        authStrategy,
-                        rateLimiter,
-                        fetchTempToken,
-                        transformDates,
-                        debug,
-                        convertDates
-                      );
-                  }
-                  console.log("[proxy] Method not found:", prop);
-                  return undefined;
-                },
-              };
-
-              const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, proxyHandler);
-
-              if (debug) {
-                console.log("[createClient] Config:", config);
-                console.log("[createClient] Proxy created:", proxy);
-              }
-
-              return proxy;
-            }
         - name: >-
             rateLimiter.ts
           type: >-
             file
-          contents: >
-            //
-            src/rateLimiter.ts
-
-            import
-            {
-            ThrottleBucket
-            }
-            from
-            "./ThrottleBucket";
-
-            import
-            {
-            ResponseError
-            }
-            from
-            "./generated/runtime";
-
-
-            export
-            class
-            RateLimiter
-            {
-              constructor(
-                private throttleBucket: ThrottleBucket | null,
-                public maxRetries: number = 3,
-                private retryDelay: number = 1000
-              ) {}
-
-              async throttle(): Promise<void> {
-                if (this.throttleBucket) {
-                  await this.throttleBucket.acquire();
-                }
-              }
-
-              async handle429(error: ResponseError, attempt: number): Promise<number> {
-                // Remove the throw here; let invokeMethod handle exhaustion
-                const retryAfter = error.response.headers.get("Retry-After");
-                return retryAfter
-                  ? parseInt(retryAfter, 10) * 1000
-                  : this.retryDelay * Math.pow(2, attempt - 1);
-              }
-            }
         - name: >-
             tokenCache.ts
           type: >-
             file
-          contents: >
-            //
-            src/tokenCache.ts
-
-            interface
-            CachedToken
-            {
-              token: string;
-              expiresAt: number;
-            }
-
-
-            export
-            class
-            TokenCache
-            {
-              private cache: Map<string, CachedToken>;
-              private readonly tempTokenLifespan: number;
-
-              constructor(tempTokenLifespan: number = 4 * 60 * 1000 + 50 * 1000) {
-                this.cache = new Map<string, CachedToken>();
-                this.tempTokenLifespan = tempTokenLifespan;
-              }
-
-              get(dbid: string): string | undefined {
-                const entry = this.cache.get(dbid);
-                const now = Date.now();
-                if (entry && entry.expiresAt > now) return entry.token;
-                if (entry) this.cache.delete(dbid); // Clean up expired temp tokens
-                return undefined;
-              }
-
-              set(dbid: string, token: string, lifespan?: number): void {
-                const now = Date.now();
-                this.cache.set(dbid, {
-                  token,
-                  expiresAt: now + (lifespan || this.tempTokenLifespan),
-                });
-              }
-
-              clear(): void {
-                this.cache.clear();
-              }
-            }
         - name: >-
             utils.ts
           type: >-
             file
-          contents: >
-            //
-            src/utils.ts
-
-            export
-            function
-            simplifyName(name:
-            string):
-            string
-            {
-              return name
-                .replace(/ById$/, "")
-                .replace(/Api$/, "")
-                .replace(/^(\w)/, (_, c) => c.toLowerCase());
-            }
     - name: >-
         test-artifacts
       type: >-
@@ -4380,11 +2777,295 @@ tree:
         directory
       children:
         - name: >-
-            log-gen.ts
+            generate-docusaurus.ts
           type: >-
             file
+          contents: >
+            #!/usr/bin/env
+            node
+
+            console.log("Docusaurus
+            generation
+            script
+            started");
+
+
+            import
+            {
+            execSync
+            }
+            from
+            "child_process";
+
+            import
+            {
+            copyFileSync,
+            existsSync,
+            mkdirSync,
+            writeFileSync
+            }
+            from
+            "fs";
+
+            import
+            {
+            join,
+            dirname
+            }
+            from
+            "path";
+
+            import
+            {
+            fileURLToPath
+            }
+            from
+            "url";
+
+
+            const
+            __dirname
+            =
+            dirname(fileURLToPath(import.meta.url));
+
+            const
+            PROJECT_ROOT
+            =
+            join(__dirname,
+            "..");
+
+            const
+            DOCS_DIR
+            =
+            join(PROJECT_ROOT,
+            "quickbase-docs");
+
+            const
+            API_DOCS_JSON
+            =
+            join(PROJECT_ROOT,
+            "docs-data",
+            "api-docs.json");
+
+            const
+            DOCS_DATA_DIR
+            =
+            join(DOCS_DIR,
+            "src",
+            "data");
+
+            const
+            DOCS_API_PAGE
+            =
+            join(DOCS_DIR,
+            "src",
+            "pages",
+            "api.tsx");
+
+
+            function
+            initializeDocusaurus()
+            {
+              if (!existsSync(DOCS_DIR)) {
+                console.log("Initializing Docusaurus...");
+                execSync(
+                  `npx create-docusaurus@latest quickbase-docs classic --typescript`,
+                  {
+                    cwd: PROJECT_ROOT,
+                    stdio: "inherit",
+                  }
+                );
+              } else {
+                console.log(
+                  "Docusaurus directory already exists, skipping initialization."
+                );
+              }
+            }
+
+
+            function
+            configureDocusaurus()
+            {
+              const configPath = join(DOCS_DIR, "docusaurus.config.js");
+              const configContent = `
+            module.exports
+            =
+            {
+              title: 'Quickbase JS API Docs',
+              tagline: 'Documentation for quickbase-js library',
+              url: 'https://your-site.com',
+              baseUrl: '/',
+              onBrokenLinks: 'throw',
+              onBrokenMarkdownLinks: 'warn',
+              favicon: 'img/favicon.ico',
+              organizationName: 'your-org',
+              projectName: 'quickbase-js',
+              presets: [
+                [
+                  'classic',
+                  {
+                    docs: { sidebarPath: require.resolve('./sidebars.js') },
+                    theme: { customCss: require.resolve('./src/css/custom.css') },
+                  },
+                ],
+              ],
+              themeConfig: {
+                navbar: {
+                  title: 'Quickbase JS',
+                  items: [
+                    { to: '/api', label: 'API', position: 'left' },
+                    { href: 'https://github.com/your-org/quickbase-js', label: 'GitHub', position: 'right' },
+                  ],
+                },
+                footer: {
+                  style: 'dark',
+                  copyright: \`Copyright © ${new Date().getFullYear()} Your Org. Built with Docusaurus.\`,
+                },
+                prism: {
+                  theme: require('prism-react-renderer/themes/github'),
+                  darkTheme: require('prism-react-renderer/themes/dracula'),
+                },
+              },
+            };
+              `;
+              writeFileSync(configPath, configContent.trim(), "utf8");
+              console.log("Updated Docusaurus config:", configPath);
+            }
+
+
+            function
+            copyApiDocs()
+            {
+              if (!existsSync(API_DOCS_JSON)) {
+                console.error(
+                  `API docs JSON not found at ${API_DOCS_JSON}. Run generate-interface.ts first.`
+                );
+                process.exit(1);
+              }
+              if (!existsSync(DOCS_DATA_DIR)) mkdirSync(DOCS_DATA_DIR, { recursive: true });
+              const targetJsonPath = join(DOCS_DATA_DIR, "api-docs.json");
+              copyFileSync(API_DOCS_JSON, targetJsonPath);
+              console.log("Copied API docs JSON to:", targetJsonPath);
+            }
+
+
+            function
+            generateApiPage()
+            {
+              const apiPageContent = `
+            import
+            React
+            from
+            'react';
+
+            import
+            Layout
+            from
+            '@theme/Layout';
+
+            import
+            apiDocs
+            from
+            '../data/api-docs.json';
+
+
+            interface
+            Method
+            {
+              name: string;
+              summary: string;
+              method: string;
+              path: string;
+              parameters: { name: string; type: string; required: boolean; description: string }[];
+              returns: string;
+              docLink: string;
+            }
+
+
+            const
+            ApiDocs:
+            React.FC
+            =
+            ()
+            =>
+            {
+              return (
+                <Layout title="API Documentation">
+                  <main className="container margin-vert--lg">
+                    <h1>QuickbaseClient API</h1>
+                    {(apiDocs as Method[]).map((method) => (
+                      <div key={method.name} className="card margin-bottom--md">
+                        <div className="card__header">
+                          <h2>{method.name}</h2>
+                          <code>{method.method} {method.path}</code>
+                        </div>
+                        <div className="card__body">
+                          <p>{method.summary}</p>
+                          {method.parameters.length > 0 && (
+                            <>
+                              <h3>Parameters</h3>
+                              <ul>
+                                {method.parameters.map((param) => (
+                                  <li key={param.name}>
+                                    <strong>{param.name}</strong> ({param.type}, {param.required ? 'required' : 'optional'}): {param.description || 'No description'}
+                                  </li>
+                                ))}
+                              </ul>
+                            </>
+                          )}
+                          <h3>Returns</h3>
+                          <p><code>{method.returns}</code></p>
+                          <a href={method.docLink} target="_blank" rel="noopener noreferrer">Official Docs</a>
+                        </div>
+                      </div>
+                    ))}
+                  </main>
+                </Layout>
+              );
+            };
+
+
+            export
+            default
+            ApiDocs;
+              `;
+              if (!existsSync(dirname(DOCS_API_PAGE)))
+                mkdirSync(dirname(DOCS_API_PAGE), { recursive: true });
+              writeFileSync(DOCS_API_PAGE, apiPageContent.trim(), "utf8");
+              console.log("Generated API page:", DOCS_API_PAGE);
+            }
+
+
+            function
+            runDocusaurus()
+            {
+              console.log("Starting Docusaurus...");
+              execSync("npm run start", { cwd: DOCS_DIR, stdio: "inherit" });
+            }
+
+
+            try
+            {
+              initializeDocusaurus();
+              configureDocusaurus();
+              copyApiDocs();
+              generateApiPage();
+              runDocusaurus();
+            }
+            catch
+            (error)
+            {
+              console.error("Error in Docusaurus generation:", error);
+              process.exit(1);
+            }
+
+
+            console.log("Docusaurus
+            generation
+            script
+            completed");
         - name: >-
-            log-gen.yaml
+            log-gen.ts
           type: >-
             file
         - name: >-
