@@ -37,7 +37,7 @@
     "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
     "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
     "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs && rm -rf docs-dist && cp -r docs/.vitepress/dist docs-dist",
+    "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docs",
     "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
