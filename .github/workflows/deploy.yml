@@ -26,7 +26,7 @@ jobs:
         run: npm run docs:build
 
       - name: Disable Jekyll
-        run: touch docs/.vitepress/dist/.nojekyll # Prevents GitHub Pages from processing with Jekyll
+        run: touch docs/.vitepress/dist/.nojekyll # Creates the .nojekyll file
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
