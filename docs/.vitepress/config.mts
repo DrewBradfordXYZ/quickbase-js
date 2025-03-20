@@ -5,7 +5,7 @@ import apiDocs from "../../docs-data/api-docs.json";
 export default defineConfig({
   title: "Quickbase JS API Docs",
   description: "Documentation for quickbase-js library",
-  base: "/quickbase-js/", // Adjust to your repo name
+  base: "/", // Adjust to your repo name
   themeConfig: {
     nav: [
       {
