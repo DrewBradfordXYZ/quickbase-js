@@ -1,5 +1,9 @@
 # quickbase-js
 
+This is a Typescript library using the QuickBase OpenAPI spec and the typescipt-fetch generator. This library is designed for both browser and Node.js environments. Code pages have first class support.
+
+Authentication methods: `Temporary Tokens`, `User Tokens`, `SSO`.
+
 # Installation
 
 ```bash
@@ -51,7 +55,39 @@ npm install --save quickbase-js
 </html>
 ```
 
-# Development workflow
+## Configuration
+
+The `quickbase` function accepts a `QuickbaseConfig` object with the following options:
+
+- **`realm`** (`string`): Your QuickBase realm (e.g., "company"). This is required and has no default value.
+- **`userToken`** (`string`, optional): A QuickBase user token for authentication. No default is provided.
+- **`useTempTokens`** (`boolean`, optional): Enables temporary token authentication. Defaults to `false`.
+- **`useSso`** (`boolean`, optional): Enables SSO authentication. Defaults to `false`.
+- **`samlToken`** (`string`, optional): A SAML token for SSO authentication. No default is provided.
+
+---
+
+_Optional advanced options:_
+
+- **`tempTokenLifespan`** (`number`, optional): The lifespan (in milliseconds) of temporary tokens in the cache. Defaults to `290000` (290 seconds).
+- **`throttle`** (`{ rate: number; burst: number }`, optional): Configures rate limiting, where `rate` is requests per second and `burst` is the maximum burst of requests. Defaults to `{ rate: 10, burst: 10 }`.
+- **`maxRetries`** (`number`, optional): The maximum number of retries for failed requests. Defaults to `3`.
+- **`retryDelay`** (`number`, optional): The base delay (in milliseconds) between retries, which increases exponentially. Defaults to `1000`.
+- **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
+- **`baseUrl`** (`string`, optional): The base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.
+- **`tempToken`** (`string`, optional): A temporary token for authentication. No default is provided.
+- **`tokenCache`** (`TokenCache`, optional): A custom token cache instance. Defaults to a new `TokenCache` instance created with `tempTokenLifespan`.
+- **`fetchApi`** (`typeof fetch`, optional): A custom fetch implementation (e.g., for Node.js). Defaults to the browser’s `fetch` if available, or the provided implementation.
+- **`debug`** (`boolean`, optional): Enables debug logging to the console. Defaults to `false`.
+
+### Configuration Notes
+
+- **Authentication**: Use `userToken` for standard auth, `tempToken` with `useTempTokens` for temporary tokens, or `samlToken` with `useSso` for SSO. Only one auth method is active at a time.
+- **`throttle`**: Controls API request pacing to avoid hitting rate limits. For example, `{ rate: 5, burst: 20 }` allows 5 requests per second with a burst capacity of 20.
+- **`tokenCache`**: If not provided, a new cache is initialized automatically, storing temporary tokens for the specified `tempTokenLifespan`.
+- **`fetchApi`**: In Node.js, you must provide a fetch implementation (e.g., `node-fetch`), as there’s no built-in `fetch` like in browsers.
+
+### Development workflow
 
 ```bash
 npm run gen:all
@@ -59,146 +95,26 @@ npm run build
 npm run test:all
 ```
 
-## Usage
+### Prerequisites
 
-### Node.js (ESM - Recommended)
+Node.js >= 18
 
-For modern Node.js applications, use ES modules:
+npm >= 8
 
-```javascript
-// ESM (Node.js) - Recommended
-import { quickbase } from "quickbase-js";
-const qb = quickbase({ realm: "example", userToken: "your-token" });
+A Quickbase app with a table and a user token. A free builder account works with must API calls.
 
-// Example: Fetching an app
-const app = await qb.getApp({ appId: "your-app-id" });
-console.log(app);
+### Contributing
 
-// Example: Creating a record with temporary token
-const qbTemp = quickbase({ realm: "example", useTempTokens: true });
-const record = await qbTemp.upsert({
-  body: {
-    to: "your-table-id",
-    data: [
-      {
-        /* record data */
-      },
-    ],
-  },
-});
-console.log(record);
-```
+1. Fork the repository.
 
-```javascript
-// Example: TypeScript ESM (Recommended)
-import { quickbase } from "quickbase-js";
-const qbTyped: QuickbaseClient = quickbase({
-  realm: "example",
-  userToken: "your-token",
-});
-const typedApp = await qbTyped.getApp({ appId: "your-app-id" });
-console.log(typedApp);
-```
+2. Create a feature branch (git checkout -b feature/your-feature).
 
-```javascript
-// Example: UMD via CDN (QuickBase Code Pages)
-// Note: This is HTML, not JavaScript, and should be used in a browser environment
+3. Commit changes (git commit -m "Add your feature").
 
-<script src="https://cdn.jsdelivr.net/npm/quickbase-js@1.1.0-beta.4/dist/umd/quickbase.umd.js"></script>
-<script>
-  const qb = new QuickbaseJS({ realm: 'example', useTempTokens: true });
-  // Example: Fetching an app
-  qb.getApp({ appId: 'your-app-id' }).then(app => console.log(app));
-</script>
+4. Push to your branch (git push origin feature/your-feature).
 
-```
+5. Open a pull request.
 
-## In QuickBase Code Pages (Browser Environment)
+### License
 
-### useTempTokens: true:
-
-Token Fetch: Auto-fetches temporary tokens using the provided fetchApi (or window.fetch by default) with cookies (withCredentials: true in the internal tokenClient).
-
-Subsequent Calls (e.g., getApp): Uses the same fetchApi (or window.fetch) with the QB-TEMP-TOKEN {TOKEN} header. No additional config needed beyond realm and useTempTokens.
-
-How It Works: Leverages the browser’s session cookies for the initial token fetch, then uses the token for all API calls. In a real code page, window.fetch handles both steps seamlessly.
-
-Test Output: The test uses page.evaluate for token fetch and node-fetch for getApp to bypass Playwright’s browser fetch issue, but in a code page, it’s all window.fetch.
-
-### userToken:
-
-All Calls: Uses the provided fetchApi (or window.fetch by default) with the QB-USER-TOKEN {TOKEN} header. No session cookies needed (credentials: "omit").
-
-How It Works: The user token authenticates directly, independent of the browser session, making it straightforward and reliable.
-
-Test Output: Confirms this with page.evaluate sending QB-USER-TOKEN.
-
-## In Node.js (Non-Browser Environment)
-
-### userToken:
-
-All Calls: Works with a provided fetchApi (e.g., fetchApi: node-fetch). Sets QB-USER-TOKEN {TOKEN} header.
-
-How It Works: Fully functional as long as fetchApi is supplied (e.g., node-fetch), since user tokens don’t require a browser session.
-
-Requirement: Must provide fetchApi explicitly (no default in Node.js).
-
-### useTempTokens: true:
-
-Behavior: Fails with a clear error unless a browser-like fetchApi is provided:
-
-"Temporary tokens require a browser environment or a custom fetchApi with browser-like session support"
-
-How It Works: Temp tokens need a browser session with cookies, which Node.js can’t provide natively. A custom fetchApi (e.g., via Puppeteer) could work but is impractical for typical Node.js use.
-
-Practicality: Effectively unusable in Node.js without external browser support, aligning with QuickBase’s temp token requirement.
-
-## getTempTokenDBID
-
-Temporary Token Handling with getTempTokenDBID
-The QuickBase API provides the getTempTokenDBID method to fetch temporary tokens (QB-TEMP-TOKEN) for browser-based authentication, typically using session credentials (e.g., cookies). These tokens are short-lived (~5 minutes) and intended for secure, client-side API calls. In the generated OpenAPI client, getTempTokenDBID makes a straightforward GET request to /v1/auth/temporary/{dbid} and returns { temporaryAuthorization: string }. However, this raw implementation lacks caching and doesn’t optimize repeated calls, which can lead to unnecessary API requests.
-In quickbaseClient.ts, we enhance getTempTokenDBID when useTempTokens: true is enabled, wrapping it with intelligent token management:
-Caching: We introduce a TokenCache to store temporary tokens by dbid. Before fetching a new token, the client checks the cache. If a valid token exists, it’s returned immediately, avoiding redundant API calls.
-
-Custom Fetch Logic: Instead of relying solely on the generated method, we use a custom fetchTempToken function to fetch tokens. This ensures consistency with browser-based session authentication (credentials: "include") and allows us to cache the result.
-
-Early Returns: For getTempTokenDBID, we bypass the generated method’s execution by returning the cached or freshly fetched token directly. This prevents unnecessary calls to the underlying API when the token is already available or just retrieved.
-
-Why This Matters
-Efficiency: Caching reduces API requests, crucial for performance in browser environments where temp tokens are fetched frequently but don’t change within their lifespan.
-
-Seamless Integration: The wrapper supports both QB-USER-TOKEN (server-side) and QB-TEMP-TOKEN (client-side) workflows, controlled by the useTempTokens config. This makes the client versatile for different use cases.
-
-Testability: The enhancement fixes issues in unit tests (e.g., getTempToken.test.ts) by ensuring predictable behavior—fetching once and reusing cached tokens—avoiding unexpected errors from redundant calls.
-
-How It Works
-When you call client.getTempTokenDBID({ dbid: "someDbid" }) with useTempTokens: true:
-Cache Check: Looks for an existing token in tokenCache for the given dbid.
-
-Fetch if Needed: If no cached token exists, fetchTempToken requests a new one from /v1/auth/temporary/{dbid} and caches it.
-
-Return Early: Returns { temporaryAuthorization: token } immediately, skipping the generated method’s execution.
-
-For other methods (e.g., getFields), the fetched temp token is applied to the Authorization header, ensuring authenticated API calls without re-fetching.
-
-## 401 Unauthorized Error Behavior
-
-The quickbase-js library manages 401 Unauthorized errors from the QuickBase API when using temporary tokens (useTempTokens: true). Normally, it keeps tokens fresh via a time-managed cache intending to never have a 401 Unauthorized error, but there is added safety measures incase a 401 happens to occur.
-
-If a 401 happens, the library tries once more with a fresh temporary token.
-
-It gets the new token using fetchTempToken and retries the call.
-
-If the retry fails with another 401, it stops and throws an error like API Error: Unauthorized (Status: 401).
-
-Fetching a New Token:
-If fetchTempToken itself gets a 401 (e.g., no valid login session), it doesn’t retry.
-
-It throws an error right away: API Error: Unauthorized (Status: 401).
-
-Why It’s Like This
-One Retry: Retries once to fix expired tokens, but stops to avoid endless tries.
-
-Fast Fail: No retry on fetchTempToken 401s means you know quickly if login is broken.
-
-No Loops: Built to never get stuck retrying forever.
+MIT License - see LICENSE for details.

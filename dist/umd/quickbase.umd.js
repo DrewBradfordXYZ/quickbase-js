@@ -9651,40 +9651,27 @@
 
     class TokenCache {
         cache;
-        lifespan; // Token lifespan in milliseconds
-        constructor(lifespan = 4 * 60 * 1000 + 50 * 1000) {
-            // Default 4:50
+        tempTokenLifespan;
+        constructor(tempTokenLifespan = 4 * 60 * 1000 + 50 * 1000) {
             this.cache = new Map();
-            this.lifespan = lifespan;
+            this.tempTokenLifespan = tempTokenLifespan;
         }
         get(dbid) {
             const entry = this.cache.get(dbid);
             const now = Date.now();
-            if (entry && entry.expiresAt > now) {
+            if (entry && entry.expiresAt > now)
                 return entry.token;
-            }
-            return undefined; // Expired or not found
+            if (entry)
+                this.cache.delete(dbid); // Clean up expired temp tokens
+            return undefined;
         }
-        // New method to get full entry
-        getEntry(dbid) {
-            const entry = this.cache.get(dbid);
-            const now = Date.now();
-            if (entry && entry.expiresAt > now) {
-                return entry;
-            }
-            return undefined; // Expired or not found
-        }
-        set(dbid, token) {
+        set(dbid, token, lifespan) {
             const now = Date.now();
             this.cache.set(dbid, {
                 token,
-                expiresAt: now + this.lifespan,
+                expiresAt: now + (lifespan || this.tempTokenLifespan),
             });
         }
-        dump() {
-            return Array.from(this.cache.entries());
-        }
-        // New method to clear the cache
         clear() {
             this.cache.clear();
         }
@@ -9698,7 +9685,180 @@
             .replace(/^(\w)/, (_, c) => c.toLowerCase());
     }
 
-    async function invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, retryCount = 0, throttleBucket = null, maxRetries = 3, retryDelay = 1000) {
+    // src/authorizationStrategy.ts
+    class TempTokenStrategy {
+        tokenCache;
+        initialTempToken;
+        constructor(tokenCache, initialTempToken) {
+            this.tokenCache = tokenCache;
+            this.initialTempToken = initialTempToken;
+        }
+        async getToken(dbid) {
+            return this.tokenCache.get(dbid) || this.initialTempToken;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+        }
+        async handleError(status, params, fetchTempToken, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug)
+                console.log(`Authorization error for ${methodName || "method"} (temp token), refreshing token:`);
+            const dbid = extractDbid(params);
+            if (!dbid) {
+                if (debug)
+                    console.log(`No dbid available for ${methodName || "method"}, skipping token refresh`);
+                return null;
+            }
+            if (debug)
+                console.log(`Refreshing temp token for dbid: ${dbid}`);
+            const newToken = await fetchTempToken(dbid);
+            this.tokenCache.set(dbid, newToken);
+            return newToken;
+        }
+    }
+    class UserTokenStrategy {
+        userToken;
+        constructor(userToken) {
+            this.userToken = userToken;
+        }
+        async getToken(_dbid) {
+            return this.userToken;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-USER-TOKEN ${token}`;
+        }
+        async handleError(status, _params, _fetchTempToken, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug)
+                console.log(`Retrying ${methodName || "method"} with existing user token: ${this.userToken.substring(0, 10)}...`);
+            return this.userToken;
+        }
+    }
+    class SsoTokenStrategy {
+        samlToken;
+        realm;
+        fetchApi;
+        debug;
+        currentToken;
+        constructor(samlToken, realm, fetchApi, debug = false) {
+            this.samlToken = samlToken;
+            this.realm = realm;
+            this.fetchApi = fetchApi;
+            this.debug = debug;
+        }
+        async getToken(_dbid) {
+            if (!this.currentToken) {
+                this.currentToken = await this.fetchSsoToken({
+                    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+                    requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
+                    subject_token: this.samlToken,
+                    subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
+                });
+            }
+            return this.currentToken;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+        }
+        async handleError(status, _params, _fetchTempToken, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug || this.debug) {
+                console.log(`Authorization error for ${methodName || "method"} (SSO), refreshing token`);
+            }
+            const newToken = await this.refreshSsoToken(debug || this.debug);
+            if (newToken) {
+                this.currentToken = newToken;
+                return newToken;
+            }
+            return null;
+        }
+        async refreshSsoToken(debug = false) {
+            const payload = {
+                grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+                requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
+                subject_token: this.samlToken,
+                subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
+            };
+            const response = await this.fetchApi(`https://api.quickbase.com/v1/auth/oauth/token`, {
+                method: "POST",
+                headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+                credentials: "omit",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                if (debug) {
+                    console.log(`[SSO Refresh] Failed: ${response.status}`, errorBody);
+                }
+                throw new Error(`SSO token refresh failed: ${errorBody.message || "Unknown error"}`);
+            }
+            const result = await response.json();
+            const newToken = result.access_token;
+            if (!newToken) {
+                throw new Error("No access token returned from SSO token exchange");
+            }
+            if (debug) {
+                console.log(`[SSO Refresh] New token: ${newToken.substring(0, 10)}...`);
+            }
+            return newToken;
+        }
+        async fetchSsoToken(params) {
+            const response = await this.fetchApi(`https://api.quickbase.com/v1/auth/oauth/token`, {
+                method: "POST",
+                headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+                credentials: "omit",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                if (this.debug) {
+                    console.log(`[fetchSsoToken] Failed: ${response.status}`, errorBody);
+                }
+                throw new Error(`SSO token fetch failed: ${errorBody.message || "Unknown error"}`);
+            }
+            const result = await response.json();
+            const newToken = result.access_token;
+            if (!newToken) {
+                throw new Error("No access token returned from SSO token exchange");
+            }
+            if (this.debug) {
+                console.log(`[fetchSsoToken] Fetched token: ${newToken.substring(0, 10)}...`);
+            }
+            return newToken;
+        }
+    }
+    function extractDbid(params) {
+        return (params.dbid ||
+            params.tableId ||
+            params.appId ||
+            params.body?.from ||
+            params.body?.to);
+    }
+
+    // src/RateLimitError.ts
+    class RateLimitError extends Error {
+        status;
+        retryAfter;
+        constructor(message, status, retryAfter) {
+            super(message);
+            this.name = "RateLimitError";
+            this.status = status;
+            this.retryAfter = retryAfter; // Seconds from Retry-After header, if present
+        }
+    }
+
+    // src/invokeMethod.ts
+    async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, fetchTempToken, transformDates, debug, convertDates) {
+        console.log("[invokeMethod] Starting for method:", methodName);
         const methodInfo = methodMap[methodName];
         if (!methodInfo)
             throw new Error(`Method ${methodName} not found`);
@@ -9711,40 +9871,31 @@
             ...restParams,
             ...(hasBody ? { generated: body } : {}),
         };
-        let requestOptions = {
-            credentials: "omit",
+        const requestOptions = {
+            credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
             method: methodInfo.httpMethod,
-            ...(hasBody ? { body } : {}),
         };
-        const selectedToken = initialTempToken || (userToken && !useTempTokens ? userToken : undefined);
-        let authorizationToken = selectedToken;
-        if (methodName === "getTempTokenDBID" && useTempTokens) {
-            const dbid = extractDbid(params, "No dbid provided for getTempTokenDBID");
-            const cachedToken = tokenCache.get(dbid);
-            if (cachedToken) {
-                return Promise.resolve({
-                    temporaryAuthorization: cachedToken,
-                });
-            }
+        let dbid = extractDbid(params);
+        console.log("[invokeMethod] Extracted dbid:", dbid);
+        let token = dbid
+            ? await authStrategy.getToken(dbid)
+            : await authStrategy.getToken("");
+        console.log("[invokeMethod] Initial token:", token);
+        if (!token && dbid) {
+            token = await fetchTempToken(dbid);
+            authStrategy.applyHeaders(baseHeaders, token);
+            requestOptions.headers = { ...baseHeaders };
+            console.log("[invokeMethod] Fetched new token:", token);
         }
-        if (useTempTokens && !authorizationToken) {
-            const dbid = extractDbid(params, `No dbid found in params for ${methodName} to fetch temp token`);
-            const cachedToken = tokenCache.get(dbid);
-            authorizationToken = cachedToken || (await fetchTempToken(dbid));
+        if (token) {
+            authStrategy.applyHeaders(baseHeaders, token);
+            requestOptions.headers = { ...baseHeaders };
+            console.log("[invokeMethod] Token found, headers set:", requestOptions.headers);
             if (methodName === "getTempTokenDBID") {
-                return Promise.resolve({
-                    temporaryAuthorization: authorizationToken,
-                });
+                console.log("[invokeMethod] Using cached token:", token);
+                return { temporaryAuthorization: token };
             }
         }
-        requestOptions.headers = authorizationToken
-            ? {
-                ...baseHeaders,
-                Authorization: useTempTokens
-                    ? `QB-TEMP-TOKEN ${authorizationToken}`
-                    : `QB-USER-TOKEN ${authorizationToken}`,
-            }
-            : baseHeaders;
         if (debug) {
             console.log(`[${methodName}] requestParameters:`, requestParameters);
             console.log(`[${methodName}] requestOptions:`, requestOptions);
@@ -9758,13 +9909,6 @@
                     ?.toLowerCase();
                 if (debug)
                     console.log(`[${methodName}] contentType:`, contentType);
-                if (contentType?.includes("application/octet-stream")) {
-                    return (await rawResponse.arrayBuffer());
-                }
-                if (contentType?.includes("application/x-yaml") ||
-                    contentType?.includes("text/yaml")) {
-                    return (await rawResponse.text());
-                }
                 if (contentType?.includes("application/json")) {
                     const jsonResponse = await rawResponse.json();
                     return transformDates(jsonResponse, convertDates);
@@ -9777,164 +9921,113 @@
                     console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
                 return transformDates(response, convertDates);
             }
-            const transformed = transformDates(rawResponse, convertDates);
-            if (debug)
-                console.log(`[${methodName}] Transformed non-Response:`, transformed);
-            return transformed;
+            return transformDates(rawResponse, convertDates);
         }
-        async function withRetries(fn, options) {
-            let attempt = 0;
-            while (true) {
-                try {
-                    if (throttleBucket) {
-                        if (debug)
-                            console.log(`[${methodName}] Awaiting throttle bucket`);
-                        await throttleBucket.acquire();
-                        if (debug)
-                            console.log(`[${methodName}] Throttle bucket acquired`);
+        async function parseErrorResponse(response) {
+            let message = "Unknown error";
+            let status = response.status || 500;
+            try {
+                const contentType = response.headers?.get("Content-Type")?.toLowerCase() ||
+                    "application/json";
+                if (contentType.includes("application/json") &&
+                    typeof response.json === "function") {
+                    const errorBody = await response.json();
+                    if (errorBody &&
+                        typeof errorBody === "object" &&
+                        "message" in errorBody) {
+                        message = errorBody.message;
                     }
-                    return await fn();
+                    else {
+                        message = "Invalid error response format";
+                    }
                 }
-                catch (error) {
-                    console.log(`[${methodName}] Caught error:`, error);
-                    console.log(`[${methodName}] instanceof ResponseError:`, error instanceof ResponseError);
-                    console.log(`[${methodName}] Response status:`, error.response?.status);
-                    const effectiveError = error instanceof Object &&
-                        "cause" in error &&
-                        error.cause instanceof ResponseError
-                        ? error.cause
-                        : error instanceof ResponseError
-                            ? error
-                            : error;
-                    console.log(`[${methodName}] Effective error:`, effectiveError);
-                    console.log(`[${methodName}] Effective instanceof ResponseError:`, effectiveError instanceof ResponseError);
-                    console.log(`[${methodName}] Effective response status:`, effectiveError.response?.status);
+                else if (typeof response.text === "function") {
+                    message = (await response.text()) || message;
+                }
+            }
+            catch (e) {
+                if (debug)
+                    console.log(`[${methodName}] Error parsing response body:`, e);
+                message = "Failed to parse error response";
+            }
+            console.log("[invokeMethod] Parsed error - status:", status, "message:", message);
+            return { message, status };
+        }
+        let attempt = 0;
+        const maxAttempts = rateLimiter.maxRetries + 1;
+        while (attempt < maxAttempts) {
+            console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
+            try {
+                await rateLimiter.throttle();
+                console.log("[invokeMethod] About to call API for method:", methodName);
+                const response = await methodInfo.method(requestParameters, requestOptions);
+                console.log("[invokeMethod] API call completed for method:", methodName);
+                return await processResponse(response);
+            }
+            catch (error) {
+                let status;
+                let message;
+                let response;
+                console.log("[invokeMethod] Caught error:", error);
+                if (error instanceof ResponseError && error.response) {
+                    response = error.response;
+                    ({ message, status } = await parseErrorResponse(response));
+                }
+                else if (error instanceof Response) {
+                    response = error;
+                    ({ message, status } = await parseErrorResponse(response));
+                }
+                else {
+                    if (debug)
+                        console.log(`[${methodName}] Unexpected error:`, error);
+                    throw error; // Rethrow non-response errors
+                }
+                console.log("[invokeMethod] Handling error with status:", status);
+                if (status === 429) {
+                    if (!(error instanceof ResponseError)) {
+                        throw new Error("Expected ResponseError for 429 handling"); // Shouldn't happen
+                    }
+                    const delay = await rateLimiter.handle429(error, attempt + 1);
+                    if (debug)
+                        console.log(`[${methodName}] 429 delay: ${delay}ms`);
+                    if (attempt + 1 === maxAttempts) {
+                        throw new RateLimitError(`API Error: ${message} (Status: ${status})`, status, response.headers.get("Retry-After")
+                            ? parseInt(response.headers.get("Retry-After"), 10)
+                            : undefined);
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, delay));
                     attempt++;
-                    if (!options.shouldRetry(effectiveError) ||
-                        attempt >= options.maxAttempts) {
-                        let errorMessage = effectiveError instanceof ResponseError
-                            ? effectiveError.message
-                            : String(error);
-                        console.log(`[${methodName}] No retry, throwing:`, errorMessage);
-                        if (effectiveError instanceof ResponseError &&
-                            effectiveError.response) {
-                            try {
-                                const errorBody = await effectiveError.response.json();
-                                if (debug)
-                                    console.log(`[${methodName}] Error response body:`, errorBody);
-                                errorMessage = errorBody?.message || errorMessage;
-                            }
-                            catch (e) {
-                                if (debug)
-                                    console.log(`[${methodName}] Failed to parse error body:`, e);
-                            }
-                            throw new Error(`API Error: ${errorMessage} (Status: ${effectiveError.response.status})`);
-                        }
-                        throw new Error(`API Error: ${errorMessage} (Status: unknown)`);
-                    }
-                    if (options.onRetry) {
-                        console.log(`[${methodName}] Retrying, attempt:`, attempt);
-                        await options.onRetry(effectiveError, attempt);
-                    }
-                    const delayMs = options.delay
-                        ? options.delay(attempt, effectiveError)
-                        : retryDelay * Math.pow(2, attempt - 1);
-                    if (debug)
-                        console.log(`[${methodName}] Retrying after ${delayMs}ms (attempt ${attempt}/${options.maxAttempts - 1})`);
-                    await new Promise((resolve) => setTimeout(resolve, delayMs));
+                    continue;
                 }
+                const newToken = await authStrategy.handleError(status, params, fetchTempToken, attempt, maxAttempts, debug, methodName);
+                if (newToken) {
+                    token = newToken;
+                    authStrategy.applyHeaders(baseHeaders, token);
+                    requestOptions.headers = { ...baseHeaders };
+                    attempt++;
+                    if (debug)
+                        console.log(`[${methodName}] Retrying with token: ${token.substring(0, 10)}...`);
+                    continue;
+                }
+                throw new Error(`API Error: ${message} (Status: ${status})`);
             }
         }
-        const mainPromise = withRetries(() => methodInfo
-            .method(requestParameters, requestOptions)
-            .then(processResponse), {
-            maxAttempts: (useTempTokens ?? false) || userToken ? 2 : 1,
-            shouldRetry: (error) => error instanceof ResponseError &&
-                error.response?.status === 401 &&
-                ((useTempTokens ?? false) ||
-                    (!!userToken && !(useTempTokens ?? false))),
-            onRetry: async (error) => {
-                if (error instanceof ResponseError && error.response?.status === 401) {
-                    if (useTempTokens ?? false) {
-                        if (debug)
-                            console.log(`Authorization error for ${methodName} (temp token), refreshing token:`, error.message);
-                        const dbid = extractDbid(params, `No dbid to refresh token after authorization error`);
-                        try {
-                            authorizationToken = await fetchTempToken(dbid);
-                        }
-                        catch (fetchError) {
-                            const fetchErrorMessage = fetchError instanceof ResponseError && fetchError.response
-                                ? (await fetchError.response.json())?.message ||
-                                    "Unauthorized"
-                                : String(fetchError);
-                            throw new Error(`API Error: ${fetchErrorMessage} (Status: ${fetchError instanceof ResponseError &&
-                            fetchError.response?.status
-                            ? fetchError.response.status
-                            : "unknown"})`);
-                        }
-                        requestOptions.headers = {
-                            ...baseHeaders,
-                            Authorization: `QB-TEMP-TOKEN ${authorizationToken}`,
-                        };
-                    }
-                    else if (userToken) {
-                        if (debug)
-                            console.log(`Authorization error for ${methodName} (user token), retrying with same token:`, error.message);
-                    }
-                    if (debug)
-                        console.log(`Retrying ${methodName} with ${useTempTokens ? "temp" : "user"} token`);
-                }
-            },
-        });
-        return mainPromise.catch((error) => {
-            let effectiveError = error;
-            if (error instanceof Object &&
-                "cause" in error &&
-                error.cause instanceof ResponseError) {
-                effectiveError = error.cause;
-            }
-            else if (error instanceof ResponseError) {
-                effectiveError = error;
-            }
-            if (effectiveError instanceof ResponseError &&
-                effectiveError.response?.status === 429) {
-                return withRetries(() => Promise.reject(error), {
-                    maxAttempts: maxRetries + 1,
-                    shouldRetry: (err) => err instanceof ResponseError && err.response?.status === 429,
-                    delay: (attempt, err) => {
-                        const headers = err instanceof ResponseError && err.response
-                            ? err.response.headers
-                            : new Headers();
-                        const retryAfter = headers.get("Retry-After");
-                        return retryAfter
-                            ? parseInt(retryAfter, 10) * 1000
-                            : retryDelay * Math.pow(2, attempt - 1);
-                    },
-                });
-            }
-            throw effectiveError;
-        });
-    }
-    function extractDbid(params, errorMessage) {
-        const dbid = params.dbid || params.tableId || params.appId;
-        if (!dbid)
-            throw new Error(errorMessage);
-        return dbid;
+        throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
     }
 
-    // src/TokenBucket.ts
+    // src/ThrottleBucket.ts
     class ThrottleBucket {
         tokens;
         maxTokens;
         refillRate; // Tokens per second
         lastRefill;
+        pending = Promise.resolve(); // Queue for sequential execution
         constructor(rate, burst) {
-            this.tokens = burst; // Start with full burst capacity
+            this.tokens = burst;
             this.maxTokens = burst;
             this.refillRate = rate;
             this.lastRefill = Date.now();
         }
-        // Refill tokens based on elapsed time
         refill() {
             const now = Date.now();
             const elapsed = (now - this.lastRefill) / 1000; // Seconds elapsed
@@ -9942,20 +10035,49 @@
             this.tokens = Math.min(this.maxTokens, this.tokens + newTokens);
             this.lastRefill = now;
         }
-        // Acquire a token, waiting if necessary
         async acquire() {
-            this.refill();
-            if (this.tokens >= 1) {
+            // Chain the new acquisition onto the pending queue
+            const previous = this.pending;
+            this.pending = (async () => {
+                await previous; // Wait for prior calls to complete
+                this.refill();
+                if (this.tokens >= 1) {
+                    this.tokens -= 1;
+                    return;
+                }
+                const waitTime = ((1 - this.tokens) / this.refillRate) * 1000; // ms until next token
+                await new Promise((resolve) => setTimeout(resolve, waitTime));
+                this.refill();
                 this.tokens -= 1;
-                return;
-            }
-            const waitTime = ((1 - this.tokens) / this.refillRate) * 1000; // ms until next token
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
-            this.refill();
-            this.tokens -= 1;
+            })();
+            await this.pending;
         }
     }
 
+    class RateLimiter {
+        throttleBucket;
+        maxRetries;
+        retryDelay;
+        constructor(throttleBucket, maxRetries = 3, retryDelay = 1000) {
+            this.throttleBucket = throttleBucket;
+            this.maxRetries = maxRetries;
+            this.retryDelay = retryDelay;
+        }
+        async throttle() {
+            if (this.throttleBucket) {
+                await this.throttleBucket.acquire();
+            }
+        }
+        async handle429(error, attempt) {
+            // Remove the throw here; let invokeMethod handle exhaustion
+            const retryAfter = error.response.headers.get("Retry-After");
+            return retryAfter
+                ? parseInt(retryAfter, 10) * 1000
+                : this.retryDelay * Math.pow(2, attempt - 1);
+        }
+    }
+
+    // src/quickbaseClient.ts
     const getParamNames = (fn) => fn
         .toString()
         .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
@@ -9984,46 +10106,58 @@
         return obj;
     }
     function inferHttpMethod(methodSource, debug) {
-        const methodMatch = methodSource.match(/method:\s*['"]?(\w+)['"]?/i);
-        const method = methodMatch ? methodMatch[1].toUpperCase() : "GET";
+        const methodMatches = [
+            ...methodSource.matchAll(/method:\s*['"]?(\w+)['"]?/gi),
+        ];
+        const method = methodMatches.length > 0
+            ? methodMatches[methodMatches.length - 1][1].toUpperCase()
+            : "GET";
+        if (debug) {
+            console.log(`[inferHttpMethod] Source:`, methodSource);
+            console.log(`[inferHttpMethod] All matches:`, methodMatches.map((m) => m[0]));
+            console.log(`[inferHttpMethod] Extracted method:`, method);
+        }
         return method;
     }
     function quickbase(config) {
-        const { realm, userToken, tempToken: initialTempToken, useTempTokens, fetchApi, debug, convertDates = true, tokenLifespan, throttle = { rate: 10, burst: 10 }, maxRetries = 3, retryDelay = 1000, } = config;
-        const baseUrl = `https://api.quickbase.com/v1`;
-        const tokenCache = new TokenCache(tokenLifespan);
+        const { realm, userToken, tempToken, useTempTokens, useSso, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { rate: 10, burst: 10 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", } = config;
+        const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
         const throttleBucket = throttle
             ? new ThrottleBucket(throttle.rate, throttle.burst)
             : null;
+        const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
+        const defaultFetch = typeof globalThis.window !== "undefined"
+            ? globalThis.window.fetch.bind(globalThis.window)
+            : undefined;
+        const effectiveFetch = fetchApi || defaultFetch;
+        if (!effectiveFetch) {
+            throw new Error("No fetch implementation available");
+        }
+        const authStrategy = useSso
+            ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
+            : useTempTokens
+                ? new TempTokenStrategy(tokenCache, tempToken)
+                : new UserTokenStrategy(userToken || "");
         const baseHeaders = {
             "QB-Realm-Hostname": `${realm}.quickbase.com`,
             "Content-Type": "application/json",
         };
-        if (initialTempToken) {
-            baseHeaders["Authorization"] = `QB-TEMP-TOKEN ${initialTempToken}`;
-        }
-        else if (userToken && !useTempTokens) {
-            baseHeaders["Authorization"] = `QB-USER-TOKEN ${userToken}`;
-        }
-        const defaultFetch = typeof globalThis.window !== "undefined"
-            ? globalThis.window.fetch.bind(globalThis.window)
-            : undefined;
         const configuration = new Configuration({
             basePath: baseUrl,
             headers: { ...baseHeaders },
-            fetchApi: fetchApi || defaultFetch,
+            fetchApi: effectiveFetch,
             credentials: "omit",
         });
-        if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
-            throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
-        }
+        // Removed redundant check:
+        // if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
+        //   throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
+        // }
         const apiInstances = Object.fromEntries(Object.entries(apis)
             .filter(([name]) => name.endsWith("Api"))
             .map(([name, ApiClass]) => [
             name.replace("Api", "").toLowerCase(),
             new ApiClass(configuration),
         ]));
-        const methodMap = buildMethodMap();
         function buildMethodMap() {
             const methodMap = {};
             const isValidMethod = (name) => !name.startsWith("_") &&
@@ -10042,21 +10176,21 @@
                         const methodSource = method.toString();
                         methodMap[simplifiedName] = {
                             api,
-                            method: boundMethod, // Adjust typing as needed
+                            method: boundMethod,
                             paramMap: getParamNames(method),
-                            httpMethod: inferHttpMethod(methodSource),
+                            httpMethod: inferHttpMethod(methodSource, debug),
                         };
                     }
                 });
             }
+            if (debug) {
+                console.log("[buildMethodMap] Methods:", Object.keys(methodMap));
+            }
             return methodMap;
         }
+        const methodMap = buildMethodMap();
         const fetchTempToken = async (dbid) => {
-            const effectiveFetch = fetchApi || defaultFetch;
-            if (!effectiveFetch) {
-                throw new Error("No fetch implementation available for fetching temp token");
-            }
-            const response = await effectiveFetch(`https://api.quickbase.com/v1/auth/temporary/${dbid}`, {
+            const response = await effectiveFetch(`${baseUrl}/auth/temporary/${dbid}`, {
                 method: "GET",
                 headers: { ...baseHeaders },
                 credentials: "include",
@@ -10066,29 +10200,32 @@
                 throw new Error(`API Error: ${errorBody.message || "Unknown error"} (Status: ${response.status})`);
             }
             const tokenResult = await response.json();
+            console.log(`[fetchTempToken] Response:`, tokenResult);
             const token = tokenResult.temporaryAuthorization;
             if (!token) {
                 throw new Error("No temporary token returned from API");
             }
-            tokenCache.set(dbid, token);
+            tokenCache.set(dbid, token, tempTokenLifespan);
             if (debug) {
                 console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
             }
             return token;
         };
-        const proxy = new Proxy({}, {
+        const proxyHandler = {
             get: (_, prop) => {
+                console.log("[proxy] Accessing:", prop, "in methodMap:", prop in methodMap);
                 if (prop in methodMap) {
                     const methodName = prop;
-                    return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, tokenCache, fetchTempToken, transformDates, initialTempToken, userToken, useTempTokens, debug, convertDates, 0, // retryCount
-                    throttleBucket, maxRetries, retryDelay);
+                    return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, fetchTempToken, transformDates, debug, convertDates);
                 }
+                console.log("[proxy] Method not found:", prop);
                 return undefined;
             },
-        });
+        };
+        const proxy = new Proxy({}, proxyHandler);
         if (debug) {
             console.log("[createClient] Config:", config);
-            console.log("[createClient] Returning:", proxy);
+            console.log("[createClient] Proxy created:", proxy);
         }
         return proxy;
     }

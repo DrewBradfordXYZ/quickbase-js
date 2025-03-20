@@ -123,7 +123,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   }
 
   async function parseErrorResponse(
-    response: any
+    response: Response
   ): Promise<{ message: string; status: number }> {
     let message = "Unknown error";
     let status = response.status || 500;
@@ -175,8 +175,10 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       );
       console.log("[invokeMethod] API call completed for method:", methodName);
       return await processResponse(response);
-    } catch (error) {
-      let status: number, message: string, response: any;
+    } catch (error: unknown) {
+      let status: number;
+      let message: string;
+      let response: Response;
 
       console.log("[invokeMethod] Caught error:", error);
 
@@ -188,12 +190,15 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         ({ message, status } = await parseErrorResponse(response));
       } else {
         if (debug) console.log(`[${methodName}] Unexpected error:`, error);
-        throw error;
+        throw error; // Rethrow non-response errors
       }
 
       console.log("[invokeMethod] Handling error with status:", status);
 
       if (status === 429) {
+        if (!(error instanceof ResponseError)) {
+          throw new Error("Expected ResponseError for 429 handling"); // Shouldn't happen
+        }
         const delay = await rateLimiter.handle429(error, attempt + 1);
         if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
         if (attempt + 1 === maxAttempts) {

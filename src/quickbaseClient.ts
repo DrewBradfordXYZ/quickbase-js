@@ -34,7 +34,7 @@ export interface QuickbaseConfig {
   maxRetries?: number;
   retryDelay?: number;
   tokenCache?: TokenCache;
-  baseUrl?: string; // Added configurable baseUrl
+  baseUrl?: string;
 }
 
 type MethodMap = {
@@ -110,7 +110,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
-    baseUrl = "https://api.quickbase.com/v1", // Default to production API
+    baseUrl = "https://api.quickbase.com/v1",
   } = config;
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
@@ -141,17 +141,16 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   };
 
   const configuration = new Configuration({
-    basePath: baseUrl, // Use configurable baseUrl
+    basePath: baseUrl,
     headers: { ...baseHeaders },
     fetchApi: effectiveFetch,
     credentials: "omit",
   });
 
-  if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
-    throw new Error(
-      "fetchApi must be provided in non-browser environments (e.g., Node.js)"
-    );
-  }
+  // Removed redundant check:
+  // if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
+  //   throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
+  // }
 
   const apiInstances = Object.fromEntries(
     Object.entries(apis)
@@ -266,10 +265,6 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   if (debug) {
     console.log("[createClient] Config:", config);
     console.log("[createClient] Proxy created:", proxy);
-    console.log(
-      "[createClient] Testing proxy:",
-      proxy.getApp ? "Works" : "Fails"
-    );
   }
 
   return proxy;
