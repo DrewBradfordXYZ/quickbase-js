@@ -1,3 +1,5 @@
+// src/quickbaseClient.ts
+
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -6,7 +8,7 @@ import {
   simplifyName,
   getParamNames,
   transformDates,
-  inferHttpMethod,
+  extractHttpMethod,
 } from "./utils"; // Updated import
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import {
@@ -135,12 +137,12 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             api[rawMethodKey] || api[rawMethodName as keyof typeof api];
           const boundMethod = method.bind(api as any) as unknown;
           if (typeof boundMethod === "function" && boundMethod.length <= 2) {
-            const methodSource = method.toString();
+            const httpMethod = extractHttpMethod(method);
             methodMap[simplifiedName] = {
               api,
               method: boundMethod as any,
               paramMap: getParamNames(method),
-              httpMethod: inferHttpMethod(methodSource, debug),
+              httpMethod,
             };
           }
         });

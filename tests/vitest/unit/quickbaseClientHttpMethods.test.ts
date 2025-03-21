@@ -1,4 +1,4 @@
-// tests/vitest/unit/inferHttpMethod.test.ts
+// tests/vitest/unit/quickbaseClient.test.ts
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { quickbase } from "../../../src/quickbaseClient";
@@ -9,7 +9,7 @@ import {
 } from "../../../src/generated/models";
 import { ChangesetSolution200Response } from "../../../src/generated/models";
 
-describe("QuickbaseClient Unit - inferHttpMethod", () => {
+describe("QuickbaseClient Unit - HTTP Method Extraction", () => {
   let clientTemp: ReturnType<typeof quickbase>;
   let clientUser: ReturnType<typeof quickbase>;
 
@@ -84,48 +84,56 @@ describe("QuickbaseClient Unit - inferHttpMethod", () => {
     });
   };
 
-  it("correctly identifies POST for updateApp", async () => {
+  it("uses POST for updateApp", async () => {
     setupMockFetch();
     await clientTemp.updateApp({
       appId: QB_APP_ID,
       body: { name: "Test App" },
     });
-    const call = mockFetch.mock.calls[1];
-    expect(call[1].method).toBe("POST");
+    const apiCall = mockFetch.mock.calls.find((call) =>
+      call[0].includes("/apps/")
+    )![1];
+    expect(apiCall.method).toBe("POST");
   });
 
-  it("correctly identifies POST for runReport", async () => {
+  it("uses POST for runReport", async () => {
     setupMockFetch();
     await clientTemp.runReport({
       tableId: QB_APP_ID,
       reportId: "report1",
       body: { skip: 0, top: 10 },
     });
-    const call = mockFetch.mock.calls[1];
-    expect(call[1].method).toBe("POST");
+    const apiCall = mockFetch.mock.calls.find((call) =>
+      call[0].includes("/reports/")
+    )![1];
+    expect(apiCall.method).toBe("POST");
   });
 
-  it("correctly identifies PUT for changesetSolution", async () => {
+  it("uses PUT for changesetSolution", async () => {
     setupMockFetchForChangeset();
     await clientUser.changesetSolution({
       solutionId: "solution1",
       body: "name: Test Solution\nversion: 1.0",
     });
-    const call = mockFetch.mock.calls[0];
-    expect(call[1].method).toBe("PUT");
+    const apiCall = mockFetch.mock.calls[0][1];
+    expect(apiCall.method).toBe("PUT");
   });
 
-  it("correctly identifies GET for getTable", async () => {
+  it("uses GET for getTable", async () => {
     setupMockFetch();
     await clientTemp.getTable({ appId: QB_APP_ID, tableId: "table1" });
-    const call = mockFetch.mock.calls[1];
-    expect(call[1].method).toBe("GET");
+    const apiCall = mockFetch.mock.calls.find((call) =>
+      call[0].includes("/tables/")
+    )![1];
+    expect(apiCall.method).toBe("GET");
   });
 
-  it("correctly identifies DELETE for deleteTable", async () => {
+  it("uses DELETE for deleteTable", async () => {
     setupMockFetch();
     await clientTemp.deleteTable({ appId: QB_APP_ID, tableId: "table1" });
-    const call = mockFetch.mock.calls[1];
-    expect(call[1].method).toBe("DELETE");
+    const apiCall = mockFetch.mock.calls.find((call) =>
+      call[0].includes("/tables/")
+    )![1];
+    expect(apiCall.method).toBe("DELETE");
   });
 });

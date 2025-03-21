@@ -94,6 +94,8 @@ _Overrides and development options:_
 - **`tokenCache`**: A custom token cache instance to track temporary tokens by dbid with a `tempTokenLifespan`. This is automatically set to a new `TokenCache` instance when `useTempTokens` is enabled.
 - **`fetchApi`**: In Node.js, you must provide a fetch implementation (e.g., `node-fetch`), as there’s no built-in `fetch` like in browsers.
 
+---
+
 ### Development workflow
 
 ```bash

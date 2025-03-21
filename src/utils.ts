@@ -1,63 +1,50 @@
-export function simplifyName(name: string): string {
-  return name
-    .replace(/ById$/, "")
-    .replace(/Api$/, "")
-    .replace(/^(\w)/, (_, c) => c.toLowerCase());
+// src/utils.ts
+
+export function simplifyName(methodName: string): string {
+  // Assuming this removes 'Raw' or similar suffixes as per your original logic
+  return methodName
+    .replace(/Raw$/, "")
+    .replace(/^./, (str) => str.toLowerCase());
 }
 
-export function getParamNames(fn: (...args: any[]) => any): string[] {
-  return fn
-    .toString()
-    .slice(fn.toString().indexOf("(") + 1, fn.toString().indexOf(")"))
-    .split(",")
-    .map((p) => p.trim().split("=")[0]?.trim())
-    .filter((p) => p && !p.match(/^\{/) && p !== "options");
+export function getParamNames(func: Function): string[] {
+  // Your existing logic to extract parameter names from a function
+  const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+  const ARGUMENT_NAMES = /([^\s,]+)/g;
+  const fnStr = func.toString().replace(STRIP_COMMENTS, "");
+  const result = fnStr
+    .slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")"))
+    .match(ARGUMENT_NAMES);
+  return result || [];
 }
 
-export function transformDates(
-  obj: any,
-  convertStringsToDates: boolean = true
-): any {
-  if (obj === null || obj === undefined) return obj;
-  if (obj instanceof Date) return obj;
-  if (
-    convertStringsToDates &&
-    typeof obj === "string" &&
-    /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?/.test(
-      obj
-    )
-  ) {
-    return new Date(obj);
-  }
-  if (Array.isArray(obj)) {
+export function transformDates(obj: any, convertStringsToDates: boolean): any {
+  // Your existing logic to transform dates
+  if (!obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj))
     return obj.map((item) => transformDates(item, convertStringsToDates));
+  const result: any = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (
+      typeof value === "string" &&
+      convertStringsToDates &&
+      /^\d{4}-\d{2}-\d{2}/.test(value)
+    ) {
+      result[key] = new Date(value);
+    } else if (value instanceof Date) {
+      result[key] = value;
+    } else if (typeof value === "object") {
+      result[key] = transformDates(value, convertStringsToDates);
+    } else {
+      result[key] = value;
+    }
   }
-  if (typeof obj === "object") {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [
-        key,
-        transformDates(value, convertStringsToDates),
-      ])
-    );
-  }
-  return obj;
+  return result;
 }
 
-export function inferHttpMethod(methodSource: string, debug?: boolean): string {
-  const methodMatches = [
-    ...methodSource.matchAll(/method:\s*['"]?(\w+)['"]?/gi),
-  ];
-  const method =
-    methodMatches.length > 0
-      ? methodMatches[methodMatches.length - 1][1].toUpperCase()
-      : "GET";
-  if (debug) {
-    console.log(`[inferHttpMethod] Source:`, methodSource);
-    console.log(
-      `[inferHttpMethod] All matches:`,
-      methodMatches.map((m) => m[0])
-    );
-    console.log(`[inferHttpMethod] Extracted method:`, method);
-  }
-  return method;
+export function extractHttpMethod(method: Function): string {
+  const source = method.toString();
+  // Match the `method: 'SOME_METHOD'` part of the `request` call
+  const match = source.match(/method:\s*['"](\w+)['"]/i);
+  return match ? match[1].toUpperCase() : "GET"; // Fallback to GET if no match
 }
