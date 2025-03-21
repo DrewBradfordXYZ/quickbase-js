@@ -63,7 +63,7 @@ npm install --save quickbase-js
 
 The `quickbase` function accepts a `QuickbaseConfig` object with the following options:
 
-_Standard user options:_
+_User options:_
 
 - **`realm`** (`string`): Your QuickBase realm (e.g., "company"). This is required and has no default value.
 - **`userToken`** (`string`, optional): A QuickBase user token for authentication. No default is provided.
@@ -79,7 +79,7 @@ _Advanced user options:_
 - **`retryDelay`** (`number`, optional): The base delay (in milliseconds) between retries, which increases exponentially. Defaults to `1000`.
 - **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
 
-_Library developemt options:_
+_Overrides and development options:_
 
 - **`fetchApi`** (`typeof fetch`, optional): A custom fetch implementation (e.g., for Node.js). Defaults to the browser’s `fetch` if available, or the provided implementation.
 - **`baseUrl`** (`string`, optional): The base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.

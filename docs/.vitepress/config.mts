@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 import apiDocs from "../../docs-data/api-docs.json";
 
 export default defineConfig({
-  title: "quickbase-js API Docs",
+  title: "quickbase-js",
   description: "Documentation for quickbase-js library",
   base: "/", // Adjust to your repo name
   themeConfig: {

@@ -1,8 +1,7 @@
-// open-api/utils/generateDocsJson.ts
 import { readFileSync, readdirSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { OpenAPIV2 } from "openapi-types";
-import { Project, PropertySignature } from "ts-morph"; // Change to PropertySignature
+import { Project, PropertySignature } from "ts-morph";
 import { PropertyDetail, ParamDetail } from "../generate-unified-interface";
 import { simplifyName } from "../../src/utils.ts";
 
@@ -88,8 +87,22 @@ export function mapRefToType(
 
 export function parseInterfaceProperties(
   modelName: string,
-  modelsDir: string
-): PropertyDetail[] {
+  modelsDir: string,
+  availableModels: string[],
+  depth: number = 0,
+  visited: Set<string> = new Set()
+): any[] {
+  console.log(
+    `Parsing interface properties for ${modelName} at depth ${depth}`
+  );
+  if (depth > 10 || visited.has(modelName)) {
+    console.warn(
+      `Recursion limit reached or circular reference detected for ${modelName}`
+    );
+    return [];
+  }
+  visited.add(modelName);
+
   const project = new Project();
   const filePath = join(modelsDir, `${modelName}.ts`);
   if (!existsSync(filePath)) {
@@ -104,17 +117,57 @@ export function parseInterfaceProperties(
     return [];
   }
 
-  return interfaceDec.getProperties().map((prop: PropertySignature) => {
+  const props = interfaceDec.getProperties().map((prop: PropertySignature) => {
     const jsDocs = prop.getJsDocs();
     const jsdocText =
       jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
-    return {
+    const propType = prop.getType().getText(prop);
+    let properties: any[] | undefined = undefined;
+
+    console.log(
+      `Processing property ${prop.getName()} with type ${propType} in ${modelName}`
+    );
+    const arrayMatch = propType.match(/(.+)\[\]$/);
+    if (arrayMatch) {
+      const innerType = arrayMatch[1].trim();
+      console.log(`Found array type ${propType}, inner type: ${innerType}`);
+      if (availableModels.includes(innerType) && !innerType.includes("[]")) {
+        properties = parseInterfaceProperties(
+          innerType,
+          modelsDir,
+          availableModels,
+          depth + 1,
+          visited
+        );
+        console.log(
+          `Nested properties for ${innerType} in ${modelName}:`,
+          properties
+        );
+      } else {
+        console.log(
+          `Skipping recursion for ${innerType} - not in availableModels or nested array`
+        );
+      }
+    } else {
+      console.log(`No array match for ${propType} in ${modelName}`);
+    }
+
+    const propDetail = {
       name: prop.getName(),
-      type: prop.getType().getText(prop),
+      type: propType,
       required: !prop.hasQuestionToken(),
       jsdoc: jsdocText,
+      properties: properties && properties.length > 0 ? properties : undefined,
     };
+    console.log(
+      `Property detail for ${prop.getName()} in ${modelName}:`,
+      propDetail
+    );
+    return propDetail;
   });
+
+  console.log(`Completed parsing ${modelName}, properties:`, props);
+  return props;
 }
 
 export function generateDocsJson(
@@ -142,6 +195,7 @@ export function generateDocsJson(
       if (!op || !op.operationId) continue;
 
       const opId = simplifyName(op.operationId);
+      console.log(`Processing operation ${opId} (${method} ${path})`);
       const paramDetails = (op.parameters || [])
         .filter(
           (p) =>
@@ -152,7 +206,7 @@ export function generateDocsJson(
         .map((p) => {
           const param = p as OpenAPIV2.ParameterObject;
           let type = "any";
-          let properties: PropertyDetail[] = [];
+          let properties: PropertyDetail[] | undefined = undefined;
           if ("schema" in p && p.schema) {
             type = mapRefToType(
               p.schema,
@@ -162,25 +216,36 @@ export function generateDocsJson(
               availableModels,
               missingTypes
             );
+            console.log(`Parameter ${param.name} type: ${type}`);
             if ("$ref" in p.schema && p.schema.$ref) {
               const refParts = p.schema.$ref.split("/");
               const model = refParts[refParts.length - 1];
               const pascalModel =
                 model.charAt(0).toUpperCase() + model.slice(1);
-              properties = parseInterfaceProperties(pascalModel, modelsDir);
+              properties = parseInterfaceProperties(
+                pascalModel,
+                modelsDir,
+                availableModels
+              );
             } else if (type !== "any" && availableModels.includes(type)) {
-              properties = parseInterfaceProperties(type, modelsDir);
+              properties = parseInterfaceProperties(
+                type,
+                modelsDir,
+                availableModels
+              );
             }
           } else if ("type" in p) {
             type = mapOpenApiTypeToTs(p.type);
           }
-          return {
+          const paramDetail = {
             name: param.in === "body" ? "body" : param.name,
             type,
             required: param.required || false,
             description: param.description || "",
-            properties: properties.length > 0 ? properties : undefined,
+            properties,
           };
+          console.log(`Parameter detail for ${opId}:`, paramDetail);
+          return paramDetail;
         });
 
       const returnTypes = ["200", "207"]
@@ -202,9 +267,35 @@ export function generateDocsJson(
         returnTypes.length > 1
           ? returnTypes.join(" | ")
           : returnTypes[0] || "void";
-      const returnTypeDetails = returnTypes
+      console.log(`Return types for ${opId}:`, returnTypes);
+
+      const returnTypeDetailsRaw = returnTypes
         .filter((type) => type !== "void" && availableModels.includes(type))
-        .flatMap((type) => parseInterfaceProperties(type, modelsDir));
+        .map((type) =>
+          parseInterfaceProperties(type, modelsDir, availableModels)
+        )
+        .flat();
+      console.log(
+        `Return type details for ${opId} before final mapping:`,
+        returnTypeDetailsRaw
+      );
+
+      const returnTypeDetails = returnTypeDetailsRaw.map((prop: any) => {
+        console.log(
+          `Mapping property ${
+            prop.name
+          } for ${opId}, has properties: ${!!prop.properties}`
+        );
+        if (prop.properties && prop.properties.length > 0) {
+          console.log(
+            `Expanding nested properties for ${prop.name} in ${opId}:`,
+            prop.properties
+          );
+          return { ...prop, properties: [...prop.properties] };
+        }
+        return { ...prop };
+      });
+      console.log(`Final return type details for ${opId}:`, returnTypeDetails);
 
       docsData.push({
         name: opId,
@@ -220,6 +311,7 @@ export function generateDocsJson(
     }
   }
 
+  console.log("Writing docs data to file:", docsData);
   writeFileSync(outputFile, JSON.stringify(docsData, null, 2), "utf8");
   console.log("Generated docs JSON:", outputFile);
 }

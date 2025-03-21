@@ -7,6 +7,8 @@ import apiDocs from '../docs-data/api-docs.json'; // ESM import from project roo
 const methods = ref(apiDocs);
 </script>
 
+Documentation of the available API methods. For full project details and features, see the [GitHub repository](https://github.com/DrewBradfordXYZ/quickbase-js).
+
 <div v-for="method in methods" :key="method.name" :id="method.name" class="method-card">
   <h2>{{ method.name }}</h2>
   <code>{{ method.method }} {{ method.path }}</code>
@@ -30,6 +32,11 @@ const methods = ref(apiDocs);
   <ul v-if="method.returnTypeDetails && method.returnTypeDetails.length">
     <li v-for="prop in method.returnTypeDetails" :key="prop.name">
       <strong>{{ prop.name }}</strong> ({{ prop.type }}, {{ prop.required ? 'required' : 'optional' }}): {{ prop.jsdoc || 'No description' }}
+      <ul v-if="prop.properties && prop.properties.length">
+        <li v-for="subProp in prop.properties" :key="subProp.name">
+          <strong>{{ subProp.name }}</strong> ({{ subProp.type }}, {{ subProp.required ? 'required' : 'optional' }}): {{ subProp.jsdoc || 'No description' }}
+        </li>
+      </ul>
     </li>
   </ul>
 </div>
