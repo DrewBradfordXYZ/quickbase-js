@@ -16,13 +16,13 @@ import {
   mapOpenApiTypeToTs,
   mapRefToType,
   parseInterfaceProperties,
-} from "./sharedUtils.ts";
-import { simplifyName } from "../../src/utils.ts";
+} from "./utils/sharedUtils.ts";
+import { simplifyName } from "../src/utils.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SPEC_FILE = join(__dirname, "..", "output", "quickbase-fixed.json");
-const MODELS_DIR = join(__dirname, "..", "..", "src", "generated", "models");
-const DOCS_DATA_DIR = join(__dirname, "..", "..", "docs-data");
+const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json"); // Updated: one less ".."
+const MODELS_DIR = join(__dirname, "..", "src", "generated", "models"); // Updated: one less ".."
+const DOCS_DATA_DIR = join(__dirname, "..", "docs-data"); // Updated: one less ".."
 const DOCS_JSON_FILE = join(DOCS_DATA_DIR, "api-docs.json");
 
 function generateDocsJson(): void {

@@ -39,7 +39,7 @@
     "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
     "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
     "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
-    "gen:docsdata": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/utils/generateDocsJson.ts",
+    "gen:docsdata": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generateDocsJson.ts",
     "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docsdata && npm run docs:build",
     "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
     "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
