@@ -17,12 +17,13 @@ const excludeDirs: string[] = [
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "open-api"
+  "open-api/utils",
+  "open-api"
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  "open-api/schema/tags",
+  // "open-api/schema/tags",
   // "open-api",
   // "tools"
   // "tests",
@@ -48,7 +49,7 @@ const includeFiles: string[] = [
 
   // "src/quickbaseClient.ts",
   // "src/invokeMethod.ts",
-  // "src/generated-unified/QuickbaseClient.ts",
+  "src/generated-unified/QuickbaseClient.ts",
   // "src/authorizationStrategy.ts",
   // "src/rateLimiter.ts",
   // "src/RateLimitError.ts",
