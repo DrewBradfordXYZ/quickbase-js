@@ -1,11 +1,25 @@
-import { readFileSync, readdirSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+#!/usr/bin/env node
+import {
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync, // Added mkdirSync here
+} from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { OpenAPIV2 } from "openapi-types";
 import { Project, PropertySignature } from "ts-morph";
-import { PropertyDetail, ParamDetail } from "../generate-unified-interface";
+import { PropertyDetail, ParamDetail } from "./sharedUtils.ts";
 import { simplifyName } from "../../src/utils.ts";
 
-export function mapOpenApiTypeToTs(
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SPEC_FILE = join(__dirname, "..", "output", "quickbase-fixed.json");
+const MODELS_DIR = join(__dirname, "..", "..", "src", "generated", "models");
+const DOCS_DATA_DIR = join(__dirname, "..", "..", "docs-data");
+const DOCS_JSON_FILE = join(DOCS_DATA_DIR, "api-docs.json");
+
+function mapOpenApiTypeToTs(
   openApiType: string | string[] | undefined
 ): string {
   const type = Array.isArray(openApiType)
@@ -25,7 +39,7 @@ export function mapOpenApiTypeToTs(
   }
 }
 
-export function mapRefToType(
+function mapRefToType(
   schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
   modelImports: Set<string>,
   spec: OpenAPIV2.Document,
@@ -85,13 +99,13 @@ export function mapRefToType(
   return "any";
 }
 
-export function parseInterfaceProperties(
+function parseInterfaceProperties(
   modelName: string,
   modelsDir: string,
   availableModels: string[],
   depth: number = 0,
   visited: Set<string> = new Set()
-): any[] {
+): PropertyDetail[] {
   console.log(
     `Parsing interface properties for ${modelName} at depth ${depth}`
   );
@@ -122,15 +136,11 @@ export function parseInterfaceProperties(
     const jsdocText =
       jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
     const propType = prop.getType().getText(prop);
-    let properties: any[] | undefined = undefined;
+    let properties: PropertyDetail[] | undefined = undefined;
 
-    console.log(
-      `Processing property ${prop.getName()} with type ${propType} in ${modelName}`
-    );
     const arrayMatch = propType.match(/(.+)\[\]$/);
     if (arrayMatch) {
       const innerType = arrayMatch[1].trim();
-      console.log(`Found array type ${propType}, inner type: ${innerType}`);
       if (availableModels.includes(innerType) && !innerType.includes("[]")) {
         properties = parseInterfaceProperties(
           innerType,
@@ -139,17 +149,7 @@ export function parseInterfaceProperties(
           depth + 1,
           visited
         );
-        console.log(
-          `Nested properties for ${innerType} in ${modelName}:`,
-          properties
-        );
-      } else {
-        console.log(
-          `Skipping recursion for ${innerType} - not in availableModels or nested array`
-        );
       }
-    } else {
-      console.log(`No array match for ${propType} in ${modelName}`);
     }
 
     const propDetail = {
@@ -159,25 +159,24 @@ export function parseInterfaceProperties(
       jsdoc: jsdocText,
       properties: properties && properties.length > 0 ? properties : undefined,
     };
-    console.log(
-      `Property detail for ${prop.getName()} in ${modelName}:`,
-      propDetail
-    );
     return propDetail;
   });
 
-  console.log(`Completed parsing ${modelName}, properties:`, props);
   return props;
 }
 
-export function generateDocsJson(
-  specFile: string,
-  modelsDir: string,
-  outputFile: string
-): void {
+function generateDocsJson(): void {
   console.log("Generating docs JSON...");
-  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
-  const availableModels = readdirSync(modelsDir)
+
+  if (!existsSync(SPEC_FILE)) {
+    console.error(
+      `Spec file ${SPEC_FILE} not found. Run 'npm run fix-spec' first.`
+    );
+    process.exit(1);
+  }
+
+  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(SPEC_FILE, "utf8"));
+  const availableModels = readdirSync(MODELS_DIR)
     .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
     .map((file) => file.replace(".ts", ""));
   const modelImports = new Set<string>();
@@ -216,7 +215,6 @@ export function generateDocsJson(
               availableModels,
               missingTypes
             );
-            console.log(`Parameter ${param.name} type: ${type}`);
             if ("$ref" in p.schema && p.schema.$ref) {
               const refParts = p.schema.$ref.split("/");
               const model = refParts[refParts.length - 1];
@@ -224,13 +222,13 @@ export function generateDocsJson(
                 model.charAt(0).toUpperCase() + model.slice(1);
               properties = parseInterfaceProperties(
                 pascalModel,
-                modelsDir,
+                MODELS_DIR,
                 availableModels
               );
             } else if (type !== "any" && availableModels.includes(type)) {
               properties = parseInterfaceProperties(
                 type,
-                modelsDir,
+                MODELS_DIR,
                 availableModels
               );
             }
@@ -244,7 +242,6 @@ export function generateDocsJson(
             description: param.description || "",
             properties,
           };
-          console.log(`Parameter detail for ${opId}:`, paramDetail);
           return paramDetail;
         });
 
@@ -267,35 +264,20 @@ export function generateDocsJson(
         returnTypes.length > 1
           ? returnTypes.join(" | ")
           : returnTypes[0] || "void";
-      console.log(`Return types for ${opId}:`, returnTypes);
 
       const returnTypeDetailsRaw = returnTypes
         .filter((type) => type !== "void" && availableModels.includes(type))
         .map((type) =>
-          parseInterfaceProperties(type, modelsDir, availableModels)
+          parseInterfaceProperties(type, MODELS_DIR, availableModels)
         )
         .flat();
-      console.log(
-        `Return type details for ${opId} before final mapping:`,
-        returnTypeDetailsRaw
-      );
 
       const returnTypeDetails = returnTypeDetailsRaw.map((prop: any) => {
-        console.log(
-          `Mapping property ${
-            prop.name
-          } for ${opId}, has properties: ${!!prop.properties}`
-        );
         if (prop.properties && prop.properties.length > 0) {
-          console.log(
-            `Expanding nested properties for ${prop.name} in ${opId}:`,
-            prop.properties
-          );
           return { ...prop, properties: [...prop.properties] };
         }
         return { ...prop };
       });
-      console.log(`Final return type details for ${opId}:`, returnTypeDetails);
 
       docsData.push({
         name: opId,
@@ -311,7 +293,18 @@ export function generateDocsJson(
     }
   }
 
-  console.log("Writing docs data to file:", docsData);
-  writeFileSync(outputFile, JSON.stringify(docsData, null, 2), "utf8");
-  console.log("Generated docs JSON:", outputFile);
+  if (!existsSync(DOCS_DATA_DIR)) {
+    mkdirSync(DOCS_DATA_DIR, { recursive: true }); // Using mkdirSync here
+  }
+  writeFileSync(DOCS_JSON_FILE, JSON.stringify(docsData, null, 2), "utf8");
+  console.log("Generated docs JSON:", DOCS_JSON_FILE);
 }
+
+try {
+  generateDocsJson();
+} catch (error) {
+  console.error("Error in generateDocsJson:", error);
+  process.exit(1);
+}
+
+console.log("Script completed");

@@ -23,8 +23,8 @@ import { Project } from "ts-morph";
 console.log("ts-morph imported");
 
 import { generateJsDoc } from "./utils/generateJsDoc.ts";
-import { generateDocsJson } from "./utils/generateDocsJson.ts";
 import { simplifyName } from "../src/utils.ts";
+import { PropertyDetail, ParamDetail } from "./utils/sharedUtils.ts"; // Import shared types
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 console.log("__dirname set:", __dirname);
@@ -33,24 +33,6 @@ const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 const MODELS_DIR = join(__dirname, "..", "src", "generated", "models");
-const DOCS_DATA_DIR = join(__dirname, "..", "docs-data");
-const DOCS_JSON_FILE = join(DOCS_DATA_DIR, "api-docs.json");
-
-export interface PropertyDetail {
-  // Added export
-  name: string;
-  type: string;
-  required: boolean;
-  jsdoc?: string;
-}
-
-export interface ParamDetail {
-  // Already exported, just ensuring consistency
-  name: string;
-  type: string;
-  required: boolean;
-  properties: PropertyDetail[];
-}
 
 function mapOpenApiTypeToTs(
   openApiType: string | string[] | undefined
@@ -336,12 +318,6 @@ function generateInterface(includeResponseProperties: boolean = false): void {
 console.log("Entering try block");
 try {
   generateInterface(true);
-  console.log("Ensuring docs data directory exists...");
-  if (!existsSync(DOCS_DATA_DIR)) {
-    mkdirSync(DOCS_DATA_DIR, { recursive: true });
-  }
-  console.log("Generating docs JSON for Vitepress...");
-  generateDocsJson(SPEC_FILE, MODELS_DIR, DOCS_JSON_FILE);
 } catch (error) {
   console.error("Error in generateInterface:", error);
   process.exit(1);
