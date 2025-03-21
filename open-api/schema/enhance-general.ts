@@ -1,31 +1,8 @@
-// schema/enhance-general.ts
 import { Operation, Parameter, Spec } from "../types/spec.ts";
 import { inferSchema } from "../utils/infer-schema.ts";
 
 export function enhanceGeneral(spec: Spec): void {
   spec.definitions = spec.definitions || {};
-
-  // Local function to wrap top-level arrays and refine items
-  function wrapTopLevelArrays(schema: any, responseName: string): any {
-    if (schema.type === "array") {
-      console.log(
-        `Wrapping ${responseName} in an object with 'items' property`
-      );
-      // Remove additionalProperties from items to ensure typing
-      if (schema.items && "additionalProperties" in schema.items) {
-        delete schema.items.additionalProperties;
-        console.log(`Removed additionalProperties from ${responseName}.items`);
-      }
-      return {
-        type: "object",
-        properties: {
-          items: schema,
-        },
-        description: `A response containing a list for ${responseName}`,
-      };
-    }
-    return schema; // Return unchanged if not a top-level array
-  }
 
   if (!spec.definitions["Record"]) {
     spec.definitions["Record"] = {
@@ -85,11 +62,11 @@ export function enhanceGeneral(spec: Spec): void {
                 `Adding ${responseName} to definitions for ${pathKey}(${method})`
               );
               let schemaToUse = response.schema;
-              // Apply general fix for top-level arrays
-              schemaToUse = wrapTopLevelArrays(schemaToUse, responseName);
+              // Only infer from example if schema is truly empty
               if (
-                !schemaToUse.type ||
-                (schemaToUse.type === "array" && !schemaToUse.items)
+                !schemaToUse.type &&
+                !schemaToUse.items &&
+                !schemaToUse.properties
               ) {
                 if (response["x-amf-mediaType"]) {
                   const mediaType = response["x-amf-mediaType"];

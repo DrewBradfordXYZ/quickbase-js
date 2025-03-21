@@ -1262,6 +1262,7 @@ tree:
             #!/usr/bin/env
             node
 
+
             console.log("Script
             started");
 
@@ -1325,6 +1326,14 @@ tree:
             }
             from
             "./utils/sharedUtils.ts";
+
+            import
+            {
+            writeFileSafe,
+            runTask
+            }
+            from
+            "./utils/common.ts";
 
 
             const
@@ -1421,7 +1430,7 @@ tree:
               });
 
               console.log("Writing missing types report...");
-              writeFileSync(
+              writeFileSafe(
                 join(OUTPUT_DIR, "missing-types-report.json"),
                 JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
               );
@@ -1436,29 +1445,20 @@ tree:
                 "\n"
               )}\n}\n`;
 
-              console.log("Ensuring output directory exists...");
-              if (!existsSync(OUTPUT_DIR)) {
-                mkdirSync(OUTPUT_DIR, { recursive: true });
-              }
-              writeFileSync(OUTPUT_FILE, interfaceContent, "utf8");
+              console.log("Ensuring output directory exists and writing interface...");
+              writeFileSafe(OUTPUT_FILE, interfaceContent);
               console.log("Generated:", OUTPUT_FILE);
             }
 
 
             console.log("Entering
-            try
+            runTask
             block");
 
-            try
-            {
-              generateInterface(true);
-            }
-            catch
-            (error)
-            {
-              console.error("Error in generateInterface:", error);
-              process.exit(1);
-            }
+            runTask("generateInterface",
+            ()
+            =>
+            generateInterface(true));
 
 
             console.log("Script
@@ -1470,6 +1470,7 @@ tree:
           contents: >
             #!/usr/bin/env
             node
+
 
             import
             {
@@ -1501,6 +1502,14 @@ tree:
             }
             from
             "./utils/sharedUtils.ts";
+
+            import
+            {
+            writeFileSafe,
+            runTask
+            }
+            from
+            "./utils/common.ts";
 
 
             const
@@ -1543,27 +1552,14 @@ tree:
             void
             {
               console.log("Generating docs JSON...");
-
               const { operations } = parseOpenApiOperations(SPEC_FILE, MODELS_DIR);
-
-              if (!existsSync(DOCS_DATA_DIR)) {
-                mkdirSync(DOCS_DATA_DIR, { recursive: true });
-              }
-              writeFileSync(DOCS_JSON_FILE, JSON.stringify(operations, null, 2), "utf8");
+              writeFileSafe(DOCS_JSON_FILE, JSON.stringify(operations, null, 2), "utf8");
               console.log("Generated docs JSON:", DOCS_JSON_FILE);
             }
 
 
-            try
-            {
-              generateDocsJson();
-            }
-            catch
-            (error)
-            {
-              console.error("Error in generateDocsJson:", error);
-              process.exit(1);
-            }
+            runTask("generateDocsJson",
+            generateDocsJson);
 
 
             console.log("Script
@@ -1792,10 +1788,409 @@ tree:
                 enhance-general.ts
               type: >-
                 file
+              contents: >
+                //
+                schema/enhance-general.ts
+
+                import
+                {
+                Operation,
+                Parameter,
+                Spec
+                }
+                from
+                "../types/spec.ts";
+
+                import
+                {
+                inferSchema
+                }
+                from
+                "../utils/infer-schema.ts";
+
+
+                export
+                function
+                enhanceGeneral(spec:
+                Spec):
+                void
+                {
+                  spec.definitions = spec.definitions || {};
+
+                  // Local function to wrap top-level arrays and refine items
+                  function wrapTopLevelArrays(schema: any, responseName: string): any {
+                    if (schema.type === "array") {
+                      console.log(
+                        `Wrapping ${responseName} in an object with 'items' property`
+                      );
+                      // Remove additionalProperties from items to ensure typing
+                      if (schema.items && "additionalProperties" in schema.items) {
+                        delete schema.items.additionalProperties;
+                        console.log(`Removed additionalProperties from ${responseName}.items`);
+                      }
+                      return {
+                        type: "object",
+                        properties: {
+                          items: schema,
+                        },
+                        description: `A response containing a list for ${responseName}`,
+                      };
+                    }
+                    return schema; // Return unchanged if not a top-level array
+                  }
+
+                  if (!spec.definitions["Record"]) {
+                    spec.definitions["Record"] = {
+                      type: "object",
+                      additionalProperties: {
+                        type: "object",
+                        properties: { value: { type: "string" } },
+                        required: ["value"],
+                      },
+                      description: "A generic QuickBase record with field ID-value pairs",
+                    };
+                    console.log("Added Record to definitions");
+                  }
+
+                  if (!spec.definitions["Permission"]) {
+                    spec.definitions["Permission"] = {
+                      type: "object",
+                      properties: {
+                        role: { type: "string", description: "The role name" },
+                        permissionType: {
+                          type: "string",
+                          description: "Permission type (e.g., View, Modify)",
+                        },
+                        roleId: { type: "integer", description: "The role identifier" },
+                      },
+                      required: ["role", "permissionType", "roleId"],
+                      description: "A single permission entry for a field",
+                    };
+                    console.log("Added Permission to definitions");
+                  }
+
+                  for (const pathKey in spec.paths) {
+                    for (const method in spec.paths[pathKey]) {
+                      const operation: Operation = spec.paths[pathKey][method];
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+
+                      if (operation.parameters) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in !== "body" && !param.type && !param.schema) {
+                            param.type = param.name.includes("Id") ? "string" : "string";
+                            console.log(
+                              `Set default type 'string' for ${pathKey}(${method}).${param.name}`
+                            );
+                          }
+                        });
+                      }
+
+                      if (operation.responses) {
+                        for (const status in operation.responses) {
+                          const response = operation.responses[status];
+                          if (response.schema) {
+                            const cleanStatus = status.replace("/", "_");
+                            const responseName = `${opId}${cleanStatus}Response`;
+                            if (!spec.definitions[responseName]) {
+                              console.log(
+                                `Adding ${responseName} to definitions for ${pathKey}(${method})`
+                              );
+                              let schemaToUse = response.schema;
+                              // Apply general fix for top-level arrays
+                              schemaToUse = wrapTopLevelArrays(schemaToUse, responseName);
+                              if (
+                                !schemaToUse.type ||
+                                (schemaToUse.type === "array" && !schemaToUse.items)
+                              ) {
+                                if (response["x-amf-mediaType"]) {
+                                  const mediaType = response["x-amf-mediaType"];
+                                  if (mediaType === "application/octet-stream") {
+                                    schemaToUse = {
+                                      type: "object",
+                                      properties: {
+                                        data: { type: "string", format: "binary" },
+                                      },
+                                      description:
+                                        schemaToUse?.description || "Binary file content",
+                                    };
+                                  } else if (mediaType === "application/x-yaml") {
+                                    schemaToUse = {
+                                      type: "object",
+                                      properties: {
+                                        content: { type: "string", format: "yaml" },
+                                      },
+                                      description: "YAML-formatted data",
+                                    };
+                                  } else if (
+                                    mediaType === "application/json" &&
+                                    schemaToUse.example
+                                  ) {
+                                    schemaToUse = inferSchema(
+                                      schemaToUse.example,
+                                      responseName
+                                    );
+                                    schemaToUse.description =
+                                      response.description || `Response for ${opId}`;
+                                  }
+                                }
+                              }
+                              spec.definitions[responseName] = schemaToUse;
+                            }
+                            response.schema = { $ref: `#/definitions/${responseName}` };
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            - name: >-
+                enhance-general.ts.bak
+              type: >-
+                file
+              contents: >
+                //
+                schema/enhance-general.ts
+
+                import
+                {
+                Operation,
+                Parameter,
+                Spec
+                }
+                from
+                "../types/spec.ts";
+
+                import
+                {
+                inferSchema
+                }
+                from
+                "../utils/infer-schema.ts";
+
+
+                export
+                function
+                enhanceGeneral(spec:
+                Spec):
+                void
+                {
+                  spec.definitions = spec.definitions || {};
+
+                  // Local function to wrap top-level arrays and refine items
+                  function wrapTopLevelArrays(schema: any, responseName: string): any {
+                    if (schema.type === "array") {
+                      console.log(
+                        `Wrapping ${responseName} in an object with 'items' property`
+                      );
+                      // Remove additionalProperties from items to ensure typing
+                      if (schema.items && "additionalProperties" in schema.items) {
+                        delete schema.items.additionalProperties;
+                        console.log(`Removed additionalProperties from ${responseName}.items`);
+                      }
+                      return {
+                        type: "object",
+                        properties: {
+                          items: schema,
+                        },
+                        description: `A response containing a list for ${responseName}`,
+                      };
+                    }
+                    return schema; // Return unchanged if not a top-level array
+                  }
+
+                  if (!spec.definitions["Record"]) {
+                    spec.definitions["Record"] = {
+                      type: "object",
+                      additionalProperties: {
+                        type: "object",
+                        properties: { value: { type: "string" } },
+                        required: ["value"],
+                      },
+                      description: "A generic QuickBase record with field ID-value pairs",
+                    };
+                    console.log("Added Record to definitions");
+                  }
+
+                  if (!spec.definitions["Permission"]) {
+                    spec.definitions["Permission"] = {
+                      type: "object",
+                      properties: {
+                        role: { type: "string", description: "The role name" },
+                        permissionType: {
+                          type: "string",
+                          description: "Permission type (e.g., View, Modify)",
+                        },
+                        roleId: { type: "integer", description: "The role identifier" },
+                      },
+                      required: ["role", "permissionType", "roleId"],
+                      description: "A single permission entry for a field",
+                    };
+                    console.log("Added Permission to definitions");
+                  }
+
+                  for (const pathKey in spec.paths) {
+                    for (const method in spec.paths[pathKey]) {
+                      const operation: Operation = spec.paths[pathKey][method];
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+
+                      if (operation.parameters) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in !== "body" && !param.type && !param.schema) {
+                            param.type = param.name.includes("Id") ? "string" : "string";
+                            console.log(
+                              `Set default type 'string' for ${pathKey}(${method}).${param.name}`
+                            );
+                          }
+                        });
+                      }
+
+                      if (operation.responses) {
+                        for (const status in operation.responses) {
+                          const response = operation.responses[status];
+                          if (response.schema) {
+                            const cleanStatus = status.replace("/", "_");
+                            const responseName = `${opId}${cleanStatus}Response`;
+                            if (!spec.definitions[responseName]) {
+                              console.log(
+                                `Adding ${responseName} to definitions for ${pathKey}(${method})`
+                              );
+                              let schemaToUse = response.schema;
+                              // Apply general fix for top-level arrays
+                              schemaToUse = wrapTopLevelArrays(schemaToUse, responseName);
+                              if (
+                                !schemaToUse.type ||
+                                (schemaToUse.type === "array" && !schemaToUse.items)
+                              ) {
+                                if (response["x-amf-mediaType"]) {
+                                  const mediaType = response["x-amf-mediaType"];
+                                  if (mediaType === "application/octet-stream") {
+                                    schemaToUse = {
+                                      type: "object",
+                                      properties: {
+                                        data: { type: "string", format: "binary" },
+                                      },
+                                      description:
+                                        schemaToUse?.description || "Binary file content",
+                                    };
+                                  } else if (mediaType === "application/x-yaml") {
+                                    schemaToUse = {
+                                      type: "object",
+                                      properties: {
+                                        content: { type: "string", format: "yaml" },
+                                      },
+                                      description: "YAML-formatted data",
+                                    };
+                                  } else if (
+                                    mediaType === "application/json" &&
+                                    schemaToUse.example
+                                  ) {
+                                    schemaToUse = inferSchema(
+                                      schemaToUse.example,
+                                      responseName
+                                    );
+                                    schemaToUse.description =
+                                      response.description || `Response for ${opId}`;
+                                  }
+                                }
+                              }
+                              spec.definitions[responseName] = schemaToUse;
+                            }
+                            response.schema = { $ref: `#/definitions/${responseName}` };
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
             - name: >-
                 fix-arrays.ts
               type: >-
                 file
+              contents: >
+                //
+                schema/fix-arrays.ts
+
+                import
+                {
+                Parameter,
+                Spec
+                }
+                from
+                "../types/spec.ts";
+
+
+                export
+                function
+                fixArrays(spec:
+                Spec):
+                void
+                {
+                  for (const pathKey in spec.paths) {
+                    for (const method in spec.paths[pathKey]) {
+                      const operation = spec.paths[pathKey][method];
+                      if (operation.parameters) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.schema?.type === "array" && !param.schema.items) {
+                            console.log(
+                              `Fixing array schema for ${pathKey}(${method}).${param.name}`
+                            );
+                            param.schema.items = { type: "string" };
+                          }
+                          if (param.schema?.properties) {
+                            for (const propKey in param.schema.properties) {
+                              const prop = param.schema.properties[propKey];
+                              if (prop.type === "array" && !prop.items) {
+                                console.log(
+                                  `Fixing nested array for ${pathKey}(${method}).${param.name}.${propKey}`
+                                );
+                                prop.items = { type: "string" };
+                              }
+                            }
+                          }
+                        });
+                      }
+                      if (operation.responses) {
+                        for (const status in operation.responses) {
+                          const response = operation.responses[status];
+                          if (response.schema?.type === "array" && !response.schema.items) {
+                            console.log(
+                              `Fixing array schema for ${pathKey}(${method}).responses.${status}`
+                            );
+                            response.schema.items = { type: "string" };
+                          }
+                          if (response.schema?.properties) {
+                            for (const propKey in response.schema.properties) {
+                              const prop = response.schema.properties[propKey];
+                              if (prop.type === "array" && !prop.items) {
+                                console.log(
+                                  `Fixing nested array for ${pathKey}(${method}).responses.${status}.${propKey}`
+                                );
+                                prop.items = { type: "string" };
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  console.log("Fixing array schemas in definitions...");
+                  const definitions = spec.definitions || {};
+                  for (const defKey in definitions) {
+                    const def = definitions[defKey];
+                    if (def.properties) {
+                      for (const propKey in def.properties) {
+                        const prop = def.properties[propKey];
+                        if (prop.type === "array" && !prop.items) {
+                          console.log(`Fixing missing items in ${defKey}.${propKey}`);
+                          prop.items = { type: "string" };
+                        }
+                      }
+                    }
+                  }
+                }
             - name: >-
                 tags
               type: >-
@@ -1844,15 +2239,90 @@ tree:
             directory
           children:
             - name: >-
+                common.ts
+              type: >-
+                file
+              contents: >
+                #!/usr/bin/env
+                node
+
+
+                import
+                {
+                existsSync,
+                mkdirSync,
+                writeFileSync
+                }
+                from
+                "fs";
+
+                import
+                {
+                dirname
+                }
+                from
+                "path";
+
+
+                export
+                function
+                writeFileSafe(
+                  filePath: string,
+                  content: string,
+                  encoding: BufferEncoding = "utf8"
+                ):
+                void
+                {
+                  console.log(`writeFileSafe: Writing to ${filePath}`);
+                  const dir = dirname(filePath);
+                  if (!existsSync(dir)) {
+                    console.log(`writeFileSafe: Creating directory ${dir}`);
+                    mkdirSync(dir, { recursive: true });
+                  }
+                  writeFileSync(filePath, content, encoding);
+                }
+
+
+                export
+                function
+                runTask(taskName:
+                string,
+                task:
+                ()
+                =>
+                void):
+                void
+                {
+                  console.log(`runTask: Starting ${taskName}`);
+                  try {
+                    task();
+                    console.log(`runTask: ${taskName} completed`);
+                  } catch (error) {
+                    console.error(`runTask: Error in ${taskName}:`, error);
+                    process.exit(1);
+                  }
+                }
+            - name: >-
                 generateJsDoc.ts
               type: >-
                 file
               contents: >
+                #!/usr/bin/env
+                node
+
+
                 import
                 {
                 ParamDetail,
                 PropertyDetail,
                 JsDocOptions
+                }
+                from
+                "./sharedUtils.ts";
+
+                import
+                {
+                getPropertyDescription
                 }
                 from
                 "./sharedUtils.ts";
@@ -1878,7 +2348,6 @@ tree:
                     `   * @param {Object} params _Object containing the parameters for_ ${opId}`,
                   ];
 
-                  // Parameters section
                   if (paramDetails.length > 0) {
                     paramDetails.forEach((p) => {
                       jsDocLines.push(
@@ -1888,9 +2357,7 @@ tree:
                       );
                       if (p.properties.length > 0) {
                         p.properties.forEach((prop) => {
-                          const propDesc = prop.jsdoc
-                            ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
-                            : `Type: ${prop.type}`;
+                          const propDesc = getPropertyDescription(prop);
                           jsDocLines.push(
                             `   *     - **${prop.name}** (\`${prop.type}\`${
                               prop.required ? ", required" : ", optional"
@@ -1903,22 +2370,29 @@ tree:
                     jsDocLines.push(`   *   No parameters`);
                   }
 
-                  // Returns section
                   jsDocLines.push(`   *`);
                   if (returnTypeDetails.length > 0) {
                     jsDocLines.push(
                       `   * @returns {Promise<${returnType}>} _Promise resolving to the ${opId} response with properties_`
                     );
-                    returnTypeDetails.forEach((prop) => {
-                      const propDesc = prop.jsdoc
-                        ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
-                        : `Type: ${prop.type}`;
-                      jsDocLines.push(
-                        `   *   - **${prop.name}** (\`${prop.type}\`${
-                          prop.required ? ", required" : ", optional"
-                        }) _${propDesc}_`
-                      );
-                    });
+                    const renderProperties = (props: PropertyDetail[], indent: string) => {
+                      props.forEach((prop) => {
+                        // Only include description if it’s not just repeating the type
+                        const propDesc =
+                          prop.properties && prop.properties.length > 0
+                            ? "" // Skip description for complex types with nested properties
+                            : getPropertyDescription(prop);
+                        jsDocLines.push(
+                          `${indent}*   - **${prop.name}** (\`${prop.type}\`${
+                            prop.required ? ", required" : ", optional"
+                          }) _${propDesc}_`
+                        );
+                        if (prop.properties && prop.properties.length > 0) {
+                          renderProperties(prop.properties, `${indent}*     `);
+                        }
+                      });
+                    };
+                    renderProperties(returnTypeDetails, `   `);
                   } else {
                     jsDocLines.push(
                       `   * @returns {Promise<${returnType}>} _Promise resolving to the ${opId} response_`
@@ -1927,10 +2401,9 @@ tree:
 
                   jsDocLines.push(
                     `   *`,
-                    `   * @see {@link ${docLink}} Official Quickbase API documentation`
+                    `   * @see {@link ${docLink}} Official Quickbase API documentation`,
+                    `   */`
                   );
-                  jsDocLines.push(`   */`);
-
                   return jsDocLines.join("\n");
                 }
             - name: >-
@@ -2020,6 +2493,10 @@ tree:
               type: >-
                 file
               contents: >
+                #!/usr/bin/env
+                node
+
+
                 import
                 {
                 OpenAPIV2
@@ -2036,14 +2513,6 @@ tree:
 
                 import
                 {
-                Project,
-                PropertySignature
-                }
-                from
-                "ts-morph";
-
-                import
-                {
                 existsSync,
                 readdirSync,
                 readFileSync
@@ -2053,16 +2522,25 @@ tree:
 
                 import
                 {
+                Project,
+                PropertySignature
+                }
+                from
+                "ts-morph";
+
+                import
+                {
                 simplifyName
                 }
                 from
                 "../../src/utils.ts";
-                //
-                Adjust
-                path
-                if
-                needed
 
+
+                //
+                (Existing
+                interfaces
+                remain
+                unchanged)
 
                 export
                 interface
@@ -2139,7 +2617,6 @@ tree:
                 string
                 {
                   if (!schema) return "any";
-
                   if ("$ref" in schema && schema.$ref) {
                     const refParts = schema.$ref.split("/");
                     const model = refParts[refParts.length - 1];
@@ -2152,7 +2629,6 @@ tree:
                     console.warn(`Type ${pascalModel} not found, defaulting to 'any'`);
                     return "any";
                   }
-
                   if ("type" in schema) {
                     if (schema.type === "object" && schema.properties) {
                       const props = schema.properties;
@@ -2186,7 +2662,6 @@ tree:
                     }
                     return mapOpenApiTypeToTs(schema.type);
                   }
-
                   return "any";
                 }
 
@@ -2209,28 +2684,24 @@ tree:
                     return [];
                   }
                   if (availableModels) visited.add(modelName);
-
                   const project = new Project();
                   const filePath = join(modelsDir, `${modelName}.ts`);
                   if (!existsSync(filePath)) {
                     console.warn(`Model file ${filePath} not found for ${modelName}`);
                     return [];
                   }
-
                   const sourceFile = project.addSourceFileAtPath(filePath);
                   const interfaceDec = sourceFile.getInterface(modelName);
                   if (!interfaceDec) {
                     console.warn(`Interface ${modelName} not found in ${filePath}`);
                     return [];
                   }
-
                   return interfaceDec.getProperties().map((prop: PropertySignature) => {
                     const jsDocs = prop.getJsDocs();
                     const jsdocText =
                       jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
                     const propType = prop.getType().getText(prop);
                     let properties: PropertyDetail[] | undefined = undefined;
-
                     if (availableModels) {
                       const arrayMatch = propType.match(/(.+)\[\]$/);
                       if (arrayMatch) {
@@ -2246,7 +2717,6 @@ tree:
                         }
                       }
                     }
-
                     return {
                       name: prop.getName(),
                       type: propType,
@@ -2290,7 +2760,6 @@ tree:
                       `Spec file ${specFile} not found. Run 'npm run fix-spec' first.`
                     );
                   }
-
                   const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
                   const availableModels = readdirSync(modelsDir)
                     .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
@@ -2298,7 +2767,6 @@ tree:
                   const modelImports = new Set<string>();
                   const missingTypes = new Set<string>();
                   const operations: OperationDoc[] = [];
-
                   for (const [path, methodsObj] of Object.entries(
                     spec.paths as OpenAPIV2.PathsObject
                   )) {
@@ -2308,7 +2776,6 @@ tree:
                     )) {
                       const op = operation as OpenAPIV2.OperationObject | undefined;
                       if (!op || !op.operationId) continue;
-
                       const opId = simplifyName(op.operationId);
                       console.log(`Processing operation ${opId} (${method} ${path})`);
                       const paramDetails = (op.parameters || [])
@@ -2359,7 +2826,6 @@ tree:
                             properties: properties || [],
                           };
                         });
-
                       const returnTypes = ["200", "207"]
                         .map(
                           (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
@@ -2379,14 +2845,12 @@ tree:
                         returnTypes.length > 1
                           ? returnTypes.join(" | ")
                           : returnTypes[0] || "void";
-
                       const returnTypeDetailsRaw = returnTypes
                         .filter((type) => type !== "void" && availableModels.includes(type))
                         .map((type) =>
                           parseInterfaceProperties(type, modelsDir, availableModels)
                         )
                         .flat();
-
                       const returnTypeDetails =
                         returnTypeDetailsRaw.length > 0
                           ? returnTypeDetailsRaw.map((prop) => ({
@@ -2397,7 +2861,6 @@ tree:
                                   : undefined,
                             }))
                           : undefined;
-
                       operations.push({
                         name: opId,
                         summary: op.summary || "No description.",
@@ -2410,8 +2873,24 @@ tree:
                       });
                     }
                   }
-
                   return { operations, modelImports, missingTypes };
+                }
+
+
+                //
+                New
+                shared
+                function
+
+                export
+                function
+                getPropertyDescription(prop:
+                PropertyDetail):
+                string
+                {
+                  return prop.jsdoc
+                    ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
+                    : `Type: ${prop.type}`;
                 }
     - name: >-
         openapitools.json
@@ -2894,10 +3373,281 @@ tree:
                     GetFieldsUsage200Response.ts
                   type: >-
                     file
+                  contents: >+
+                    /*
+                    tslint:disable
+                    */
+
+                    /*
+                    eslint-disable
+                    */
+
+                    /**
+                     * Quick Base API
+                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                     *
+                     * The version of the OpenAPI document: 1.0.0
+                     * 
+                     *
+                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                     * https://openapi-generator.tech
+                     * Do not edit the class manually.
+                     */
+
+                    import
+                    {
+                    mapValues
+                    }
+                    from
+                    '../runtime';
+
+                    import
+                    type
+                    {
+                    GetFieldsUsage200ResponseItemsInner
+                    }
+                    from
+                    './GetFieldsUsage200ResponseItemsInner';
+
+                    import
+                    {
+                        GetFieldsUsage200ResponseItemsInnerFromJSON,
+                        GetFieldsUsage200ResponseItemsInnerFromJSONTyped,
+                        GetFieldsUsage200ResponseItemsInnerToJSON,
+                        GetFieldsUsage200ResponseItemsInnerToJSONTyped,
+                    }
+                    from
+                    './GetFieldsUsage200ResponseItemsInner';
+
+
+                    /**
+                     * A response containing a list for getFieldsUsage200Response
+                     * @export
+                     * @interface GetFieldsUsage200Response
+                     */
+                    export
+                    interface
+                    GetFieldsUsage200Response
+                    {
+                        /**
+                         * 
+                         * @type {Array<GetFieldsUsage200ResponseItemsInner>}
+                         * @memberof GetFieldsUsage200Response
+                         */
+                        items?: Array<GetFieldsUsage200ResponseItemsInner>;
+                    }
+
+
+                    /**
+                     * Check if a given object implements the GetFieldsUsage200Response interface.
+                     */
+                    export
+                    function
+                    instanceOfGetFieldsUsage200Response(value:
+                    object):
+                    value
+                    is
+                    GetFieldsUsage200Response
+                    {
+                        return true;
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseFromJSON(json:
+                    any):
+                    GetFieldsUsage200Response
+                    {
+                        return GetFieldsUsage200ResponseFromJSONTyped(json, false);
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseFromJSONTyped(json:
+                    any,
+                    ignoreDiscriminator:
+                    boolean):
+                    GetFieldsUsage200Response
+                    {
+                        if (json == null) {
+                            return json;
+                        }
+                        return {
+                            
+                            'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(GetFieldsUsage200ResponseItemsInnerFromJSON)),
+                        };
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseToJSON(json:
+                    any):
+                    GetFieldsUsage200Response
+                    {
+                        return GetFieldsUsage200ResponseToJSONTyped(json, false);
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseToJSONTyped(value?:
+                    GetFieldsUsage200Response
+                    |
+                    null,
+                    ignoreDiscriminator:
+                    boolean
+                    =
+                    false):
+                    any
+                    {
+                        if (value == null) {
+                            return value;
+                        }
+
+                        return {
+                            
+                            'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(GetFieldsUsage200ResponseItemsInnerToJSON)),
+                        };
+                    }
+
                 - name: >-
                     GetFieldsUsage200ResponseItemsInner.ts
                   type: >-
                     file
+                  contents: >+
+                    /*
+                    tslint:disable
+                    */
+
+                    /*
+                    eslint-disable
+                    */
+
+                    /**
+                     * Quick Base API
+                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                     *
+                     * The version of the OpenAPI document: 1.0.0
+                     * 
+                     *
+                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                     * https://openapi-generator.tech
+                     * Do not edit the class manually.
+                     */
+
+                    import
+                    {
+                    mapValues
+                    }
+                    from
+                    '../runtime';
+
+                    /**
+                     * 
+                     * @export
+                     * @interface GetFieldsUsage200ResponseItemsInner
+                     */
+                    export
+                    interface
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                        /**
+                         * Basic information about the field.
+                         * @type {{ [key: string]: any; }}
+                         * @memberof GetFieldsUsage200ResponseItemsInner
+                         */
+                        field: { [key: string]: any; };
+                        /**
+                         * Usage Information about the field.
+                         * @type {{ [key: string]: any; }}
+                         * @memberof GetFieldsUsage200ResponseItemsInner
+                         */
+                        usage: { [key: string]: any; };
+                    }
+
+
+                    /**
+                     * Check if a given object implements the GetFieldsUsage200ResponseItemsInner interface.
+                     */
+                    export
+                    function
+                    instanceOfGetFieldsUsage200ResponseItemsInner(value:
+                    object):
+                    value
+                    is
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                        if (!('field' in value) || value['field'] === undefined) return false;
+                        if (!('usage' in value) || value['usage'] === undefined) return false;
+                        return true;
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerFromJSON(json:
+                    any):
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                        return GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json, false);
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json:
+                    any,
+                    ignoreDiscriminator:
+                    boolean):
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                        if (json == null) {
+                            return json;
+                        }
+                        return {
+                            
+                            'field': json['field'],
+                            'usage': json['usage'],
+                        };
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerToJSON(json:
+                    any):
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                        return GetFieldsUsage200ResponseItemsInnerToJSONTyped(json, false);
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerToJSONTyped(value?:
+                    GetFieldsUsage200ResponseItemsInner
+                    |
+                    null,
+                    ignoreDiscriminator:
+                    boolean
+                    =
+                    false):
+                    any
+                    {
+                        if (value == null) {
+                            return value;
+                        }
+
+                        return {
+                            
+                            'field': value['field'],
+                            'usage': value['usage'],
+                        };
+                    }
+
                 - name: >-
                     GetRelationships200Response.ts
                   type: >-
@@ -3171,7 +3921,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-21T05:29:30.573Z
+                2025-03-21T19:56:12.122Z
 
                 import
                 {
@@ -3369,7 +4119,13 @@ tree:
                    *   @param {string} params.appId _Required parameter with properties_
                    *
                    * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response with properties_
-                   *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) _Type: GetAppEvents200ResponseItemsInner[]_
+                   *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) __
+                   *     *   - **isActive** (`boolean`, optional) _Indication of whether current event is active._
+                   *     *   - **type** (`GetAppEvents200ResponseItemsInnerTypeEnum`, optional) _Type of an event._
+                   *     *   - **name** (`string`, optional) _The name of the event. This property is not returned for automations._
+                   *     *   - **url** (`string`, optional) _The url to automation that can be accessed from the browser. Only returned for automations._
+                   *     *   - **owner** (`{ [key: string]: any; }`, optional) _The user that owns the event._
+                   *     *   - **tableId** (`string`, optional) _The unique identifier of the table to which event belongs to._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getAppEvents} Official Quickbase API documentation
                    */
@@ -3439,7 +4195,23 @@ tree:
                    *   @param {string} params.appId _Required parameter with properties_
                    *
                    * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response with properties_
-                   *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) _Type: GetAppTables200ResponseItemsInner[]_
+                   *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) __
+                   *     *   - **name** (`string`, optional) _The name of the table._
+                   *     *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
+                   *     *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
+                   *     *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
+                   *     *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
+                   *     *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
+                   *     *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
+                   *     *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
+                   *     *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
+                   *     *   - **defaultSortOrder** (`GetAppTables200ResponseItemsInnerDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
+                   *     *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
+                   *     *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
+                   *     *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
+                   *     *   - **sizeLimit** (`string`, optional) _The size limit for the table._
+                   *     *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
+                   *     *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getAppTables} Official Quickbase API documentation
                    */
@@ -3597,7 +4369,16 @@ tree:
                    *   @param {string} params.tableId _Required parameter with properties_
                    *
                    * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response with properties_
-                   *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) _This is simple example of report schema for more details please refer [Report types page](../reportTypes)_
+                   *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) __
+                   *     *   - **id** (`string`, optional) _The identifier of the report, unique to the table._
+                   *     *   - **name** (`string`, optional) _The configured name of the report._
+                   *     *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
+                   *     *   - **description** (`string`, optional) _The configured description of a report._
+                   *     *   - **ownerId** (`number`, optional) _Optional, showed only for personal reports. The user ID of report owner._
+                   *     *   - **query** (`{ [key: string]: any; }`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
+                   *     *   - **properties** (`{ [key: string]: any; }`, optional) _A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)_
+                   *     *   - **usedLast** (`string`, optional) _The instant at which a report was last used._
+                   *     *   - **usedCount** (`number`, optional) _The number of times a report has been used._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getTableReports} Official Quickbase API documentation
                    */
@@ -3649,7 +4430,22 @@ tree:
                    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
                    *
                    * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
-                   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) _Type: GetFields200ResponseItemsInner[]_
+                   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) __
+                   *     *   - **id** (`number`, required) _The id of the field, unique to this table._
+                   *     *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
+                   *     *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
+                   *     *   - **label** (`string`, optional) _The label (name) of the field._
+                   *     *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
+                   *     *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
+                   *     *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
+                   *     *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
+                   *     *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
+                   *     *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
+                   *     *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
+                   *     *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
+                   *     *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
+                   *     *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
+                   *     *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
                    */
@@ -3789,7 +4585,9 @@ tree:
                    *   @param {number} params.top _Optional parameter with properties_
                    *
                    * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
-                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
+                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
+                   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
+                   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
                    */
@@ -3802,7 +4600,9 @@ tree:
                    *   @param {number} params.fieldId _Required parameter with properties_
                    *
                    * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
-                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
+                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
+                   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
+                   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
                    */
@@ -4180,8 +4980,17 @@ tree:
                    *   - **start** (`Date`, required) _The start date and time of the requested summaries in ISO 8601 time format._
                    *   - **end** (`Date`, required) _The end date and time of the requested summaries in ISO 8601 time format._
                    *   - **groupBy** (`PlatformAnalyticEventSummaries200ResponseGroupByEnum`, required) _How the events should be grouped._
-                   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) _Type: PlatformAnalyticEventSummaries200ResponseWhereInner[]_
-                   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) _An array of objects that contains Application/User information and an events object with summaries by event type._
+                   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) __
+                   *     *   - **id** (`string`, required) _Id of the item to filter by._
+                   *     *   - **type** (`PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum`, required) _The type of item to filter by._
+                   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) __
+                   *     *   - **eventTypes** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner[]`, required) __
+                   *     *     *   - **billingCategory** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum`, optional) _Billing category of the event type._
+                   *     *     *   - **count** (`number`, optional) _Count of events associated with that event type and Application/User._
+                   *     *     *   - **eventType** (`string`, optional) _Event type_
+                   *     *   - **id** (`string`, required) _Id of the Application/User._
+                   *     *   - **name** (`string`, required) _Name of the Application/User._
+                   *     *   - **totals** (`PlatformAnalyticEventSummaries200ResponseResultsInnerTotals`, required) _Type: PlatformAnalyticEventSummaries200ResponseResultsInnerTotals_
                    *   - **metadata** (`PlatformAnalyticEventSummaries200ResponseMetadata`, optional) _Type: PlatformAnalyticEventSummaries200ResponseMetadata_
                    *   - **totals** (`PlatformAnalyticEventSummaries200ResponseTotals`, optional) _Type: PlatformAnalyticEventSummaries200ResponseTotals_
                    *
@@ -4335,10 +5144,591 @@ tree:
             invokeMethod.ts
           type: >-
             file
+          contents: >
+            //
+            src/invokeMethod.ts
+
+
+            import
+            {
+            AuthorizationStrategy,
+            extractDbid
+            }
+            from
+            "./authorizationStrategy";
+
+            import
+            {
+            RateLimiter
+            }
+            from
+            "./rateLimiter";
+
+            import
+            {
+            RateLimitError
+            }
+            from
+            "./RateLimitError";
+
+            import
+            {
+            ResponseError
+            }
+            from
+            "./generated/runtime";
+
+            import
+            {
+            QuickbaseClient
+            }
+            from
+            "./quickbaseClient";
+
+
+            export
+            type
+            ApiMethod<K
+            extends
+            keyof
+            QuickbaseClient>
+            =
+            (
+              requestParameters: Parameters<QuickbaseClient[K]>[0],
+              initOverrides?: RequestInit
+            )
+            =>
+            Promise<ReturnType<QuickbaseClient[K]>>;
+
+
+            export
+            interface
+            MethodInfo<K
+            extends
+            keyof
+            QuickbaseClient>
+            {
+              api: any;
+              method: ApiMethod<K>;
+              paramMap: string[];
+              httpMethod: string;
+            }
+
+
+            export
+            async
+            function
+            invokeMethod<K
+            extends
+            keyof
+            QuickbaseClient>(
+              methodName: K,
+              params: Parameters<QuickbaseClient[K]>[0] & {
+                dbid?: string;
+                tableId?: string;
+                appId?: string;
+              },
+              methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
+              baseHeaders: Record<string, string>,
+              authStrategy: AuthorizationStrategy,
+              rateLimiter: RateLimiter,
+              transformDates: (obj: any, convertStringsToDates: boolean) => any,
+              debug: boolean | undefined,
+              convertDates: boolean
+            ):
+            Promise<ReturnType<QuickbaseClient[K]>>
+            {
+              console.log("[invokeMethod] Starting for method:", methodName);
+
+              const methodInfo = methodMap[methodName];
+              if (!methodInfo) throw new Error(`Method ${methodName} not found`);
+
+              const hasBody = "body" in params && params.body !== undefined;
+              const body = hasBody ? params.body : undefined;
+              const restParams: any = hasBody
+                ? Object.fromEntries(
+                    Object.entries(params).filter(([key]) => key !== "body")
+                  )
+                : { ...params };
+              const requestParameters: any = {
+                ...restParams,
+                ...(hasBody ? { generated: body } : {}),
+              };
+
+              const requestOptions: RequestInit = {
+                credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
+                method: methodInfo.httpMethod,
+              };
+
+              let dbid: string | undefined = extractDbid(params);
+              console.log("[invokeMethod] Extracted dbid:", dbid);
+
+              let token = dbid
+                ? await authStrategy.getToken(dbid)
+                : await authStrategy.getToken("");
+              console.log("[invokeMethod] Initial token:", token);
+
+              if (token) {
+                authStrategy.applyHeaders(baseHeaders, token);
+                requestOptions.headers = { ...baseHeaders };
+                console.log(
+                  "[invokeMethod] Token found, headers set:",
+                  requestOptions.headers
+                );
+                if (methodName === "getTempTokenDBID") {
+                  console.log("[invokeMethod] Using cached token:", token);
+                  return { temporaryAuthorization: token } as ReturnType<
+                    QuickbaseClient[K]
+                  >;
+                }
+              }
+
+              if (debug) {
+                console.log(`[${methodName}] requestParameters:`, requestParameters);
+                console.log(`[${methodName}] requestOptions:`, requestOptions);
+              }
+
+              async function processResponse(
+                rawResponse: any
+              ): Promise<ReturnType<QuickbaseClient[K]>> {
+                if (debug) console.log(`[${methodName}] rawResponse:`, rawResponse);
+                if (rawResponse instanceof Response) {
+                  const contentType = rawResponse.headers
+                    .get("Content-Type")
+                    ?.toLowerCase();
+                  if (debug) console.log(`[${methodName}] contentType:`, contentType);
+                  if (contentType?.includes("application/json")) {
+                    const jsonResponse = await rawResponse.json();
+                    return transformDates(jsonResponse, convertDates) as ReturnType<
+                      QuickbaseClient[K]
+                    >;
+                  }
+                  return rawResponse as ReturnType<QuickbaseClient[K]>;
+                }
+                if (rawResponse && typeof rawResponse.value === "function") {
+                  const response = await rawResponse.value();
+                  if (debug)
+                    console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
+                  return transformDates(response, convertDates) as ReturnType<
+                    QuickbaseClient[K]
+                  >;
+                }
+                return transformDates(rawResponse, convertDates) as ReturnType<
+                  QuickbaseClient[K]
+                >;
+              }
+
+              async function parseErrorResponse(
+                response: Response
+              ): Promise<{ message: string; status: number }> {
+                let message = "Unknown error";
+                let status = response.status || 500;
+                try {
+                  const contentType =
+                    response.headers?.get("Content-Type")?.toLowerCase() ||
+                    "application/json";
+                  if (
+                    contentType.includes("application/json") &&
+                    typeof response.json === "function"
+                  ) {
+                    const errorBody = await response.json();
+                    if (
+                      errorBody &&
+                      typeof errorBody === "object" &&
+                      "message" in errorBody
+                    ) {
+                      message = errorBody.message;
+                    } else {
+                      message = "Invalid error response format";
+                    }
+                  } else if (typeof response.text === "function") {
+                    message = (await response.text()) || message;
+                  }
+                } catch (e) {
+                  if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
+                  message = "Failed to parse error response";
+                }
+                if (debug)
+                  console.log(
+                    "[invokeMethod] Parsed error - status:",
+                    status,
+                    "message:",
+                    message
+                  );
+                return { message, status };
+              }
+
+              let attempt = 0;
+              const maxAttempts = rateLimiter.maxRetries + 1;
+
+              while (attempt < maxAttempts) {
+                console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
+                try {
+                  await rateLimiter.throttle();
+                  console.log("[invokeMethod] About to call API for method:", methodName);
+                  const response = await methodInfo.method(
+                    requestParameters,
+                    requestOptions
+                  );
+                  console.log("[invokeMethod] API call completed for method:", methodName);
+                  return await processResponse(response);
+                } catch (error: unknown) {
+                  if (debug) console.log("[invokeMethod] Caught error:", error);
+
+                  let status: number;
+                  let message: string;
+                  let response: Response | undefined;
+
+                  if (error instanceof ResponseError && error.response) {
+                    response = error.response;
+                    ({ message, status } = await parseErrorResponse(response));
+                  } else if (error instanceof Response) {
+                    response = error;
+                    ({ message, status } = await parseErrorResponse(response));
+                  } else {
+                    if (debug) console.log(`[${methodName}] Unexpected error:`, error);
+                    // Attempt to handle as a fetch error with a response
+                    if (error instanceof Error && "response" in error) {
+                      response = (error as any).response;
+                      if (response instanceof Response) {
+                        ({ message, status } = await parseErrorResponse(response));
+                      } else {
+                        throw error; // Rethrow if no response
+                      }
+                    } else {
+                      throw error; // Rethrow truly unexpected errors
+                    }
+                  }
+
+                  if (debug)
+                    console.log("[invokeMethod] Handling error with status:", status);
+
+                  if (status === 429) {
+                    if (!(error instanceof ResponseError)) {
+                      throw new Error("Expected ResponseError for 429 handling");
+                    }
+                    const delay = await rateLimiter.handle429(error, attempt + 1);
+                    if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
+                    if (attempt + 1 === maxAttempts) {
+                      throw new RateLimitError(
+                        `API Error: ${message} (Status: ${status})`,
+                        status,
+                        response?.headers.get("Retry-After")
+                          ? parseInt(response.headers.get("Retry-After")!, 10)
+                          : undefined
+                      );
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, delay));
+                    attempt++;
+                    continue;
+                  }
+
+                  const newToken = await authStrategy.handleError(
+                    status,
+                    params,
+                    attempt,
+                    maxAttempts,
+                    debug,
+                    methodName
+                  );
+                  if (newToken) {
+                    token = newToken;
+                    authStrategy.applyHeaders(baseHeaders, token);
+                    requestOptions.headers = { ...baseHeaders };
+                    attempt++;
+                    if (debug)
+                      console.log(
+                        `[${methodName}] Retrying with token: ${token.substring(0, 10)}...`
+                      );
+                    continue;
+                  }
+
+                  throw new Error(`API Error: ${message} (Status: ${status})`);
+                }
+              }
+              throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
+            }
         - name: >-
             quickbaseClient.ts
           type: >-
             file
+          contents: >
+            //
+            src/quickbaseClient.ts
+
+
+            import
+            {
+            QuickbaseClient
+            as
+            IQuickbaseClient
+            }
+            from
+            "./generated-unified/QuickbaseClient";
+
+            import
+            {
+            Configuration,
+            HTTPHeaders
+            }
+            from
+            "./generated/runtime";
+
+            import
+            *
+            as
+            apis
+            from
+            "./generated/apis";
+
+            import
+            {
+            TokenCache
+            }
+            from
+            "./tokenCache";
+
+            import
+            {
+              simplifyName,
+              getParamNames,
+              transformDates,
+              extractHttpMethod,
+            }
+            from
+            "./utils";
+            //
+            Updated
+            import
+
+            import
+            {
+            invokeMethod,
+            MethodInfo
+            }
+            from
+            "./invokeMethod";
+
+            import
+            {
+              TempTokenStrategy,
+              UserTokenStrategy,
+              AuthorizationStrategy,
+              SsoTokenStrategy,
+            }
+            from
+            "./authorizationStrategy";
+
+            import
+            {
+            ThrottleBucket
+            }
+            from
+            "./ThrottleBucket";
+
+            import
+            {
+            RateLimiter
+            }
+            from
+            "./rateLimiter";
+
+
+            export
+            *
+            from
+            "./generated/models/index";
+
+
+            export
+            interface
+            QuickbaseClient
+            extends
+            IQuickbaseClient
+            {}
+
+
+            export
+            interface
+            QuickbaseConfig
+            {
+              realm: string;
+              userToken?: string;
+              tempToken?: string;
+              useTempTokens?: boolean;
+              useSso?: boolean;
+              samlToken?: string;
+              debug?: boolean;
+              fetchApi?: typeof fetch;
+              convertDates?: boolean;
+              tempTokenLifespan?: number;
+              throttle?: { rate: number; burst: number };
+              maxRetries?: number;
+              retryDelay?: number;
+              tokenCache?: TokenCache;
+              baseUrl?: string;
+            }
+
+
+            type
+            MethodMap
+            =
+            {
+              [K in keyof QuickbaseClient]: MethodInfo<K>;
+            };
+
+
+            export
+            function
+            quickbase(config:
+            QuickbaseConfig):
+            QuickbaseClient
+            {
+              const {
+                realm,
+                userToken,
+                tempToken,
+                useTempTokens,
+                useSso,
+                samlToken,
+                fetchApi,
+                debug,
+                convertDates = true,
+                tempTokenLifespan = 290000,
+                throttle = { rate: 10, burst: 10 },
+                maxRetries = 3,
+                retryDelay = 1000,
+                tokenCache: providedTokenCache,
+                baseUrl = "https://api.quickbase.com/v1",
+              } = config;
+
+              const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
+              const throttleBucket = throttle
+                ? new ThrottleBucket(throttle.rate, throttle.burst)
+                : null;
+              const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
+
+              const defaultFetch: typeof fetch | undefined =
+                typeof globalThis.window !== "undefined"
+                  ? globalThis.window.fetch.bind(globalThis.window)
+                  : undefined;
+              const effectiveFetch = fetchApi || defaultFetch;
+
+              if (!effectiveFetch) {
+                throw new Error("No fetch implementation available");
+              }
+
+              const authStrategy: AuthorizationStrategy = useSso
+                ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
+                : useTempTokens
+                ? new TempTokenStrategy(
+                    tokenCache,
+                    tempToken,
+                    effectiveFetch,
+                    realm,
+                    baseUrl
+                  )
+                : new UserTokenStrategy(userToken || "");
+
+              const baseHeaders: HTTPHeaders = {
+                "QB-Realm-Hostname": `${realm}.quickbase.com`,
+                "Content-Type": "application/json",
+              };
+
+              const configuration = new Configuration({
+                basePath: baseUrl,
+                headers: { ...baseHeaders },
+                fetchApi: effectiveFetch,
+                credentials: "omit",
+              });
+
+              const apiInstances = Object.fromEntries(
+                Object.entries(apis)
+                  .filter(([name]) => name.endsWith("Api"))
+                  .map(([name, ApiClass]) => [
+                    name.replace("Api", "").toLowerCase(),
+                    new ApiClass(configuration),
+                  ])
+              );
+
+              function buildMethodMap(): MethodMap {
+                const methodMap: Partial<MethodMap> = {};
+                const isValidMethod = (name: string) =>
+                  !name.startsWith("_") &&
+                  name !== "constructor" &&
+                  !["Middleware", "Pre", "Post", "Raw"].some((s) => name.includes(s));
+
+                for (const [apiName, api] of Object.entries(apiInstances)) {
+                  Object.getOwnPropertyNames(Object.getPrototypeOf(api))
+                    .filter(
+                      (name) =>
+                        isValidMethod(name) &&
+                        typeof api[name as keyof typeof api] === "function"
+                    )
+                    .forEach((rawMethodName) => {
+                      const simplifiedName = simplifyName(
+                        rawMethodName
+                      ) as keyof QuickbaseClient;
+                      const rawMethodKey = `${rawMethodName}Raw` as keyof typeof api;
+                      const method =
+                        api[rawMethodKey] || api[rawMethodName as keyof typeof api];
+                      const boundMethod = method.bind(api as any) as unknown;
+                      if (typeof boundMethod === "function" && boundMethod.length <= 2) {
+                        const httpMethod = extractHttpMethod(method);
+                        methodMap[simplifiedName] = {
+                          api,
+                          method: boundMethod as any,
+                          paramMap: getParamNames(method),
+                          httpMethod,
+                        };
+                      }
+                    });
+                }
+                if (debug) {
+                  console.log("[buildMethodMap] Methods:", Object.keys(methodMap));
+                }
+                return methodMap as MethodMap;
+              }
+
+              const methodMap = buildMethodMap();
+
+              const proxyHandler: ProxyHandler<QuickbaseClient> = {
+                get: (_, prop: string) => {
+                  console.log(
+                    "[proxy] Accessing:",
+                    prop,
+                    "in methodMap:",
+                    prop in methodMap
+                  );
+                  if (prop in methodMap) {
+                    const methodName = prop as keyof QuickbaseClient;
+                    return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
+                      invokeMethod(
+                        methodName,
+                        params,
+                        methodMap,
+                        baseHeaders,
+                        authStrategy,
+                        rateLimiter,
+                        transformDates,
+                        debug,
+                        convertDates
+                      );
+                  }
+                  console.log("[proxy] Method not found:", prop);
+                  return undefined;
+                },
+              };
+
+              const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, proxyHandler);
+
+              if (debug) {
+                console.log("[createClient] Config:", config);
+                console.log("[createClient] Proxy created:", proxy);
+              }
+
+              return proxy;
+            }
         - name: >-
             rateLimiter.ts
           type: >-
@@ -4412,6 +5802,158 @@ tree:
             setup.ts
           type: >-
             file
+          contents: >
+            //
+            @tests/setup.ts
+
+            import
+            {
+            vi
+            }
+            from
+            "vitest";
+
+            import
+            {
+            quickbase
+            }
+            from
+            "../src/quickbaseClient.ts";
+
+            import
+            type
+            {
+            QuickbaseConfig
+            }
+            from
+            "../src/quickbaseClient.ts";
+
+            import
+            dotenv
+            from
+            "dotenv";
+
+
+            //
+            Load
+            environment
+            variables
+            from
+            .env
+            file
+
+            dotenv.config({
+            path:
+            "./.env"
+            });
+            //
+            Assumes
+            .env
+            is
+            at
+            project
+            root
+
+
+            export
+            const
+            mockFetch
+            =
+            vi.fn();
+
+
+            export
+            const
+            QB_REALM
+            =
+            process.env.QB_REALM
+            ||
+            "test-realm";
+
+            export
+            const
+            QB_USER_TOKEN
+            =
+              process.env.QB_USER_TOKEN || "user-token-1234567890";
+            export
+            const
+            QB_APP_ID
+            =
+            process.env.QB_APP_ID
+            ||
+            "app-id-1234567890";
+
+            export
+            const
+            QB_TABLE_ID_1
+            =
+              process.env.QB_TABLE_ID_1 || "table-id-1-1234567890";
+            export
+            const
+            QB_TABLE_ID_2
+            =
+              process.env.QB_TABLE_ID_2 || "table-id-2-1234567890";
+
+            //
+            Mock
+            env
+            variables
+            for
+            consistency,
+            using
+            .env
+            values
+            if
+            available
+
+            vi.stubEnv("QB_REALM",
+            QB_REALM);
+
+            vi.stubEnv("QB_USER_TOKEN",
+            QB_USER_TOKEN);
+
+            vi.stubEnv("QB_APP_ID",
+            QB_APP_ID);
+
+            vi.stubEnv("QB_TABLE_ID_1",
+            QB_TABLE_ID_1);
+
+            vi.stubEnv("QB_TABLE_ID_2",
+            QB_TABLE_ID_2);
+
+
+            export
+            const
+            createClient
+            =
+            (
+              fetchApi?: any,
+              config: Partial<QuickbaseConfig> = {}
+            )
+            =>
+            {
+              // Use loaded env vars with fallbacks for safety
+              const realm = QB_REALM;
+              const userToken = QB_USER_TOKEN;
+
+              const client = quickbase({
+                realm,
+                userToken,
+                debug: true,
+                fetchApi,
+                throttle: { rate: 10, burst: 10 }, // Throttle at 10 req/s with 10 burst capacity
+                ...config, // Allow overrides if provided
+              });
+              console.log("[createClient] Config:", {
+                realm,
+                userToken,
+                debug: true,
+                throttle: { rate: 10, burst: 10 },
+                ...config,
+              });
+              console.log("[createClient] Returning:", client);
+              return client;
+            };
         - name: >-
             vitest
           type: >-

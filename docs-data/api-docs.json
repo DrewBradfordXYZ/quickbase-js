@@ -1631,106 +1631,6 @@
       }
     ],
     "returns": "GetFields200Response",
-    "returnTypeDetails": [
-      {
-        "name": "items",
-        "type": "GetFields200ResponseItemsInner[]",
-        "required": false,
-        "jsdoc": "",
-        "properties": [
-          {
-            "name": "id",
-            "type": "number",
-            "required": true,
-            "jsdoc": "The id of the field, unique to this table."
-          },
-          {
-            "name": "fieldType",
-            "type": "string",
-            "required": false,
-            "jsdoc": "The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)."
-          },
-          {
-            "name": "mode",
-            "type": "string",
-            "required": false,
-            "jsdoc": "For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank."
-          },
-          {
-            "name": "label",
-            "type": "string",
-            "required": false,
-            "jsdoc": "The label (name) of the field."
-          },
-          {
-            "name": "noWrap",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is configured to not wrap when displayed in the product."
-          },
-          {
-            "name": "bold",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is configured to display in bold in the product."
-          },
-          {
-            "name": "required",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is marked required."
-          },
-          {
-            "name": "appearsByDefault",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is marked as a default in reports."
-          },
-          {
-            "name": "findEnabled",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is marked as searchable."
-          },
-          {
-            "name": "unique",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is marked unique."
-          },
-          {
-            "name": "doesDataCopy",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field data will copy when a user copies the record."
-          },
-          {
-            "name": "fieldHelp",
-            "type": "string",
-            "required": false,
-            "jsdoc": "The configured help text shown to users within the product."
-          },
-          {
-            "name": "audited",
-            "type": "boolean",
-            "required": false,
-            "jsdoc": "Indicates if the field is being tracked as part of Quickbase Audit Logs."
-          },
-          {
-            "name": "properties",
-            "type": "{ [key: string]: any; }",
-            "required": false,
-            "jsdoc": "Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type."
-          },
-          {
-            "name": "permissions",
-            "type": "object[]",
-            "required": false,
-            "jsdoc": "Field Permissions for different roles."
-          }
-        ]
-      }
-    ],
     "docLink": "https://developer.quickbase.com/operation/getFields"
   },
   {
@@ -2339,28 +2239,6 @@
       }
     ],
     "returns": "GetFieldsUsage200Response",
-    "returnTypeDetails": [
-      {
-        "name": "items",
-        "type": "GetFieldsUsage200ResponseItemsInner[]",
-        "required": false,
-        "jsdoc": "",
-        "properties": [
-          {
-            "name": "field",
-            "type": "{ [key: string]: any; }",
-            "required": true,
-            "jsdoc": "Basic information about the field."
-          },
-          {
-            "name": "usage",
-            "type": "{ [key: string]: any; }",
-            "required": true,
-            "jsdoc": "Usage Information about the field."
-          }
-        ]
-      }
-    ],
     "docLink": "https://developer.quickbase.com/operation/getFieldsUsage"
   },
   {
@@ -2385,28 +2263,6 @@
       }
     ],
     "returns": "GetFieldUsage200Response",
-    "returnTypeDetails": [
-      {
-        "name": "items",
-        "type": "GetFieldsUsage200ResponseItemsInner[]",
-        "required": false,
-        "jsdoc": "",
-        "properties": [
-          {
-            "name": "field",
-            "type": "{ [key: string]: any; }",
-            "required": true,
-            "jsdoc": "Basic information about the field."
-          },
-          {
-            "name": "usage",
-            "type": "{ [key: string]: any; }",
-            "required": true,
-            "jsdoc": "Usage Information about the field."
-          }
-        ]
-      }
-    ],
     "docLink": "https://developer.quickbase.com/operation/getFieldUsage"
   },
   {

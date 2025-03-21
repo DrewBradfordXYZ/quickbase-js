@@ -18,6 +18,7 @@ const excludeDirs: string[] = [
 // prettier-ignore
 const includeFolders: string[] = [
   "open-api/utils",
+  "open-api/schema",
   "open-api"
 ];
 
@@ -33,9 +34,9 @@ const includeRecursiveFolders: string[] = [
 
 // prettier-ignore
 const includeFiles: string[] = [
-  // "tests/setup.ts",
+  "package.json",
+  "tests/setup.ts",
   // "vitest.config.ts",
-  // "package.json",
 
   // "open-api/generate-unified-interface.ts",
   // "open-api/utils/generateDocsJson.ts",
@@ -47,8 +48,8 @@ const includeFiles: string[] = [
   // "build-umd.js",
   // "build-esm.js",
 
-  // "src/quickbaseClient.ts",
-  // "src/invokeMethod.ts",
+  "src/quickbaseClient.ts",
+  "src/invokeMethod.ts",
   "src/generated-unified/QuickbaseClient.ts",
   // "src/authorizationStrategy.ts",
   // "src/rateLimiter.ts",
@@ -57,12 +58,13 @@ const includeFiles: string[] = [
   // "src/tokenCache.ts",
   // "src/utils.ts",
 
+  "src/generated/models/GetFieldsUsage200Response.ts",
+  "src/generated/models/GetFieldsUsage200ResponseItemsInner.ts",
   // "src/generated/runtime.ts",
   // "src/generated/apis/AuthApi.ts",
   // "src/generated/apis/FieldsApi.ts",
   // "src/generated/apis/AppsApi.ts",
 
-  "test/vitest/unit/fields/createField.test.ts",
 ];
 
 const projectGoals: string[] = [

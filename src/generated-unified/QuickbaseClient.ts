@@ -1,4 +1,4 @@
-// Generated on 2025-03-21T17:11:36.058Z
+// Generated on 2025-03-21T20:09:55.119Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -413,23 +413,7 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
    *
-   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
-   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) __
-   *     *   - **id** (`number`, required) _The id of the field, unique to this table._
-   *     *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
-   *     *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
-   *     *   - **label** (`string`, optional) _The label (name) of the field._
-   *     *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
-   *     *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
-   *     *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
-   *     *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
-   *     *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
-   *     *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
-   *     *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
-   *     *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
-   *     *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
-   *     *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-   *     *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
+   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response_
    *
    * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
    */
@@ -568,10 +552,7 @@ export interface QuickbaseClient {
    *   @param {number} params.skip _Optional parameter with properties_
    *   @param {number} params.top _Optional parameter with properties_
    *
-   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
-   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
-   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
-   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
+   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response_
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
    */
@@ -583,10 +564,7 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *   @param {number} params.fieldId _Required parameter with properties_
    *
-   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
-   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
-   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
-   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
+   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response_
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
    */
