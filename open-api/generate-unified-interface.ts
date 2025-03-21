@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 console.log("Script started");
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
@@ -20,6 +21,7 @@ import {
   parseInterfaceProperties,
   parseOpenApiOperations,
 } from "./utils/sharedUtils.ts";
+import { writeFileSafe, runTask } from "./utils/common.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 console.log("__dirname set:", __dirname);
@@ -76,7 +78,7 @@ function generateInterface(includeResponseProperties: boolean = false): void {
   });
 
   console.log("Writing missing types report...");
-  writeFileSync(
+  writeFileSafe(
     join(OUTPUT_DIR, "missing-types-report.json"),
     JSON.stringify({ missingTypes: Array.from(missingTypes) }, null, 2)
   );
@@ -91,20 +93,12 @@ function generateInterface(includeResponseProperties: boolean = false): void {
     "\n"
   )}\n}\n`;
 
-  console.log("Ensuring output directory exists...");
-  if (!existsSync(OUTPUT_DIR)) {
-    mkdirSync(OUTPUT_DIR, { recursive: true });
-  }
-  writeFileSync(OUTPUT_FILE, interfaceContent, "utf8");
+  console.log("Ensuring output directory exists and writing interface...");
+  writeFileSafe(OUTPUT_FILE, interfaceContent);
   console.log("Generated:", OUTPUT_FILE);
 }
 
-console.log("Entering try block");
-try {
-  generateInterface(true);
-} catch (error) {
-  console.error("Error in generateInterface:", error);
-  process.exit(1);
-}
+console.log("Entering runTask block");
+runTask("generateInterface", () => generateInterface(true));
 
 console.log("Script completed");

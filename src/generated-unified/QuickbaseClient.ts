@@ -1,4 +1,4 @@
-// Generated on 2025-03-21T16:33:28.362Z
+// Generated on 2025-03-21T17:11:36.058Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -103,7 +103,7 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response with properties_
-   *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) _Type: GetAppEvents200ResponseItemsInner[]_
+   *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) __
    *     *   - **isActive** (`boolean`, optional) _Indication of whether current event is active._
    *     *   - **type** (`GetAppEvents200ResponseItemsInnerTypeEnum`, optional) _Type of an event._
    *     *   - **name** (`string`, optional) _The name of the event. This property is not returned for automations._
@@ -179,7 +179,7 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response with properties_
-   *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) _Type: GetAppTables200ResponseItemsInner[]_
+   *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) __
    *     *   - **name** (`string`, optional) _The name of the table._
    *     *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
    *     *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
@@ -353,7 +353,7 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *
    * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response with properties_
-   *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) _This is simple example of report schema for more details please refer [Report types page](../reportTypes)_
+   *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) __
    *     *   - **id** (`string`, optional) _The identifier of the report, unique to the table._
    *     *   - **name** (`string`, optional) _The configured name of the report._
    *     *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
@@ -414,7 +414,7 @@ export interface QuickbaseClient {
    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
    *
    * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
-   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) _Type: GetFields200ResponseItemsInner[]_
+   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) __
    *     *   - **id** (`number`, required) _The id of the field, unique to this table._
    *     *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
    *     *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
@@ -569,7 +569,7 @@ export interface QuickbaseClient {
    *   @param {number} params.top _Optional parameter with properties_
    *
    * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
-   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
+   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
    *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
    *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
    *
@@ -584,7 +584,7 @@ export interface QuickbaseClient {
    *   @param {number} params.fieldId _Required parameter with properties_
    *
    * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
-   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
+   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
    *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
    *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
    *
@@ -964,11 +964,11 @@ export interface QuickbaseClient {
    *   - **start** (`Date`, required) _The start date and time of the requested summaries in ISO 8601 time format._
    *   - **end** (`Date`, required) _The end date and time of the requested summaries in ISO 8601 time format._
    *   - **groupBy** (`PlatformAnalyticEventSummaries200ResponseGroupByEnum`, required) _How the events should be grouped._
-   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) _Type: PlatformAnalyticEventSummaries200ResponseWhereInner[]_
+   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) __
    *     *   - **id** (`string`, required) _Id of the item to filter by._
    *     *   - **type** (`PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum`, required) _The type of item to filter by._
-   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) _An array of objects that contains Application/User information and an events object with summaries by event type._
-   *     *   - **eventTypes** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner[]`, required) _An array of events that contains specific information associated with an Application/User broken down by event type._
+   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) __
+   *     *   - **eventTypes** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner[]`, required) __
    *     *     *   - **billingCategory** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum`, optional) _Billing category of the event type._
    *     *     *   - **count** (`number`, optional) _Count of events associated with that event type and Application/User._
    *     *     *   - **eventType** (`string`, optional) _Event type_

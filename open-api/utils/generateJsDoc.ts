@@ -1,4 +1,7 @@
+#!/usr/bin/env node
+
 import { ParamDetail, PropertyDetail, JsDocOptions } from "./sharedUtils.ts";
+import { getPropertyDescription } from "./sharedUtils.ts";
 
 export function generateJsDoc({
   summary,
@@ -15,7 +18,6 @@ export function generateJsDoc({
     `   * @param {Object} params _Object containing the parameters for_ ${opId}`,
   ];
 
-  // Parameters section (unchanged)
   if (paramDetails.length > 0) {
     paramDetails.forEach((p) => {
       jsDocLines.push(
@@ -25,9 +27,7 @@ export function generateJsDoc({
       );
       if (p.properties.length > 0) {
         p.properties.forEach((prop) => {
-          const propDesc = prop.jsdoc
-            ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
-            : `Type: ${prop.type}`;
+          const propDesc = getPropertyDescription(prop);
           jsDocLines.push(
             `   *     - **${prop.name}** (\`${prop.type}\`${
               prop.required ? ", required" : ", optional"
@@ -40,7 +40,6 @@ export function generateJsDoc({
     jsDocLines.push(`   *   No parameters`);
   }
 
-  // Returns section with recursive property rendering
   jsDocLines.push(`   *`);
   if (returnTypeDetails.length > 0) {
     jsDocLines.push(
@@ -48,9 +47,11 @@ export function generateJsDoc({
     );
     const renderProperties = (props: PropertyDetail[], indent: string) => {
       props.forEach((prop) => {
-        const propDesc = prop.jsdoc
-          ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
-          : `Type: ${prop.type}`;
+        // Only include description if it’s not just repeating the type
+        const propDesc =
+          prop.properties && prop.properties.length > 0
+            ? "" // Skip description for complex types with nested properties
+            : getPropertyDescription(prop);
         jsDocLines.push(
           `${indent}*   - **${prop.name}** (\`${prop.type}\`${
             prop.required ? ", required" : ", optional"

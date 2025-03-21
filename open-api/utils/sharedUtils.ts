@@ -1,9 +1,12 @@
+#!/usr/bin/env node
+
 import { OpenAPIV2 } from "openapi-types";
 import { join } from "path";
-import { Project, PropertySignature } from "ts-morph";
 import { existsSync, readdirSync, readFileSync } from "fs";
-import { simplifyName } from "../../src/utils.ts"; // Adjust path if needed
+import { Project, PropertySignature } from "ts-morph";
+import { simplifyName } from "../../src/utils.ts";
 
+// (Existing interfaces remain unchanged)
 export interface PropertyDetail {
   name: string;
   type: string;
@@ -58,7 +61,6 @@ export function mapRefToType(
   missingTypes: Set<string>
 ): string {
   if (!schema) return "any";
-
   if ("$ref" in schema && schema.$ref) {
     const refParts = schema.$ref.split("/");
     const model = refParts[refParts.length - 1];
@@ -71,7 +73,6 @@ export function mapRefToType(
     console.warn(`Type ${pascalModel} not found, defaulting to 'any'`);
     return "any";
   }
-
   if ("type" in schema) {
     if (schema.type === "object" && schema.properties) {
       const props = schema.properties;
@@ -105,7 +106,6 @@ export function mapRefToType(
     }
     return mapOpenApiTypeToTs(schema.type);
   }
-
   return "any";
 }
 
@@ -123,28 +123,24 @@ export function parseInterfaceProperties(
     return [];
   }
   if (availableModels) visited.add(modelName);
-
   const project = new Project();
   const filePath = join(modelsDir, `${modelName}.ts`);
   if (!existsSync(filePath)) {
     console.warn(`Model file ${filePath} not found for ${modelName}`);
     return [];
   }
-
   const sourceFile = project.addSourceFileAtPath(filePath);
   const interfaceDec = sourceFile.getInterface(modelName);
   if (!interfaceDec) {
     console.warn(`Interface ${modelName} not found in ${filePath}`);
     return [];
   }
-
   return interfaceDec.getProperties().map((prop: PropertySignature) => {
     const jsDocs = prop.getJsDocs();
     const jsdocText =
       jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
     const propType = prop.getType().getText(prop);
     let properties: PropertyDetail[] | undefined = undefined;
-
     if (availableModels) {
       const arrayMatch = propType.match(/(.+)\[\]$/);
       if (arrayMatch) {
@@ -160,7 +156,6 @@ export function parseInterfaceProperties(
         }
       }
     }
-
     return {
       name: prop.getName(),
       type: propType,
@@ -195,7 +190,6 @@ export function parseOpenApiOperations(
       `Spec file ${specFile} not found. Run 'npm run fix-spec' first.`
     );
   }
-
   const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
   const availableModels = readdirSync(modelsDir)
     .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
@@ -203,7 +197,6 @@ export function parseOpenApiOperations(
   const modelImports = new Set<string>();
   const missingTypes = new Set<string>();
   const operations: OperationDoc[] = [];
-
   for (const [path, methodsObj] of Object.entries(
     spec.paths as OpenAPIV2.PathsObject
   )) {
@@ -213,7 +206,6 @@ export function parseOpenApiOperations(
     )) {
       const op = operation as OpenAPIV2.OperationObject | undefined;
       if (!op || !op.operationId) continue;
-
       const opId = simplifyName(op.operationId);
       console.log(`Processing operation ${opId} (${method} ${path})`);
       const paramDetails = (op.parameters || [])
@@ -264,7 +256,6 @@ export function parseOpenApiOperations(
             properties: properties || [],
           };
         });
-
       const returnTypes = ["200", "207"]
         .map(
           (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
@@ -284,14 +275,12 @@ export function parseOpenApiOperations(
         returnTypes.length > 1
           ? returnTypes.join(" | ")
           : returnTypes[0] || "void";
-
       const returnTypeDetailsRaw = returnTypes
         .filter((type) => type !== "void" && availableModels.includes(type))
         .map((type) =>
           parseInterfaceProperties(type, modelsDir, availableModels)
         )
         .flat();
-
       const returnTypeDetails =
         returnTypeDetailsRaw.length > 0
           ? returnTypeDetailsRaw.map((prop) => ({
@@ -302,7 +291,6 @@ export function parseOpenApiOperations(
                   : undefined,
             }))
           : undefined;
-
       operations.push({
         name: opId,
         summary: op.summary || "No description.",
@@ -315,6 +303,12 @@ export function parseOpenApiOperations(
       });
     }
   }
-
   return { operations, modelImports, missingTypes };
+}
+
+// New shared function
+export function getPropertyDescription(prop: PropertyDetail): string {
+  return prop.jsdoc
+    ? prop.jsdoc.replace(/@type\s*{[^}]+}\s*@memberof\s*\w+/, "").trim()
+    : `Type: ${prop.type}`;
 }
