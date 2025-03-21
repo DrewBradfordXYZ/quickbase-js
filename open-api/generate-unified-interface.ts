@@ -340,7 +340,7 @@ try {
   if (!existsSync(DOCS_DATA_DIR)) {
     mkdirSync(DOCS_DATA_DIR, { recursive: true });
   }
-  console.log("Generating docs JSON for Docusaurus...");
+  console.log("Generating docs JSON for Vitepress...");
   generateDocsJson(SPEC_FILE, MODELS_DIR, DOCS_JSON_FILE);
 } catch (error) {
   console.error("Error in generateInterface:", error);

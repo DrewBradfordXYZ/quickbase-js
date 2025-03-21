@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { promises as fs } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -34,6 +35,15 @@ async function fixQuickBaseSpec(): Promise<void> {
   }
   console.log("Spec definitions after initialization:", spec.definitions);
 
+  console.log(
+    "Original /apps/{appId}/events 200 schema:",
+    JSON.stringify(
+      spec.paths["/apps/{appId}/events"]?.get?.responses?.["200"]?.schema,
+      null,
+      2
+    )
+  );
+
   console.log("Fixing parameters...");
   for (const pathKey in spec.paths) {
     for (const method in spec.paths[pathKey]) {
@@ -64,14 +74,40 @@ async function fixQuickBaseSpec(): Promise<void> {
 
   console.log("Spec definitions before enhanceTags:", spec.definitions);
   console.log("Enhancing raw spec with tags...");
-  const { enhanceTags } = await import("./schema/tags/index.ts"); // Updated to index.ts
+  const { enhanceTags } = await import("./schema/tags/index.ts");
   enhanceTags(spec);
+  console.log(
+    "After enhanceTags:",
+    JSON.stringify(
+      spec.paths["/apps/{appId}/events"]?.get?.responses?.["200"]?.schema,
+      null,
+      2
+    )
+  );
+
   console.log("Enhancing raw spec with general enhancements...");
   const { enhanceGeneral } = await import("./schema/enhance-general.ts");
   enhanceGeneral(spec);
+  console.log(
+    "After enhanceGeneral:",
+    JSON.stringify(
+      spec.paths["/apps/{appId}/events"]?.get?.responses?.["200"]?.schema,
+      null,
+      2
+    )
+  );
+
   console.log("Fixing array schemas...");
   const { fixArrays } = await import("./schema/fix-arrays.ts");
   fixArrays(spec);
+  console.log(
+    "After fixArrays:",
+    JSON.stringify(
+      spec.paths["/apps/{appId}/events"]?.get?.responses?.["200"]?.schema,
+      null,
+      2
+    )
+  );
 
   console.log("Removing unexpected top-level attributes...");
   delete spec.operations;

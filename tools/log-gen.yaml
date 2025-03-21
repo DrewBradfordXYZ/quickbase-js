@@ -728,6 +728,10 @@ tree:
       type: >-
         file
     - name: >-
+        api-examples.md
+      type: >-
+        file
+    - name: >-
         build-common.js
       type: >-
         file
@@ -791,6 +795,247 @@ tree:
               type: >-
                 file
     - name: >-
+        docs
+      type: >-
+        directory
+      children:
+        - name: >-
+            .vitepress
+          type: >-
+            directory
+          children:
+            - name: >-
+                cache
+              type: >-
+                directory
+              children:
+                - name: >-
+                    deps
+                  type: >-
+                    directory
+                  children:
+                    - name: >-
+                        @theme_index.js
+                      type: >-
+                        file
+                    - name: >-
+                        @theme_index.js.map
+                      type: >-
+                        file
+                    - name: >-
+                        _metadata.json
+                      type: >-
+                        file
+                    - name: >-
+                        chunk-5A67QEFC.js
+                      type: >-
+                        file
+                    - name: >-
+                        chunk-5A67QEFC.js.map
+                      type: >-
+                        file
+                    - name: >-
+                        chunk-7D4P4MMP.js
+                      type: >-
+                        file
+                    - name: >-
+                        chunk-7D4P4MMP.js.map
+                      type: >-
+                        file
+                    - name: >-
+                        package.json
+                      type: >-
+                        file
+                    - name: >-
+                        vitepress___@vue_devtools-api.js
+                      type: >-
+                        file
+                    - name: >-
+                        vitepress___@vue_devtools-api.js.map
+                      type: >-
+                        file
+                    - name: >-
+                        vitepress___@vueuse_core.js
+                      type: >-
+                        file
+                    - name: >-
+                        vitepress___@vueuse_core.js.map
+                      type: >-
+                        file
+                    - name: >-
+                        vue.js
+                      type: >-
+                        file
+                    - name: >-
+                        vue.js.map
+                      type: >-
+                        file
+            - name: >-
+                config.mts
+              type: >-
+                file
+            - name: >-
+                dist
+              type: >-
+                directory
+              children:
+                - name: >-
+                    404.html
+                  type: >-
+                    file
+                - name: >-
+                    api-examples.html
+                  type: >-
+                    file
+                - name: >-
+                    assets
+                  type: >-
+                    directory
+                  children:
+                    - name: >-
+                        api-examples.md.CRRh3xeI.js
+                      type: >-
+                        file
+                    - name: >-
+                        api-examples.md.CRRh3xeI.lean.js
+                      type: >-
+                        file
+                    - name: >-
+                        app.Yv9tMCdR.js
+                      type: >-
+                        file
+                    - name: >-
+                        chunks
+                      type: >-
+                        directory
+                      children:
+                        - name: >-
+                            framework.Dh1jimFm.js
+                          type: >-
+                            file
+                        - name: >-
+                            theme.CDm2W-g2.js
+                          type: >-
+                            file
+                    - name: >-
+                        index.md.Mlz2-sGG.js
+                      type: >-
+                        file
+                    - name: >-
+                        index.md.Mlz2-sGG.lean.js
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-cyrillic-ext.r48I6akx.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-cyrillic.By2_1cv3.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-greek-ext.1u6EdAuj.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-greek.DJ8dCoTZ.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-latin-ext.CN1xVJS-.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-latin.C2AdPX0b.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-italic-vietnamese.BSbpV94h.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-cyrillic-ext.BBPuwvHQ.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-cyrillic.C5lxZ8CY.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-greek-ext.CqjqNYQ-.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-greek.BBVDIX6e.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-latin-ext.4ZJIpNVo.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-latin.Di8DUHzh.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        inter-roman-vietnamese.BjW4sHH5.woff2
+                      type: >-
+                        file
+                    - name: >-
+                        markdown-examples.md.ediKJOVO.js
+                      type: >-
+                        file
+                    - name: >-
+                        markdown-examples.md.ediKJOVO.lean.js
+                      type: >-
+                        file
+                    - name: >-
+                        style.BXK1qnoW.css
+                      type: >-
+                        file
+                - name: >-
+                    hashmap.json
+                  type: >-
+                    file
+                - name: >-
+                    index.html
+                  type: >-
+                    file
+                - name: >-
+                    markdown-examples.html
+                  type: >-
+                    file
+                - name: >-
+                    vp-icons.css
+                  type: >-
+                    file
+        - name: >-
+            api-examples.md
+          type: >-
+            file
+        - name: >-
+            index.md
+          type: >-
+            file
+        - name: >-
+            markdown-examples.md
+          type: >-
+            file
+        - name: >-
+            node_modules
+          type: >-
+            directory
+          children: []
+    - name: >-
+        docs-data
+      type: >-
+        directory
+      children:
+        - name: >-
+            api-docs.json
+          type: >-
+            file
+    - name: >-
         examples
       type: >-
         directory
@@ -808,6 +1053,14 @@ tree:
           type: >-
             file
     - name: >-
+        index.md
+      type: >-
+        file
+    - name: >-
+        markdown-examples.md
+      type: >-
+        file
+    - name: >-
         open-api
       type: >-
         directory
@@ -820,399 +1073,6 @@ tree:
             generate-unified-interface.ts
           type: >-
             file
-          contents: >
-            #!/usr/bin/env
-            node
-
-            console.log("Script
-            started");
-
-
-            import
-            {
-              readFileSync,
-              writeFileSync,
-              mkdirSync,
-              existsSync,
-              readdirSync,
-            }
-            from
-            "fs";
-
-            import
-            {
-            join,
-            dirname
-            }
-            from
-            "path";
-
-            import
-            {
-            fileURLToPath
-            }
-            from
-            "url";
-
-            import
-            {
-            OpenAPIV2
-            }
-            from
-            "openapi-types";
-
-            import
-            {
-            Project
-            }
-            from
-            "ts-morph";
-
-            import
-            {
-            generateJsDoc
-            }
-            from
-            "./utils/generateJsDoc.js";
-
-            import
-            {
-            generateDocsJson
-            }
-            from
-            "./utils/generateDocsJson.js";
-            //
-            Keep
-            in
-            utils/
-
-
-            const
-            simplifyName
-            =
-            (str:
-            string):
-            string
-            =>
-            str;
-
-
-            const
-            __dirname
-            =
-            dirname(fileURLToPath(import.meta.url));
-
-            const
-            SPEC_FILE
-            =
-            join(__dirname,
-            "output",
-            "quickbase-fixed.json");
-
-            const
-            OUTPUT_DIR
-            =
-            join(__dirname,
-            "..",
-            "src",
-            "generated-unified");
-
-            const
-            OUTPUT_FILE
-            =
-            join(OUTPUT_DIR,
-            "QuickbaseClient.ts");
-
-            const
-            MODELS_DIR
-            =
-            join(__dirname,
-            "..",
-            "src",
-            "generated",
-            "models");
-
-            const
-            DOCS_DATA_DIR
-            =
-            join(__dirname,
-            "..",
-            "docs-data");
-
-            const
-            DOCS_JSON_FILE
-            =
-            join(DOCS_DATA_DIR,
-            "api-docs.json");
-
-
-            function
-            mapOpenApiTypeToTs(
-              openApiType: string | string[] | undefined
-            ):
-            string
-            {
-              const type = Array.isArray(openApiType)
-                ? openApiType[0]
-                : openApiType || "any";
-              switch (type.toLowerCase()) {
-                case "integer":
-                case "int":
-                case "number":
-                  return "number";
-                case "string":
-                  return "string";
-                case "boolean":
-                  return "boolean";
-                default:
-                  return "any";
-              }
-            }
-
-
-            function
-            mapRefToType(
-              schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
-              modelImports: Set<string>,
-              spec: OpenAPIV2.Document,
-              depth: number = 0,
-              availableModels: string[],
-              missingTypes: Set<string>
-            ):
-            string
-            {
-              if (!schema) return "any";
-              if ("$ref" in schema && schema.$ref) {
-                const refParts = schema.$ref.split("/");
-                const model = refParts[refParts.length - 1];
-                const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
-                if (availableModels.includes(pascalModel)) {
-                  modelImports.add(pascalModel);
-                  return pascalModel;
-                }
-                missingTypes.add(pascalModel);
-                return "any";
-              }
-              if ("type" in schema) {
-                if (schema.type === "object" && schema.properties) {
-                  const props = Object.entries(schema.properties).map(([key, prop]) => {
-                    const propSchema = prop as OpenAPIV2.SchemaObject;
-                    const propType = mapRefToType(
-                      propSchema,
-                      modelImports,
-                      spec,
-                      depth + 1,
-                      availableModels,
-                      missingTypes
-                    );
-                    return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
-                  });
-                  return `{ ${props.join("; ")} }`;
-                }
-                if (schema.type === "array" && schema.items) {
-                  const itemType = mapRefToType(
-                    schema.items as OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject,
-                    modelImports,
-                    spec,
-                    depth + 1,
-                    availableModels,
-                    missingTypes
-                  );
-                  return `${itemType}[]`;
-                }
-                return mapOpenApiTypeToTs(schema.type);
-              }
-              return "any";
-            }
-
-
-            interface
-            PropertyDetail
-            {
-              name: string;
-              type: string;
-              required: boolean;
-              jsdoc?: string;
-            }
-
-
-            function
-            parseInterfaceProperties(
-              modelName: string,
-              modelsDir: string
-            ):
-            PropertyDetail[]
-            {
-              const project = new Project();
-              const filePath = join(modelsDir, `${modelName}.ts`);
-              if (!existsSync(filePath)) return [];
-              const sourceFile = project.addSourceFileAtPath(filePath);
-              const interfaceDec = sourceFile.getInterface(modelName);
-              if (!interfaceDec) return [];
-              return interfaceDec.getProperties().map((prop) => ({
-                name: prop.getName(),
-                type: prop.getType().getText(prop),
-                required: !prop.hasQuestionToken(),
-                jsdoc: prop.getJsDocs()[0]?.getDescription().trim(),
-              }));
-            }
-
-
-            interface
-            ParamDetail
-            {
-              name: string;
-              type: string;
-              required: boolean;
-              properties: PropertyDetail[];
-            }
-
-
-            function
-            generateInterface(includeResponseProperties:
-            boolean
-            =
-            false):
-            void
-            {
-              if (!existsSync(SPEC_FILE)) {
-                console.error(
-                  `Spec file ${SPEC_FILE} not found. Run 'npm run fix-spec' first.`
-                );
-                process.exit(1);
-              }
-              const spec: OpenAPIV2.Document = JSON.parse(readFileSync(SPEC_FILE, "utf8"));
-              const availableModels = readdirSync(MODELS_DIR)
-                .filter((f) => f.endsWith(".ts") && !f.startsWith("index"))
-                .map((f) => f.replace(".ts", ""));
-              const modelImports = new Set<string>();
-              const missingTypes = new Set<string>();
-              const methods: string[] = [];
-
-              for (const [path, methodsObj] of Object.entries(
-                spec.paths as OpenAPIV2.PathsObject
-              )) {
-                if (!methodsObj) continue;
-                for (const [method, operation] of Object.entries(
-                  methodsObj as OpenAPIV2.PathItemObject
-                )) {
-                  const op = operation as OpenAPIV2.OperationObject | undefined;
-                  if (!op || !op.operationId) continue;
-
-                  const opId = simplifyName(op.operationId);
-                  const paramDetails: ParamDetail[] = (op.parameters || [])
-                    .filter(
-                      (p) =>
-                        !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
-                          (p as OpenAPIV2.ParameterObject).name || ""
-                        )
-                    )
-                    .map((p) => {
-                      const param = p as OpenAPIV2.ParameterObject;
-                      let type = "any";
-                      let properties: PropertyDetail[] = [];
-                      if ("schema" in p && p.schema) {
-                        type = mapRefToType(
-                          p.schema,
-                          modelImports,
-                          spec,
-                          1,
-                          availableModels,
-                          missingTypes
-                        );
-                        if ("$ref" in p.schema) {
-                          const model = p.schema.$ref.split("/").pop()!;
-                          properties = parseInterfaceProperties(
-                            model.charAt(0).toUpperCase() + model.slice(1),
-                            MODELS_DIR
-                          );
-                        }
-                      } else if ("type" in p) {
-                        type = mapOpenApiTypeToTs(p.type);
-                      }
-                      return {
-                        name: param.in === "body" ? "body" : param.name,
-                        type,
-                        required: param.required || false,
-                        properties,
-                      };
-                    });
-
-                  const params = paramDetails
-                    .map((p) => `${p.name}${p.required ? "" : "?"}: ${p.type}`)
-                    .join("; ");
-                  const returnTypes = ["200", "207"]
-                    .map(
-                      (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
-                    )
-                    .filter(Boolean)
-                    .map((schema) =>
-                      mapRefToType(
-                        schema!,
-                        modelImports,
-                        spec,
-                        1,
-                        availableModels,
-                        missingTypes
-                      )
-                    );
-                  const returnType =
-                    returnTypes.length > 1
-                      ? returnTypes.join(" | ")
-                      : returnTypes[0] || "void";
-                  const returnTypeDetails =
-                    includeResponseProperties &&
-                    returnTypes.length === 1 &&
-                    returnTypes[0] !== "void"
-                      ? parseInterfaceProperties(returnTypes[0], MODELS_DIR)
-                      : [];
-
-                  const jsDoc = generateJsDoc({
-                    summary: op.summary || "No description.",
-                    opId,
-                    paramDetails,
-                    returnType,
-                    returnTypeDetails,
-                    docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
-                  });
-
-                  methods.push(
-                    `${jsDoc}\n  ${opId}: (params: { ${params} }) => Promise<${returnType}>;`
-                  );
-                }
-              }
-
-              const importStatement =
-                modelImports.size > 0
-                  ? `import { ${Array.from(modelImports)
-                      .sort()
-                      .join(", ")} } from "../generated/models";`
-                  : "";
-              const interfaceContent = `// Generated on ${new Date().toISOString()}\n${importStatement}\n\nexport interface QuickbaseClient {\n${methods.join(
-                "\n"
-              )}\n}\n`;
-              if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
-              writeFileSync(OUTPUT_FILE, interfaceContent, "utf8");
-              console.log("Generated interface:", OUTPUT_FILE);
-            }
-
-
-            try
-            {
-              generateInterface(true);
-              if (!existsSync(DOCS_DATA_DIR)) mkdirSync(DOCS_DATA_DIR, { recursive: true });
-              generateDocsJson(SPEC_FILE, MODELS_DIR, DOCS_JSON_FILE);
-            }
-            catch
-            (error)
-            {
-              console.error("Error:", error);
-              process.exit(1);
-            }
-
-
-            console.log("Script
-            completed");
         - name: >-
             regenerate-client.ts
           type: >-
@@ -1239,30 +1099,1271 @@ tree:
                     apps.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    schema/tags/apps.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+
+                    export
+                    function
+                    enhanceApps(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (operation.parameters && operation.tags?.includes("Apps")) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              let properties;
+                              if (pathKey.includes("/copy") && method === "post") {
+                                properties = {
+                                  name: { type: "string", description: "The name of the new app." },
+                                  description: {
+                                    type: "string",
+                                    description: "A description for the new app.",
+                                  },
+                                  properties: {
+                                    type: "object",
+                                    properties: {
+                                      keepData: {
+                                        type: "boolean",
+                                        description: "Whether to copy data.",
+                                      },
+                                      excludeFiles: {
+                                        type: "boolean",
+                                        description: "Whether to exclude files.",
+                                      },
+                                      usersAndRoles: {
+                                        type: "boolean",
+                                        description: "Whether to copy users and roles.",
+                                      },
+                                      assignUserToken: {
+                                        type: "boolean",
+                                        description: "Whether to assign the user token.",
+                                      },
+                                    },
+                                    description: "Options for customizing the app copy process.",
+                                  },
+                                };
+                              } else {
+                                properties = {
+                                  name: { type: "string", description: "The name of the app." },
+                                  description: {
+                                    type: "string",
+                                    description: "A description for the app.",
+                                  },
+                                  assignToken: {
+                                    type: "boolean",
+                                    description: "Whether to assign the user token.",
+                                  },
+                                };
+                              }
+                              spec.definitions[requestName] = {
+                                type: "object",
+                                properties,
+                                required: Object.keys(properties).filter(
+                                  (key) => key !== "description" && key !== "properties"
+                                ),
+                                description: operation.summary || `Request body for ${opId}`,
+                              };
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
                 - name: >-
                     fields.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    schema/tags/fields.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+
+                    export
+                    function
+                    enhanceFields(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (operation.parameters && operation.tags?.includes("Fields")) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              let properties;
+                              let requiredFields: string[];
+
+                              if (method === "delete") {
+                                // DELETE /fields (deleteFields)
+                                properties = {
+                                  fieldIds: { type: "array", items: { type: "integer" } },
+                                };
+                                requiredFields = ["fieldIds"];
+                              } else {
+                                // Common properties for createField and updateField
+                                properties = {
+                                  label: { type: "string", description: "The label of the field" },
+                                  fieldType: {
+                                    type: "string",
+                                    description: "The type of the field",
+                                    enum: [
+                                      "text",
+                                      "text-multiple-choice",
+                                      "text-multi-line",
+                                      "rich-text",
+                                      "numeric",
+                                      "currency",
+                                      "percent",
+                                      "rating",
+                                      "date",
+                                      "date-time",
+                                      "time-of-day",
+                                      "duration",
+                                      "checkbox",
+                                      "user",
+                                      "multi-user",
+                                      "address",
+                                      "email",
+                                      "phone",
+                                      "url",
+                                      "file",
+                                      "record-id",
+                                    ],
+                                  },
+                                  fieldHelp: {
+                                    type: "string",
+                                    description: "Help text for the field",
+                                    nullable: true,
+                                  },
+                                  addToForms: {
+                                    type: "boolean",
+                                    description: "Whether to add the field to forms",
+                                    nullable: true,
+                                  },
+                                  permissions: {
+                                    anyOf: [
+                                      {
+                                        type: "array",
+                                        items: { $ref: "#/definitions/Permission" },
+                                      },
+                                      { type: "null" },
+                                    ],
+                                    description: "Custom permissions for the field",
+                                  },
+                                  required: {
+                                    type: "boolean",
+                                    description: "Whether the field is required",
+                                    nullable: true,
+                                  },
+                                  unique: {
+                                    type: "boolean",
+                                    description: "Whether the field must have unique values",
+                                    nullable: true,
+                                  },
+                                  noWrap: {
+                                    type: "boolean",
+                                    description: "Whether text wrapping is disabled",
+                                    nullable: true,
+                                  },
+                                  bold: {
+                                    type: "boolean",
+                                    description: "Whether the field is bolded",
+                                    nullable: true,
+                                  },
+                                  appearsByDefault: {
+                                    type: "boolean",
+                                    description: "Whether the field appears by default in reports",
+                                    nullable: true,
+                                  },
+                                  findEnabled: {
+                                    type: "boolean",
+                                    description: "Whether the field is searchable",
+                                    nullable: true,
+                                  },
+                                  doesDataCopy: {
+                                    type: "boolean",
+                                    description: "Whether the field copies data",
+                                    nullable: true,
+                                  },
+                                  audited: {
+                                    type: "boolean",
+                                    description: "Whether changes to the field are audited",
+                                    nullable: true,
+                                  },
+                                  properties: {
+                                    type: "object",
+                                    description: "Specific field properties",
+                                    properties: {
+                                      numLines: {
+                                        type: "integer",
+                                        description:
+                                          "The number of lines shown in QuickBase for this text field",
+                                      },
+                                      maxLength: {
+                                        type: "integer",
+                                        description:
+                                          "The maximum number of characters allowed for entry",
+                                      },
+                                      appendOnly: {
+                                        type: "boolean",
+                                        description: "Whether this field is append-only",
+                                      },
+                                      sortAsGiven: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if the listed entries sort as entered vs alphabetically",
+                                      },
+                                      allowMentions: {
+                                        type: "boolean",
+                                        description:
+                                          "If someone can @mention users in the rich text field",
+                                      },
+                                      comments: {
+                                        type: "string",
+                                        description:
+                                          "The comments entered on the field properties by an administrator",
+                                      },
+                                      doesTotal: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether this field totals in reports within the product",
+                                      },
+                                      autoSave: {
+                                        type: "boolean",
+                                        description: "Whether the link field will auto save",
+                                      },
+                                      defaultValueLuid: {
+                                        type: "integer",
+                                        description: "Default user id value",
+                                      },
+                                      useI18NFormat: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether phone numbers should be in E.164 standard international format",
+                                      },
+                                      maxVersions: {
+                                        type: "integer",
+                                        description:
+                                          "The maximum number of versions configured for a file attachment",
+                                      },
+                                      format: {
+                                        type: "integer",
+                                        description: "The format to display time",
+                                      },
+                                      carryChoices: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether the field should carry its multiple choice fields when copied",
+                                      },
+                                      linkText: {
+                                        type: "string",
+                                        description:
+                                          "The configured text value that replaces the URL users see",
+                                      },
+                                      parentFieldId: {
+                                        type: "integer",
+                                        description:
+                                          "The id of the parent composite field, when applicable",
+                                      },
+                                      displayTimezone: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates whether to display the timezone within the product",
+                                      },
+                                      summaryTargetFieldId: {
+                                        type: "integer",
+                                        description:
+                                          "The id of the field used to aggregate values from the child",
+                                      },
+                                      allowNewChoices: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if users can add new choices to a selection list",
+                                      },
+                                      defaultToday: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if the field value is defaulted today for new records",
+                                      },
+                                      units: {
+                                        type: "string",
+                                        description: "The units label",
+                                      },
+                                      openTargetIn: {
+                                        type: "string",
+                                        enum: ["sameWindow", "newWindow", "popup"],
+                                        description:
+                                          "Indicates which target the URL should open in when clicked",
+                                      },
+                                      lookupTargetFieldId: {
+                                        type: "integer",
+                                        description:
+                                          "The id of the field that is the target on the parent table for this lookup",
+                                      },
+                                      summaryFunction: {
+                                        type: "string",
+                                        enum: [
+                                          "AVG",
+                                          "SUM",
+                                          "MAX",
+                                          "MIN",
+                                          "STD-DEV",
+                                          "COUNT",
+                                          "COMBINED-TEXT",
+                                          "COMBINED-USER",
+                                          "DISTINCT-COUNT",
+                                        ],
+                                        description: "The accumulation type for the summary field",
+                                      },
+                                      sourceFieldId: {
+                                        type: "integer",
+                                        description: "The id of the source field",
+                                      },
+                                      doesAverage: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether this field averages in reports within the product",
+                                      },
+                                      formula: {
+                                        type: "string",
+                                        description:
+                                          "The formula of the field as configured in QuickBase",
+                                      },
+                                      decimalPlaces: {
+                                        type: "integer",
+                                        description:
+                                          "The number of decimal places displayed in the product",
+                                      },
+                                      defaultCountryCode: {
+                                        type: "string",
+                                        description:
+                                          "Controls the default country shown on international phone widgets",
+                                      },
+                                      displayMonth: {
+                                        type: "string",
+                                        description: "How to display months",
+                                      },
+                                      seeVersions: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if users can see other versions of a file attachment",
+                                      },
+                                      defaultKind: {
+                                        type: "string",
+                                        description: "The user default type",
+                                      },
+                                      displayEmail: {
+                                        type: "string",
+                                        description: "How the email is displayed",
+                                      },
+                                      coverText: {
+                                        type: "string",
+                                        description:
+                                          "Alternate user-friendly text for displaying a link",
+                                      },
+                                      currencySymbol: {
+                                        type: "string",
+                                        description:
+                                          "The currency symbol used when displaying field values",
+                                      },
+                                      summaryQuery: {
+                                        type: "string",
+                                        description: "The summary query",
+                                      },
+                                      targetFieldId: {
+                                        type: "integer",
+                                        description: "The id of the target field",
+                                      },
+                                      displayUser: {
+                                        type: "string",
+                                        description: "The configured option for how users display",
+                                      },
+                                      blankIsZero: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether a blank value is treated as 0 in calculations",
+                                      },
+                                      exact: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether an exact match is required for a report link",
+                                      },
+                                      defaultDomain: {
+                                        type: "string",
+                                        description: "Default email domain",
+                                      },
+                                      defaultValue: {
+                                        type: "string",
+                                        description: "The default value configured for a field",
+                                      },
+                                      abbreviate: {
+                                        type: "boolean",
+                                        description:
+                                          "Don't show the URL protocol when showing the URL",
+                                      },
+                                      numberFormat: {
+                                        type: "integer",
+                                        description:
+                                          "The format used for displaying numeric values",
+                                      },
+                                      targetTableName: {
+                                        type: "string",
+                                        description: "The field's target table name",
+                                      },
+                                      appearsAs: {
+                                        type: "string",
+                                        description:
+                                          "The link text; if empty, the URL will be used",
+                                      },
+                                      width: {
+                                        type: "integer",
+                                        description: "The field's HTML input width in the product",
+                                      },
+                                      currencyFormat: {
+                                        type: "string",
+                                        enum: ["left", "right", "middle"],
+                                        description:
+                                          "The currency format used when displaying field values",
+                                      },
+                                      displayDayOfWeek: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates whether to display the day of the week",
+                                      },
+                                      summaryReferenceFieldId: {
+                                        type: "integer",
+                                        description:
+                                          "The id of the field that is the reference in the relationship",
+                                      },
+                                      commaStart: {
+                                        type: "integer",
+                                        description: "The number of digits before commas display",
+                                      },
+                                      choices: {
+                                        type: "array",
+                                        items: { type: "string" },
+                                        description:
+                                          "An array of entries that exist for a field offering choices",
+                                      },
+                                      targetTableId: {
+                                        type: "string",
+                                        description: "The id of the target table",
+                                      },
+                                      displayRelative: {
+                                        type: "boolean",
+                                        description: "Whether to display time as relative",
+                                      },
+                                      compositeFields: {
+                                        type: "array",
+                                        items: { type: "object", additionalProperties: true },
+                                        description:
+                                          "An array of fields that make up a composite field (e.g., address)",
+                                      },
+                                      displayCheckboxAsText: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates whether checkbox values are shown as text in reports",
+                                      },
+                                      versionMode: {
+                                        type: "string",
+                                        enum: ["keepallversions", "keeplastversions"],
+                                        description: "Version modes for files",
+                                      },
+                                      snapFieldId: {
+                                        type: "integer",
+                                        description: "The id of the field used to snapshot values",
+                                      },
+                                      hours24: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates whether to display time in 24-hour format",
+                                      },
+                                      sortAlpha: {
+                                        type: "boolean",
+                                        description:
+                                          "Whether to sort alphabetically (default is by record ID)",
+                                      },
+                                      hasExtension: {
+                                        type: "boolean",
+                                        description: "Whether this field has a phone extension",
+                                      },
+                                      useNewWindow: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if the file should open a new window when clicked",
+                                      },
+                                      displayAsLink: {
+                                        type: "boolean",
+                                        description:
+                                          "Indicates if the field should be shown as a hyperlink",
+                                      },
+                                      lookupReferenceFieldId: {
+                                        type: "integer",
+                                        description:
+                                          "The id of the field that is the reference for this lookup",
+                                      },
+                                    },
+                                    nullable: true,
+                                  },
+                                };
+
+                                // Adjust required fields based on operation
+                                if (pathKey.includes("{fieldId}") && method === "post") {
+                                  // UpdateField (POST /fields/{fieldId})
+                                  requiredFields = ["label"]; // fieldType is not allowed in updates
+                                } else {
+                                  // CreateField (POST /fields)
+                                  requiredFields = ["label", "fieldType"];
+                                }
+                              }
+
+                              spec.definitions[requestName] = {
+                                type: "object",
+                                properties,
+                                required: requiredFields,
+                                description: operation.summary || `Request body for ${opId}`,
+                              };
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
                 - name: >-
                     groups.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    schema/tags/groups.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+
+                    export
+                    function
+                    enhanceGroups(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (
+                        operation.parameters &&
+                        operation.tags?.includes("Groups") &&
+                        operation.summary?.toLowerCase().includes("subgroup")
+                      ) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              const properties = {
+                                groupIds: { type: "array", items: { type: "string" } },
+                              };
+                              spec.definitions[requestName] = {
+                                type: "object",
+                                properties,
+                                required: Object.keys(properties),
+                                description: operation.summary || `Request body for ${opId}`,
+                              };
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
                 - name: >-
                     index.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    open-api/schema/tags/index.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+                    import
+                    {
+                    enhanceUsers
+                    }
+                    from
+                    "./users.ts";
+
+                    import
+                    {
+                    enhanceGroups
+                    }
+                    from
+                    "./groups.ts";
+
+                    import
+                    {
+                    enhanceRecords
+                    }
+                    from
+                    "./records.ts";
+
+                    import
+                    {
+                    enhanceApps
+                    }
+                    from
+                    "./apps.ts";
+
+                    import
+                    {
+                    enhanceFields
+                    }
+                    from
+                    "./fields.ts";
+
+                    import
+                    {
+                    enhanceTables
+                    }
+                    from
+                    "./tables.ts";
+
+
+                    export
+                    function
+                    enhanceTags(spec:
+                    Spec):
+                    void
+                    {
+                      console.log("enhanceTags version: 2025-03-16-fix-applied"); // Confirmation log
+
+                      for (const pathKey in spec.paths) {
+                        for (const method in spec.paths[pathKey]) {
+                          const operation: Operation = spec.paths[pathKey][method];
+                          const opId =
+                            operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+
+                          if (operation.parameters) {
+                            operation.parameters.forEach((param: Parameter) => {
+                              if (param.in === "body") {
+                                if (!param.schema) param.schema = {};
+                                let requestName =
+                                  param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                                requestName = normalizeDefinitionName(requestName);
+
+                                if (spec.definitions[requestName]?.type === "array") {
+                                  console.log(
+                                    `Wrapping array schema for ${requestName} in ${pathKey}(${method})`
+                                  );
+                                  const arraySchema = spec.definitions[requestName];
+                                  let wrapperPropName = operation.tags?.includes("Users")
+                                    ? "userIds"
+                                    : "items";
+                                  if (
+                                    operation.tags?.includes("Groups") &&
+                                    operation.summary?.toLowerCase().includes("subgroup")
+                                  ) {
+                                    wrapperPropName = "groupIds";
+                                  }
+                                  spec.definitions[requestName] = {
+                                    type: "object",
+                                    properties: { [wrapperPropName]: arraySchema },
+                                    required: arraySchema.minItems > 0 ? [wrapperPropName] : [],
+                                    description:
+                                      arraySchema.description || `Request body for ${opId}`,
+                                  };
+                                  param.schema = { $ref: `#/definitions/${requestName}` };
+                                  console.log(
+                                    `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                                  );
+                                }
+                              }
+                            });
+                          }
+
+                          enhanceUsers(spec, pathKey, method, operation);
+                          enhanceGroups(spec, pathKey, method, operation);
+                          enhanceRecords(spec, pathKey, method, operation);
+                          enhanceApps(spec, pathKey, method, operation);
+                          enhanceFields(spec, pathKey, method, operation);
+                          enhanceTables(spec, pathKey, method, operation);
+                        }
+                      }
+                    }
                 - name: >-
                     records.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    open-api/schema/tags/records.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+                    //
+                    Ensure
+                    this
+                    import
+                    is
+                    present
+
+
+                    export
+                    function
+                    enhanceRecords(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (operation.parameters && operation.tags?.includes("Records")) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              let properties;
+                              // Upsert endpoint (/records)
+                              if (pathKey === "/records" && method === "post") {
+                                properties = {
+                                  data: { type: "array", items: { $ref: "#/definitions/Record" } },
+                                  to: { type: "string" },
+                                  fieldsToReturn: { type: "array", items: { type: "integer" } },
+                                };
+                              }
+                              // Query endpoint (/records/query)
+                              else if (pathKey === "/records/query" && method === "post") {
+                                properties = {
+                                  from: { type: "string", description: "The table identifier." },
+                                  select: {
+                                    type: "array",
+                                    items: { type: "integer" },
+                                    description: "An array of field ids...",
+                                  },
+                                  where: {
+                                    type: "string",
+                                    description:
+                                      "The filter, using the Quickbase query language...",
+                                  },
+                                  sortBy: {
+                                    type: "array",
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        fieldId: { type: "integer" },
+                                        order: {
+                                          type: "string",
+                                          enum: ["ASC", "DESC", "equal-values"],
+                                        },
+                                      },
+                                      required: ["fieldId", "order"],
+                                    },
+                                    description: "An array of field IDs and sort directions...",
+                                  },
+                                  groupBy: {
+                                    type: "array",
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        fieldId: { type: "integer" },
+                                        grouping: { type: "string", enum: ["equal-values"] },
+                                      },
+                                      required: ["fieldId", "grouping"],
+                                    },
+                                    description:
+                                      "An array that contains the fields to group the records by.",
+                                  },
+                                  options: {
+                                    type: "object",
+                                    properties: {
+                                      skip: { type: "integer" },
+                                      top: { type: "integer" },
+                                      compareWithAppLocalTime: { type: "boolean" },
+                                    },
+                                    description: "Additional query options.",
+                                  },
+                                };
+                              }
+                              // Delete endpoint (/records)
+                              else if (method === "delete") {
+                                properties = {
+                                  from: { type: "string" },
+                                  where: { type: "string" },
+                                };
+                              }
+                              if (properties) {
+                                spec.definitions[requestName] = {
+                                  type: "object",
+                                  properties,
+                                  required: ["from"], // Only 'from' is required per the spec
+                                  description: operation.summary || `Request body for ${opId}`,
+                                };
+                              }
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
                 - name: >-
                     tables.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    schema/tags/tables.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+
+                    export
+                    function
+                    enhanceTables(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (operation.parameters && operation.tags?.includes("Tables")) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              let properties;
+
+                              // Existing logic for other endpoints remains unchanged
+                              if (pathKey === "/tables" && method === "post") {
+                                properties = {
+                                  name: {
+                                    type: "string",
+                                    description: "The name for the table.",
+                                    minLength: 1,
+                                  },
+                                  description: {
+                                    type: "string",
+                                    description: "The description for the table...",
+                                  },
+                                  singleRecordName: {
+                                    type: "string",
+                                    description: "The singular noun for records...",
+                                  },
+                                  pluralRecordName: {
+                                    type: "string",
+                                    description: "The plural noun for records...",
+                                  },
+                                };
+                              } else if (pathKey === "/tables/{tableId}" && method === "post") {
+                                properties = {
+                                  name: {
+                                    type: "string",
+                                    description: "The updated name of the table.",
+                                  },
+                                  description: {
+                                    type: "string",
+                                    description: "The updated description for the table.",
+                                  },
+                                };
+                              }
+                              // Add minimal fix for relationship endpoints
+                              else if (
+                                pathKey === "/tables/{tableId}/relationship" &&
+                                method === "post"
+                              ) {
+                                requestName = "CreateRelationshipRequest"; // Force correct name
+                                if (!spec.definitions[requestName]) {
+                                  properties = {
+                                    parentTableId: {
+                                      type: "string",
+                                      description: "The parent table id for the relationship.",
+                                    },
+                                    foreignKeyField: {
+                                      type: "object",
+                                      properties: {
+                                        label: {
+                                          type: "string",
+                                          description: "The label for the foreign key field.",
+                                        },
+                                      },
+                                      additionalProperties: true,
+                                    },
+                                    lookupFieldIds: {
+                                      type: "array",
+                                      items: { type: "integer" },
+                                      description: "Array of field ids...",
+                                    },
+                                    summaryFields: {
+                                      type: "array",
+                                      items: {
+                                        type: "object",
+                                        properties: {
+                                          summaryFid: {
+                                            type: "number",
+                                            description: "The field id to summarize.",
+                                          },
+                                          label: {
+                                            type: "string",
+                                            description: "The label for the summary field.",
+                                          },
+                                          accumulationType: {
+                                            type: "string",
+                                            enum: [
+                                              "AVG",
+                                              "SUM",
+                                              "MAX",
+                                              "MIN",
+                                              "STD-DEV",
+                                              "COUNT",
+                                              "COMBINED-TEXT",
+                                              "COMBINED-USER",
+                                              "DISTINCT-COUNT",
+                                            ],
+                                            description: "The accumulation type...",
+                                          },
+                                          where: { type: "string", description: "The filter..." },
+                                        },
+                                        required: ["accumulationType"],
+                                        additionalProperties: true,
+                                      },
+                                      description: "Array of summary field objects...",
+                                    },
+                                  };
+                                }
+                              } else if (
+                                pathKey === "/tables/{tableId}/relationship/{relationshipId}" &&
+                                method === "post"
+                              ) {
+                                requestName = "UpdateRelationshipRequest"; // Force correct name
+                                if (!spec.definitions[requestName]) {
+                                  properties = {
+                                    parentTableId: {
+                                      type: "string",
+                                      description: "The updated parent table id...",
+                                    },
+                                    foreignKeyField: {
+                                      type: "object",
+                                      properties: {
+                                        label: {
+                                          type: "string",
+                                          description: "The updated label...",
+                                        },
+                                      },
+                                      additionalProperties: true,
+                                    },
+                                    lookupFieldIds: {
+                                      type: "array",
+                                      items: { type: "integer" },
+                                      description: "Updated array of field ids...",
+                                    },
+                                    summaryFields: {
+                                      type: "array",
+                                      items: {
+                                        type: "object",
+                                        properties: {
+                                          summaryFid: { type: "number" },
+                                          label: { type: "string" },
+                                          accumulationType: {
+                                            type: "string",
+                                            enum: [
+                                              "AVG",
+                                              "SUM",
+                                              "MAX",
+                                              "MIN",
+                                              "STD-DEV",
+                                              "COUNT",
+                                              "COMBINED-TEXT",
+                                              "COMBINED-USER",
+                                              "DISTINCT-COUNT",
+                                            ],
+                                          },
+                                          where: { type: "string" },
+                                        },
+                                        required: ["accumulationType"],
+                                        additionalProperties: true,
+                                      },
+                                    },
+                                  };
+                                }
+                              }
+
+                              if (properties) {
+                                spec.definitions[requestName] = {
+                                  type: "object",
+                                  properties,
+                                  required:
+                                    pathKey.includes("relationship") &&
+                                    pathKey.endsWith("/relationship")
+                                      ? ["parentTableId"]
+                                      : pathKey === "/tables"
+                                      ? ["name"]
+                                      : [],
+                                  additionalProperties: pathKey.includes("relationship")
+                                    ? false
+                                    : true, // Match raw spec
+                                  description: operation.summary || `Request body for ${opId}`,
+                                };
+                              }
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
                 - name: >-
                     users.ts
                   type: >-
                     file
+                  contents: >
+                    //
+                    schema/tags/users.ts
+
+                    import
+                    {
+                    Operation,
+                    Parameter,
+                    Spec
+                    }
+                    from
+                    "../../types/spec.ts";
+
+                    import
+                    {
+                    normalizeDefinitionName
+                    }
+                    from
+                    "../../utils/naming.ts";
+
+
+                    export
+                    function
+                    enhanceUsers(
+                      spec: Spec,
+                      pathKey: string,
+                      method: string,
+                      operation: Operation
+                    ):
+                    void
+                    {
+                      const opId =
+                        operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                      if (operation.parameters && operation.tags?.includes("Users")) {
+                        operation.parameters.forEach((param: Parameter) => {
+                          if (param.in === "body") {
+                            if (!param.schema) param.schema = {};
+                            let requestName =
+                              param.schema.$ref?.split("/").pop() || `${opId}Request`;
+                            requestName = normalizeDefinitionName(requestName);
+
+                            if (
+                              !spec.definitions[requestName] ||
+                              !spec.definitions[requestName].type ||
+                              Object.keys(spec.definitions[requestName]?.properties || {})
+                                .length === 0
+                            ) {
+                              console.log(
+                                `Defining schema for ${requestName} in ${pathKey}(${method})`
+                              );
+                              const properties = {
+                                userIds: { type: "array", items: { type: "string" } },
+                              };
+                              spec.definitions[requestName] = {
+                                type: "object",
+                                properties,
+                                required: Object.keys(properties),
+                                description: operation.summary || `Request body for ${opId}`,
+                              };
+                            }
+                            param.schema = { $ref: `#/definitions/${requestName}` };
+                            console.log(
+                              `Ensured ${requestName} in definitions for ${pathKey}(${method})`
+                            );
+                          }
+                        });
+                      }
+                    }
         - name: >-
             types
           type: >-
@@ -1281,200 +2382,8 @@ tree:
                 generateDocsJson.ts
               type: >-
                 file
-              contents: >
-                //
-                open-api/utils/generateDocsJson.ts
-
-                import
-                {
-                readFileSync,
-                writeFileSync,
-                readdirSync
-                }
-                from
-                "fs";
-
-                import
-                {
-                OpenAPIV2
-                }
-                from
-                "openapi-types";
-
-
-                function
-                mapOpenApiTypeToTs(
-                  openApiType: string | string[] | undefined
-                ):
-                string
-                {
-                  const type = Array.isArray(openApiType)
-                    ? openApiType[0]
-                    : openApiType || "any";
-                  switch (type.toLowerCase()) {
-                    case "integer":
-                    case "int":
-                    case "number":
-                      return "number";
-                    case "string":
-                      return "string";
-                    case "boolean":
-                      return "boolean";
-                    default:
-                      return "any";
-                  }
-                }
-
-
-                function
-                mapRefToType(
-                  schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
-                  modelImports: Set<string>,
-                  spec: OpenAPIV2.Document,
-                  depth: number = 0,
-                  availableModels: string[],
-                  missingTypes: Set<string>
-                ):
-                string
-                {
-                  if (!schema) return "any";
-                  if ("$ref" in schema && schema.$ref) {
-                    const refParts = schema.$ref.split("/");
-                    const model = refParts[refParts.length - 1];
-                    const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
-                    if (availableModels.includes(pascalModel)) {
-                      modelImports.add(pascalModel);
-                      return pascalModel;
-                    }
-                    missingTypes.add(pascalModel);
-                    return "any";
-                  }
-                  if ("type" in schema) {
-                    if (schema.type === "object" && schema.properties) {
-                      const props = Object.entries(schema.properties).map(([key, prop]) => {
-                        const propSchema = prop as OpenAPIV2.SchemaObject;
-                        const propType = mapRefToType(
-                          propSchema,
-                          modelImports,
-                          spec,
-                          depth + 1,
-                          availableModels,
-                          missingTypes
-                        );
-                        return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
-                      });
-                      return `{ ${props.join("; ")} }`;
-                    }
-                    if (schema.type === "array" && schema.items) {
-                      const itemType = mapRefToType(
-                        schema.items as OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject,
-                        modelImports,
-                        spec,
-                        depth + 1,
-                        availableModels,
-                        missingTypes
-                      );
-                      return `${itemType}[]`;
-                    }
-                    return mapOpenApiTypeToTs(schema.type);
-                  }
-                  return "any";
-                }
-
-
-                export
-                function
-                generateDocsJson(
-                  specFile: string,
-                  modelsDir: string,
-                  outputFile: string
-                ):
-                void
-                {
-                  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
-                  const availableModels: string[] = readdirSync(modelsDir)
-                    .filter((f) => f.endsWith(".ts") && !f.startsWith("index"))
-                    .map((f) => f.replace(".ts", ""));
-                  const modelImports = new Set<string>();
-                  const missingTypes = new Set<string>();
-                  const docsData: any[] = [];
-
-                  for (const [path, methodsObj] of Object.entries(
-                    spec.paths as OpenAPIV2.PathsObject
-                  )) {
-                    if (!methodsObj) continue;
-                    for (const [method, operation] of Object.entries(
-                      methodsObj as OpenAPIV2.PathItemObject
-                    )) {
-                      const op = operation as OpenAPIV2.OperationObject | undefined;
-                      if (!op || !op.operationId) continue;
-
-                      const opId = op.operationId; // Using raw operationId since simplifyName is minimal
-                      const paramDetails = (op.parameters || [])
-                        .filter(
-                          (p) =>
-                            !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
-                              (p as OpenAPIV2.ParameterObject).name || ""
-                            )
-                        )
-                        .map((p) => {
-                          const param = p as OpenAPIV2.ParameterObject;
-                          let type = "any";
-                          if ("schema" in p && p.schema)
-                            type = mapRefToType(
-                              p.schema,
-                              modelImports,
-                              spec,
-                              1,
-                              availableModels,
-                              missingTypes
-                            );
-                          else if ("type" in p) type = mapOpenApiTypeToTs(p.type);
-                          return {
-                            name: param.in === "body" ? "body" : param.name,
-                            type,
-                            required: param.required || false,
-                            description: param.description || "",
-                          };
-                        });
-
-                      const returnTypes = ["200", "207"]
-                        .map(
-                          (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
-                        )
-                        .filter(Boolean)
-                        .map((schema) =>
-                          mapRefToType(
-                            schema!,
-                            modelImports,
-                            spec,
-                            1,
-                            availableModels,
-                            missingTypes
-                          )
-                        );
-                      const returnType =
-                        returnTypes.length > 1
-                          ? returnTypes.join(" | ")
-                          : returnTypes[0] || "void";
-
-                      docsData.push({
-                        name: opId,
-                        summary: op.summary || "No description.",
-                        method: method.toUpperCase(),
-                        path,
-                        parameters: paramDetails,
-                        returns: returnType,
-                        docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
-                      });
-                    }
-                  }
-
-                  writeFileSync(outputFile, JSON.stringify(docsData, null, 2), "utf8");
-                  console.log("Generated docs JSON:", outputFile);
-                }
             - name: >-
-                generateJsDoc.ts.bak
+                generateJsDoc.ts
               type: >-
                 file
             - name: >-
@@ -1497,98 +2406,6 @@ tree:
         package.json
       type: >-
         file
-      contents: >
-        {
-          "name": "quickbase-js",
-          "version": "0.1.0-beta.9",
-          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
-          "type": "module",
-          "main": "dist/esm/quickbase.js",
-          "module": "dist/esm/quickbase.js",
-          "types": "dist/esm/quickbase.d.ts",
-          "publishConfig": {
-            "access": "public"
-          },
-          "exports": {
-            ".": {
-              "types": "./dist/esm/quickbase.d.ts",
-              "import": {
-                "minified": "./dist/esm/quickbase.min.js",
-                "default": "./dist/esm/quickbase.js"
-              },
-              "require": {
-                "minified": "./dist/umd/quickbase.umd.min.js",
-                "default": "./dist/umd/quickbase.umd.js"
-              },
-              "umd:types": "./dist/umd/quickbase.umd.d.ts"
-            }
-          },
-          "scripts": {
-            "build": "npm run build:esm && npm run build:umd",
-            "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-esm.js",
-            "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-umd.js",
-            "release": "standard-version",
-            "release:beta": "standard-version --prerelease beta",
-            "release:alpha": "standard-version --prerelease alpha",
-            "release:push": "npm run release:beta && git push --follow-tags origin main",
-            "release:publish": "npm run release:push && npm publish --tag beta",
-            "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
-            "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
-            "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
-            "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
-            "gen:docs": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/generate-docusaurus.ts",
-            "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docs",
-            "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
-            "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
-            "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
-            "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
-            "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
-            "test:vitest:unit": "vitest run tests/vitest/unit/**/*.test.ts",
-            "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/*.test.ts",
-            "test:vitest:qb:auth": "vitest run tests/vitest/qb/auth/*.test.ts",
-            "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/*.test.ts",
-            "test:vitest:qb:records": "vitest run tests/vitest/qb/records/*.test.ts",
-            "test:vitest:qb:tables": "vitest run tests/vitest/qb/tables/*.test.ts",
-            "test:vitest:unit:apps": "vitest run tests/vitest/unit/apps/*.test.ts",
-            "test:vitest:unit:auth": "vitest run tests/vitest/unit/auth/*.test.ts",
-            "test:vitest:unit:fields": "vitest run tests/vitest/unit/fields/*.test.ts",
-            "test:vitest:unit:formulas": "vitest run tests/vitest/unit/formulas/*.test.ts",
-            "test:vitest:unit:records": "vitest run tests/vitest/unit/records/*.test.ts",
-            "test:vitest:unit:tables": "vitest run tests/vitest/unit/tables/*.test.ts",
-            "test:pw:qb:auth": "playwright test tests/playwright/qb/auth"
-          },
-          "devDependencies": {
-            "@openapitools/openapi-generator-cli": "^2.18.4",
-            "@playwright/test": "^1.51.0",
-            "@rollup/plugin-commonjs": "^28.0.3",
-            "@rollup/plugin-node-resolve": "^16.0.1",
-            "@rollup/plugin-terser": "^0.4.4",
-            "@rollup/plugin-typescript": "^12.1.2",
-            "@types/fast-json-patch": "^1.0.4",
-            "@types/js-yaml": "^4.0.9",
-            "@types/node": "^22.13.10",
-            "dotenv": "^16.4.7",
-            "express": "^4.21.2",
-            "fast-json-patch": "^3.1.1",
-            "glob": "^10.4.5",
-            "js-yaml": "^4.1.0",
-            "jsdom": "^26.0.0",
-            "node-fetch": "^3.3.2",
-            "openapi-schema-validator": "^12.1.3",
-            "openapi-types": "^12.1.3",
-            "openapi-typescript": "^7.6.1",
-            "rimraf": "^5.0.10",
-            "rollup": "^4.35.0",
-            "rollup-plugin-dts": "^6.1.1",
-            "standard-version": "^9.5.0",
-            "ts-morph": "^25.0.1",
-            "ts-node": "^10.9.2",
-            "tslib": "^2.8.1",
-            "typescript": "^5.8.2",
-            "undici-types": "^7.5.0",
-            "vitest": "^3.0.8"
-          }
-        }
     - name: >-
         playwright.config.ts
       type: >-
@@ -2349,26 +3166,6 @@ tree:
           type: >-
             file
     - name: >-
-        test-esm.js
-      type: >-
-        file
-    - name: >-
-        test-results.json
-      type: >-
-        file
-    - name: >-
-        test-umd.js
-      type: >-
-        file
-    - name: >-
-        test.log
-      type: >-
-        file
-    - name: >-
-        test.ts
-      type: >-
-        file
-    - name: >-
         tests
       type: >-
         directory
@@ -2768,304 +3565,16 @@ tree:
                   type: >-
                     file
     - name: >-
-        text.txt
-      type: >-
-        file
-    - name: >-
         tools
       type: >-
         directory
       children:
         - name: >-
-            generate-docusaurus.ts
+            log-gen.ts
           type: >-
             file
-          contents: >
-            #!/usr/bin/env
-            node
-
-            console.log("Docusaurus
-            generation
-            script
-            started");
-
-
-            import
-            {
-            execSync
-            }
-            from
-            "child_process";
-
-            import
-            {
-            copyFileSync,
-            existsSync,
-            mkdirSync,
-            writeFileSync
-            }
-            from
-            "fs";
-
-            import
-            {
-            join,
-            dirname
-            }
-            from
-            "path";
-
-            import
-            {
-            fileURLToPath
-            }
-            from
-            "url";
-
-
-            const
-            __dirname
-            =
-            dirname(fileURLToPath(import.meta.url));
-
-            const
-            PROJECT_ROOT
-            =
-            join(__dirname,
-            "..");
-
-            const
-            DOCS_DIR
-            =
-            join(PROJECT_ROOT,
-            "quickbase-docs");
-
-            const
-            API_DOCS_JSON
-            =
-            join(PROJECT_ROOT,
-            "docs-data",
-            "api-docs.json");
-
-            const
-            DOCS_DATA_DIR
-            =
-            join(DOCS_DIR,
-            "src",
-            "data");
-
-            const
-            DOCS_API_PAGE
-            =
-            join(DOCS_DIR,
-            "src",
-            "pages",
-            "api.tsx");
-
-
-            function
-            initializeDocusaurus()
-            {
-              if (!existsSync(DOCS_DIR)) {
-                console.log("Initializing Docusaurus...");
-                execSync(
-                  `npx create-docusaurus@latest quickbase-docs classic --typescript`,
-                  {
-                    cwd: PROJECT_ROOT,
-                    stdio: "inherit",
-                  }
-                );
-              } else {
-                console.log(
-                  "Docusaurus directory already exists, skipping initialization."
-                );
-              }
-            }
-
-
-            function
-            configureDocusaurus()
-            {
-              const configPath = join(DOCS_DIR, "docusaurus.config.js");
-              const configContent = `
-            module.exports
-            =
-            {
-              title: 'Quickbase JS API Docs',
-              tagline: 'Documentation for quickbase-js library',
-              url: 'https://your-site.com',
-              baseUrl: '/',
-              onBrokenLinks: 'throw',
-              onBrokenMarkdownLinks: 'warn',
-              favicon: 'img/favicon.ico',
-              organizationName: 'your-org',
-              projectName: 'quickbase-js',
-              presets: [
-                [
-                  'classic',
-                  {
-                    docs: { sidebarPath: require.resolve('./sidebars.js') },
-                    theme: { customCss: require.resolve('./src/css/custom.css') },
-                  },
-                ],
-              ],
-              themeConfig: {
-                navbar: {
-                  title: 'Quickbase JS',
-                  items: [
-                    { to: '/api', label: 'API', position: 'left' },
-                    { href: 'https://github.com/your-org/quickbase-js', label: 'GitHub', position: 'right' },
-                  ],
-                },
-                footer: {
-                  style: 'dark',
-                  copyright: \`Copyright © ${new Date().getFullYear()} Your Org. Built with Docusaurus.\`,
-                },
-                prism: {
-                  theme: require('prism-react-renderer/themes/github'),
-                  darkTheme: require('prism-react-renderer/themes/dracula'),
-                },
-              },
-            };
-              `;
-              writeFileSync(configPath, configContent.trim(), "utf8");
-              console.log("Updated Docusaurus config:", configPath);
-            }
-
-
-            function
-            copyApiDocs()
-            {
-              if (!existsSync(API_DOCS_JSON)) {
-                console.error(
-                  `API docs JSON not found at ${API_DOCS_JSON}. Run generate-interface.ts first.`
-                );
-                process.exit(1);
-              }
-              if (!existsSync(DOCS_DATA_DIR)) mkdirSync(DOCS_DATA_DIR, { recursive: true });
-              const targetJsonPath = join(DOCS_DATA_DIR, "api-docs.json");
-              copyFileSync(API_DOCS_JSON, targetJsonPath);
-              console.log("Copied API docs JSON to:", targetJsonPath);
-            }
-
-
-            function
-            generateApiPage()
-            {
-              const apiPageContent = `
-            import
-            React
-            from
-            'react';
-
-            import
-            Layout
-            from
-            '@theme/Layout';
-
-            import
-            apiDocs
-            from
-            '../data/api-docs.json';
-
-
-            interface
-            Method
-            {
-              name: string;
-              summary: string;
-              method: string;
-              path: string;
-              parameters: { name: string; type: string; required: boolean; description: string }[];
-              returns: string;
-              docLink: string;
-            }
-
-
-            const
-            ApiDocs:
-            React.FC
-            =
-            ()
-            =>
-            {
-              return (
-                <Layout title="API Documentation">
-                  <main className="container margin-vert--lg">
-                    <h1>QuickbaseClient API</h1>
-                    {(apiDocs as Method[]).map((method) => (
-                      <div key={method.name} className="card margin-bottom--md">
-                        <div className="card__header">
-                          <h2>{method.name}</h2>
-                          <code>{method.method} {method.path}</code>
-                        </div>
-                        <div className="card__body">
-                          <p>{method.summary}</p>
-                          {method.parameters.length > 0 && (
-                            <>
-                              <h3>Parameters</h3>
-                              <ul>
-                                {method.parameters.map((param) => (
-                                  <li key={param.name}>
-                                    <strong>{param.name}</strong> ({param.type}, {param.required ? 'required' : 'optional'}): {param.description || 'No description'}
-                                  </li>
-                                ))}
-                              </ul>
-                            </>
-                          )}
-                          <h3>Returns</h3>
-                          <p><code>{method.returns}</code></p>
-                          <a href={method.docLink} target="_blank" rel="noopener noreferrer">Official Docs</a>
-                        </div>
-                      </div>
-                    ))}
-                  </main>
-                </Layout>
-              );
-            };
-
-
-            export
-            default
-            ApiDocs;
-              `;
-              if (!existsSync(dirname(DOCS_API_PAGE)))
-                mkdirSync(dirname(DOCS_API_PAGE), { recursive: true });
-              writeFileSync(DOCS_API_PAGE, apiPageContent.trim(), "utf8");
-              console.log("Generated API page:", DOCS_API_PAGE);
-            }
-
-
-            function
-            runDocusaurus()
-            {
-              console.log("Starting Docusaurus...");
-              execSync("npm run start", { cwd: DOCS_DIR, stdio: "inherit" });
-            }
-
-
-            try
-            {
-              initializeDocusaurus();
-              configureDocusaurus();
-              copyApiDocs();
-              generateApiPage();
-              runDocusaurus();
-            }
-            catch
-            (error)
-            {
-              console.error("Error in Docusaurus generation:", error);
-              process.exit(1);
-            }
-
-
-            console.log("Docusaurus
-            generation
-            script
-            completed");
         - name: >-
-            log-gen.ts
+            log-gen.yaml
           type: >-
             file
         - name: >-

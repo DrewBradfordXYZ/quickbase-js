@@ -37,7 +37,6 @@ export function fixArrays(spec: Spec): void {
           }
           if (response.schema?.properties) {
             for (const propKey in response.schema.properties) {
-              // Fixed: Changed param to response
               const prop = response.schema.properties[propKey];
               if (prop.type === "array" && !prop.items) {
                 console.log(

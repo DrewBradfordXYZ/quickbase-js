@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import { execSync } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
@@ -9,10 +10,10 @@ import readline from "readline";
 const CURRENT_JAR_VERSION = "7.12.0";
 const MAVEN_METADATA_URL =
   "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/maven-metadata.xml";
-const CODEGEN_DIR = join(fileURLToPath(import.meta.url), ".."); // open-api/
-const JARS_DIR = join(CODEGEN_DIR, "..", "tools", "openapi-jars"); // Updated to tools/openapi-jars/
-const SPEC_INPUT = join(CODEGEN_DIR, "output", "quickbase-fixed.json"); // Relative to open-api/
-const OUTPUT_DIR = join(CODEGEN_DIR, "..", "src", "generated"); // Up to root, then into src/generated/
+const CODEGEN_DIR = join(fileURLToPath(import.meta.url), "..");
+const JARS_DIR = join(CODEGEN_DIR, "..", "tools", "openapi-jars");
+const SPEC_INPUT = join(CODEGEN_DIR, "output", "quickbase-fixed.json");
+const OUTPUT_DIR = join(CODEGEN_DIR, "..", "src", "generated");
 
 async function getLatestVersion(): Promise<string> {
   const response = await fetch(MAVEN_METADATA_URL);
@@ -80,7 +81,7 @@ async function ensureJarExists(
 
 function regenerateClient(jarPath: string, messages: string[]) {
   messages.push("Regenerating client from spec...");
-  const command = `java -jar ${jarPath} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR} --additional-properties=generateAliasAsModel=true`;
+  const command = `java -jar ${jarPath} generate -i ${SPEC_INPUT} -g typescript-fetch -o ${OUTPUT_DIR} --additional-properties=generateAliasAsModel=true,withInterfaces=true,supportsES6=true,modelPropertyNaming=original`;
   try {
     execSync(command, { stdio: "inherit" });
     messages.push("Client regeneration complete.");

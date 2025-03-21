@@ -391,6 +391,14 @@
       }
     ],
     "returns": "GetAppEvents200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetAppEvents200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": ""
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getAppEvents"
   },
   {
@@ -663,6 +671,14 @@
       }
     ],
     "returns": "GetAppTables200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetAppTables200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": ""
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getAppTables"
   },
   {
@@ -1225,6 +1241,14 @@
       }
     ],
     "returns": "GetTableReports200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetTableReports200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": "This is simple example of report schema for more details please refer [Report types page](../reportTypes)"
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getTableReports"
   },
   {
@@ -1385,6 +1409,14 @@
       }
     ],
     "returns": "GetFields200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetFields200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": ""
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getFields"
   },
   {
@@ -1983,6 +2015,14 @@
       }
     ],
     "returns": "GetFieldsUsage200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetFieldsUsage200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": ""
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getFieldsUsage"
   },
   {
@@ -2005,6 +2045,14 @@
       }
     ],
     "returns": "GetFieldUsage200Response",
+    "returnTypeDetails": [
+      {
+        "name": "items",
+        "type": "GetFieldsUsage200ResponseItemsInner[]",
+        "required": false,
+        "jsdoc": ""
+      }
+    ],
     "docLink": "https://developer.quickbase.com/operation/getFieldUsage"
   },
   {
@@ -2251,19 +2299,19 @@
     "returns": "ExchangeSsoToken200Response",
     "returnTypeDetails": [
       {
-        "name": "accessToken",
+        "name": "access_token",
         "type": "string",
         "required": false,
         "jsdoc": "The security token issued by the authorization server in response to the token exchange request. The identifier `access_token` is used for historical reasons and the issued token need not be an OAuth access token."
       },
       {
-        "name": "issuedTokenType",
+        "name": "issued_token_type",
         "type": "ExchangeSsoToken200ResponseIssuedTokenTypeEnum",
         "required": false,
         "jsdoc": "An identifier for the representation of the issued security token."
       },
       {
-        "name": "tokenType",
+        "name": "token_type",
         "type": "\"N_A\"",
         "required": false,
         "jsdoc": "Will always return `N_A`"

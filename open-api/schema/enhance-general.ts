@@ -5,6 +5,28 @@ import { inferSchema } from "../utils/infer-schema.ts";
 export function enhanceGeneral(spec: Spec): void {
   spec.definitions = spec.definitions || {};
 
+  // Local function to wrap top-level arrays and refine items
+  function wrapTopLevelArrays(schema: any, responseName: string): any {
+    if (schema.type === "array") {
+      console.log(
+        `Wrapping ${responseName} in an object with 'items' property`
+      );
+      // Remove additionalProperties from items to ensure typing
+      if (schema.items && "additionalProperties" in schema.items) {
+        delete schema.items.additionalProperties;
+        console.log(`Removed additionalProperties from ${responseName}.items`);
+      }
+      return {
+        type: "object",
+        properties: {
+          items: schema,
+        },
+        description: `A response containing a list for ${responseName}`,
+      };
+    }
+    return schema; // Return unchanged if not a top-level array
+  }
+
   if (!spec.definitions["Record"]) {
     spec.definitions["Record"] = {
       type: "object",
@@ -62,34 +84,46 @@ export function enhanceGeneral(spec: Spec): void {
               console.log(
                 `Adding ${responseName} to definitions for ${pathKey}(${method})`
               );
-              if (!response.schema.type && response["x-amf-mediaType"]) {
-                const mediaType = response["x-amf-mediaType"];
-                if (mediaType === "application/octet-stream") {
-                  response.schema = {
-                    type: "object",
-                    properties: { data: { type: "string", format: "binary" } },
-                    description:
-                      response.schema?.description || "Binary file content",
-                  };
-                } else if (mediaType === "application/x-yaml") {
-                  response.schema = {
-                    type: "object",
-                    properties: { content: { type: "string", format: "yaml" } },
-                    description: "YAML-formatted data",
-                  };
-                } else if (
-                  mediaType === "application/json" &&
-                  response.schema.example
-                ) {
-                  response.schema = inferSchema(
-                    response.schema.example,
-                    responseName
-                  );
-                  response.schema.description =
-                    response.description || `Response for ${opId}`;
+              let schemaToUse = response.schema;
+              // Apply general fix for top-level arrays
+              schemaToUse = wrapTopLevelArrays(schemaToUse, responseName);
+              if (
+                !schemaToUse.type ||
+                (schemaToUse.type === "array" && !schemaToUse.items)
+              ) {
+                if (response["x-amf-mediaType"]) {
+                  const mediaType = response["x-amf-mediaType"];
+                  if (mediaType === "application/octet-stream") {
+                    schemaToUse = {
+                      type: "object",
+                      properties: {
+                        data: { type: "string", format: "binary" },
+                      },
+                      description:
+                        schemaToUse?.description || "Binary file content",
+                    };
+                  } else if (mediaType === "application/x-yaml") {
+                    schemaToUse = {
+                      type: "object",
+                      properties: {
+                        content: { type: "string", format: "yaml" },
+                      },
+                      description: "YAML-formatted data",
+                    };
+                  } else if (
+                    mediaType === "application/json" &&
+                    schemaToUse.example
+                  ) {
+                    schemaToUse = inferSchema(
+                      schemaToUse.example,
+                      responseName
+                    );
+                    schemaToUse.description =
+                      response.description || `Response for ${opId}`;
+                  }
                 }
               }
-              spec.definitions[responseName] = response.schema;
+              spec.definitions[responseName] = schemaToUse;
             }
             response.schema = { $ref: `#/definitions/${responseName}` };
           }

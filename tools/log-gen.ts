@@ -17,10 +17,12 @@ const excludeDirs: string[] = [
 
 // prettier-ignore
 const includeFolders: string[] = [
+  // "open-api"
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
+  "open-api/schema/tags",
   // "open-api",
   // "tools"
   // "tests",
@@ -32,11 +34,11 @@ const includeRecursiveFolders: string[] = [
 const includeFiles: string[] = [
   // "tests/setup.ts",
   // "vitest.config.ts",
+  // "package.json",
 
-  "package.json",
-  "open-api/generate-unified-interface.ts",
-  "open-api/utils/generateDocsJson.ts",
-  "tools/generate-docusaurus.ts",
+  // "open-api/generate-unified-interface.ts",
+  // "open-api/utils/generateDocsJson.ts",
+
   // "tsconfig.json",
   // "tsconfig.build.json",
   // "rollup.config.js",
