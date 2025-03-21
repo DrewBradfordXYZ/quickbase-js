@@ -119,7 +119,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       }
     ],
     "returns": "GetApp200Response",
@@ -215,7 +216,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "body",
@@ -337,7 +339,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "body",
@@ -387,7 +390,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       }
     ],
     "returns": "GetAppEvents200Response",
@@ -449,7 +453,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "body",
@@ -559,7 +564,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "body",
@@ -705,7 +711,8 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       }
     ],
     "returns": "GetAppTables200Response",
@@ -827,13 +834,15 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       }
     ],
     "returns": "GetTable200Response",
@@ -947,13 +956,15 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "body",
@@ -1087,13 +1098,15 @@
         "name": "appId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app"
+        "description": "The unique identifier of an app",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       }
     ],
     "returns": "DeleteTable200Response",
@@ -1117,13 +1130,15 @@
         "name": "skip",
         "type": "number",
         "required": false,
-        "description": "The number of relationships to skip."
+        "description": "The number of relationships to skip.",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the child table."
+        "description": "The unique identifier (dbid) of the child table.",
+        "properties": []
       }
     ],
     "returns": "GetRelationships200Response",
@@ -1153,7 +1168,8 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table. This will be the child table."
+        "description": "The unique identifier (dbid) of the table. This will be the child table.",
+        "properties": []
       },
       {
         "name": "body",
@@ -1245,13 +1261,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table. This will be the child table."
+        "description": "The unique identifier (dbid) of the table. This will be the child table.",
+        "properties": []
       },
       {
         "name": "relationshipId",
         "type": "number",
         "required": true,
-        "description": "The relationship id. This is the field id of the reference field on the child table."
+        "description": "The relationship id. This is the field id of the reference field on the child table.",
+        "properties": []
       },
       {
         "name": "body",
@@ -1343,13 +1361,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table. This will be the child table."
+        "description": "The unique identifier (dbid) of the table. This will be the child table.",
+        "properties": []
       },
       {
         "name": "relationshipId",
         "type": "number",
         "required": true,
-        "description": "The relationship id. This is the field id of the reference field on the child table."
+        "description": "The relationship id. This is the field id of the reference field on the child table.",
+        "properties": []
       }
     ],
     "returns": "DeleteRelationship200Response",
@@ -1373,7 +1393,8 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       }
     ],
     "returns": "GetTableReports200Response",
@@ -1453,13 +1474,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of table."
+        "description": "The unique identifier of table.",
+        "properties": []
       },
       {
         "name": "reportId",
         "type": "string",
         "required": true,
-        "description": "The identifier of the report, unique to the table."
+        "description": "The identifier of the report, unique to the table.",
+        "properties": []
       }
     ],
     "returns": "GetReport200Response",
@@ -1531,31 +1554,36 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The identifier of the table for the report."
+        "description": "The identifier of the table for the report.",
+        "properties": []
       },
       {
         "name": "skip",
         "type": "number",
         "required": false,
-        "description": "The number of records to skip. You can set this value when paginating through a set of results."
+        "description": "The number of records to skip. You can set this value when paginating through a set of results.",
+        "properties": []
       },
       {
         "name": "top",
         "type": "number",
         "required": false,
-        "description": "The maximum number of records to return. You can override the default Quickbase pagination to get more or fewer results. If your requested value here exceeds the dynamic maximums, we will return a subset of results and the rest can be gathered in subsequent API calls."
+        "description": "The maximum number of records to return. You can override the default Quickbase pagination to get more or fewer results. If your requested value here exceeds the dynamic maximums, we will return a subset of results and the rest can be gathered in subsequent API calls.",
+        "properties": []
       },
       {
         "name": "reportId",
         "type": "string",
         "required": true,
-        "description": "The identifier of the report, unique to the table."
+        "description": "The identifier of the report, unique to the table.",
+        "properties": []
       },
       {
         "name": "body",
         "type": "any",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "RunReport200Response",
@@ -1591,13 +1619,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "includeFieldPerms",
         "type": "boolean",
         "required": false,
-        "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s)."
+        "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s).",
+        "properties": []
       }
     ],
     "returns": "GetFields200Response",
@@ -1713,7 +1743,8 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "body",
@@ -1913,7 +1944,8 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "body",
@@ -1957,19 +1989,22 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "includeFieldPerms",
         "type": "boolean",
         "required": false,
-        "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s)."
+        "description": "Set to 'true' if you'd like to get back the custom permissions for the field(s).",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field."
+        "description": "The unique identifier (fid) of the field.",
+        "properties": []
       }
     ],
     "returns": "GetField200Response",
@@ -2077,13 +2112,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field."
+        "description": "The unique identifier (fid) of the field.",
+        "properties": []
       },
       {
         "name": "body",
@@ -2283,19 +2320,22 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "skip",
         "type": "number",
         "required": false,
-        "description": "The number of fields to skip from the list."
+        "description": "The number of fields to skip from the list.",
+        "properties": []
       },
       {
         "name": "top",
         "type": "number",
         "required": false,
-        "description": "The maximum number of fields to return."
+        "description": "The maximum number of fields to return.",
+        "properties": []
       }
     ],
     "returns": "GetFieldsUsage200Response",
@@ -2333,13 +2373,15 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field."
+        "description": "The unique identifier (fid) of the field.",
+        "properties": []
       }
     ],
     "returns": "GetFieldUsage200Response",
@@ -2377,7 +2419,8 @@
         "name": "body",
         "type": "{ formula?: string; rid?: number; from?: string }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "RunFormula200Response",
@@ -2603,13 +2646,15 @@
         "name": "dbid",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of an app or table."
+        "description": "The unique identifier of an app or table.",
+        "properties": []
       },
       {
         "name": "qBAppToken",
         "type": "string",
         "required": false,
-        "description": "Your Quickbase app token"
+        "description": "Your Quickbase app token",
+        "properties": []
       }
     ],
     "returns": "GetTempTokenDBID200Response",
@@ -2633,7 +2678,8 @@
         "name": "body",
         "type": "{ grant_type?: string; requested_token_type?: string; subject_token?: string; subject_token_type?: string }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "ExchangeSsoToken200Response",
@@ -2669,7 +2715,8 @@
         "name": "body",
         "type": "{ name?: string; description?: string }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "CloneUserToken200Response",
@@ -2729,7 +2776,8 @@
         "name": "body",
         "type": "{ id?: number; from?: string; to?: string }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "TransferUserToken200Response",
@@ -2817,25 +2865,29 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the record."
+        "description": "The unique identifier of the record.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the field."
+        "description": "The unique identifier of the field.",
+        "properties": []
       },
       {
         "name": "versionNumber",
         "type": "number",
         "required": true,
-        "description": "The file attachment version number."
+        "description": "The file attachment version number.",
+        "properties": []
       }
     ],
     "returns": "DownloadFile200Response",
@@ -2859,25 +2911,29 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the record."
+        "description": "The unique identifier of the record.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the field."
+        "description": "The unique identifier of the field.",
+        "properties": []
       },
       {
         "name": "versionNumber",
         "type": "number",
         "required": true,
-        "description": "The file attachment version number."
+        "description": "The file attachment version number.",
+        "properties": []
       }
     ],
     "returns": "DeleteFile200Response",
@@ -2919,7 +2975,8 @@
         "name": "accountId",
         "type": "number",
         "required": false,
-        "description": "The account id being used to get users. If no value is specified, the first account associated with the requesting user token is chosen."
+        "description": "The account id being used to get users. If no value is specified, the first account associated with the requesting user token is chosen.",
+        "properties": []
       },
       {
         "name": "body",
@@ -2963,7 +3020,8 @@
         "name": "accountId",
         "type": "number",
         "required": false,
-        "description": "The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen."
+        "description": "The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3007,13 +3065,15 @@
         "name": "accountId",
         "type": "number",
         "required": false,
-        "description": "The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen."
+        "description": "The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen.",
+        "properties": []
       },
       {
         "name": "shouldDeleteFromGroups",
         "type": "boolean",
         "required": true,
-        "description": "Specifies if the users should also be removed from all groups."
+        "description": "Specifies if the users should also be removed from all groups.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3057,7 +3117,8 @@
         "name": "accountId",
         "type": "number",
         "required": false,
-        "description": "The account id being used to undeny users. If no value is specified, the first account associated with the requesting user token is chosen."
+        "description": "The account id being used to undeny users. If no value is specified, the first account associated with the requesting user token is chosen.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3101,7 +3162,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3145,7 +3207,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3189,7 +3252,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3233,7 +3297,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3277,7 +3342,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3321,7 +3387,8 @@
         "name": "gid",
         "type": "number",
         "required": true,
-        "description": "This is the ID of the group being modified."
+        "description": "This is the ID of the group being modified.",
+        "properties": []
       },
       {
         "name": "body",
@@ -3365,7 +3432,8 @@
         "name": "body",
         "type": "{ nextToken?: string; numRows?: number; queryId?: string; date?: string; topics?: string[] }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "Audit200Response",
@@ -3401,7 +3469,8 @@
         "name": "day",
         "type": "string",
         "required": false,
-        "description": "The date for which read summaries need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past."
+        "description": "The date for which read summaries need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past.",
+        "properties": []
       }
     ],
     "returns": "PlatformAnalyticReads200Response",
@@ -3431,13 +3500,15 @@
         "name": "accountId",
         "type": "number",
         "required": false,
-        "description": "The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen."
+        "description": "The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen.",
+        "properties": []
       },
       {
         "name": "body",
         "type": "{ start?: string; end?: string; groupBy?: string; nextToken?: string; where?: { id?: string; type?: string }[] }",
         "required": false,
-        "description": ""
+        "description": "",
+        "properties": []
       }
     ],
     "returns": "PlatformAnalyticEventSummaries200Response",
@@ -3563,13 +3634,15 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of a solution"
+        "description": "The unique identifier of a solution",
+        "properties": []
       },
       {
         "name": "qBLVersion",
         "type": "string",
         "required": false,
-        "description": "The QBL version to be used for the export. If not specified the default would be used."
+        "description": "The QBL version to be used for the export. If not specified the default would be used.",
+        "properties": []
       }
     ],
     "returns": "ExportSolution200Response",
@@ -3593,19 +3666,22 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of a solution"
+        "description": "The unique identifier of a solution",
+        "properties": []
       },
       {
         "name": "body",
         "type": "any",
         "required": false,
-        "description": "The QBL to be used for the update."
+        "description": "The QBL to be used for the update.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "UpdateSolution200Response",
@@ -3621,13 +3697,15 @@
         "name": "body",
         "type": "any",
         "required": false,
-        "description": "The QBL to be used for the create."
+        "description": "The QBL to be used for the create.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "CreateSolution200Response",
@@ -3643,31 +3721,36 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the solution."
+        "description": "The unique identifier of the solution.",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field."
+        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       },
       {
         "name": "qBLVersion",
         "type": "string",
         "required": false,
-        "description": "The QBL version to be used for the export. If not specified the default would be used."
+        "description": "The QBL version to be used for the export. If not specified the default would be used.",
+        "properties": []
       }
     ],
     "returns": "ExportSolutionToRecord200Response",
@@ -3683,25 +3766,29 @@
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field."
+        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the record."
+        "description": "The unique identifier of the record.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "CreateSolutionFromRecord200Response",
@@ -3717,31 +3804,36 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the solution."
+        "description": "The unique identifier of the solution.",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field."
+        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the record."
+        "description": "The unique identifier of the record.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "UpdateSolutionToRecord200Response",
@@ -3757,19 +3849,22 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the solution."
+        "description": "The unique identifier of the solution.",
+        "properties": []
       },
       {
         "name": "body",
         "type": "any",
         "required": false,
-        "description": "The QBL to be used for the changeset."
+        "description": "The QBL to be used for the changeset.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "ChangesetSolution200Response",
@@ -3785,31 +3880,36 @@
         "name": "solutionId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the solution."
+        "description": "The unique identifier of the solution.",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier (dbid) of the table."
+        "description": "The unique identifier (dbid) of the table.",
+        "properties": []
       },
       {
         "name": "fieldId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field."
+        "description": "The unique identifier (fid) of the field. It needs to be a file attachment field.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": true,
-        "description": "The unique identifier of the record."
+        "description": "The unique identifier of the record.",
+        "properties": []
       },
       {
         "name": "xQBLErrorsAsSuccess",
         "type": "boolean",
         "required": false,
-        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body."
+        "description": "If this header is set to true, the API will return a 207 status code even if there are errors. The errors will be returned in the response body.",
+        "properties": []
       }
     ],
     "returns": "ChangesetSolutionFromRecord200Response",
@@ -3825,67 +3925,78 @@
         "name": "templateId",
         "type": "number",
         "required": true,
-        "description": "This is the ID of document template."
+        "description": "This is the ID of document template.",
+        "properties": []
       },
       {
         "name": "tableId",
         "type": "string",
         "required": true,
-        "description": "The unique identifier of the table."
+        "description": "The unique identifier of the table.",
+        "properties": []
       },
       {
         "name": "recordId",
         "type": "number",
         "required": false,
-        "description": "The ID of the record"
+        "description": "The ID of the record",
+        "properties": []
       },
       {
         "name": "filename",
         "type": "string",
         "required": true,
-        "description": "File name for the downloaded file"
+        "description": "File name for the downloaded file",
+        "properties": []
       },
       {
         "name": "accept",
         "type": "string",
         "required": false,
-        "description": "The content-type of the response. application/json will return a JSON payload with a base64 encoded file. application/octet-stream will download the file directly."
+        "description": "The content-type of the response. application/json will return a JSON payload with a base64 encoded file. application/octet-stream will download the file directly.",
+        "properties": []
       },
       {
         "name": "format",
         "type": "string",
         "required": false,
-        "description": "The format of the file that is returned. Default is \"pdf\"."
+        "description": "The format of the file that is returned. Default is \"pdf\".",
+        "properties": []
       },
       {
         "name": "margin",
         "type": "string",
         "required": false,
-        "description": "Margin formatted as top right bottom left, separated by spaces. Add to override the value set in the template builder."
+        "description": "Margin formatted as top right bottom left, separated by spaces. Add to override the value set in the template builder.",
+        "properties": []
       },
       {
         "name": "unit",
         "type": "string",
         "required": false,
-        "description": "Unit of measurement for the margin. Default is \"in\". Add to override the value set in the template builder."
+        "description": "Unit of measurement for the margin. Default is \"in\". Add to override the value set in the template builder.",
+        "properties": []
       },
       {
         "name": "pageSize",
         "type": "string",
         "required": false,
-        "description": "Page size. Default is \"A4\". Add to override the value set in the template builder."
+        "description": "Page size. Default is \"A4\". Add to override the value set in the template builder.",
+        "properties": []
       },
       {
         "name": "orientation",
         "type": "string",
         "required": false,
-        "description": "Page orientation. Default is \"portrait\". Add to override the value set in the template builder."
+        "description": "Page orientation. Default is \"portrait\". Add to override the value set in the template builder.",
+        "properties": []
       },
       {
         "name": "realm",
         "type": "string",
         "required": false,
-        "description": "Your Quickbase domain, for example demo.quickbase.com"
+        "description": "Your Quickbase domain, for example demo.quickbase.com",
+        "properties": []
       }
     ],
     "returns": "GenerateDocument200Response",

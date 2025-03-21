@@ -2358,7 +2358,7 @@ interface CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner
      * @type {string}
      * @memberof CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner
      */
-    $appITTotalManagement?: string;
+    $App_IT_Total_Management?: string;
 }
 /**
  * Check if a given object implements the CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner interface.
@@ -3446,19 +3446,19 @@ interface ExchangeSsoToken200Response {
      * @type {string}
      * @memberof ExchangeSsoToken200Response
      */
-    accessToken?: string;
+    access_token?: string;
     /**
      * An identifier for the representation of the issued security token.
      * @type {string}
      * @memberof ExchangeSsoToken200Response
      */
-    issuedTokenType?: ExchangeSsoToken200ResponseIssuedTokenTypeEnum;
+    issued_token_type?: ExchangeSsoToken200ResponseIssuedTokenTypeEnum;
     /**
      * Will always return `N_A`
      * @type {string}
      * @memberof ExchangeSsoToken200Response
      */
-    tokenType?: ExchangeSsoToken200ResponseTokenTypeEnum;
+    token_type?: ExchangeSsoToken200ResponseTokenTypeEnum;
 }
 /**
  * @export
@@ -3506,25 +3506,25 @@ interface ExchangeSsoTokenRequest {
      * @type {string}
      * @memberof ExchangeSsoTokenRequest
      */
-    grantType: ExchangeSsoTokenRequestGrantTypeEnum;
+    grant_type: ExchangeSsoTokenRequestGrantTypeEnum;
     /**
      * An identifier for the type of the requested security token. For the RESTful API, use `urn:quickbase:params:oauth:token-type:temp_token`. For the XML or SCIM APIs use `urn:quickbase:params:oauth:token-type:temp_ticket`.
      * @type {string}
      * @memberof ExchangeSsoTokenRequest
      */
-    requestedTokenType: ExchangeSsoTokenRequestRequestedTokenTypeEnum;
+    requested_token_type: ExchangeSsoTokenRequestRequestedTokenTypeEnum;
     /**
      * A security token that represents the identity of the party on behalf of whom the request is being made. For SAML 2.0, the value should be a base64url-encoded SAML 2.0 assertion.
      * @type {string}
      * @memberof ExchangeSsoTokenRequest
      */
-    subjectToken: string;
+    subject_token: string;
     /**
      * An identifier that indicates the type of the security token in the `subject_token` parameter.
      * @type {string}
      * @memberof ExchangeSsoTokenRequest
      */
-    subjectTokenType: ExchangeSsoTokenRequestSubjectTokenTypeEnum;
+    subject_token_type: ExchangeSsoTokenRequestSubjectTokenTypeEnum;
 }
 /**
  * @export
@@ -3768,7 +3768,7 @@ interface ExportSolutionToRecord200ResponseInner {
      * @type {number}
      * @memberof ExportSolutionToRecord200ResponseInner
      */
-    recordId?: number;
+    record_id?: number;
     /**
      *
      * @type {string}
@@ -4139,9 +4139,93 @@ declare function GetApp200ResponseToJSONTyped(value?: GetApp200Response | null, 
 /**
  *
  * @export
+ * @interface GetAppEvents200ResponseItemsInner
+ */
+interface GetAppEvents200ResponseItemsInner {
+    /**
+     * Indication of whether current event is active.
+     * @type {boolean}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    isActive?: boolean;
+    /**
+     * Type of an event.
+     * @type {string}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    type?: GetAppEvents200ResponseItemsInnerTypeEnum;
+    /**
+     * The name of the event. This property is not returned for automations.
+     * @type {string}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    name?: string;
+    /**
+     * The url to automation that can be accessed from the browser. Only returned for automations.
+     * @type {string}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    url?: string;
+    /**
+     * The user that owns the event.
+     * @type {{ [key: string]: any; }}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    owner?: {
+        [key: string]: any;
+    };
+    /**
+     * The unique identifier of the table to which event belongs to.
+     * @type {string}
+     * @memberof GetAppEvents200ResponseItemsInner
+     */
+    tableId?: string;
+}
+/**
+ * @export
+ */
+declare const GetAppEvents200ResponseItemsInnerTypeEnum: {
+    readonly Webhook: "webhook";
+    readonly QbAction: "qb-action";
+    readonly EmailNotification: "email-notification";
+    readonly Subscription: "subscription";
+    readonly Reminder: "reminder";
+    readonly Automation: "automation";
+};
+type GetAppEvents200ResponseItemsInnerTypeEnum = typeof GetAppEvents200ResponseItemsInnerTypeEnum[keyof typeof GetAppEvents200ResponseItemsInnerTypeEnum];
+/**
+ * Check if a given object implements the GetAppEvents200ResponseItemsInner interface.
+ */
+declare function instanceOfGetAppEvents200ResponseItemsInner(value: object): value is GetAppEvents200ResponseItemsInner;
+declare function GetAppEvents200ResponseItemsInnerFromJSON(json: any): GetAppEvents200ResponseItemsInner;
+declare function GetAppEvents200ResponseItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAppEvents200ResponseItemsInner;
+declare function GetAppEvents200ResponseItemsInnerToJSON(json: any): GetAppEvents200ResponseItemsInner;
+declare function GetAppEvents200ResponseItemsInnerToJSONTyped(value?: GetAppEvents200ResponseItemsInner | null, ignoreDiscriminator?: boolean): any;
+
+/**
+ * Quick Base API
+ * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+ *
+ * The version of the OpenAPI document: 1.0.0
+ *
+ *
+ * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+ * https://openapi-generator.tech
+ * Do not edit the class manually.
+ */
+
+/**
+ * A response containing a list for getAppEvents200Response
+ * @export
  * @interface GetAppEvents200Response
  */
-interface GetAppEvents200Response extends Array<any> {
+interface GetAppEvents200Response {
+    /**
+     *
+     * @type {Array<GetAppEvents200ResponseItemsInner>}
+     * @memberof GetAppEvents200Response
+     */
+    items?: Array<GetAppEvents200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetAppEvents200Response interface.
@@ -4166,9 +4250,147 @@ declare function GetAppEvents200ResponseToJSONTyped(value?: GetAppEvents200Respo
 /**
  *
  * @export
+ * @interface GetAppTables200ResponseItemsInner
+ */
+interface GetAppTables200ResponseItemsInner {
+    /**
+     * The name of the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    name?: string;
+    /**
+     * The unique identifier (dbid) of the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    id?: string;
+    /**
+     * The automatically-created table alias for the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    alias?: string;
+    /**
+     * The description of the table, as configured by an application administrator.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    description?: string;
+    /**
+     * The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    created?: string;
+    /**
+     * The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone).
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    updated?: string;
+    /**
+     * The incremental Record ID that will be used when the next record is created, as determined when the API call was ran.
+     * @type {number}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    nextRecordId?: number;
+    /**
+     * The incremental Field ID that will be used when the next field is created, as determined when the API call was ran.
+     * @type {number}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    nextFieldId?: number;
+    /**
+     * The id of the field that is configured for default sorting.
+     * @type {number}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    defaultSortFieldId?: number;
+    /**
+     * The configuration of the default sort order on the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    defaultSortOrder?: GetAppTables200ResponseItemsInnerDefaultSortOrderEnum;
+    /**
+     * The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID.
+     * @type {number}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    keyFieldId?: number;
+    /**
+     * The builder-configured singular noun of the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    singleRecordName?: string;
+    /**
+     * The builder-configured plural noun of the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    pluralRecordName?: string;
+    /**
+     * The size limit for the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    sizeLimit?: string;
+    /**
+     * The amount of space currently being used by the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    spaceUsed?: string;
+    /**
+     * The amount of space remaining for use by the table.
+     * @type {string}
+     * @memberof GetAppTables200ResponseItemsInner
+     */
+    spaceRemaining?: string;
+}
+/**
+ * @export
+ */
+declare const GetAppTables200ResponseItemsInnerDefaultSortOrderEnum: {
+    readonly Asc: "ASC";
+    readonly Desc: "DESC";
+};
+type GetAppTables200ResponseItemsInnerDefaultSortOrderEnum = typeof GetAppTables200ResponseItemsInnerDefaultSortOrderEnum[keyof typeof GetAppTables200ResponseItemsInnerDefaultSortOrderEnum];
+/**
+ * Check if a given object implements the GetAppTables200ResponseItemsInner interface.
+ */
+declare function instanceOfGetAppTables200ResponseItemsInner(value: object): value is GetAppTables200ResponseItemsInner;
+declare function GetAppTables200ResponseItemsInnerFromJSON(json: any): GetAppTables200ResponseItemsInner;
+declare function GetAppTables200ResponseItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetAppTables200ResponseItemsInner;
+declare function GetAppTables200ResponseItemsInnerToJSON(json: any): GetAppTables200ResponseItemsInner;
+declare function GetAppTables200ResponseItemsInnerToJSONTyped(value?: GetAppTables200ResponseItemsInner | null, ignoreDiscriminator?: boolean): any;
+
+/**
+ * Quick Base API
+ * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+ *
+ * The version of the OpenAPI document: 1.0.0
+ *
+ *
+ * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+ * https://openapi-generator.tech
+ * Do not edit the class manually.
+ */
+
+/**
+ * A response containing a list for getAppTables200Response
+ * @export
  * @interface GetAppTables200Response
  */
-interface GetAppTables200Response extends Array<any> {
+interface GetAppTables200Response {
+    /**
+     *
+     * @type {Array<GetAppTables200ResponseItemsInner>}
+     * @memberof GetAppTables200Response
+     */
+    items?: Array<GetAppTables200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetAppTables200Response interface.
@@ -4313,9 +4535,59 @@ declare function GetField200ResponseToJSONTyped(value?: GetField200Response | nu
 /**
  *
  * @export
+ * @interface GetFieldsUsage200ResponseItemsInner
+ */
+interface GetFieldsUsage200ResponseItemsInner {
+    /**
+     * Basic information about the field.
+     * @type {{ [key: string]: any; }}
+     * @memberof GetFieldsUsage200ResponseItemsInner
+     */
+    field: {
+        [key: string]: any;
+    };
+    /**
+     * Usage Information about the field.
+     * @type {{ [key: string]: any; }}
+     * @memberof GetFieldsUsage200ResponseItemsInner
+     */
+    usage: {
+        [key: string]: any;
+    };
+}
+/**
+ * Check if a given object implements the GetFieldsUsage200ResponseItemsInner interface.
+ */
+declare function instanceOfGetFieldsUsage200ResponseItemsInner(value: object): value is GetFieldsUsage200ResponseItemsInner;
+declare function GetFieldsUsage200ResponseItemsInnerFromJSON(json: any): GetFieldsUsage200ResponseItemsInner;
+declare function GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetFieldsUsage200ResponseItemsInner;
+declare function GetFieldsUsage200ResponseItemsInnerToJSON(json: any): GetFieldsUsage200ResponseItemsInner;
+declare function GetFieldsUsage200ResponseItemsInnerToJSONTyped(value?: GetFieldsUsage200ResponseItemsInner | null, ignoreDiscriminator?: boolean): any;
+
+/**
+ * Quick Base API
+ * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+ *
+ * The version of the OpenAPI document: 1.0.0
+ *
+ *
+ * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+ * https://openapi-generator.tech
+ * Do not edit the class manually.
+ */
+
+/**
+ * A response containing a list for getFieldUsage200Response
+ * @export
  * @interface GetFieldUsage200Response
  */
-interface GetFieldUsage200Response extends Array<any> {
+interface GetFieldUsage200Response {
+    /**
+     *
+     * @type {Array<GetFieldsUsage200ResponseItemsInner>}
+     * @memberof GetFieldUsage200Response
+     */
+    items?: Array<GetFieldsUsage200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetFieldUsage200Response interface.
@@ -4340,9 +4612,135 @@ declare function GetFieldUsage200ResponseToJSONTyped(value?: GetFieldUsage200Res
 /**
  *
  * @export
+ * @interface GetFields200ResponseItemsInner
+ */
+interface GetFields200ResponseItemsInner {
+    /**
+     * The id of the field, unique to this table.
+     * @type {number}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    id: number;
+    /**
+     * The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html).
+     * @type {string}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    fieldType?: string;
+    /**
+     * For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank.
+     * @type {string}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    mode?: string;
+    /**
+     * The label (name) of the field.
+     * @type {string}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    label?: string;
+    /**
+     * Indicates if the field is configured to not wrap when displayed in the product.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    noWrap?: boolean;
+    /**
+     * Indicates if the field is configured to display in bold in the product.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    bold?: boolean;
+    /**
+     * Indicates if the field is marked required.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    required?: boolean;
+    /**
+     * Indicates if the field is marked as a default in reports.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    appearsByDefault?: boolean;
+    /**
+     * Indicates if the field is marked as searchable.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    findEnabled?: boolean;
+    /**
+     * Indicates if the field is marked unique.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    unique?: boolean;
+    /**
+     * Indicates if the field data will copy when a user copies the record.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    doesDataCopy?: boolean;
+    /**
+     * The configured help text shown to users within the product.
+     * @type {string}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    fieldHelp?: string;
+    /**
+     * Indicates if the field is being tracked as part of Quickbase Audit Logs.
+     * @type {boolean}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    audited?: boolean;
+    /**
+     * Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type.
+     * @type {{ [key: string]: any; }}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    properties?: {
+        [key: string]: any;
+    };
+    /**
+     * Field Permissions for different roles.
+     * @type {Array<object>}
+     * @memberof GetFields200ResponseItemsInner
+     */
+    permissions?: Array<object>;
+}
+/**
+ * Check if a given object implements the GetFields200ResponseItemsInner interface.
+ */
+declare function instanceOfGetFields200ResponseItemsInner(value: object): value is GetFields200ResponseItemsInner;
+declare function GetFields200ResponseItemsInnerFromJSON(json: any): GetFields200ResponseItemsInner;
+declare function GetFields200ResponseItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetFields200ResponseItemsInner;
+declare function GetFields200ResponseItemsInnerToJSON(json: any): GetFields200ResponseItemsInner;
+declare function GetFields200ResponseItemsInnerToJSONTyped(value?: GetFields200ResponseItemsInner | null, ignoreDiscriminator?: boolean): any;
+
+/**
+ * Quick Base API
+ * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+ *
+ * The version of the OpenAPI document: 1.0.0
+ *
+ *
+ * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+ * https://openapi-generator.tech
+ * Do not edit the class manually.
+ */
+
+/**
+ * A response containing a list for getFields200Response
+ * @export
  * @interface GetFields200Response
  */
-interface GetFields200Response extends Array<any> {
+interface GetFields200Response {
+    /**
+     *
+     * @type {Array<GetFields200ResponseItemsInner>}
+     * @memberof GetFields200Response
+     */
+    items?: Array<GetFields200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetFields200Response interface.
@@ -4364,12 +4762,19 @@ declare function GetFields200ResponseToJSONTyped(value?: GetFields200Response | 
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+
 /**
- *
+ * A response containing a list for getFieldsUsage200Response
  * @export
  * @interface GetFieldsUsage200Response
  */
-interface GetFieldsUsage200Response extends Array<any> {
+interface GetFieldsUsage200Response {
+    /**
+     *
+     * @type {Array<GetFieldsUsage200ResponseItemsInner>}
+     * @memberof GetFieldsUsage200Response
+     */
+    items?: Array<GetFieldsUsage200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetFieldsUsage200Response interface.
@@ -4654,11 +5059,103 @@ declare function GetTable200ResponseToJSONTyped(value?: GetTable200Response | nu
  * Do not edit the class manually.
  */
 /**
- * This is simple example of report schema for more details please refer [Report types page](../reportTypes)
+ *
+ * @export
+ * @interface GetTableReports200ResponseItemsInner
+ */
+interface GetTableReports200ResponseItemsInner {
+    /**
+     * The identifier of the report, unique to the table.
+     * @type {string}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    id?: string;
+    /**
+     * The configured name of the report.
+     * @type {string}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    name?: string;
+    /**
+     * The type of report in Quickbase (e.g., chart).
+     * @type {string}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    type?: string;
+    /**
+     * The configured description of a report.
+     * @type {string}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    description?: string;
+    /**
+     * Optional, showed only for personal reports. The user ID of report owner.
+     * @type {number}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    ownerId?: number;
+    /**
+     * The query definition as configured in Quickbase that gets executed when the report is run.
+     * @type {{ [key: string]: any; }}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    query?: {
+        [key: string]: any;
+    };
+    /**
+     * A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)
+     * @type {{ [key: string]: any; }}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    properties?: {
+        [key: string]: any;
+    };
+    /**
+     * The instant at which a report was last used.
+     * @type {string}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    usedLast?: string;
+    /**
+     * The number of times a report has been used.
+     * @type {number}
+     * @memberof GetTableReports200ResponseItemsInner
+     */
+    usedCount?: number;
+}
+/**
+ * Check if a given object implements the GetTableReports200ResponseItemsInner interface.
+ */
+declare function instanceOfGetTableReports200ResponseItemsInner(value: object): value is GetTableReports200ResponseItemsInner;
+declare function GetTableReports200ResponseItemsInnerFromJSON(json: any): GetTableReports200ResponseItemsInner;
+declare function GetTableReports200ResponseItemsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetTableReports200ResponseItemsInner;
+declare function GetTableReports200ResponseItemsInnerToJSON(json: any): GetTableReports200ResponseItemsInner;
+declare function GetTableReports200ResponseItemsInnerToJSONTyped(value?: GetTableReports200ResponseItemsInner | null, ignoreDiscriminator?: boolean): any;
+
+/**
+ * Quick Base API
+ * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+ *
+ * The version of the OpenAPI document: 1.0.0
+ *
+ *
+ * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+ * https://openapi-generator.tech
+ * Do not edit the class manually.
+ */
+
+/**
+ * A response containing a list for getTableReports200Response
  * @export
  * @interface GetTableReports200Response
  */
-interface GetTableReports200Response extends Array<any> {
+interface GetTableReports200Response {
+    /**
+     * This is simple example of report schema for more details please refer [Report types page](../reportTypes)
+     * @type {Array<GetTableReports200ResponseItemsInner>}
+     * @memberof GetTableReports200Response
+     */
+    items?: Array<GetTableReports200ResponseItemsInner>;
 }
 /**
  * Check if a given object implements the GetTableReports200Response interface.
@@ -7566,7 +8063,8 @@ interface QuickbaseClient$1 {
      * @param {Object} params _Object containing the parameters for_ getAppEvents
      *   @param {string} params.appId _Required parameter with properties_
      *
-     * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response_
+     * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response with properties_
+     *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) _Type: GetAppEvents200ResponseItemsInner[]_
      *
      * @see {@link https://developer.quickbase.com/operation/getAppEvents} Official Quickbase API documentation
      */
@@ -7643,7 +8141,8 @@ interface QuickbaseClient$1 {
      * @param {Object} params _Object containing the parameters for_ getAppTables
      *   @param {string} params.appId _Required parameter with properties_
      *
-     * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response_
+     * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response with properties_
+     *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) _Type: GetAppTables200ResponseItemsInner[]_
      *
      * @see {@link https://developer.quickbase.com/operation/getAppTables} Official Quickbase API documentation
      */
@@ -7825,7 +8324,8 @@ interface QuickbaseClient$1 {
      * @param {Object} params _Object containing the parameters for_ getTableReports
      *   @param {string} params.tableId _Required parameter with properties_
      *
-     * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response_
+     * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response with properties_
+     *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) _This is simple example of report schema for more details please refer [Report types page](../reportTypes)_
      *
      * @see {@link https://developer.quickbase.com/operation/getTableReports} Official Quickbase API documentation
      */
@@ -7887,7 +8387,8 @@ interface QuickbaseClient$1 {
      *   @param {string} params.tableId _Required parameter with properties_
      *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
      *
-     * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response_
+     * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
+     *   - **items** (`GetFields200ResponseItemsInner[]`, optional) _Type: GetFields200ResponseItemsInner[]_
      *
      * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
      */
@@ -8043,7 +8544,8 @@ interface QuickbaseClient$1 {
      *   @param {number} params.skip _Optional parameter with properties_
      *   @param {number} params.top _Optional parameter with properties_
      *
-     * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response_
+     * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
+     *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
      *
      * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
      */
@@ -8059,7 +8561,8 @@ interface QuickbaseClient$1 {
      *   @param {string} params.tableId _Required parameter with properties_
      *   @param {number} params.fieldId _Required parameter with properties_
      *
-     * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response_
+     * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
+     *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) _Type: GetFieldsUsage200ResponseItemsInner[]_
      *
      * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
      */
@@ -8094,7 +8597,11 @@ interface QuickbaseClient$1 {
      *     - **to** (`string`, optional) _Type: string_
      *     - **fieldsToReturn** (`number[]`, optional) _Type: number[]_
      *
-     * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response_
+     * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response with properties_
+     *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
+     *   - **data** (`string[]`, optional) _The data that is expected to be returned._
+     *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
+     *   - **data** (`string[]`, optional) _The data that is expected to be returned._
      *
      * @see {@link https://developer.quickbase.com/operation/upsert} Official Quickbase API documentation
      */
@@ -8162,9 +8669,9 @@ interface QuickbaseClient$1 {
      *   @param {{ grant_type?: string; requested_token_type?: string; subject_token?: string; subject_token_type?: string }} params.body _Optional parameter with properties_
      *
      * @returns {Promise<ExchangeSsoToken200Response>} _Promise resolving to the exchangeSsoToken response with properties_
-     *   - **accessToken** (`string`, optional) _The security token issued by the authorization server in response to the token exchange request. The identifier `access_token` is used for historical reasons and the issued token need not be an OAuth access token._
-     *   - **issuedTokenType** (`ExchangeSsoToken200ResponseIssuedTokenTypeEnum`, optional) _An identifier for the representation of the issued security token._
-     *   - **tokenType** (`"N_A"`, optional) _Will always return `N_A`_
+     *   - **access_token** (`string`, optional) _The security token issued by the authorization server in response to the token exchange request. The identifier `access_token` is used for historical reasons and the issued token need not be an OAuth access token._
+     *   - **issued_token_type** (`ExchangeSsoToken200ResponseIssuedTokenTypeEnum`, optional) _An identifier for the representation of the issued security token._
+     *   - **token_type** (`"N_A"`, optional) _Will always return `N_A`_
      *
      * @see {@link https://developer.quickbase.com/operation/exchangeSsoToken} Official Quickbase API documentation
      */
@@ -8758,4 +9265,4 @@ interface QuickbaseConfig {
 }
 declare function quickbase(config: QuickbaseConfig): QuickbaseClient;
 
-export { type AddManagersToGroup200Response, AddManagersToGroup200ResponseFromJSON, AddManagersToGroup200ResponseFromJSONTyped, AddManagersToGroup200ResponseToJSON, AddManagersToGroup200ResponseToJSONTyped, type AddManagersToGroupRequest, AddManagersToGroupRequestFromJSON, AddManagersToGroupRequestFromJSONTyped, AddManagersToGroupRequestToJSON, AddManagersToGroupRequestToJSONTyped, type AddMembersToGroup200Response, AddMembersToGroup200ResponseFromJSON, AddMembersToGroup200ResponseFromJSONTyped, AddMembersToGroup200ResponseToJSON, AddMembersToGroup200ResponseToJSONTyped, type AddMembersToGroupRequest, AddMembersToGroupRequestFromJSON, AddMembersToGroupRequestFromJSONTyped, AddMembersToGroupRequestToJSON, AddMembersToGroupRequestToJSONTyped, type AddSubgroupsToGroup200Response, AddSubgroupsToGroup200ResponseFromJSON, AddSubgroupsToGroup200ResponseFromJSONTyped, AddSubgroupsToGroup200ResponseToJSON, AddSubgroupsToGroup200ResponseToJSONTyped, type AddSubgroupsToGroupRequest, AddSubgroupsToGroupRequestFromJSON, AddSubgroupsToGroupRequestFromJSONTyped, AddSubgroupsToGroupRequestToJSON, AddSubgroupsToGroupRequestToJSONTyped, type Audit200Response, Audit200ResponseFromJSON, Audit200ResponseFromJSONTyped, Audit200ResponseToJSON, Audit200ResponseToJSONTyped, type Audit202Response, Audit202ResponseFromJSON, Audit202ResponseFromJSONTyped, Audit202ResponseToJSON, Audit202ResponseToJSONTyped, type AuditRequest, AuditRequestFromJSON, AuditRequestFromJSONTyped, AuditRequestToJSON, AuditRequestToJSONTyped, type ChangesetSolution200Response, ChangesetSolution200ResponseFromJSON, ChangesetSolution200ResponseFromJSONTyped, type ChangesetSolution200ResponseInner, type ChangesetSolution200ResponseInnerChangesInnerInner, ChangesetSolution200ResponseInnerChangesInnerInnerFromJSON, ChangesetSolution200ResponseInnerChangesInnerInnerFromJSONTyped, ChangesetSolution200ResponseInnerChangesInnerInnerToJSON, ChangesetSolution200ResponseInnerChangesInnerInnerToJSONTyped, ChangesetSolution200ResponseInnerFromJSON, ChangesetSolution200ResponseInnerFromJSONTyped, ChangesetSolution200ResponseInnerToJSON, ChangesetSolution200ResponseInnerToJSONTyped, ChangesetSolution200ResponseToJSON, ChangesetSolution200ResponseToJSONTyped, type ChangesetSolution400Response, ChangesetSolution400ResponseFromJSON, ChangesetSolution400ResponseFromJSONTyped, ChangesetSolution400ResponseToJSON, ChangesetSolution400ResponseToJSONTyped, type ChangesetSolution401403Response, ChangesetSolution401403ResponseFromJSON, ChangesetSolution401403ResponseFromJSONTyped, ChangesetSolution401403ResponseToJSON, ChangesetSolution401403ResponseToJSONTyped, type ChangesetSolution404Response, ChangesetSolution404ResponseFromJSON, ChangesetSolution404ResponseFromJSONTyped, ChangesetSolution404ResponseToJSON, ChangesetSolution404ResponseToJSONTyped, type ChangesetSolution4xx5xxResponse, ChangesetSolution4xx5xxResponseFromJSON, ChangesetSolution4xx5xxResponseFromJSONTyped, ChangesetSolution4xx5xxResponseToJSON, ChangesetSolution4xx5xxResponseToJSONTyped, type ChangesetSolutionFromRecord200Response, ChangesetSolutionFromRecord200ResponseFromJSON, ChangesetSolutionFromRecord200ResponseFromJSONTyped, ChangesetSolutionFromRecord200ResponseToJSON, ChangesetSolutionFromRecord200ResponseToJSONTyped, type ChangesetSolutionFromRecord400Response, ChangesetSolutionFromRecord400ResponseFromJSON, ChangesetSolutionFromRecord400ResponseFromJSONTyped, ChangesetSolutionFromRecord400ResponseToJSON, ChangesetSolutionFromRecord400ResponseToJSONTyped, type ChangesetSolutionFromRecord401403Response, ChangesetSolutionFromRecord401403ResponseFromJSON, ChangesetSolutionFromRecord401403ResponseFromJSONTyped, ChangesetSolutionFromRecord401403ResponseToJSON, ChangesetSolutionFromRecord401403ResponseToJSONTyped, type ChangesetSolutionFromRecord404Response, ChangesetSolutionFromRecord404ResponseFromJSON, ChangesetSolutionFromRecord404ResponseFromJSONTyped, ChangesetSolutionFromRecord404ResponseToJSON, ChangesetSolutionFromRecord404ResponseToJSONTyped, type ChangesetSolutionFromRecord4xx5xxResponse, ChangesetSolutionFromRecord4xx5xxResponseFromJSON, ChangesetSolutionFromRecord4xx5xxResponseFromJSONTyped, ChangesetSolutionFromRecord4xx5xxResponseToJSON, ChangesetSolutionFromRecord4xx5xxResponseToJSONTyped, type CloneUserToken200Response, CloneUserToken200ResponseFromJSON, CloneUserToken200ResponseFromJSONTyped, CloneUserToken200ResponseToJSON, CloneUserToken200ResponseToJSONTyped, type CloneUserTokenRequest, CloneUserTokenRequestFromJSON, CloneUserTokenRequestFromJSONTyped, CloneUserTokenRequestToJSON, CloneUserTokenRequestToJSONTyped, type CopyApp200Response, CopyApp200ResponseFromJSON, CopyApp200ResponseFromJSONTyped, CopyApp200ResponseToJSON, CopyApp200ResponseToJSONTyped, type CopyAppRequest, CopyAppRequestFromJSON, CopyAppRequestFromJSONTyped, type CopyAppRequestProperties, CopyAppRequestPropertiesFromJSON, CopyAppRequestPropertiesFromJSONTyped, CopyAppRequestPropertiesToJSON, CopyAppRequestPropertiesToJSONTyped, CopyAppRequestToJSON, CopyAppRequestToJSONTyped, type CreateApp200Response, CreateApp200ResponseFromJSON, CreateApp200ResponseFromJSONTyped, CreateApp200ResponseToJSON, CreateApp200ResponseToJSONTyped, type CreateAppRequest, CreateAppRequestFromJSON, CreateAppRequestFromJSONTyped, CreateAppRequestToJSON, CreateAppRequestToJSONTyped, type CreateField200Response, CreateField200ResponseFromJSON, CreateField200ResponseFromJSONTyped, CreateField200ResponseToJSON, CreateField200ResponseToJSONTyped, type CreateFieldRequest, CreateFieldRequestFieldTypeEnum, CreateFieldRequestFromJSON, CreateFieldRequestFromJSONTyped, type CreateFieldRequestProperties, CreateFieldRequestPropertiesCurrencyFormatEnum, CreateFieldRequestPropertiesFromJSON, CreateFieldRequestPropertiesFromJSONTyped, CreateFieldRequestPropertiesOpenTargetInEnum, CreateFieldRequestPropertiesSummaryFunctionEnum, CreateFieldRequestPropertiesToJSON, CreateFieldRequestPropertiesToJSONTyped, CreateFieldRequestPropertiesVersionModeEnum, CreateFieldRequestToJSON, CreateFieldRequestToJSONTyped, type CreateRelationship200Response, CreateRelationship200ResponseFromJSON, CreateRelationship200ResponseFromJSONTyped, CreateRelationship200ResponseToJSON, CreateRelationship200ResponseToJSONTyped, type CreateRelationshipRequest, CreateRelationshipRequestFromJSON, CreateRelationshipRequestFromJSONTyped, CreateRelationshipRequestToJSON, CreateRelationshipRequestToJSONTyped, type CreateSolution200Response, CreateSolution200ResponseFromJSON, CreateSolution200ResponseFromJSONTyped, CreateSolution200ResponseToJSON, CreateSolution200ResponseToJSONTyped, type CreateSolution400Response, CreateSolution400ResponseFromJSON, CreateSolution400ResponseFromJSONTyped, CreateSolution400ResponseToJSON, CreateSolution400ResponseToJSONTyped, type CreateSolution401403Response, CreateSolution401403ResponseFromJSON, CreateSolution401403ResponseFromJSONTyped, CreateSolution401403ResponseToJSON, CreateSolution401403ResponseToJSONTyped, type CreateSolution4xx5xxResponse, CreateSolution4xx5xxResponseFromJSON, CreateSolution4xx5xxResponseFromJSONTyped, CreateSolution4xx5xxResponseToJSON, CreateSolution4xx5xxResponseToJSONTyped, type CreateSolutionFromRecord200Response, CreateSolutionFromRecord200ResponseFromJSON, CreateSolutionFromRecord200ResponseFromJSONTyped, type CreateSolutionFromRecord200ResponseInner, type CreateSolutionFromRecord200ResponseInnerCreatedResourcesInner, type CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerFromJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerToJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerToJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerFromJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerToJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerToJSONTyped, CreateSolutionFromRecord200ResponseInnerFromJSON, CreateSolutionFromRecord200ResponseInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerToJSON, CreateSolutionFromRecord200ResponseInnerToJSONTyped, CreateSolutionFromRecord200ResponseToJSON, CreateSolutionFromRecord200ResponseToJSONTyped, type CreateSolutionFromRecord400Response, CreateSolutionFromRecord400ResponseFromJSON, CreateSolutionFromRecord400ResponseFromJSONTyped, CreateSolutionFromRecord400ResponseToJSON, CreateSolutionFromRecord400ResponseToJSONTyped, type CreateSolutionFromRecord401403Response, CreateSolutionFromRecord401403ResponseFromJSON, CreateSolutionFromRecord401403ResponseFromJSONTyped, CreateSolutionFromRecord401403ResponseToJSON, CreateSolutionFromRecord401403ResponseToJSONTyped, type CreateSolutionFromRecord404Response, CreateSolutionFromRecord404ResponseFromJSON, CreateSolutionFromRecord404ResponseFromJSONTyped, CreateSolutionFromRecord404ResponseToJSON, CreateSolutionFromRecord404ResponseToJSONTyped, type CreateSolutionFromRecord4xx5xxResponse, CreateSolutionFromRecord4xx5xxResponseFromJSON, CreateSolutionFromRecord4xx5xxResponseFromJSONTyped, CreateSolutionFromRecord4xx5xxResponseToJSON, CreateSolutionFromRecord4xx5xxResponseToJSONTyped, type CreateTable200Response, CreateTable200ResponseDefaultSortOrderEnum, CreateTable200ResponseFromJSON, CreateTable200ResponseFromJSONTyped, CreateTable200ResponseToJSON, CreateTable200ResponseToJSONTyped, type CreateTableRequest, CreateTableRequestFromJSON, CreateTableRequestFromJSONTyped, CreateTableRequestToJSON, CreateTableRequestToJSONTyped, type DeactivateUserToken200Response, DeactivateUserToken200ResponseFromJSON, DeactivateUserToken200ResponseFromJSONTyped, DeactivateUserToken200ResponseToJSON, DeactivateUserToken200ResponseToJSONTyped, type DeleteApp200Response, DeleteApp200ResponseFromJSON, DeleteApp200ResponseFromJSONTyped, DeleteApp200ResponseToJSON, DeleteApp200ResponseToJSONTyped, type DeleteAppRequest, DeleteAppRequestFromJSON, DeleteAppRequestFromJSONTyped, DeleteAppRequestToJSON, DeleteAppRequestToJSONTyped, type DeleteFields200Response, DeleteFields200ResponseFromJSON, DeleteFields200ResponseFromJSONTyped, DeleteFields200ResponseToJSON, DeleteFields200ResponseToJSONTyped, type DeleteFieldsRequest, DeleteFieldsRequestFromJSON, DeleteFieldsRequestFromJSONTyped, DeleteFieldsRequestToJSON, DeleteFieldsRequestToJSONTyped, type DeleteFile200Response, DeleteFile200ResponseFromJSON, DeleteFile200ResponseFromJSONTyped, DeleteFile200ResponseToJSON, DeleteFile200ResponseToJSONTyped, type DeleteRecords200Response, DeleteRecords200ResponseFromJSON, DeleteRecords200ResponseFromJSONTyped, DeleteRecords200ResponseToJSON, DeleteRecords200ResponseToJSONTyped, type DeleteRecordsRequest, DeleteRecordsRequestFromJSON, DeleteRecordsRequestFromJSONTyped, DeleteRecordsRequestToJSON, DeleteRecordsRequestToJSONTyped, type DeleteRelationship200Response, DeleteRelationship200ResponseFromJSON, DeleteRelationship200ResponseFromJSONTyped, DeleteRelationship200ResponseToJSON, DeleteRelationship200ResponseToJSONTyped, type DeleteTable200Response, DeleteTable200ResponseFromJSON, DeleteTable200ResponseFromJSONTyped, DeleteTable200ResponseToJSON, DeleteTable200ResponseToJSONTyped, type DeleteUserToken200Response, DeleteUserToken200ResponseFromJSON, DeleteUserToken200ResponseFromJSONTyped, DeleteUserToken200ResponseToJSON, DeleteUserToken200ResponseToJSONTyped, type DenyUsers200Response, DenyUsers200ResponseFromJSON, DenyUsers200ResponseFromJSONTyped, DenyUsers200ResponseToJSON, DenyUsers200ResponseToJSONTyped, type DenyUsersAndGroups200Response, DenyUsersAndGroups200ResponseFromJSON, DenyUsersAndGroups200ResponseFromJSONTyped, DenyUsersAndGroups200ResponseToJSON, DenyUsersAndGroups200ResponseToJSONTyped, type DenyUsersAndGroupsRequest, DenyUsersAndGroupsRequestFromJSON, DenyUsersAndGroupsRequestFromJSONTyped, DenyUsersAndGroupsRequestToJSON, DenyUsersAndGroupsRequestToJSONTyped, type DenyUsersRequest, DenyUsersRequestFromJSON, DenyUsersRequestFromJSONTyped, DenyUsersRequestToJSON, DenyUsersRequestToJSONTyped, type DownloadFile200Response, DownloadFile200ResponseFromJSON, DownloadFile200ResponseFromJSONTyped, DownloadFile200ResponseToJSON, DownloadFile200ResponseToJSONTyped, type ExchangeSsoToken200Response, ExchangeSsoToken200ResponseFromJSON, ExchangeSsoToken200ResponseFromJSONTyped, ExchangeSsoToken200ResponseIssuedTokenTypeEnum, ExchangeSsoToken200ResponseToJSON, ExchangeSsoToken200ResponseToJSONTyped, ExchangeSsoToken200ResponseTokenTypeEnum, type ExchangeSsoTokenRequest, ExchangeSsoTokenRequestFromJSON, ExchangeSsoTokenRequestFromJSONTyped, ExchangeSsoTokenRequestGrantTypeEnum, ExchangeSsoTokenRequestRequestedTokenTypeEnum, ExchangeSsoTokenRequestSubjectTokenTypeEnum, ExchangeSsoTokenRequestToJSON, ExchangeSsoTokenRequestToJSONTyped, type ExportSolution200Response, ExportSolution200ResponseFromJSON, ExportSolution200ResponseFromJSONTyped, ExportSolution200ResponseToJSON, ExportSolution200ResponseToJSONTyped, type ExportSolution400Response, ExportSolution400ResponseFromJSON, ExportSolution400ResponseFromJSONTyped, ExportSolution400ResponseToJSON, ExportSolution400ResponseToJSONTyped, type ExportSolution401403Response, ExportSolution401403ResponseFromJSON, ExportSolution401403ResponseFromJSONTyped, ExportSolution401403ResponseToJSON, ExportSolution401403ResponseToJSONTyped, type ExportSolution404Response, ExportSolution404ResponseFromJSON, ExportSolution404ResponseFromJSONTyped, ExportSolution404ResponseToJSON, ExportSolution404ResponseToJSONTyped, type ExportSolution4xx5xxResponse, ExportSolution4xx5xxResponseFromJSON, ExportSolution4xx5xxResponseFromJSONTyped, ExportSolution4xx5xxResponseToJSON, ExportSolution4xx5xxResponseToJSONTyped, type ExportSolutionToRecord200Response, ExportSolutionToRecord200ResponseFromJSON, ExportSolutionToRecord200ResponseFromJSONTyped, type ExportSolutionToRecord200ResponseInner, ExportSolutionToRecord200ResponseInnerFromJSON, ExportSolutionToRecord200ResponseInnerFromJSONTyped, ExportSolutionToRecord200ResponseInnerToJSON, ExportSolutionToRecord200ResponseInnerToJSONTyped, ExportSolutionToRecord200ResponseToJSON, ExportSolutionToRecord200ResponseToJSONTyped, type ExportSolutionToRecord400Response, ExportSolutionToRecord400ResponseFromJSON, ExportSolutionToRecord400ResponseFromJSONTyped, ExportSolutionToRecord400ResponseToJSON, ExportSolutionToRecord400ResponseToJSONTyped, type ExportSolutionToRecord401403Response, ExportSolutionToRecord401403ResponseFromJSON, ExportSolutionToRecord401403ResponseFromJSONTyped, ExportSolutionToRecord401403ResponseToJSON, ExportSolutionToRecord401403ResponseToJSONTyped, type ExportSolutionToRecord404Response, ExportSolutionToRecord404ResponseFromJSON, ExportSolutionToRecord404ResponseFromJSONTyped, ExportSolutionToRecord404ResponseToJSON, ExportSolutionToRecord404ResponseToJSONTyped, type ExportSolutionToRecord4xx5xxResponse, ExportSolutionToRecord4xx5xxResponseFromJSON, ExportSolutionToRecord4xx5xxResponseFromJSONTyped, ExportSolutionToRecord4xx5xxResponseToJSON, ExportSolutionToRecord4xx5xxResponseToJSONTyped, type GenerateDocument200Response, GenerateDocument200ResponseFromJSON, GenerateDocument200ResponseFromJSONTyped, GenerateDocument200ResponseToJSON, GenerateDocument200ResponseToJSONTyped, type GetApp200Response, GetApp200ResponseFromJSON, GetApp200ResponseFromJSONTyped, GetApp200ResponseToJSON, GetApp200ResponseToJSONTyped, type GetAppEvents200Response, GetAppEvents200ResponseFromJSON, GetAppEvents200ResponseFromJSONTyped, GetAppEvents200ResponseToJSON, GetAppEvents200ResponseToJSONTyped, type GetAppTables200Response, GetAppTables200ResponseFromJSON, GetAppTables200ResponseFromJSONTyped, GetAppTables200ResponseToJSON, GetAppTables200ResponseToJSONTyped, type GetField200Response, GetField200ResponseFromJSON, GetField200ResponseFromJSONTyped, GetField200ResponseToJSON, GetField200ResponseToJSONTyped, type GetFieldUsage200Response, GetFieldUsage200ResponseFromJSON, GetFieldUsage200ResponseFromJSONTyped, GetFieldUsage200ResponseToJSON, GetFieldUsage200ResponseToJSONTyped, type GetFields200Response, GetFields200ResponseFromJSON, GetFields200ResponseFromJSONTyped, GetFields200ResponseToJSON, GetFields200ResponseToJSONTyped, type GetFieldsUsage200Response, GetFieldsUsage200ResponseFromJSON, GetFieldsUsage200ResponseFromJSONTyped, GetFieldsUsage200ResponseToJSON, GetFieldsUsage200ResponseToJSONTyped, type GetRelationships200Response, GetRelationships200ResponseFromJSON, GetRelationships200ResponseFromJSONTyped, GetRelationships200ResponseToJSON, GetRelationships200ResponseToJSONTyped, type GetReport200Response, GetReport200ResponseFromJSON, GetReport200ResponseFromJSONTyped, GetReport200ResponseToJSON, GetReport200ResponseToJSONTyped, type GetTable200Response, GetTable200ResponseDefaultSortOrderEnum, GetTable200ResponseFromJSON, GetTable200ResponseFromJSONTyped, GetTable200ResponseToJSON, GetTable200ResponseToJSONTyped, type GetTableReports200Response, GetTableReports200ResponseFromJSON, GetTableReports200ResponseFromJSONTyped, GetTableReports200ResponseToJSON, GetTableReports200ResponseToJSONTyped, type GetTempTokenDBID200Response, GetTempTokenDBID200ResponseFromJSON, GetTempTokenDBID200ResponseFromJSONTyped, GetTempTokenDBID200ResponseToJSON, GetTempTokenDBID200ResponseToJSONTyped, type GetUsers200Response, GetUsers200ResponseFromJSON, GetUsers200ResponseFromJSONTyped, GetUsers200ResponseToJSON, GetUsers200ResponseToJSONTyped, type GetUsersRequest, GetUsersRequestFromJSON, GetUsersRequestFromJSONTyped, GetUsersRequestToJSON, GetUsersRequestToJSONTyped, type Permission, PermissionFromJSON, PermissionFromJSONTyped, PermissionToJSON, PermissionToJSONTyped, type PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummaries200ResponseFromJSON, PlatformAnalyticEventSummaries200ResponseFromJSONTyped, PlatformAnalyticEventSummaries200ResponseGroupByEnum, type PlatformAnalyticEventSummaries200ResponseMetadata, PlatformAnalyticEventSummaries200ResponseMetadataFromJSON, PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped, PlatformAnalyticEventSummaries200ResponseMetadataToJSON, PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped, type PlatformAnalyticEventSummaries200ResponseResultsInner, type PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped, type PlatformAnalyticEventSummaries200ResponseResultsInnerTotals, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped, PlatformAnalyticEventSummaries200ResponseToJSON, PlatformAnalyticEventSummaries200ResponseToJSONTyped, type PlatformAnalyticEventSummaries200ResponseTotals, PlatformAnalyticEventSummaries200ResponseTotalsFromJSON, PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped, PlatformAnalyticEventSummaries200ResponseTotalsToJSON, PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped, type PlatformAnalyticEventSummaries200ResponseWhereInner, PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON, PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON, PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped, PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum, type PlatformAnalyticEventSummariesRequest, PlatformAnalyticEventSummariesRequestFromJSON, PlatformAnalyticEventSummariesRequestFromJSONTyped, PlatformAnalyticEventSummariesRequestGroupByEnum, PlatformAnalyticEventSummariesRequestToJSON, PlatformAnalyticEventSummariesRequestToJSONTyped, type PlatformAnalyticEventSummariesRequestWhereInner, PlatformAnalyticEventSummariesRequestWhereInnerFromJSON, PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped, PlatformAnalyticEventSummariesRequestWhereInnerToJSON, PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped, PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum, type PlatformAnalyticReads200Response, PlatformAnalyticReads200ResponseFromJSON, PlatformAnalyticReads200ResponseFromJSONTyped, PlatformAnalyticReads200ResponseToJSON, PlatformAnalyticReads200ResponseToJSONTyped, type QuickbaseClient, type QuickbaseConfig, type Record, RecordFromJSON, RecordFromJSONTyped, RecordToJSON, RecordToJSONTyped, type RecordValue, RecordValueFromJSON, RecordValueFromJSONTyped, RecordValueToJSON, RecordValueToJSONTyped, type RemoveManagersFromGroup200Response, RemoveManagersFromGroup200ResponseFromJSON, RemoveManagersFromGroup200ResponseFromJSONTyped, RemoveManagersFromGroup200ResponseToJSON, RemoveManagersFromGroup200ResponseToJSONTyped, type RemoveManagersFromGroupRequest, RemoveManagersFromGroupRequestFromJSON, RemoveManagersFromGroupRequestFromJSONTyped, RemoveManagersFromGroupRequestToJSON, RemoveManagersFromGroupRequestToJSONTyped, type RemoveMembersFromGroup200Response, RemoveMembersFromGroup200ResponseFromJSON, RemoveMembersFromGroup200ResponseFromJSONTyped, RemoveMembersFromGroup200ResponseToJSON, RemoveMembersFromGroup200ResponseToJSONTyped, type RemoveMembersFromGroupRequest, RemoveMembersFromGroupRequestFromJSON, RemoveMembersFromGroupRequestFromJSONTyped, RemoveMembersFromGroupRequestToJSON, RemoveMembersFromGroupRequestToJSONTyped, type RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroup200ResponseFromJSON, RemoveSubgroupsFromGroup200ResponseFromJSONTyped, RemoveSubgroupsFromGroup200ResponseToJSON, RemoveSubgroupsFromGroup200ResponseToJSONTyped, type RemoveSubgroupsFromGroupRequest, RemoveSubgroupsFromGroupRequestFromJSON, RemoveSubgroupsFromGroupRequestFromJSONTyped, RemoveSubgroupsFromGroupRequestToJSON, RemoveSubgroupsFromGroupRequestToJSONTyped, type RunFormula200Response, RunFormula200ResponseFromJSON, RunFormula200ResponseFromJSONTyped, RunFormula200ResponseToJSON, RunFormula200ResponseToJSONTyped, type RunFormulaRequest, RunFormulaRequestFromJSON, RunFormulaRequestFromJSONTyped, RunFormulaRequestToJSON, RunFormulaRequestToJSONTyped, type RunQuery200Response, RunQuery200ResponseFromJSON, RunQuery200ResponseFromJSONTyped, RunQuery200ResponseToJSON, RunQuery200ResponseToJSONTyped, type RunQueryRequest, RunQueryRequestFromJSON, RunQueryRequestFromJSONTyped, type RunQueryRequestGroupByInner, RunQueryRequestGroupByInnerFromJSON, RunQueryRequestGroupByInnerFromJSONTyped, RunQueryRequestGroupByInnerGroupingEnum, RunQueryRequestGroupByInnerToJSON, RunQueryRequestGroupByInnerToJSONTyped, type RunQueryRequestOptions, RunQueryRequestOptionsFromJSON, RunQueryRequestOptionsFromJSONTyped, RunQueryRequestOptionsToJSON, RunQueryRequestOptionsToJSONTyped, type RunQueryRequestSortByInner, RunQueryRequestSortByInnerFromJSON, RunQueryRequestSortByInnerFromJSONTyped, RunQueryRequestSortByInnerOrderEnum, RunQueryRequestSortByInnerToJSON, RunQueryRequestSortByInnerToJSONTyped, RunQueryRequestToJSON, RunQueryRequestToJSONTyped, type RunReport200Response, RunReport200ResponseFromJSON, RunReport200ResponseFromJSONTyped, RunReport200ResponseToJSON, RunReport200ResponseToJSONTyped, type TransferUserToken200Response, TransferUserToken200ResponseFromJSON, TransferUserToken200ResponseFromJSONTyped, TransferUserToken200ResponseToJSON, TransferUserToken200ResponseToJSONTyped, type TransferUserTokenRequest, TransferUserTokenRequestFromJSON, TransferUserTokenRequestFromJSONTyped, TransferUserTokenRequestToJSON, TransferUserTokenRequestToJSONTyped, type UndenyUsers200Response, UndenyUsers200ResponseFromJSON, UndenyUsers200ResponseFromJSONTyped, UndenyUsers200ResponseToJSON, UndenyUsers200ResponseToJSONTyped, type UndenyUsersRequest, UndenyUsersRequestFromJSON, UndenyUsersRequestFromJSONTyped, UndenyUsersRequestToJSON, UndenyUsersRequestToJSONTyped, type UpdateApp200Response, UpdateApp200ResponseFromJSON, UpdateApp200ResponseFromJSONTyped, UpdateApp200ResponseToJSON, UpdateApp200ResponseToJSONTyped, type UpdateAppRequest, UpdateAppRequestFromJSON, UpdateAppRequestFromJSONTyped, UpdateAppRequestToJSON, UpdateAppRequestToJSONTyped, type UpdateField200Response, UpdateField200ResponseFromJSON, UpdateField200ResponseFromJSONTyped, UpdateField200ResponseToJSON, UpdateField200ResponseToJSONTyped, type UpdateFieldRequest, UpdateFieldRequestFieldTypeEnum, UpdateFieldRequestFromJSON, UpdateFieldRequestFromJSONTyped, UpdateFieldRequestToJSON, UpdateFieldRequestToJSONTyped, type UpdateRelationship200Response, UpdateRelationship200ResponseFromJSON, UpdateRelationship200ResponseFromJSONTyped, UpdateRelationship200ResponseToJSON, UpdateRelationship200ResponseToJSONTyped, type UpdateRelationshipRequest, UpdateRelationshipRequestFromJSON, UpdateRelationshipRequestFromJSONTyped, UpdateRelationshipRequestToJSON, UpdateRelationshipRequestToJSONTyped, type UpdateSolution200Response, UpdateSolution200ResponseFromJSON, UpdateSolution200ResponseFromJSONTyped, type UpdateSolution200ResponseInner, type UpdateSolution200ResponseInnerCreatedResourcesInner, UpdateSolution200ResponseInnerCreatedResourcesInnerFromJSON, UpdateSolution200ResponseInnerCreatedResourcesInnerFromJSONTyped, UpdateSolution200ResponseInnerCreatedResourcesInnerToJSON, UpdateSolution200ResponseInnerCreatedResourcesInnerToJSONTyped, UpdateSolution200ResponseInnerFromJSON, UpdateSolution200ResponseInnerFromJSONTyped, UpdateSolution200ResponseInnerToJSON, UpdateSolution200ResponseInnerToJSONTyped, UpdateSolution200ResponseToJSON, UpdateSolution200ResponseToJSONTyped, type UpdateSolution400Response, UpdateSolution400ResponseFromJSON, UpdateSolution400ResponseFromJSONTyped, UpdateSolution400ResponseToJSON, UpdateSolution400ResponseToJSONTyped, type UpdateSolution401403Response, UpdateSolution401403ResponseFromJSON, UpdateSolution401403ResponseFromJSONTyped, UpdateSolution401403ResponseToJSON, UpdateSolution401403ResponseToJSONTyped, type UpdateSolution4xx5xxResponse, UpdateSolution4xx5xxResponseFromJSON, UpdateSolution4xx5xxResponseFromJSONTyped, UpdateSolution4xx5xxResponseToJSON, UpdateSolution4xx5xxResponseToJSONTyped, type UpdateSolutionToRecord200Response, UpdateSolutionToRecord200ResponseFromJSON, UpdateSolutionToRecord200ResponseFromJSONTyped, type UpdateSolutionToRecord200ResponseInner, UpdateSolutionToRecord200ResponseInnerFromJSON, UpdateSolutionToRecord200ResponseInnerFromJSONTyped, UpdateSolutionToRecord200ResponseInnerToJSON, UpdateSolutionToRecord200ResponseInnerToJSONTyped, UpdateSolutionToRecord200ResponseToJSON, UpdateSolutionToRecord200ResponseToJSONTyped, type UpdateSolutionToRecord400Response, UpdateSolutionToRecord400ResponseFromJSON, UpdateSolutionToRecord400ResponseFromJSONTyped, UpdateSolutionToRecord400ResponseToJSON, UpdateSolutionToRecord400ResponseToJSONTyped, type UpdateSolutionToRecord401403Response, UpdateSolutionToRecord401403ResponseFromJSON, UpdateSolutionToRecord401403ResponseFromJSONTyped, UpdateSolutionToRecord401403ResponseToJSON, UpdateSolutionToRecord401403ResponseToJSONTyped, type UpdateSolutionToRecord404Response, UpdateSolutionToRecord404ResponseFromJSON, UpdateSolutionToRecord404ResponseFromJSONTyped, UpdateSolutionToRecord404ResponseToJSON, UpdateSolutionToRecord404ResponseToJSONTyped, type UpdateSolutionToRecord4xx5xxResponse, UpdateSolutionToRecord4xx5xxResponseFromJSON, UpdateSolutionToRecord4xx5xxResponseFromJSONTyped, UpdateSolutionToRecord4xx5xxResponseToJSON, UpdateSolutionToRecord4xx5xxResponseToJSONTyped, type UpdateTable200Response, UpdateTable200ResponseDefaultSortOrderEnum, UpdateTable200ResponseFromJSON, UpdateTable200ResponseFromJSONTyped, UpdateTable200ResponseToJSON, UpdateTable200ResponseToJSONTyped, type UpdateTableRequest, UpdateTableRequestFromJSON, UpdateTableRequestFromJSONTyped, UpdateTableRequestToJSON, UpdateTableRequestToJSONTyped, type Upsert200Response, Upsert200ResponseFromJSON, Upsert200ResponseFromJSONTyped, Upsert200ResponseToJSON, Upsert200ResponseToJSONTyped, type Upsert207Response, Upsert207ResponseFromJSON, Upsert207ResponseFromJSONTyped, Upsert207ResponseToJSON, Upsert207ResponseToJSONTyped, type Upsert400Response, Upsert400ResponseFromJSON, Upsert400ResponseFromJSONTyped, Upsert400ResponseToJSON, Upsert400ResponseToJSONTyped, type UpsertRequest, UpsertRequestFromJSON, UpsertRequestFromJSONTyped, UpsertRequestToJSON, UpsertRequestToJSONTyped, instanceOfAddManagersToGroup200Response, instanceOfAddManagersToGroupRequest, instanceOfAddMembersToGroup200Response, instanceOfAddMembersToGroupRequest, instanceOfAddSubgroupsToGroup200Response, instanceOfAddSubgroupsToGroupRequest, instanceOfAudit200Response, instanceOfAudit202Response, instanceOfAuditRequest, instanceOfChangesetSolution200Response, instanceOfChangesetSolution200ResponseInner, instanceOfChangesetSolution200ResponseInnerChangesInnerInner, instanceOfChangesetSolution400Response, instanceOfChangesetSolution401403Response, instanceOfChangesetSolution404Response, instanceOfChangesetSolution4xx5xxResponse, instanceOfChangesetSolutionFromRecord200Response, instanceOfChangesetSolutionFromRecord400Response, instanceOfChangesetSolutionFromRecord401403Response, instanceOfChangesetSolutionFromRecord404Response, instanceOfChangesetSolutionFromRecord4xx5xxResponse, instanceOfCloneUserToken200Response, instanceOfCloneUserTokenRequest, instanceOfCopyApp200Response, instanceOfCopyAppRequest, instanceOfCopyAppRequestProperties, instanceOfCreateApp200Response, instanceOfCreateAppRequest, instanceOfCreateField200Response, instanceOfCreateFieldRequest, instanceOfCreateFieldRequestProperties, instanceOfCreateRelationship200Response, instanceOfCreateRelationshipRequest, instanceOfCreateSolution200Response, instanceOfCreateSolution400Response, instanceOfCreateSolution401403Response, instanceOfCreateSolution4xx5xxResponse, instanceOfCreateSolutionFromRecord200Response, instanceOfCreateSolutionFromRecord200ResponseInner, instanceOfCreateSolutionFromRecord200ResponseInnerCreatedResourcesInner, instanceOfCreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner, instanceOfCreateSolutionFromRecord400Response, instanceOfCreateSolutionFromRecord401403Response, instanceOfCreateSolutionFromRecord404Response, instanceOfCreateSolutionFromRecord4xx5xxResponse, instanceOfCreateTable200Response, instanceOfCreateTableRequest, instanceOfDeactivateUserToken200Response, instanceOfDeleteApp200Response, instanceOfDeleteAppRequest, instanceOfDeleteFields200Response, instanceOfDeleteFieldsRequest, instanceOfDeleteFile200Response, instanceOfDeleteRecords200Response, instanceOfDeleteRecordsRequest, instanceOfDeleteRelationship200Response, instanceOfDeleteTable200Response, instanceOfDeleteUserToken200Response, instanceOfDenyUsers200Response, instanceOfDenyUsersAndGroups200Response, instanceOfDenyUsersAndGroupsRequest, instanceOfDenyUsersRequest, instanceOfDownloadFile200Response, instanceOfExchangeSsoToken200Response, instanceOfExchangeSsoTokenRequest, instanceOfExportSolution200Response, instanceOfExportSolution400Response, instanceOfExportSolution401403Response, instanceOfExportSolution404Response, instanceOfExportSolution4xx5xxResponse, instanceOfExportSolutionToRecord200Response, instanceOfExportSolutionToRecord200ResponseInner, instanceOfExportSolutionToRecord400Response, instanceOfExportSolutionToRecord401403Response, instanceOfExportSolutionToRecord404Response, instanceOfExportSolutionToRecord4xx5xxResponse, instanceOfGenerateDocument200Response, instanceOfGetApp200Response, instanceOfGetAppEvents200Response, instanceOfGetAppTables200Response, instanceOfGetField200Response, instanceOfGetFieldUsage200Response, instanceOfGetFields200Response, instanceOfGetFieldsUsage200Response, instanceOfGetRelationships200Response, instanceOfGetReport200Response, instanceOfGetTable200Response, instanceOfGetTableReports200Response, instanceOfGetTempTokenDBID200Response, instanceOfGetUsers200Response, instanceOfGetUsersRequest, instanceOfPermission, instanceOfPlatformAnalyticEventSummaries200Response, instanceOfPlatformAnalyticEventSummaries200ResponseMetadata, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals, instanceOfPlatformAnalyticEventSummaries200ResponseTotals, instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner, instanceOfPlatformAnalyticEventSummariesRequest, instanceOfPlatformAnalyticEventSummariesRequestWhereInner, instanceOfPlatformAnalyticReads200Response, instanceOfRecord, instanceOfRecordValue, instanceOfRemoveManagersFromGroup200Response, instanceOfRemoveManagersFromGroupRequest, instanceOfRemoveMembersFromGroup200Response, instanceOfRemoveMembersFromGroupRequest, instanceOfRemoveSubgroupsFromGroup200Response, instanceOfRemoveSubgroupsFromGroupRequest, instanceOfRunFormula200Response, instanceOfRunFormulaRequest, instanceOfRunQuery200Response, instanceOfRunQueryRequest, instanceOfRunQueryRequestGroupByInner, instanceOfRunQueryRequestOptions, instanceOfRunQueryRequestSortByInner, instanceOfRunReport200Response, instanceOfTransferUserToken200Response, instanceOfTransferUserTokenRequest, instanceOfUndenyUsers200Response, instanceOfUndenyUsersRequest, instanceOfUpdateApp200Response, instanceOfUpdateAppRequest, instanceOfUpdateField200Response, instanceOfUpdateFieldRequest, instanceOfUpdateRelationship200Response, instanceOfUpdateRelationshipRequest, instanceOfUpdateSolution200Response, instanceOfUpdateSolution200ResponseInner, instanceOfUpdateSolution200ResponseInnerCreatedResourcesInner, instanceOfUpdateSolution400Response, instanceOfUpdateSolution401403Response, instanceOfUpdateSolution4xx5xxResponse, instanceOfUpdateSolutionToRecord200Response, instanceOfUpdateSolutionToRecord200ResponseInner, instanceOfUpdateSolutionToRecord400Response, instanceOfUpdateSolutionToRecord401403Response, instanceOfUpdateSolutionToRecord404Response, instanceOfUpdateSolutionToRecord4xx5xxResponse, instanceOfUpdateTable200Response, instanceOfUpdateTableRequest, instanceOfUpsert200Response, instanceOfUpsert207Response, instanceOfUpsert400Response, instanceOfUpsertRequest, quickbase };
+export { type AddManagersToGroup200Response, AddManagersToGroup200ResponseFromJSON, AddManagersToGroup200ResponseFromJSONTyped, AddManagersToGroup200ResponseToJSON, AddManagersToGroup200ResponseToJSONTyped, type AddManagersToGroupRequest, AddManagersToGroupRequestFromJSON, AddManagersToGroupRequestFromJSONTyped, AddManagersToGroupRequestToJSON, AddManagersToGroupRequestToJSONTyped, type AddMembersToGroup200Response, AddMembersToGroup200ResponseFromJSON, AddMembersToGroup200ResponseFromJSONTyped, AddMembersToGroup200ResponseToJSON, AddMembersToGroup200ResponseToJSONTyped, type AddMembersToGroupRequest, AddMembersToGroupRequestFromJSON, AddMembersToGroupRequestFromJSONTyped, AddMembersToGroupRequestToJSON, AddMembersToGroupRequestToJSONTyped, type AddSubgroupsToGroup200Response, AddSubgroupsToGroup200ResponseFromJSON, AddSubgroupsToGroup200ResponseFromJSONTyped, AddSubgroupsToGroup200ResponseToJSON, AddSubgroupsToGroup200ResponseToJSONTyped, type AddSubgroupsToGroupRequest, AddSubgroupsToGroupRequestFromJSON, AddSubgroupsToGroupRequestFromJSONTyped, AddSubgroupsToGroupRequestToJSON, AddSubgroupsToGroupRequestToJSONTyped, type Audit200Response, Audit200ResponseFromJSON, Audit200ResponseFromJSONTyped, Audit200ResponseToJSON, Audit200ResponseToJSONTyped, type Audit202Response, Audit202ResponseFromJSON, Audit202ResponseFromJSONTyped, Audit202ResponseToJSON, Audit202ResponseToJSONTyped, type AuditRequest, AuditRequestFromJSON, AuditRequestFromJSONTyped, AuditRequestToJSON, AuditRequestToJSONTyped, type ChangesetSolution200Response, ChangesetSolution200ResponseFromJSON, ChangesetSolution200ResponseFromJSONTyped, type ChangesetSolution200ResponseInner, type ChangesetSolution200ResponseInnerChangesInnerInner, ChangesetSolution200ResponseInnerChangesInnerInnerFromJSON, ChangesetSolution200ResponseInnerChangesInnerInnerFromJSONTyped, ChangesetSolution200ResponseInnerChangesInnerInnerToJSON, ChangesetSolution200ResponseInnerChangesInnerInnerToJSONTyped, ChangesetSolution200ResponseInnerFromJSON, ChangesetSolution200ResponseInnerFromJSONTyped, ChangesetSolution200ResponseInnerToJSON, ChangesetSolution200ResponseInnerToJSONTyped, ChangesetSolution200ResponseToJSON, ChangesetSolution200ResponseToJSONTyped, type ChangesetSolution400Response, ChangesetSolution400ResponseFromJSON, ChangesetSolution400ResponseFromJSONTyped, ChangesetSolution400ResponseToJSON, ChangesetSolution400ResponseToJSONTyped, type ChangesetSolution401403Response, ChangesetSolution401403ResponseFromJSON, ChangesetSolution401403ResponseFromJSONTyped, ChangesetSolution401403ResponseToJSON, ChangesetSolution401403ResponseToJSONTyped, type ChangesetSolution404Response, ChangesetSolution404ResponseFromJSON, ChangesetSolution404ResponseFromJSONTyped, ChangesetSolution404ResponseToJSON, ChangesetSolution404ResponseToJSONTyped, type ChangesetSolution4xx5xxResponse, ChangesetSolution4xx5xxResponseFromJSON, ChangesetSolution4xx5xxResponseFromJSONTyped, ChangesetSolution4xx5xxResponseToJSON, ChangesetSolution4xx5xxResponseToJSONTyped, type ChangesetSolutionFromRecord200Response, ChangesetSolutionFromRecord200ResponseFromJSON, ChangesetSolutionFromRecord200ResponseFromJSONTyped, ChangesetSolutionFromRecord200ResponseToJSON, ChangesetSolutionFromRecord200ResponseToJSONTyped, type ChangesetSolutionFromRecord400Response, ChangesetSolutionFromRecord400ResponseFromJSON, ChangesetSolutionFromRecord400ResponseFromJSONTyped, ChangesetSolutionFromRecord400ResponseToJSON, ChangesetSolutionFromRecord400ResponseToJSONTyped, type ChangesetSolutionFromRecord401403Response, ChangesetSolutionFromRecord401403ResponseFromJSON, ChangesetSolutionFromRecord401403ResponseFromJSONTyped, ChangesetSolutionFromRecord401403ResponseToJSON, ChangesetSolutionFromRecord401403ResponseToJSONTyped, type ChangesetSolutionFromRecord404Response, ChangesetSolutionFromRecord404ResponseFromJSON, ChangesetSolutionFromRecord404ResponseFromJSONTyped, ChangesetSolutionFromRecord404ResponseToJSON, ChangesetSolutionFromRecord404ResponseToJSONTyped, type ChangesetSolutionFromRecord4xx5xxResponse, ChangesetSolutionFromRecord4xx5xxResponseFromJSON, ChangesetSolutionFromRecord4xx5xxResponseFromJSONTyped, ChangesetSolutionFromRecord4xx5xxResponseToJSON, ChangesetSolutionFromRecord4xx5xxResponseToJSONTyped, type CloneUserToken200Response, CloneUserToken200ResponseFromJSON, CloneUserToken200ResponseFromJSONTyped, CloneUserToken200ResponseToJSON, CloneUserToken200ResponseToJSONTyped, type CloneUserTokenRequest, CloneUserTokenRequestFromJSON, CloneUserTokenRequestFromJSONTyped, CloneUserTokenRequestToJSON, CloneUserTokenRequestToJSONTyped, type CopyApp200Response, CopyApp200ResponseFromJSON, CopyApp200ResponseFromJSONTyped, CopyApp200ResponseToJSON, CopyApp200ResponseToJSONTyped, type CopyAppRequest, CopyAppRequestFromJSON, CopyAppRequestFromJSONTyped, type CopyAppRequestProperties, CopyAppRequestPropertiesFromJSON, CopyAppRequestPropertiesFromJSONTyped, CopyAppRequestPropertiesToJSON, CopyAppRequestPropertiesToJSONTyped, CopyAppRequestToJSON, CopyAppRequestToJSONTyped, type CreateApp200Response, CreateApp200ResponseFromJSON, CreateApp200ResponseFromJSONTyped, CreateApp200ResponseToJSON, CreateApp200ResponseToJSONTyped, type CreateAppRequest, CreateAppRequestFromJSON, CreateAppRequestFromJSONTyped, CreateAppRequestToJSON, CreateAppRequestToJSONTyped, type CreateField200Response, CreateField200ResponseFromJSON, CreateField200ResponseFromJSONTyped, CreateField200ResponseToJSON, CreateField200ResponseToJSONTyped, type CreateFieldRequest, CreateFieldRequestFieldTypeEnum, CreateFieldRequestFromJSON, CreateFieldRequestFromJSONTyped, type CreateFieldRequestProperties, CreateFieldRequestPropertiesCurrencyFormatEnum, CreateFieldRequestPropertiesFromJSON, CreateFieldRequestPropertiesFromJSONTyped, CreateFieldRequestPropertiesOpenTargetInEnum, CreateFieldRequestPropertiesSummaryFunctionEnum, CreateFieldRequestPropertiesToJSON, CreateFieldRequestPropertiesToJSONTyped, CreateFieldRequestPropertiesVersionModeEnum, CreateFieldRequestToJSON, CreateFieldRequestToJSONTyped, type CreateRelationship200Response, CreateRelationship200ResponseFromJSON, CreateRelationship200ResponseFromJSONTyped, CreateRelationship200ResponseToJSON, CreateRelationship200ResponseToJSONTyped, type CreateRelationshipRequest, CreateRelationshipRequestFromJSON, CreateRelationshipRequestFromJSONTyped, CreateRelationshipRequestToJSON, CreateRelationshipRequestToJSONTyped, type CreateSolution200Response, CreateSolution200ResponseFromJSON, CreateSolution200ResponseFromJSONTyped, CreateSolution200ResponseToJSON, CreateSolution200ResponseToJSONTyped, type CreateSolution400Response, CreateSolution400ResponseFromJSON, CreateSolution400ResponseFromJSONTyped, CreateSolution400ResponseToJSON, CreateSolution400ResponseToJSONTyped, type CreateSolution401403Response, CreateSolution401403ResponseFromJSON, CreateSolution401403ResponseFromJSONTyped, CreateSolution401403ResponseToJSON, CreateSolution401403ResponseToJSONTyped, type CreateSolution4xx5xxResponse, CreateSolution4xx5xxResponseFromJSON, CreateSolution4xx5xxResponseFromJSONTyped, CreateSolution4xx5xxResponseToJSON, CreateSolution4xx5xxResponseToJSONTyped, type CreateSolutionFromRecord200Response, CreateSolutionFromRecord200ResponseFromJSON, CreateSolutionFromRecord200ResponseFromJSONTyped, type CreateSolutionFromRecord200ResponseInner, type CreateSolutionFromRecord200ResponseInnerCreatedResourcesInner, type CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerFromJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerToJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerToJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerFromJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerToJSON, CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerToJSONTyped, CreateSolutionFromRecord200ResponseInnerFromJSON, CreateSolutionFromRecord200ResponseInnerFromJSONTyped, CreateSolutionFromRecord200ResponseInnerToJSON, CreateSolutionFromRecord200ResponseInnerToJSONTyped, CreateSolutionFromRecord200ResponseToJSON, CreateSolutionFromRecord200ResponseToJSONTyped, type CreateSolutionFromRecord400Response, CreateSolutionFromRecord400ResponseFromJSON, CreateSolutionFromRecord400ResponseFromJSONTyped, CreateSolutionFromRecord400ResponseToJSON, CreateSolutionFromRecord400ResponseToJSONTyped, type CreateSolutionFromRecord401403Response, CreateSolutionFromRecord401403ResponseFromJSON, CreateSolutionFromRecord401403ResponseFromJSONTyped, CreateSolutionFromRecord401403ResponseToJSON, CreateSolutionFromRecord401403ResponseToJSONTyped, type CreateSolutionFromRecord404Response, CreateSolutionFromRecord404ResponseFromJSON, CreateSolutionFromRecord404ResponseFromJSONTyped, CreateSolutionFromRecord404ResponseToJSON, CreateSolutionFromRecord404ResponseToJSONTyped, type CreateSolutionFromRecord4xx5xxResponse, CreateSolutionFromRecord4xx5xxResponseFromJSON, CreateSolutionFromRecord4xx5xxResponseFromJSONTyped, CreateSolutionFromRecord4xx5xxResponseToJSON, CreateSolutionFromRecord4xx5xxResponseToJSONTyped, type CreateTable200Response, CreateTable200ResponseDefaultSortOrderEnum, CreateTable200ResponseFromJSON, CreateTable200ResponseFromJSONTyped, CreateTable200ResponseToJSON, CreateTable200ResponseToJSONTyped, type CreateTableRequest, CreateTableRequestFromJSON, CreateTableRequestFromJSONTyped, CreateTableRequestToJSON, CreateTableRequestToJSONTyped, type DeactivateUserToken200Response, DeactivateUserToken200ResponseFromJSON, DeactivateUserToken200ResponseFromJSONTyped, DeactivateUserToken200ResponseToJSON, DeactivateUserToken200ResponseToJSONTyped, type DeleteApp200Response, DeleteApp200ResponseFromJSON, DeleteApp200ResponseFromJSONTyped, DeleteApp200ResponseToJSON, DeleteApp200ResponseToJSONTyped, type DeleteAppRequest, DeleteAppRequestFromJSON, DeleteAppRequestFromJSONTyped, DeleteAppRequestToJSON, DeleteAppRequestToJSONTyped, type DeleteFields200Response, DeleteFields200ResponseFromJSON, DeleteFields200ResponseFromJSONTyped, DeleteFields200ResponseToJSON, DeleteFields200ResponseToJSONTyped, type DeleteFieldsRequest, DeleteFieldsRequestFromJSON, DeleteFieldsRequestFromJSONTyped, DeleteFieldsRequestToJSON, DeleteFieldsRequestToJSONTyped, type DeleteFile200Response, DeleteFile200ResponseFromJSON, DeleteFile200ResponseFromJSONTyped, DeleteFile200ResponseToJSON, DeleteFile200ResponseToJSONTyped, type DeleteRecords200Response, DeleteRecords200ResponseFromJSON, DeleteRecords200ResponseFromJSONTyped, DeleteRecords200ResponseToJSON, DeleteRecords200ResponseToJSONTyped, type DeleteRecordsRequest, DeleteRecordsRequestFromJSON, DeleteRecordsRequestFromJSONTyped, DeleteRecordsRequestToJSON, DeleteRecordsRequestToJSONTyped, type DeleteRelationship200Response, DeleteRelationship200ResponseFromJSON, DeleteRelationship200ResponseFromJSONTyped, DeleteRelationship200ResponseToJSON, DeleteRelationship200ResponseToJSONTyped, type DeleteTable200Response, DeleteTable200ResponseFromJSON, DeleteTable200ResponseFromJSONTyped, DeleteTable200ResponseToJSON, DeleteTable200ResponseToJSONTyped, type DeleteUserToken200Response, DeleteUserToken200ResponseFromJSON, DeleteUserToken200ResponseFromJSONTyped, DeleteUserToken200ResponseToJSON, DeleteUserToken200ResponseToJSONTyped, type DenyUsers200Response, DenyUsers200ResponseFromJSON, DenyUsers200ResponseFromJSONTyped, DenyUsers200ResponseToJSON, DenyUsers200ResponseToJSONTyped, type DenyUsersAndGroups200Response, DenyUsersAndGroups200ResponseFromJSON, DenyUsersAndGroups200ResponseFromJSONTyped, DenyUsersAndGroups200ResponseToJSON, DenyUsersAndGroups200ResponseToJSONTyped, type DenyUsersAndGroupsRequest, DenyUsersAndGroupsRequestFromJSON, DenyUsersAndGroupsRequestFromJSONTyped, DenyUsersAndGroupsRequestToJSON, DenyUsersAndGroupsRequestToJSONTyped, type DenyUsersRequest, DenyUsersRequestFromJSON, DenyUsersRequestFromJSONTyped, DenyUsersRequestToJSON, DenyUsersRequestToJSONTyped, type DownloadFile200Response, DownloadFile200ResponseFromJSON, DownloadFile200ResponseFromJSONTyped, DownloadFile200ResponseToJSON, DownloadFile200ResponseToJSONTyped, type ExchangeSsoToken200Response, ExchangeSsoToken200ResponseFromJSON, ExchangeSsoToken200ResponseFromJSONTyped, ExchangeSsoToken200ResponseIssuedTokenTypeEnum, ExchangeSsoToken200ResponseToJSON, ExchangeSsoToken200ResponseToJSONTyped, ExchangeSsoToken200ResponseTokenTypeEnum, type ExchangeSsoTokenRequest, ExchangeSsoTokenRequestFromJSON, ExchangeSsoTokenRequestFromJSONTyped, ExchangeSsoTokenRequestGrantTypeEnum, ExchangeSsoTokenRequestRequestedTokenTypeEnum, ExchangeSsoTokenRequestSubjectTokenTypeEnum, ExchangeSsoTokenRequestToJSON, ExchangeSsoTokenRequestToJSONTyped, type ExportSolution200Response, ExportSolution200ResponseFromJSON, ExportSolution200ResponseFromJSONTyped, ExportSolution200ResponseToJSON, ExportSolution200ResponseToJSONTyped, type ExportSolution400Response, ExportSolution400ResponseFromJSON, ExportSolution400ResponseFromJSONTyped, ExportSolution400ResponseToJSON, ExportSolution400ResponseToJSONTyped, type ExportSolution401403Response, ExportSolution401403ResponseFromJSON, ExportSolution401403ResponseFromJSONTyped, ExportSolution401403ResponseToJSON, ExportSolution401403ResponseToJSONTyped, type ExportSolution404Response, ExportSolution404ResponseFromJSON, ExportSolution404ResponseFromJSONTyped, ExportSolution404ResponseToJSON, ExportSolution404ResponseToJSONTyped, type ExportSolution4xx5xxResponse, ExportSolution4xx5xxResponseFromJSON, ExportSolution4xx5xxResponseFromJSONTyped, ExportSolution4xx5xxResponseToJSON, ExportSolution4xx5xxResponseToJSONTyped, type ExportSolutionToRecord200Response, ExportSolutionToRecord200ResponseFromJSON, ExportSolutionToRecord200ResponseFromJSONTyped, type ExportSolutionToRecord200ResponseInner, ExportSolutionToRecord200ResponseInnerFromJSON, ExportSolutionToRecord200ResponseInnerFromJSONTyped, ExportSolutionToRecord200ResponseInnerToJSON, ExportSolutionToRecord200ResponseInnerToJSONTyped, ExportSolutionToRecord200ResponseToJSON, ExportSolutionToRecord200ResponseToJSONTyped, type ExportSolutionToRecord400Response, ExportSolutionToRecord400ResponseFromJSON, ExportSolutionToRecord400ResponseFromJSONTyped, ExportSolutionToRecord400ResponseToJSON, ExportSolutionToRecord400ResponseToJSONTyped, type ExportSolutionToRecord401403Response, ExportSolutionToRecord401403ResponseFromJSON, ExportSolutionToRecord401403ResponseFromJSONTyped, ExportSolutionToRecord401403ResponseToJSON, ExportSolutionToRecord401403ResponseToJSONTyped, type ExportSolutionToRecord404Response, ExportSolutionToRecord404ResponseFromJSON, ExportSolutionToRecord404ResponseFromJSONTyped, ExportSolutionToRecord404ResponseToJSON, ExportSolutionToRecord404ResponseToJSONTyped, type ExportSolutionToRecord4xx5xxResponse, ExportSolutionToRecord4xx5xxResponseFromJSON, ExportSolutionToRecord4xx5xxResponseFromJSONTyped, ExportSolutionToRecord4xx5xxResponseToJSON, ExportSolutionToRecord4xx5xxResponseToJSONTyped, type GenerateDocument200Response, GenerateDocument200ResponseFromJSON, GenerateDocument200ResponseFromJSONTyped, GenerateDocument200ResponseToJSON, GenerateDocument200ResponseToJSONTyped, type GetApp200Response, GetApp200ResponseFromJSON, GetApp200ResponseFromJSONTyped, GetApp200ResponseToJSON, GetApp200ResponseToJSONTyped, type GetAppEvents200Response, GetAppEvents200ResponseFromJSON, GetAppEvents200ResponseFromJSONTyped, type GetAppEvents200ResponseItemsInner, GetAppEvents200ResponseItemsInnerFromJSON, GetAppEvents200ResponseItemsInnerFromJSONTyped, GetAppEvents200ResponseItemsInnerToJSON, GetAppEvents200ResponseItemsInnerToJSONTyped, GetAppEvents200ResponseItemsInnerTypeEnum, GetAppEvents200ResponseToJSON, GetAppEvents200ResponseToJSONTyped, type GetAppTables200Response, GetAppTables200ResponseFromJSON, GetAppTables200ResponseFromJSONTyped, type GetAppTables200ResponseItemsInner, GetAppTables200ResponseItemsInnerDefaultSortOrderEnum, GetAppTables200ResponseItemsInnerFromJSON, GetAppTables200ResponseItemsInnerFromJSONTyped, GetAppTables200ResponseItemsInnerToJSON, GetAppTables200ResponseItemsInnerToJSONTyped, GetAppTables200ResponseToJSON, GetAppTables200ResponseToJSONTyped, type GetField200Response, GetField200ResponseFromJSON, GetField200ResponseFromJSONTyped, GetField200ResponseToJSON, GetField200ResponseToJSONTyped, type GetFieldUsage200Response, GetFieldUsage200ResponseFromJSON, GetFieldUsage200ResponseFromJSONTyped, GetFieldUsage200ResponseToJSON, GetFieldUsage200ResponseToJSONTyped, type GetFields200Response, GetFields200ResponseFromJSON, GetFields200ResponseFromJSONTyped, type GetFields200ResponseItemsInner, GetFields200ResponseItemsInnerFromJSON, GetFields200ResponseItemsInnerFromJSONTyped, GetFields200ResponseItemsInnerToJSON, GetFields200ResponseItemsInnerToJSONTyped, GetFields200ResponseToJSON, GetFields200ResponseToJSONTyped, type GetFieldsUsage200Response, GetFieldsUsage200ResponseFromJSON, GetFieldsUsage200ResponseFromJSONTyped, type GetFieldsUsage200ResponseItemsInner, GetFieldsUsage200ResponseItemsInnerFromJSON, GetFieldsUsage200ResponseItemsInnerFromJSONTyped, GetFieldsUsage200ResponseItemsInnerToJSON, GetFieldsUsage200ResponseItemsInnerToJSONTyped, GetFieldsUsage200ResponseToJSON, GetFieldsUsage200ResponseToJSONTyped, type GetRelationships200Response, GetRelationships200ResponseFromJSON, GetRelationships200ResponseFromJSONTyped, GetRelationships200ResponseToJSON, GetRelationships200ResponseToJSONTyped, type GetReport200Response, GetReport200ResponseFromJSON, GetReport200ResponseFromJSONTyped, GetReport200ResponseToJSON, GetReport200ResponseToJSONTyped, type GetTable200Response, GetTable200ResponseDefaultSortOrderEnum, GetTable200ResponseFromJSON, GetTable200ResponseFromJSONTyped, GetTable200ResponseToJSON, GetTable200ResponseToJSONTyped, type GetTableReports200Response, GetTableReports200ResponseFromJSON, GetTableReports200ResponseFromJSONTyped, type GetTableReports200ResponseItemsInner, GetTableReports200ResponseItemsInnerFromJSON, GetTableReports200ResponseItemsInnerFromJSONTyped, GetTableReports200ResponseItemsInnerToJSON, GetTableReports200ResponseItemsInnerToJSONTyped, GetTableReports200ResponseToJSON, GetTableReports200ResponseToJSONTyped, type GetTempTokenDBID200Response, GetTempTokenDBID200ResponseFromJSON, GetTempTokenDBID200ResponseFromJSONTyped, GetTempTokenDBID200ResponseToJSON, GetTempTokenDBID200ResponseToJSONTyped, type GetUsers200Response, GetUsers200ResponseFromJSON, GetUsers200ResponseFromJSONTyped, GetUsers200ResponseToJSON, GetUsers200ResponseToJSONTyped, type GetUsersRequest, GetUsersRequestFromJSON, GetUsersRequestFromJSONTyped, GetUsersRequestToJSON, GetUsersRequestToJSONTyped, type Permission, PermissionFromJSON, PermissionFromJSONTyped, PermissionToJSON, PermissionToJSONTyped, type PlatformAnalyticEventSummaries200Response, PlatformAnalyticEventSummaries200ResponseFromJSON, PlatformAnalyticEventSummaries200ResponseFromJSONTyped, PlatformAnalyticEventSummaries200ResponseGroupByEnum, type PlatformAnalyticEventSummaries200ResponseMetadata, PlatformAnalyticEventSummaries200ResponseMetadataFromJSON, PlatformAnalyticEventSummaries200ResponseMetadataFromJSONTyped, PlatformAnalyticEventSummaries200ResponseMetadataToJSON, PlatformAnalyticEventSummaries200ResponseMetadataToJSONTyped, type PlatformAnalyticEventSummaries200ResponseResultsInner, type PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerToJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerToJSONTyped, type PlatformAnalyticEventSummaries200ResponseResultsInnerTotals, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsFromJSONTyped, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSON, PlatformAnalyticEventSummaries200ResponseResultsInnerTotalsToJSONTyped, PlatformAnalyticEventSummaries200ResponseToJSON, PlatformAnalyticEventSummaries200ResponseToJSONTyped, type PlatformAnalyticEventSummaries200ResponseTotals, PlatformAnalyticEventSummaries200ResponseTotalsFromJSON, PlatformAnalyticEventSummaries200ResponseTotalsFromJSONTyped, PlatformAnalyticEventSummaries200ResponseTotalsToJSON, PlatformAnalyticEventSummaries200ResponseTotalsToJSONTyped, type PlatformAnalyticEventSummaries200ResponseWhereInner, PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSON, PlatformAnalyticEventSummaries200ResponseWhereInnerFromJSONTyped, PlatformAnalyticEventSummaries200ResponseWhereInnerToJSON, PlatformAnalyticEventSummaries200ResponseWhereInnerToJSONTyped, PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum, type PlatformAnalyticEventSummariesRequest, PlatformAnalyticEventSummariesRequestFromJSON, PlatformAnalyticEventSummariesRequestFromJSONTyped, PlatformAnalyticEventSummariesRequestGroupByEnum, PlatformAnalyticEventSummariesRequestToJSON, PlatformAnalyticEventSummariesRequestToJSONTyped, type PlatformAnalyticEventSummariesRequestWhereInner, PlatformAnalyticEventSummariesRequestWhereInnerFromJSON, PlatformAnalyticEventSummariesRequestWhereInnerFromJSONTyped, PlatformAnalyticEventSummariesRequestWhereInnerToJSON, PlatformAnalyticEventSummariesRequestWhereInnerToJSONTyped, PlatformAnalyticEventSummariesRequestWhereInnerTypeEnum, type PlatformAnalyticReads200Response, PlatformAnalyticReads200ResponseFromJSON, PlatformAnalyticReads200ResponseFromJSONTyped, PlatformAnalyticReads200ResponseToJSON, PlatformAnalyticReads200ResponseToJSONTyped, type QuickbaseClient, type QuickbaseConfig, type Record, RecordFromJSON, RecordFromJSONTyped, RecordToJSON, RecordToJSONTyped, type RecordValue, RecordValueFromJSON, RecordValueFromJSONTyped, RecordValueToJSON, RecordValueToJSONTyped, type RemoveManagersFromGroup200Response, RemoveManagersFromGroup200ResponseFromJSON, RemoveManagersFromGroup200ResponseFromJSONTyped, RemoveManagersFromGroup200ResponseToJSON, RemoveManagersFromGroup200ResponseToJSONTyped, type RemoveManagersFromGroupRequest, RemoveManagersFromGroupRequestFromJSON, RemoveManagersFromGroupRequestFromJSONTyped, RemoveManagersFromGroupRequestToJSON, RemoveManagersFromGroupRequestToJSONTyped, type RemoveMembersFromGroup200Response, RemoveMembersFromGroup200ResponseFromJSON, RemoveMembersFromGroup200ResponseFromJSONTyped, RemoveMembersFromGroup200ResponseToJSON, RemoveMembersFromGroup200ResponseToJSONTyped, type RemoveMembersFromGroupRequest, RemoveMembersFromGroupRequestFromJSON, RemoveMembersFromGroupRequestFromJSONTyped, RemoveMembersFromGroupRequestToJSON, RemoveMembersFromGroupRequestToJSONTyped, type RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroup200ResponseFromJSON, RemoveSubgroupsFromGroup200ResponseFromJSONTyped, RemoveSubgroupsFromGroup200ResponseToJSON, RemoveSubgroupsFromGroup200ResponseToJSONTyped, type RemoveSubgroupsFromGroupRequest, RemoveSubgroupsFromGroupRequestFromJSON, RemoveSubgroupsFromGroupRequestFromJSONTyped, RemoveSubgroupsFromGroupRequestToJSON, RemoveSubgroupsFromGroupRequestToJSONTyped, type RunFormula200Response, RunFormula200ResponseFromJSON, RunFormula200ResponseFromJSONTyped, RunFormula200ResponseToJSON, RunFormula200ResponseToJSONTyped, type RunFormulaRequest, RunFormulaRequestFromJSON, RunFormulaRequestFromJSONTyped, RunFormulaRequestToJSON, RunFormulaRequestToJSONTyped, type RunQuery200Response, RunQuery200ResponseFromJSON, RunQuery200ResponseFromJSONTyped, RunQuery200ResponseToJSON, RunQuery200ResponseToJSONTyped, type RunQueryRequest, RunQueryRequestFromJSON, RunQueryRequestFromJSONTyped, type RunQueryRequestGroupByInner, RunQueryRequestGroupByInnerFromJSON, RunQueryRequestGroupByInnerFromJSONTyped, RunQueryRequestGroupByInnerGroupingEnum, RunQueryRequestGroupByInnerToJSON, RunQueryRequestGroupByInnerToJSONTyped, type RunQueryRequestOptions, RunQueryRequestOptionsFromJSON, RunQueryRequestOptionsFromJSONTyped, RunQueryRequestOptionsToJSON, RunQueryRequestOptionsToJSONTyped, type RunQueryRequestSortByInner, RunQueryRequestSortByInnerFromJSON, RunQueryRequestSortByInnerFromJSONTyped, RunQueryRequestSortByInnerOrderEnum, RunQueryRequestSortByInnerToJSON, RunQueryRequestSortByInnerToJSONTyped, RunQueryRequestToJSON, RunQueryRequestToJSONTyped, type RunReport200Response, RunReport200ResponseFromJSON, RunReport200ResponseFromJSONTyped, RunReport200ResponseToJSON, RunReport200ResponseToJSONTyped, type TransferUserToken200Response, TransferUserToken200ResponseFromJSON, TransferUserToken200ResponseFromJSONTyped, TransferUserToken200ResponseToJSON, TransferUserToken200ResponseToJSONTyped, type TransferUserTokenRequest, TransferUserTokenRequestFromJSON, TransferUserTokenRequestFromJSONTyped, TransferUserTokenRequestToJSON, TransferUserTokenRequestToJSONTyped, type UndenyUsers200Response, UndenyUsers200ResponseFromJSON, UndenyUsers200ResponseFromJSONTyped, UndenyUsers200ResponseToJSON, UndenyUsers200ResponseToJSONTyped, type UndenyUsersRequest, UndenyUsersRequestFromJSON, UndenyUsersRequestFromJSONTyped, UndenyUsersRequestToJSON, UndenyUsersRequestToJSONTyped, type UpdateApp200Response, UpdateApp200ResponseFromJSON, UpdateApp200ResponseFromJSONTyped, UpdateApp200ResponseToJSON, UpdateApp200ResponseToJSONTyped, type UpdateAppRequest, UpdateAppRequestFromJSON, UpdateAppRequestFromJSONTyped, UpdateAppRequestToJSON, UpdateAppRequestToJSONTyped, type UpdateField200Response, UpdateField200ResponseFromJSON, UpdateField200ResponseFromJSONTyped, UpdateField200ResponseToJSON, UpdateField200ResponseToJSONTyped, type UpdateFieldRequest, UpdateFieldRequestFieldTypeEnum, UpdateFieldRequestFromJSON, UpdateFieldRequestFromJSONTyped, UpdateFieldRequestToJSON, UpdateFieldRequestToJSONTyped, type UpdateRelationship200Response, UpdateRelationship200ResponseFromJSON, UpdateRelationship200ResponseFromJSONTyped, UpdateRelationship200ResponseToJSON, UpdateRelationship200ResponseToJSONTyped, type UpdateRelationshipRequest, UpdateRelationshipRequestFromJSON, UpdateRelationshipRequestFromJSONTyped, UpdateRelationshipRequestToJSON, UpdateRelationshipRequestToJSONTyped, type UpdateSolution200Response, UpdateSolution200ResponseFromJSON, UpdateSolution200ResponseFromJSONTyped, type UpdateSolution200ResponseInner, type UpdateSolution200ResponseInnerCreatedResourcesInner, UpdateSolution200ResponseInnerCreatedResourcesInnerFromJSON, UpdateSolution200ResponseInnerCreatedResourcesInnerFromJSONTyped, UpdateSolution200ResponseInnerCreatedResourcesInnerToJSON, UpdateSolution200ResponseInnerCreatedResourcesInnerToJSONTyped, UpdateSolution200ResponseInnerFromJSON, UpdateSolution200ResponseInnerFromJSONTyped, UpdateSolution200ResponseInnerToJSON, UpdateSolution200ResponseInnerToJSONTyped, UpdateSolution200ResponseToJSON, UpdateSolution200ResponseToJSONTyped, type UpdateSolution400Response, UpdateSolution400ResponseFromJSON, UpdateSolution400ResponseFromJSONTyped, UpdateSolution400ResponseToJSON, UpdateSolution400ResponseToJSONTyped, type UpdateSolution401403Response, UpdateSolution401403ResponseFromJSON, UpdateSolution401403ResponseFromJSONTyped, UpdateSolution401403ResponseToJSON, UpdateSolution401403ResponseToJSONTyped, type UpdateSolution4xx5xxResponse, UpdateSolution4xx5xxResponseFromJSON, UpdateSolution4xx5xxResponseFromJSONTyped, UpdateSolution4xx5xxResponseToJSON, UpdateSolution4xx5xxResponseToJSONTyped, type UpdateSolutionToRecord200Response, UpdateSolutionToRecord200ResponseFromJSON, UpdateSolutionToRecord200ResponseFromJSONTyped, type UpdateSolutionToRecord200ResponseInner, UpdateSolutionToRecord200ResponseInnerFromJSON, UpdateSolutionToRecord200ResponseInnerFromJSONTyped, UpdateSolutionToRecord200ResponseInnerToJSON, UpdateSolutionToRecord200ResponseInnerToJSONTyped, UpdateSolutionToRecord200ResponseToJSON, UpdateSolutionToRecord200ResponseToJSONTyped, type UpdateSolutionToRecord400Response, UpdateSolutionToRecord400ResponseFromJSON, UpdateSolutionToRecord400ResponseFromJSONTyped, UpdateSolutionToRecord400ResponseToJSON, UpdateSolutionToRecord400ResponseToJSONTyped, type UpdateSolutionToRecord401403Response, UpdateSolutionToRecord401403ResponseFromJSON, UpdateSolutionToRecord401403ResponseFromJSONTyped, UpdateSolutionToRecord401403ResponseToJSON, UpdateSolutionToRecord401403ResponseToJSONTyped, type UpdateSolutionToRecord404Response, UpdateSolutionToRecord404ResponseFromJSON, UpdateSolutionToRecord404ResponseFromJSONTyped, UpdateSolutionToRecord404ResponseToJSON, UpdateSolutionToRecord404ResponseToJSONTyped, type UpdateSolutionToRecord4xx5xxResponse, UpdateSolutionToRecord4xx5xxResponseFromJSON, UpdateSolutionToRecord4xx5xxResponseFromJSONTyped, UpdateSolutionToRecord4xx5xxResponseToJSON, UpdateSolutionToRecord4xx5xxResponseToJSONTyped, type UpdateTable200Response, UpdateTable200ResponseDefaultSortOrderEnum, UpdateTable200ResponseFromJSON, UpdateTable200ResponseFromJSONTyped, UpdateTable200ResponseToJSON, UpdateTable200ResponseToJSONTyped, type UpdateTableRequest, UpdateTableRequestFromJSON, UpdateTableRequestFromJSONTyped, UpdateTableRequestToJSON, UpdateTableRequestToJSONTyped, type Upsert200Response, Upsert200ResponseFromJSON, Upsert200ResponseFromJSONTyped, Upsert200ResponseToJSON, Upsert200ResponseToJSONTyped, type Upsert207Response, Upsert207ResponseFromJSON, Upsert207ResponseFromJSONTyped, Upsert207ResponseToJSON, Upsert207ResponseToJSONTyped, type Upsert400Response, Upsert400ResponseFromJSON, Upsert400ResponseFromJSONTyped, Upsert400ResponseToJSON, Upsert400ResponseToJSONTyped, type UpsertRequest, UpsertRequestFromJSON, UpsertRequestFromJSONTyped, UpsertRequestToJSON, UpsertRequestToJSONTyped, instanceOfAddManagersToGroup200Response, instanceOfAddManagersToGroupRequest, instanceOfAddMembersToGroup200Response, instanceOfAddMembersToGroupRequest, instanceOfAddSubgroupsToGroup200Response, instanceOfAddSubgroupsToGroupRequest, instanceOfAudit200Response, instanceOfAudit202Response, instanceOfAuditRequest, instanceOfChangesetSolution200Response, instanceOfChangesetSolution200ResponseInner, instanceOfChangesetSolution200ResponseInnerChangesInnerInner, instanceOfChangesetSolution400Response, instanceOfChangesetSolution401403Response, instanceOfChangesetSolution404Response, instanceOfChangesetSolution4xx5xxResponse, instanceOfChangesetSolutionFromRecord200Response, instanceOfChangesetSolutionFromRecord400Response, instanceOfChangesetSolutionFromRecord401403Response, instanceOfChangesetSolutionFromRecord404Response, instanceOfChangesetSolutionFromRecord4xx5xxResponse, instanceOfCloneUserToken200Response, instanceOfCloneUserTokenRequest, instanceOfCopyApp200Response, instanceOfCopyAppRequest, instanceOfCopyAppRequestProperties, instanceOfCreateApp200Response, instanceOfCreateAppRequest, instanceOfCreateField200Response, instanceOfCreateFieldRequest, instanceOfCreateFieldRequestProperties, instanceOfCreateRelationship200Response, instanceOfCreateRelationshipRequest, instanceOfCreateSolution200Response, instanceOfCreateSolution400Response, instanceOfCreateSolution401403Response, instanceOfCreateSolution4xx5xxResponse, instanceOfCreateSolutionFromRecord200Response, instanceOfCreateSolutionFromRecord200ResponseInner, instanceOfCreateSolutionFromRecord200ResponseInnerCreatedResourcesInner, instanceOfCreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner, instanceOfCreateSolutionFromRecord400Response, instanceOfCreateSolutionFromRecord401403Response, instanceOfCreateSolutionFromRecord404Response, instanceOfCreateSolutionFromRecord4xx5xxResponse, instanceOfCreateTable200Response, instanceOfCreateTableRequest, instanceOfDeactivateUserToken200Response, instanceOfDeleteApp200Response, instanceOfDeleteAppRequest, instanceOfDeleteFields200Response, instanceOfDeleteFieldsRequest, instanceOfDeleteFile200Response, instanceOfDeleteRecords200Response, instanceOfDeleteRecordsRequest, instanceOfDeleteRelationship200Response, instanceOfDeleteTable200Response, instanceOfDeleteUserToken200Response, instanceOfDenyUsers200Response, instanceOfDenyUsersAndGroups200Response, instanceOfDenyUsersAndGroupsRequest, instanceOfDenyUsersRequest, instanceOfDownloadFile200Response, instanceOfExchangeSsoToken200Response, instanceOfExchangeSsoTokenRequest, instanceOfExportSolution200Response, instanceOfExportSolution400Response, instanceOfExportSolution401403Response, instanceOfExportSolution404Response, instanceOfExportSolution4xx5xxResponse, instanceOfExportSolutionToRecord200Response, instanceOfExportSolutionToRecord200ResponseInner, instanceOfExportSolutionToRecord400Response, instanceOfExportSolutionToRecord401403Response, instanceOfExportSolutionToRecord404Response, instanceOfExportSolutionToRecord4xx5xxResponse, instanceOfGenerateDocument200Response, instanceOfGetApp200Response, instanceOfGetAppEvents200Response, instanceOfGetAppEvents200ResponseItemsInner, instanceOfGetAppTables200Response, instanceOfGetAppTables200ResponseItemsInner, instanceOfGetField200Response, instanceOfGetFieldUsage200Response, instanceOfGetFields200Response, instanceOfGetFields200ResponseItemsInner, instanceOfGetFieldsUsage200Response, instanceOfGetFieldsUsage200ResponseItemsInner, instanceOfGetRelationships200Response, instanceOfGetReport200Response, instanceOfGetTable200Response, instanceOfGetTableReports200Response, instanceOfGetTableReports200ResponseItemsInner, instanceOfGetTempTokenDBID200Response, instanceOfGetUsers200Response, instanceOfGetUsersRequest, instanceOfPermission, instanceOfPlatformAnalyticEventSummaries200Response, instanceOfPlatformAnalyticEventSummaries200ResponseMetadata, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInner, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner, instanceOfPlatformAnalyticEventSummaries200ResponseResultsInnerTotals, instanceOfPlatformAnalyticEventSummaries200ResponseTotals, instanceOfPlatformAnalyticEventSummaries200ResponseWhereInner, instanceOfPlatformAnalyticEventSummariesRequest, instanceOfPlatformAnalyticEventSummariesRequestWhereInner, instanceOfPlatformAnalyticReads200Response, instanceOfRecord, instanceOfRecordValue, instanceOfRemoveManagersFromGroup200Response, instanceOfRemoveManagersFromGroupRequest, instanceOfRemoveMembersFromGroup200Response, instanceOfRemoveMembersFromGroupRequest, instanceOfRemoveSubgroupsFromGroup200Response, instanceOfRemoveSubgroupsFromGroupRequest, instanceOfRunFormula200Response, instanceOfRunFormulaRequest, instanceOfRunQuery200Response, instanceOfRunQueryRequest, instanceOfRunQueryRequestGroupByInner, instanceOfRunQueryRequestOptions, instanceOfRunQueryRequestSortByInner, instanceOfRunReport200Response, instanceOfTransferUserToken200Response, instanceOfTransferUserTokenRequest, instanceOfUndenyUsers200Response, instanceOfUndenyUsersRequest, instanceOfUpdateApp200Response, instanceOfUpdateAppRequest, instanceOfUpdateField200Response, instanceOfUpdateFieldRequest, instanceOfUpdateRelationship200Response, instanceOfUpdateRelationshipRequest, instanceOfUpdateSolution200Response, instanceOfUpdateSolution200ResponseInner, instanceOfUpdateSolution200ResponseInnerCreatedResourcesInner, instanceOfUpdateSolution400Response, instanceOfUpdateSolution401403Response, instanceOfUpdateSolution4xx5xxResponse, instanceOfUpdateSolutionToRecord200Response, instanceOfUpdateSolutionToRecord200ResponseInner, instanceOfUpdateSolutionToRecord400Response, instanceOfUpdateSolutionToRecord401403Response, instanceOfUpdateSolutionToRecord404Response, instanceOfUpdateSolutionToRecord4xx5xxResponse, instanceOfUpdateTable200Response, instanceOfUpdateTableRequest, instanceOfUpsert200Response, instanceOfUpsert207Response, instanceOfUpsert400Response, instanceOfUpsertRequest, quickbase };

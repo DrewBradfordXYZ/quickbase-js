@@ -1,28 +1,4 @@
-interface ParamDetail {
-  name: string;
-  type: string;
-  required: boolean;
-  properties: {
-    name: string;
-    type: string;
-    required: boolean;
-    jsdoc?: string;
-  }[];
-}
-
-interface JsDocOptions {
-  summary: string;
-  opId: string;
-  paramDetails: ParamDetail[];
-  returnType: string;
-  returnTypeDetails: {
-    name: string;
-    type: string;
-    required: boolean;
-    jsdoc?: string;
-  }[];
-  docLink: string;
-}
+import { ParamDetail, PropertyDetail, JsDocOptions } from "./sharedUtils.ts";
 
 export function generateJsDoc({
   summary,

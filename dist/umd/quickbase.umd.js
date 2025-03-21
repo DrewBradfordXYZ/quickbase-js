@@ -2311,7 +2311,7 @@
             return json;
         }
         return {
-            '$appITTotalManagement': json['$App_IT_Total_Management'] == null ? undefined : json['$App_IT_Total_Management'],
+            '$App_IT_Total_Management': json['$App_IT_Total_Management'] == null ? undefined : json['$App_IT_Total_Management'],
         };
     }
     function CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInnerToJSON(json) {
@@ -2322,7 +2322,7 @@
             return value;
         }
         return {
-            '$App_IT_Total_Management': value['$appITTotalManagement'],
+            '$App_IT_Total_Management': value['$App_IT_Total_Management'],
         };
     }
 
@@ -3504,9 +3504,9 @@
         }
         return {
             ...json,
-            'accessToken': json['access_token'] == null ? undefined : json['access_token'],
-            'issuedTokenType': json['issued_token_type'] == null ? undefined : json['issued_token_type'],
-            'tokenType': json['token_type'] == null ? undefined : json['token_type'],
+            'access_token': json['access_token'] == null ? undefined : json['access_token'],
+            'issued_token_type': json['issued_token_type'] == null ? undefined : json['issued_token_type'],
+            'token_type': json['token_type'] == null ? undefined : json['token_type'],
         };
     }
     function ExchangeSsoToken200ResponseToJSON(json) {
@@ -3518,9 +3518,9 @@
         }
         return {
             ...value,
-            'access_token': value['accessToken'],
-            'issued_token_type': value['issuedTokenType'],
-            'token_type': value['tokenType'],
+            'access_token': value['access_token'],
+            'issued_token_type': value['issued_token_type'],
+            'token_type': value['token_type'],
         };
     }
 
@@ -3560,13 +3560,13 @@
      * Check if a given object implements the ExchangeSsoTokenRequest interface.
      */
     function instanceOfExchangeSsoTokenRequest(value) {
-        if (!('grantType' in value) || value['grantType'] === undefined)
+        if (!('grant_type' in value) || value['grant_type'] === undefined)
             return false;
-        if (!('requestedTokenType' in value) || value['requestedTokenType'] === undefined)
+        if (!('requested_token_type' in value) || value['requested_token_type'] === undefined)
             return false;
-        if (!('subjectToken' in value) || value['subjectToken'] === undefined)
+        if (!('subject_token' in value) || value['subject_token'] === undefined)
             return false;
-        if (!('subjectTokenType' in value) || value['subjectTokenType'] === undefined)
+        if (!('subject_token_type' in value) || value['subject_token_type'] === undefined)
             return false;
         return true;
     }
@@ -3578,10 +3578,10 @@
             return json;
         }
         return {
-            'grantType': json['grant_type'],
-            'requestedTokenType': json['requested_token_type'],
-            'subjectToken': json['subject_token'],
-            'subjectTokenType': json['subject_token_type'],
+            'grant_type': json['grant_type'],
+            'requested_token_type': json['requested_token_type'],
+            'subject_token': json['subject_token'],
+            'subject_token_type': json['subject_token_type'],
         };
     }
     function ExchangeSsoTokenRequestToJSON(json) {
@@ -3592,10 +3592,10 @@
             return value;
         }
         return {
-            'grant_type': value['grantType'],
-            'requested_token_type': value['requestedTokenType'],
-            'subject_token': value['subjectToken'],
-            'subject_token_type': value['subjectTokenType'],
+            'grant_type': value['grant_type'],
+            'requested_token_type': value['requested_token_type'],
+            'subject_token': value['subject_token'],
+            'subject_token_type': value['subject_token_type'],
         };
     }
 
@@ -3876,7 +3876,7 @@
             return json;
         }
         return {
-            'recordId': json['record_id'] == null ? undefined : json['record_id'],
+            'record_id': json['record_id'] == null ? undefined : json['record_id'],
             'filename': json['filename'] == null ? undefined : json['filename'],
         };
     }
@@ -3888,7 +3888,7 @@
             return value;
         }
         return {
-            'record_id': value['recordId'],
+            'record_id': value['record_id'],
             'filename': value['filename'],
         };
     }
@@ -4201,6 +4201,69 @@
      * Do not edit the class manually.
      */
     /**
+     * @export
+     */
+    const GetAppEvents200ResponseItemsInnerTypeEnum = {
+        Webhook: 'webhook',
+        QbAction: 'qb-action',
+        EmailNotification: 'email-notification',
+        Subscription: 'subscription',
+        Reminder: 'reminder',
+        Automation: 'automation'
+    };
+    /**
+     * Check if a given object implements the GetAppEvents200ResponseItemsInner interface.
+     */
+    function instanceOfGetAppEvents200ResponseItemsInner(value) {
+        return true;
+    }
+    function GetAppEvents200ResponseItemsInnerFromJSON(json) {
+        return GetAppEvents200ResponseItemsInnerFromJSONTyped(json);
+    }
+    function GetAppEvents200ResponseItemsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'isActive': json['isActive'] == null ? undefined : json['isActive'],
+            'type': json['type'] == null ? undefined : json['type'],
+            'name': json['name'] == null ? undefined : json['name'],
+            'url': json['url'] == null ? undefined : json['url'],
+            'owner': json['owner'] == null ? undefined : json['owner'],
+            'tableId': json['tableId'] == null ? undefined : json['tableId'],
+        };
+    }
+    function GetAppEvents200ResponseItemsInnerToJSON(json) {
+        return GetAppEvents200ResponseItemsInnerToJSONTyped(json, false);
+    }
+    function GetAppEvents200ResponseItemsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'isActive': value['isActive'],
+            'type': value['type'],
+            'name': value['name'],
+            'url': value['url'],
+            'owner': value['owner'],
+            'tableId': value['tableId'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
      * Check if a given object implements the GetAppEvents200Response interface.
      */
     function instanceOfGetAppEvents200Response(value) {
@@ -4210,13 +4273,102 @@
         return GetAppEvents200ResponseFromJSONTyped(json);
     }
     function GetAppEvents200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetAppEvents200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetAppEvents200ResponseToJSON(json) {
         return GetAppEvents200ResponseToJSONTyped(json, false);
     }
     function GetAppEvents200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetAppEvents200ResponseItemsInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * @export
+     */
+    const GetAppTables200ResponseItemsInnerDefaultSortOrderEnum = {
+        Asc: 'ASC',
+        Desc: 'DESC'
+    };
+    /**
+     * Check if a given object implements the GetAppTables200ResponseItemsInner interface.
+     */
+    function instanceOfGetAppTables200ResponseItemsInner(value) {
+        return true;
+    }
+    function GetAppTables200ResponseItemsInnerFromJSON(json) {
+        return GetAppTables200ResponseItemsInnerFromJSONTyped(json);
+    }
+    function GetAppTables200ResponseItemsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'name': json['name'] == null ? undefined : json['name'],
+            'id': json['id'] == null ? undefined : json['id'],
+            'alias': json['alias'] == null ? undefined : json['alias'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'created': json['created'] == null ? undefined : json['created'],
+            'updated': json['updated'] == null ? undefined : json['updated'],
+            'nextRecordId': json['nextRecordId'] == null ? undefined : json['nextRecordId'],
+            'nextFieldId': json['nextFieldId'] == null ? undefined : json['nextFieldId'],
+            'defaultSortFieldId': json['defaultSortFieldId'] == null ? undefined : json['defaultSortFieldId'],
+            'defaultSortOrder': json['defaultSortOrder'] == null ? undefined : json['defaultSortOrder'],
+            'keyFieldId': json['keyFieldId'] == null ? undefined : json['keyFieldId'],
+            'singleRecordName': json['singleRecordName'] == null ? undefined : json['singleRecordName'],
+            'pluralRecordName': json['pluralRecordName'] == null ? undefined : json['pluralRecordName'],
+            'sizeLimit': json['sizeLimit'] == null ? undefined : json['sizeLimit'],
+            'spaceUsed': json['spaceUsed'] == null ? undefined : json['spaceUsed'],
+            'spaceRemaining': json['spaceRemaining'] == null ? undefined : json['spaceRemaining'],
+        };
+    }
+    function GetAppTables200ResponseItemsInnerToJSON(json) {
+        return GetAppTables200ResponseItemsInnerToJSONTyped(json, false);
+    }
+    function GetAppTables200ResponseItemsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'name': value['name'],
+            'id': value['id'],
+            'alias': value['alias'],
+            'description': value['description'],
+            'created': value['created'],
+            'updated': value['updated'],
+            'nextRecordId': value['nextRecordId'],
+            'nextFieldId': value['nextFieldId'],
+            'defaultSortFieldId': value['defaultSortFieldId'],
+            'defaultSortOrder': value['defaultSortOrder'],
+            'keyFieldId': value['keyFieldId'],
+            'singleRecordName': value['singleRecordName'],
+            'pluralRecordName': value['pluralRecordName'],
+            'sizeLimit': value['sizeLimit'],
+            'spaceUsed': value['spaceUsed'],
+            'spaceRemaining': value['spaceRemaining'],
+        };
     }
 
     /* tslint:disable */
@@ -4242,13 +4394,23 @@
         return GetAppTables200ResponseFromJSONTyped(json);
     }
     function GetAppTables200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetAppTables200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetAppTables200ResponseToJSON(json) {
         return GetAppTables200ResponseToJSONTyped(json, false);
     }
     function GetAppTables200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetAppTables200ResponseItemsInnerToJSON)),
+        };
     }
 
     /* tslint:disable */
@@ -4339,6 +4501,54 @@
      * Do not edit the class manually.
      */
     /**
+     * Check if a given object implements the GetFieldsUsage200ResponseItemsInner interface.
+     */
+    function instanceOfGetFieldsUsage200ResponseItemsInner(value) {
+        if (!('field' in value) || value['field'] === undefined)
+            return false;
+        if (!('usage' in value) || value['usage'] === undefined)
+            return false;
+        return true;
+    }
+    function GetFieldsUsage200ResponseItemsInnerFromJSON(json) {
+        return GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json);
+    }
+    function GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'field': json['field'],
+            'usage': json['usage'],
+        };
+    }
+    function GetFieldsUsage200ResponseItemsInnerToJSON(json) {
+        return GetFieldsUsage200ResponseItemsInnerToJSONTyped(json, false);
+    }
+    function GetFieldsUsage200ResponseItemsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'field': value['field'],
+            'usage': value['usage'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
      * Check if a given object implements the GetFieldUsage200Response interface.
      */
     function instanceOfGetFieldUsage200Response(value) {
@@ -4348,13 +4558,95 @@
         return GetFieldUsage200ResponseFromJSONTyped(json);
     }
     function GetFieldUsage200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetFieldsUsage200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetFieldUsage200ResponseToJSON(json) {
         return GetFieldUsage200ResponseToJSONTyped(json, false);
     }
     function GetFieldUsage200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetFieldsUsage200ResponseItemsInnerToJSON)),
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
+     * Check if a given object implements the GetFields200ResponseItemsInner interface.
+     */
+    function instanceOfGetFields200ResponseItemsInner(value) {
+        if (!('id' in value) || value['id'] === undefined)
+            return false;
+        return true;
+    }
+    function GetFields200ResponseItemsInnerFromJSON(json) {
+        return GetFields200ResponseItemsInnerFromJSONTyped(json);
+    }
+    function GetFields200ResponseItemsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'],
+            'fieldType': json['fieldType'] == null ? undefined : json['fieldType'],
+            'mode': json['mode'] == null ? undefined : json['mode'],
+            'label': json['label'] == null ? undefined : json['label'],
+            'noWrap': json['noWrap'] == null ? undefined : json['noWrap'],
+            'bold': json['bold'] == null ? undefined : json['bold'],
+            'required': json['required'] == null ? undefined : json['required'],
+            'appearsByDefault': json['appearsByDefault'] == null ? undefined : json['appearsByDefault'],
+            'findEnabled': json['findEnabled'] == null ? undefined : json['findEnabled'],
+            'unique': json['unique'] == null ? undefined : json['unique'],
+            'doesDataCopy': json['doesDataCopy'] == null ? undefined : json['doesDataCopy'],
+            'fieldHelp': json['fieldHelp'] == null ? undefined : json['fieldHelp'],
+            'audited': json['audited'] == null ? undefined : json['audited'],
+            'properties': json['properties'] == null ? undefined : json['properties'],
+            'permissions': json['permissions'] == null ? undefined : json['permissions'],
+        };
+    }
+    function GetFields200ResponseItemsInnerToJSON(json) {
+        return GetFields200ResponseItemsInnerToJSONTyped(json, false);
+    }
+    function GetFields200ResponseItemsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'fieldType': value['fieldType'],
+            'mode': value['mode'],
+            'label': value['label'],
+            'noWrap': value['noWrap'],
+            'bold': value['bold'],
+            'required': value['required'],
+            'appearsByDefault': value['appearsByDefault'],
+            'findEnabled': value['findEnabled'],
+            'unique': value['unique'],
+            'doesDataCopy': value['doesDataCopy'],
+            'fieldHelp': value['fieldHelp'],
+            'audited': value['audited'],
+            'properties': value['properties'],
+            'permissions': value['permissions'],
+        };
     }
 
     /* tslint:disable */
@@ -4380,13 +4672,23 @@
         return GetFields200ResponseFromJSONTyped(json);
     }
     function GetFields200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetFields200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetFields200ResponseToJSON(json) {
         return GetFields200ResponseToJSONTyped(json, false);
     }
     function GetFields200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetFields200ResponseItemsInnerToJSON)),
+        };
     }
 
     /* tslint:disable */
@@ -4412,13 +4714,23 @@
         return GetFieldsUsage200ResponseFromJSONTyped(json);
     }
     function GetFieldsUsage200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetFieldsUsage200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetFieldsUsage200ResponseToJSON(json) {
         return GetFieldsUsage200ResponseToJSONTyped(json, false);
     }
     function GetFieldsUsage200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetFieldsUsage200ResponseItemsInnerToJSON)),
+        };
     }
 
     /* tslint:disable */
@@ -4624,6 +4936,64 @@
      * Do not edit the class manually.
      */
     /**
+     * Check if a given object implements the GetTableReports200ResponseItemsInner interface.
+     */
+    function instanceOfGetTableReports200ResponseItemsInner(value) {
+        return true;
+    }
+    function GetTableReports200ResponseItemsInnerFromJSON(json) {
+        return GetTableReports200ResponseItemsInnerFromJSONTyped(json);
+    }
+    function GetTableReports200ResponseItemsInnerFromJSONTyped(json, ignoreDiscriminator) {
+        if (json == null) {
+            return json;
+        }
+        return {
+            'id': json['id'] == null ? undefined : json['id'],
+            'name': json['name'] == null ? undefined : json['name'],
+            'type': json['type'] == null ? undefined : json['type'],
+            'description': json['description'] == null ? undefined : json['description'],
+            'ownerId': json['ownerId'] == null ? undefined : json['ownerId'],
+            'query': json['query'] == null ? undefined : json['query'],
+            'properties': json['properties'] == null ? undefined : json['properties'],
+            'usedLast': json['usedLast'] == null ? undefined : json['usedLast'],
+            'usedCount': json['usedCount'] == null ? undefined : json['usedCount'],
+        };
+    }
+    function GetTableReports200ResponseItemsInnerToJSON(json) {
+        return GetTableReports200ResponseItemsInnerToJSONTyped(json, false);
+    }
+    function GetTableReports200ResponseItemsInnerToJSONTyped(value, ignoreDiscriminator = false) {
+        if (value == null) {
+            return value;
+        }
+        return {
+            'id': value['id'],
+            'name': value['name'],
+            'type': value['type'],
+            'description': value['description'],
+            'ownerId': value['ownerId'],
+            'query': value['query'],
+            'properties': value['properties'],
+            'usedLast': value['usedLast'],
+            'usedCount': value['usedCount'],
+        };
+    }
+
+    /* tslint:disable */
+    /* eslint-disable */
+    /**
+     * Quick Base API
+     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+     *
+     * The version of the OpenAPI document: 1.0.0
+     *
+     *
+     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+     * https://openapi-generator.tech
+     * Do not edit the class manually.
+     */
+    /**
      * Check if a given object implements the GetTableReports200Response interface.
      */
     function instanceOfGetTableReports200Response(value) {
@@ -4633,13 +5003,23 @@
         return GetTableReports200ResponseFromJSONTyped(json);
     }
     function GetTableReports200ResponseFromJSONTyped(json, ignoreDiscriminator) {
-        return json;
+        if (json == null) {
+            return json;
+        }
+        return {
+            'items': json['items'] == null ? undefined : (json['items'].map(GetTableReports200ResponseItemsInnerFromJSON)),
+        };
     }
     function GetTableReports200ResponseToJSON(json) {
         return GetTableReports200ResponseToJSONTyped(json, false);
     }
     function GetTableReports200ResponseToJSONTyped(value, ignoreDiscriminator = false) {
-        return value;
+        if (value == null) {
+            return value;
+        }
+        return {
+            'items': value['items'] == null ? undefined : (value['items'].map(GetTableReports200ResponseItemsInnerToJSON)),
+        };
     }
 
     /* tslint:disable */
@@ -9686,20 +10066,55 @@
     }
 
     // src/authorizationStrategy.ts
+    // src/authorizationStrategy.ts (partial update)
     class TempTokenStrategy {
         tokenCache;
         initialTempToken;
-        constructor(tokenCache, initialTempToken) {
+        fetchApi;
+        realm;
+        baseUrl;
+        constructor(tokenCache, initialTempToken, fetchApi, realm, baseUrl = "https://api.quickbase.com/v1") {
             this.tokenCache = tokenCache;
             this.initialTempToken = initialTempToken;
+            this.fetchApi = fetchApi;
+            this.realm = realm;
+            this.baseUrl = baseUrl;
+        }
+        async fetchTempToken(dbid) {
+            const headers = {
+                "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                "Content-Type": "application/json",
+            };
+            const response = await this.fetchApi(`${this.baseUrl}/auth/temporary/${dbid}`, {
+                method: "GET",
+                headers,
+                credentials: "include",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                const message = errorBody.message || "Unknown error";
+                throw new Error(`API Error: ${message} (Status: ${response.status})`);
+            }
+            const tokenResult = await response.json();
+            const token = tokenResult.temporaryAuthorization;
+            if (!token) {
+                throw new Error("API Error: No temporary token returned from API (Status: 200)");
+            }
+            this.tokenCache.set(dbid, token);
+            console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
+            return token;
         }
         async getToken(dbid) {
-            return this.tokenCache.get(dbid) || this.initialTempToken;
+            let token = this.tokenCache.get(dbid) || this.initialTempToken;
+            if (!token && dbid) {
+                token = await this.fetchTempToken(dbid);
+            }
+            return token;
         }
         applyHeaders(headers, token) {
             headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
         }
-        async handleError(status, params, fetchTempToken, attempt, maxAttempts, debug, methodName) {
+        async handleError(status, params, attempt, maxAttempts, debug, methodName) {
             if (status !== 401 || attempt >= maxAttempts - 1)
                 return null;
             if (debug)
@@ -9712,7 +10127,7 @@
             }
             if (debug)
                 console.log(`Refreshing temp token for dbid: ${dbid}`);
-            const newToken = await fetchTempToken(dbid);
+            const newToken = await this.fetchTempToken(dbid);
             this.tokenCache.set(dbid, newToken);
             return newToken;
         }
@@ -9728,7 +10143,7 @@
         applyHeaders(headers, token) {
             headers["Authorization"] = `QB-USER-TOKEN ${token}`;
         }
-        async handleError(status, _params, _fetchTempToken, attempt, maxAttempts, debug, methodName) {
+        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
             if (status !== 401 || attempt >= maxAttempts - 1)
                 return null;
             if (debug)
@@ -9762,7 +10177,7 @@
         applyHeaders(headers, token) {
             headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
         }
-        async handleError(status, _params, _fetchTempToken, attempt, maxAttempts, debug, methodName) {
+        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
             if (status !== 401 || attempt >= maxAttempts - 1)
                 return null;
             if (debug || this.debug) {
@@ -9857,7 +10272,7 @@
     }
 
     // src/invokeMethod.ts
-    async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, fetchTempToken, transformDates, debug, convertDates) {
+    async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates) {
         console.log("[invokeMethod] Starting for method:", methodName);
         const methodInfo = methodMap[methodName];
         if (!methodInfo)
@@ -9881,12 +10296,6 @@
             ? await authStrategy.getToken(dbid)
             : await authStrategy.getToken("");
         console.log("[invokeMethod] Initial token:", token);
-        if (!token && dbid) {
-            token = await fetchTempToken(dbid);
-            authStrategy.applyHeaders(baseHeaders, token);
-            requestOptions.headers = { ...baseHeaders };
-            console.log("[invokeMethod] Fetched new token:", token);
-        }
         if (token) {
             authStrategy.applyHeaders(baseHeaders, token);
             requestOptions.headers = { ...baseHeaders };
@@ -9950,7 +10359,8 @@
                     console.log(`[${methodName}] Error parsing response body:`, e);
                 message = "Failed to parse error response";
             }
-            console.log("[invokeMethod] Parsed error - status:", status, "message:", message);
+            if (debug)
+                console.log("[invokeMethod] Parsed error - status:", status, "message:", message);
             return { message, status };
         }
         let attempt = 0;
@@ -9965,10 +10375,11 @@
                 return await processResponse(response);
             }
             catch (error) {
+                if (debug)
+                    console.log("[invokeMethod] Caught error:", error);
                 let status;
                 let message;
                 let response;
-                console.log("[invokeMethod] Caught error:", error);
                 if (error instanceof ResponseError && error.response) {
                     response = error.response;
                     ({ message, status } = await parseErrorResponse(response));
@@ -9980,18 +10391,31 @@
                 else {
                     if (debug)
                         console.log(`[${methodName}] Unexpected error:`, error);
-                    throw error; // Rethrow non-response errors
+                    // Attempt to handle as a fetch error with a response
+                    if (error instanceof Error && "response" in error) {
+                        response = error.response;
+                        if (response instanceof Response) {
+                            ({ message, status } = await parseErrorResponse(response));
+                        }
+                        else {
+                            throw error; // Rethrow if no response
+                        }
+                    }
+                    else {
+                        throw error; // Rethrow truly unexpected errors
+                    }
                 }
-                console.log("[invokeMethod] Handling error with status:", status);
+                if (debug)
+                    console.log("[invokeMethod] Handling error with status:", status);
                 if (status === 429) {
                     if (!(error instanceof ResponseError)) {
-                        throw new Error("Expected ResponseError for 429 handling"); // Shouldn't happen
+                        throw new Error("Expected ResponseError for 429 handling");
                     }
                     const delay = await rateLimiter.handle429(error, attempt + 1);
                     if (debug)
                         console.log(`[${methodName}] 429 delay: ${delay}ms`);
                     if (attempt + 1 === maxAttempts) {
-                        throw new RateLimitError(`API Error: ${message} (Status: ${status})`, status, response.headers.get("Retry-After")
+                        throw new RateLimitError(`API Error: ${message} (Status: ${status})`, status, response?.headers.get("Retry-After")
                             ? parseInt(response.headers.get("Retry-After"), 10)
                             : undefined);
                     }
@@ -9999,7 +10423,7 @@
                     attempt++;
                     continue;
                 }
-                const newToken = await authStrategy.handleError(status, params, fetchTempToken, attempt, maxAttempts, debug, methodName);
+                const newToken = await authStrategy.handleError(status, params, attempt, maxAttempts, debug, methodName);
                 if (newToken) {
                     token = newToken;
                     authStrategy.applyHeaders(baseHeaders, token);
@@ -10136,7 +10560,7 @@
         const authStrategy = useSso
             ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
             : useTempTokens
-                ? new TempTokenStrategy(tokenCache, tempToken)
+                ? new TempTokenStrategy(tokenCache, tempToken, effectiveFetch, realm, baseUrl)
                 : new UserTokenStrategy(userToken || "");
         const baseHeaders = {
             "QB-Realm-Hostname": `${realm}.quickbase.com`,
@@ -10148,10 +10572,6 @@
             fetchApi: effectiveFetch,
             credentials: "omit",
         });
-        // Removed redundant check:
-        // if (!configuration.fetchApi && typeof globalThis.window === "undefined") {
-        //   throw new Error("fetchApi must be provided in non-browser environments (e.g., Node.js)");
-        // }
         const apiInstances = Object.fromEntries(Object.entries(apis)
             .filter(([name]) => name.endsWith("Api"))
             .map(([name, ApiClass]) => [
@@ -10189,34 +10609,12 @@
             return methodMap;
         }
         const methodMap = buildMethodMap();
-        const fetchTempToken = async (dbid) => {
-            const response = await effectiveFetch(`${baseUrl}/auth/temporary/${dbid}`, {
-                method: "GET",
-                headers: { ...baseHeaders },
-                credentials: "include",
-            });
-            if (!response.ok) {
-                const errorBody = await response.json();
-                throw new Error(`API Error: ${errorBody.message || "Unknown error"} (Status: ${response.status})`);
-            }
-            const tokenResult = await response.json();
-            console.log(`[fetchTempToken] Response:`, tokenResult);
-            const token = tokenResult.temporaryAuthorization;
-            if (!token) {
-                throw new Error("No temporary token returned from API");
-            }
-            tokenCache.set(dbid, token, tempTokenLifespan);
-            if (debug) {
-                console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
-            }
-            return token;
-        };
         const proxyHandler = {
             get: (_, prop) => {
                 console.log("[proxy] Accessing:", prop, "in methodMap:", prop in methodMap);
                 if (prop in methodMap) {
                     const methodName = prop;
-                    return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, fetchTempToken, transformDates, debug, convertDates);
+                    return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates);
                 }
                 console.log("[proxy] Method not found:", prop);
                 return undefined;
@@ -10555,10 +10953,20 @@
     exports.GetApp200ResponseToJSONTyped = GetApp200ResponseToJSONTyped;
     exports.GetAppEvents200ResponseFromJSON = GetAppEvents200ResponseFromJSON;
     exports.GetAppEvents200ResponseFromJSONTyped = GetAppEvents200ResponseFromJSONTyped;
+    exports.GetAppEvents200ResponseItemsInnerFromJSON = GetAppEvents200ResponseItemsInnerFromJSON;
+    exports.GetAppEvents200ResponseItemsInnerFromJSONTyped = GetAppEvents200ResponseItemsInnerFromJSONTyped;
+    exports.GetAppEvents200ResponseItemsInnerToJSON = GetAppEvents200ResponseItemsInnerToJSON;
+    exports.GetAppEvents200ResponseItemsInnerToJSONTyped = GetAppEvents200ResponseItemsInnerToJSONTyped;
+    exports.GetAppEvents200ResponseItemsInnerTypeEnum = GetAppEvents200ResponseItemsInnerTypeEnum;
     exports.GetAppEvents200ResponseToJSON = GetAppEvents200ResponseToJSON;
     exports.GetAppEvents200ResponseToJSONTyped = GetAppEvents200ResponseToJSONTyped;
     exports.GetAppTables200ResponseFromJSON = GetAppTables200ResponseFromJSON;
     exports.GetAppTables200ResponseFromJSONTyped = GetAppTables200ResponseFromJSONTyped;
+    exports.GetAppTables200ResponseItemsInnerDefaultSortOrderEnum = GetAppTables200ResponseItemsInnerDefaultSortOrderEnum;
+    exports.GetAppTables200ResponseItemsInnerFromJSON = GetAppTables200ResponseItemsInnerFromJSON;
+    exports.GetAppTables200ResponseItemsInnerFromJSONTyped = GetAppTables200ResponseItemsInnerFromJSONTyped;
+    exports.GetAppTables200ResponseItemsInnerToJSON = GetAppTables200ResponseItemsInnerToJSON;
+    exports.GetAppTables200ResponseItemsInnerToJSONTyped = GetAppTables200ResponseItemsInnerToJSONTyped;
     exports.GetAppTables200ResponseToJSON = GetAppTables200ResponseToJSON;
     exports.GetAppTables200ResponseToJSONTyped = GetAppTables200ResponseToJSONTyped;
     exports.GetField200ResponseFromJSON = GetField200ResponseFromJSON;
@@ -10571,10 +10979,18 @@
     exports.GetFieldUsage200ResponseToJSONTyped = GetFieldUsage200ResponseToJSONTyped;
     exports.GetFields200ResponseFromJSON = GetFields200ResponseFromJSON;
     exports.GetFields200ResponseFromJSONTyped = GetFields200ResponseFromJSONTyped;
+    exports.GetFields200ResponseItemsInnerFromJSON = GetFields200ResponseItemsInnerFromJSON;
+    exports.GetFields200ResponseItemsInnerFromJSONTyped = GetFields200ResponseItemsInnerFromJSONTyped;
+    exports.GetFields200ResponseItemsInnerToJSON = GetFields200ResponseItemsInnerToJSON;
+    exports.GetFields200ResponseItemsInnerToJSONTyped = GetFields200ResponseItemsInnerToJSONTyped;
     exports.GetFields200ResponseToJSON = GetFields200ResponseToJSON;
     exports.GetFields200ResponseToJSONTyped = GetFields200ResponseToJSONTyped;
     exports.GetFieldsUsage200ResponseFromJSON = GetFieldsUsage200ResponseFromJSON;
     exports.GetFieldsUsage200ResponseFromJSONTyped = GetFieldsUsage200ResponseFromJSONTyped;
+    exports.GetFieldsUsage200ResponseItemsInnerFromJSON = GetFieldsUsage200ResponseItemsInnerFromJSON;
+    exports.GetFieldsUsage200ResponseItemsInnerFromJSONTyped = GetFieldsUsage200ResponseItemsInnerFromJSONTyped;
+    exports.GetFieldsUsage200ResponseItemsInnerToJSON = GetFieldsUsage200ResponseItemsInnerToJSON;
+    exports.GetFieldsUsage200ResponseItemsInnerToJSONTyped = GetFieldsUsage200ResponseItemsInnerToJSONTyped;
     exports.GetFieldsUsage200ResponseToJSON = GetFieldsUsage200ResponseToJSON;
     exports.GetFieldsUsage200ResponseToJSONTyped = GetFieldsUsage200ResponseToJSONTyped;
     exports.GetRelationships200ResponseFromJSON = GetRelationships200ResponseFromJSON;
@@ -10592,6 +11008,10 @@
     exports.GetTable200ResponseToJSONTyped = GetTable200ResponseToJSONTyped;
     exports.GetTableReports200ResponseFromJSON = GetTableReports200ResponseFromJSON;
     exports.GetTableReports200ResponseFromJSONTyped = GetTableReports200ResponseFromJSONTyped;
+    exports.GetTableReports200ResponseItemsInnerFromJSON = GetTableReports200ResponseItemsInnerFromJSON;
+    exports.GetTableReports200ResponseItemsInnerFromJSONTyped = GetTableReports200ResponseItemsInnerFromJSONTyped;
+    exports.GetTableReports200ResponseItemsInnerToJSON = GetTableReports200ResponseItemsInnerToJSON;
+    exports.GetTableReports200ResponseItemsInnerToJSONTyped = GetTableReports200ResponseItemsInnerToJSONTyped;
     exports.GetTableReports200ResponseToJSON = GetTableReports200ResponseToJSON;
     exports.GetTableReports200ResponseToJSONTyped = GetTableReports200ResponseToJSONTyped;
     exports.GetTempTokenDBID200ResponseFromJSON = GetTempTokenDBID200ResponseFromJSON;
@@ -10914,15 +11334,20 @@
     exports.instanceOfGenerateDocument200Response = instanceOfGenerateDocument200Response;
     exports.instanceOfGetApp200Response = instanceOfGetApp200Response;
     exports.instanceOfGetAppEvents200Response = instanceOfGetAppEvents200Response;
+    exports.instanceOfGetAppEvents200ResponseItemsInner = instanceOfGetAppEvents200ResponseItemsInner;
     exports.instanceOfGetAppTables200Response = instanceOfGetAppTables200Response;
+    exports.instanceOfGetAppTables200ResponseItemsInner = instanceOfGetAppTables200ResponseItemsInner;
     exports.instanceOfGetField200Response = instanceOfGetField200Response;
     exports.instanceOfGetFieldUsage200Response = instanceOfGetFieldUsage200Response;
     exports.instanceOfGetFields200Response = instanceOfGetFields200Response;
+    exports.instanceOfGetFields200ResponseItemsInner = instanceOfGetFields200ResponseItemsInner;
     exports.instanceOfGetFieldsUsage200Response = instanceOfGetFieldsUsage200Response;
+    exports.instanceOfGetFieldsUsage200ResponseItemsInner = instanceOfGetFieldsUsage200ResponseItemsInner;
     exports.instanceOfGetRelationships200Response = instanceOfGetRelationships200Response;
     exports.instanceOfGetReport200Response = instanceOfGetReport200Response;
     exports.instanceOfGetTable200Response = instanceOfGetTable200Response;
     exports.instanceOfGetTableReports200Response = instanceOfGetTableReports200Response;
+    exports.instanceOfGetTableReports200ResponseItemsInner = instanceOfGetTableReports200ResponseItemsInner;
     exports.instanceOfGetTempTokenDBID200Response = instanceOfGetTempTokenDBID200Response;
     exports.instanceOfGetUsers200Response = instanceOfGetUsers200Response;
     exports.instanceOfGetUsersRequest = instanceOfGetUsersRequest;

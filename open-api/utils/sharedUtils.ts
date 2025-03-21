@@ -1,7 +1,8 @@
 import { OpenAPIV2 } from "openapi-types";
 import { join } from "path";
 import { Project, PropertySignature } from "ts-morph";
-import { existsSync } from "fs";
+import { existsSync, readdirSync, readFileSync } from "fs";
+import { simplifyName } from "../../src/utils.ts"; // Adjust path if needed
 
 export interface PropertyDetail {
   name: string;
@@ -16,6 +17,16 @@ export interface ParamDetail {
   type: string;
   required: boolean;
   properties: PropertyDetail[];
+  description?: string;
+}
+
+export interface JsDocOptions {
+  summary: string;
+  opId: string;
+  paramDetails: ParamDetail[];
+  returnType: string;
+  returnTypeDetails: PropertyDetail[];
+  docLink: string;
 }
 
 export function mapOpenApiTypeToTs(
@@ -101,7 +112,7 @@ export function mapRefToType(
 export function parseInterfaceProperties(
   modelName: string,
   modelsDir: string,
-  availableModels?: string[], // Optional for generate-unified-interface.ts
+  availableModels?: string[],
   depth: number = 0,
   visited: Set<string> = new Set()
 ): PropertyDetail[] {
@@ -158,4 +169,152 @@ export function parseInterfaceProperties(
       properties: properties && properties.length > 0 ? properties : undefined,
     };
   });
+}
+
+export interface OperationDoc {
+  name: string;
+  summary: string;
+  method: string;
+  path: string;
+  parameters: ParamDetail[];
+  returns: string;
+  returnTypeDetails: PropertyDetail[] | undefined;
+  docLink: string;
+}
+
+export function parseOpenApiOperations(
+  specFile: string,
+  modelsDir: string
+): {
+  operations: OperationDoc[];
+  modelImports: Set<string>;
+  missingTypes: Set<string>;
+} {
+  if (!existsSync(specFile)) {
+    throw new Error(
+      `Spec file ${specFile} not found. Run 'npm run fix-spec' first.`
+    );
+  }
+
+  const spec: OpenAPIV2.Document = JSON.parse(readFileSync(specFile, "utf8"));
+  const availableModels = readdirSync(modelsDir)
+    .filter((file) => file.endsWith(".ts") && !file.startsWith("index"))
+    .map((file) => file.replace(".ts", ""));
+  const modelImports = new Set<string>();
+  const missingTypes = new Set<string>();
+  const operations: OperationDoc[] = [];
+
+  for (const [path, methodsObj] of Object.entries(
+    spec.paths as OpenAPIV2.PathsObject
+  )) {
+    if (!methodsObj) continue;
+    for (const [method, operation] of Object.entries(
+      methodsObj as OpenAPIV2.PathItemObject
+    )) {
+      const op = operation as OpenAPIV2.OperationObject | undefined;
+      if (!op || !op.operationId) continue;
+
+      const opId = simplifyName(op.operationId);
+      console.log(`Processing operation ${opId} (${method} ${path})`);
+      const paramDetails = (op.parameters || [])
+        .filter(
+          (p) =>
+            !["QB-Realm-Hostname", "Authorization", "User-Agent"].includes(
+              (p as OpenAPIV2.ParameterObject).name || ""
+            )
+        )
+        .map((p) => {
+          const param = p as OpenAPIV2.ParameterObject;
+          let type = "any";
+          let properties: PropertyDetail[] | undefined = undefined;
+          if ("schema" in p && p.schema) {
+            type = mapRefToType(
+              p.schema,
+              modelImports,
+              spec,
+              1,
+              availableModels,
+              missingTypes
+            );
+            if ("$ref" in p.schema && p.schema.$ref) {
+              const refParts = p.schema.$ref.split("/");
+              const model = refParts[refParts.length - 1];
+              const pascalModel =
+                model.charAt(0).toUpperCase() + model.slice(1);
+              properties = parseInterfaceProperties(
+                pascalModel,
+                modelsDir,
+                availableModels
+              );
+            } else if (type !== "any" && availableModels.includes(type)) {
+              properties = parseInterfaceProperties(
+                type,
+                modelsDir,
+                availableModels
+              );
+            }
+          } else if ("type" in p) {
+            type = mapOpenApiTypeToTs(p.type);
+          }
+          return {
+            name: param.in === "body" ? "body" : param.name,
+            type,
+            required: param.required || false,
+            description: param.description || "",
+            properties: properties || [],
+          };
+        });
+
+      const returnTypes = ["200", "207"]
+        .map(
+          (code) => (op.responses?.[code] as OpenAPIV2.ResponseObject)?.schema
+        )
+        .filter(Boolean)
+        .map((schema) =>
+          mapRefToType(
+            schema!,
+            modelImports,
+            spec,
+            1,
+            availableModels,
+            missingTypes
+          )
+        );
+      const returnType =
+        returnTypes.length > 1
+          ? returnTypes.join(" | ")
+          : returnTypes[0] || "void";
+
+      const returnTypeDetailsRaw = returnTypes
+        .filter((type) => type !== "void" && availableModels.includes(type))
+        .map((type) =>
+          parseInterfaceProperties(type, modelsDir, availableModels)
+        )
+        .flat();
+
+      const returnTypeDetails =
+        returnTypeDetailsRaw.length > 0
+          ? returnTypeDetailsRaw.map((prop) => ({
+              ...prop,
+              properties:
+                prop.properties && prop.properties.length > 0
+                  ? [...prop.properties]
+                  : undefined,
+            }))
+          : undefined;
+
+      operations.push({
+        name: opId,
+        summary: op.summary || "No description.",
+        method: method.toUpperCase(),
+        path,
+        parameters: paramDetails,
+        returns: returnType,
+        returnTypeDetails,
+        docLink: `https://developer.quickbase.com/operation/${op.operationId}`,
+      });
+    }
+  }
+
+  return { operations, modelImports, missingTypes };
 }
