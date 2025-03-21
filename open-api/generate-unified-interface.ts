@@ -24,7 +24,13 @@ console.log("ts-morph imported");
 
 import { generateJsDoc } from "./utils/generateJsDoc.ts";
 import { simplifyName } from "../src/utils.ts";
-import { PropertyDetail, ParamDetail } from "./utils/sharedUtils.ts"; // Import shared types
+import {
+  PropertyDetail,
+  ParamDetail,
+  mapOpenApiTypeToTs,
+  mapRefToType,
+  parseInterfaceProperties,
+} from "./utils/sharedUtils.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 console.log("__dirname set:", __dirname);
@@ -33,117 +39,6 @@ const SPEC_FILE = join(__dirname, "output", "quickbase-fixed.json");
 const OUTPUT_DIR = join(__dirname, "..", "src", "generated-unified");
 const OUTPUT_FILE = join(OUTPUT_DIR, "QuickbaseClient.ts");
 const MODELS_DIR = join(__dirname, "..", "src", "generated", "models");
-
-function mapOpenApiTypeToTs(
-  openApiType: string | string[] | undefined
-): string {
-  const type = Array.isArray(openApiType)
-    ? openApiType[0]
-    : openApiType || "any";
-  switch (type.toLowerCase()) {
-    case "integer":
-    case "int":
-    case "number":
-      return "number";
-    case "string":
-      return "string";
-    case "boolean":
-      return "boolean";
-    default:
-      return "any";
-  }
-}
-
-function mapRefToType(
-  schema: OpenAPIV2.SchemaObject | OpenAPIV2.ReferenceObject | undefined,
-  modelImports: Set<string>,
-  spec: OpenAPIV2.Document,
-  depth: number = 0,
-  availableModels: string[],
-  missingTypes: Set<string>
-): string {
-  if (!schema) return "any";
-
-  if ("$ref" in schema && schema.$ref) {
-    const refParts = schema.$ref.split("/");
-    const model = refParts[refParts.length - 1];
-    const pascalModel = model.charAt(0).toUpperCase() + model.slice(1);
-    if (availableModels.includes(pascalModel)) {
-      modelImports.add(pascalModel);
-      return pascalModel;
-    }
-    missingTypes.add(pascalModel);
-    console.warn(`Type ${pascalModel} not found, defaulting to 'any'`);
-    return "any";
-  }
-
-  if ("type" in schema) {
-    if (schema.type === "object" && schema.properties) {
-      const props = schema.properties;
-      const propTypes = Object.entries(props).map(([key, prop]) => {
-        const propSchema = prop as OpenAPIV2.SchemaObject;
-        const propType = mapRefToType(
-          propSchema,
-          modelImports,
-          spec,
-          depth + 1,
-          availableModels,
-          missingTypes
-        );
-        return `${key}${propSchema.required ? "" : "?"}: ${propType}`;
-      });
-      return `{ ${propTypes.join("; ")} }`;
-    }
-    if (schema.type === "array" && schema.items) {
-      const items = schema.items as
-        | OpenAPIV2.SchemaObject
-        | OpenAPIV2.ReferenceObject;
-      const itemType = mapRefToType(
-        items,
-        modelImports,
-        spec,
-        depth + 1,
-        availableModels,
-        missingTypes
-      );
-      return `${itemType}[]`;
-    }
-    return mapOpenApiTypeToTs(schema.type);
-  }
-
-  return "any";
-}
-
-function parseInterfaceProperties(
-  modelName: string,
-  modelsDir: string
-): PropertyDetail[] {
-  const project = new Project();
-  const filePath = join(modelsDir, `${modelName}.ts`);
-  if (!existsSync(filePath)) {
-    console.warn(`Model file ${filePath} not found for ${modelName}`);
-    return [];
-  }
-
-  const sourceFile = project.addSourceFileAtPath(filePath);
-  const interfaceDec = sourceFile.getInterface(modelName);
-  if (!interfaceDec) {
-    console.warn(`Interface ${modelName} not found in ${filePath}`);
-    return [];
-  }
-
-  return interfaceDec.getProperties().map((prop) => {
-    const jsDocs = prop.getJsDocs();
-    const jsdocText =
-      jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
-    return {
-      name: prop.getName(),
-      type: prop.getType().getText(prop),
-      required: !prop.hasQuestionToken(),
-      jsdoc: jsdocText,
-    };
-  });
-}
 
 function generateInterface(includeResponseProperties: boolean = false): void {
   console.log(
