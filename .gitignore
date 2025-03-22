@@ -9,6 +9,9 @@ yarn-error.log
 generated/
 generated-old/
 
+# API Documentation website
+docs/.vitepress/dist/
+
 # Environment variables
 .env
 
