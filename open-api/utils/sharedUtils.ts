@@ -3,7 +3,7 @@
 import { OpenAPIV2 } from "openapi-types";
 import { join } from "path";
 import { existsSync, readdirSync, readFileSync } from "fs";
-import { Project, PropertySignature } from "ts-morph";
+import { Project, PropertySignature, ts } from "ts-morph"; // Import ts from ts-morph
 import { simplifyName } from "../../src/utils.ts";
 
 // (Existing interfaces remain unchanged)
@@ -123,6 +123,7 @@ export function parseInterfaceProperties(
     return [];
   }
   if (availableModels) visited.add(modelName);
+
   const project = new Project();
   const filePath = join(modelsDir, `${modelName}.ts`);
   if (!existsSync(filePath)) {
@@ -130,17 +131,53 @@ export function parseInterfaceProperties(
     return [];
   }
   const sourceFile = project.addSourceFileAtPath(filePath);
-  const interfaceDec = sourceFile.getInterface(modelName);
+
+  // Try to get the interface first
+  let interfaceDec = sourceFile.getInterface(modelName);
   if (!interfaceDec) {
-    console.warn(`Interface ${modelName} not found in ${filePath}`);
+    // If no interface, check for a type alias (e.g., array type)
+    const typeAlias = sourceFile.getTypeAlias(modelName);
+    if (typeAlias) {
+      const typeNode = typeAlias.getTypeNode();
+      if (typeNode && typeNode.getKindName() === "ArrayType") {
+        const elementType = typeNode.getFirstChildByKindOrThrow(
+          ts.SyntaxKind.TypeReference // Use ts.SyntaxKind from ts-morph
+        );
+        const innerType = elementType.getText(); // e.g., "GetFields200ResponseItemsInner"
+        if (availableModels?.includes(innerType)) {
+          console.log(
+            `Detected array type alias ${modelName}, parsing inner type ${innerType}`
+          );
+          // Recursively parse the inner interface
+          return parseInterfaceProperties(
+            innerType,
+            modelsDir,
+            availableModels,
+            depth + 1,
+            visited
+          );
+        } else {
+          console.warn(
+            `Inner type ${innerType} not found in available models for ${modelName}`
+          );
+          return [];
+        }
+      }
+    }
+    console.warn(
+      `Interface or supported type alias ${modelName} not found in ${filePath}`
+    );
     return [];
   }
+
+  // Parse properties of the interface
   return interfaceDec.getProperties().map((prop: PropertySignature) => {
     const jsDocs = prop.getJsDocs();
     const jsdocText =
       jsDocs.length > 0 ? jsDocs[0].getDescription().trim() : undefined;
     const propType = prop.getType().getText(prop);
     let properties: PropertyDetail[] | undefined = undefined;
+
     if (availableModels) {
       const arrayMatch = propType.match(/(.+)\[\]$/);
       if (arrayMatch) {
@@ -156,6 +193,7 @@ export function parseInterfaceProperties(
         }
       }
     }
+
     return {
       name: prop.getName(),
       type: propType,

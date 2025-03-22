@@ -1,4 +1,4 @@
-// Generated on 2025-03-21T20:09:55.119Z
+// Generated on 2025-03-22T00:06:07.021Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -103,13 +103,12 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response with properties_
-   *   - **items** (`GetAppEvents200ResponseItemsInner[]`, optional) __
-   *     *   - **isActive** (`boolean`, optional) _Indication of whether current event is active._
-   *     *   - **type** (`GetAppEvents200ResponseItemsInnerTypeEnum`, optional) _Type of an event._
-   *     *   - **name** (`string`, optional) _The name of the event. This property is not returned for automations._
-   *     *   - **url** (`string`, optional) _The url to automation that can be accessed from the browser. Only returned for automations._
-   *     *   - **owner** (`{ [key: string]: any; }`, optional) _The user that owns the event._
-   *     *   - **tableId** (`string`, optional) _The unique identifier of the table to which event belongs to._
+   *   - **isActive** (`boolean`, optional) _Type: boolean_
+   *   - **type** (`string`, optional) _Type: string_
+   *   - **name** (`string`, optional) _Type: string_
+   *   - **url** (`string`, optional) _Type: string_
+   *   - **owner** (`object`, optional) _Type: object_
+   *   - **tableId** (`string`, optional) _Type: string_
    *
    * @see {@link https://developer.quickbase.com/operation/getAppEvents} Official Quickbase API documentation
    */
@@ -179,23 +178,22 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response with properties_
-   *   - **items** (`GetAppTables200ResponseItemsInner[]`, optional) __
-   *     *   - **name** (`string`, optional) _The name of the table._
-   *     *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
-   *     *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
-   *     *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
-   *     *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-   *     *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
-   *     *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
-   *     *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
-   *     *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-   *     *   - **defaultSortOrder** (`GetAppTables200ResponseItemsInnerDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
-   *     *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
-   *     *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
-   *     *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
-   *     *   - **sizeLimit** (`string`, optional) _The size limit for the table._
-   *     *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
-   *     *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
+   *   - **name** (`string`, optional) _Type: string_
+   *   - **id** (`string`, optional) _Type: string_
+   *   - **alias** (`string`, optional) _Type: string_
+   *   - **description** (`string`, optional) _Type: string_
+   *   - **created** (`string`, optional) _Type: string_
+   *   - **updated** (`string`, optional) _Type: string_
+   *   - **nextRecordId** (`number`, optional) _Type: number_
+   *   - **nextFieldId** (`number`, optional) _Type: number_
+   *   - **defaultSortFieldId** (`number`, optional) _Type: number_
+   *   - **defaultSortOrder** (`string`, optional) _Type: string_
+   *   - **keyFieldId** (`number`, optional) _Type: number_
+   *   - **singleRecordName** (`string`, optional) _Type: string_
+   *   - **pluralRecordName** (`string`, optional) _Type: string_
+   *   - **sizeLimit** (`string`, optional) _Type: string_
+   *   - **spaceUsed** (`string`, optional) _Type: string_
+   *   - **spaceRemaining** (`string`, optional) _Type: string_
    *
    * @see {@link https://developer.quickbase.com/operation/getAppTables} Official Quickbase API documentation
    */
@@ -353,16 +351,15 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *
    * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response with properties_
-   *   - **items** (`GetTableReports200ResponseItemsInner[]`, optional) __
-   *     *   - **id** (`string`, optional) _The identifier of the report, unique to the table._
-   *     *   - **name** (`string`, optional) _The configured name of the report._
-   *     *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
-   *     *   - **description** (`string`, optional) _The configured description of a report._
-   *     *   - **ownerId** (`number`, optional) _Optional, showed only for personal reports. The user ID of report owner._
-   *     *   - **query** (`{ [key: string]: any; }`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
-   *     *   - **properties** (`{ [key: string]: any; }`, optional) _A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)_
-   *     *   - **usedLast** (`string`, optional) _The instant at which a report was last used._
-   *     *   - **usedCount** (`number`, optional) _The number of times a report has been used._
+   *   - **id** (`string`, optional) _Type: string_
+   *   - **name** (`string`, optional) _Type: string_
+   *   - **type** (`string`, optional) _Type: string_
+   *   - **description** (`string`, optional) _Type: string_
+   *   - **ownerId** (`number`, optional) _Type: number_
+   *   - **query** (`object`, optional) _Type: object_
+   *   - **properties** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
+   *   - **usedLast** (`string`, optional) _Type: string_
+   *   - **usedCount** (`number`, optional) _Type: number_
    *
    * @see {@link https://developer.quickbase.com/operation/getTableReports} Official Quickbase API documentation
    */
@@ -413,7 +410,25 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
    *
-   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response_
+   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
+   *   - **id** (`number`, required) _Type: number_
+   *   - **fieldType** (`string`, optional) _Type: string_
+   *   - **mode** (`string`, optional) _Type: string_
+   *   - **label** (`string`, optional) _Type: string_
+   *   - **noWrap** (`boolean`, optional) _Type: boolean_
+   *   - **bold** (`boolean`, optional) _Type: boolean_
+   *   - **required** (`boolean`, optional) _Type: boolean_
+   *   - **appearsByDefault** (`boolean`, optional) _Type: boolean_
+   *   - **findEnabled** (`boolean`, optional) _Type: boolean_
+   *   - **unique** (`boolean`, optional) _Type: boolean_
+   *   - **doesDataCopy** (`boolean`, optional) _Type: boolean_
+   *   - **fieldHelp** (`string`, optional) _Type: string_
+   *   - **audited** (`boolean`, optional) _Type: boolean_
+   *   - **properties** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
+   *   - **permissions** (`Permission[]`, optional) __
+   *     *   - **role** (`string`, required) _The role name_
+   *     *   - **permissionType** (`string`, required) _Permission type (e.g., View, Modify)_
+   *     *   - **roleId** (`number`, required) _The role identifier_
    *
    * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
    */
@@ -552,7 +567,9 @@ export interface QuickbaseClient {
    *   @param {number} params.skip _Optional parameter with properties_
    *   @param {number} params.top _Optional parameter with properties_
    *
-   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response_
+   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
+   *   - **field** (`object`, required) _Type: object_
+   *   - **usage** (`object`, required) _Type: object_
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
    */
@@ -564,7 +581,9 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *   @param {number} params.fieldId _Required parameter with properties_
    *
-   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response_
+   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
+   *   - **field** (`object`, required) _Type: object_
+   *   - **usage** (`object`, required) _Type: object_
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
    */
@@ -980,7 +999,11 @@ export interface QuickbaseClient {
    *   @param {any} params.body _Optional parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<UpdateSolution200Response>} _Promise resolving to the updateSolution response_
+   * @returns {Promise<UpdateSolution200Response>} _Promise resolving to the updateSolution response with properties_
+   *   - **solutionId** (`string`, optional) _Type: string_
+   *   - **alias** (`object`, optional) _Type: object_
+   *   - **createdResources** (`any`, optional) _Type: any_
+   *   - **warnings** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/updateSolution} Official Quickbase API documentation
    */
@@ -992,7 +1015,11 @@ export interface QuickbaseClient {
    *   @param {any} params.body _Optional parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<CreateSolution200Response>} _Promise resolving to the createSolution response_
+   * @returns {Promise<CreateSolution200Response>} _Promise resolving to the createSolution response with properties_
+   *   - **solutionId** (`string`, optional) _Type: string_
+   *   - **alias** (`object`, optional) _Type: object_
+   *   - **createdResources** (`any`, optional) _Type: any_
+   *   - **warnings** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/createSolution} Official Quickbase API documentation
    */
@@ -1007,7 +1034,9 @@ export interface QuickbaseClient {
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *   @param {string} params.qBLVersion _Optional parameter with properties_
    *
-   * @returns {Promise<ExportSolutionToRecord200Response>} _Promise resolving to the exportSolutionToRecord response_
+   * @returns {Promise<ExportSolutionToRecord200Response>} _Promise resolving to the exportSolutionToRecord response with properties_
+   *   - **record_id** (`number`, optional) _Type: number_
+   *   - **filename** (`string`, optional) _Type: string_
    *
    * @see {@link https://developer.quickbase.com/operation/exportSolutionToRecord} Official Quickbase API documentation
    */
@@ -1021,7 +1050,11 @@ export interface QuickbaseClient {
    *   @param {number} params.recordId _Required parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<CreateSolutionFromRecord200Response>} _Promise resolving to the createSolutionFromRecord response_
+   * @returns {Promise<CreateSolutionFromRecord200Response>} _Promise resolving to the createSolutionFromRecord response with properties_
+   *   - **solutionId** (`string`, optional) _Type: string_
+   *   - **alias** (`object`, optional) _Type: object_
+   *   - **createdResources** (`any`, optional) _Type: any_
+   *   - **warnings** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/createSolutionFromRecord} Official Quickbase API documentation
    */
@@ -1036,7 +1069,11 @@ export interface QuickbaseClient {
    *   @param {number} params.recordId _Required parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<UpdateSolutionToRecord200Response>} _Promise resolving to the updateSolutionToRecord response_
+   * @returns {Promise<UpdateSolutionToRecord200Response>} _Promise resolving to the updateSolutionToRecord response with properties_
+   *   - **solutionId** (`string`, optional) _Type: string_
+   *   - **alias** (`object`, optional) _Type: object_
+   *   - **resources** (`any`, optional) _Type: any_
+   *   - **warnings** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/updateSolutionToRecord} Official Quickbase API documentation
    */
@@ -1049,7 +1086,9 @@ export interface QuickbaseClient {
    *   @param {any} params.body _Optional parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<ChangesetSolution200Response>} _Promise resolving to the changesetSolution response_
+   * @returns {Promise<ChangesetSolution200Response>} _Promise resolving to the changesetSolution response with properties_
+   *   - **id** (`string`, optional) _Type: string_
+   *   - **changes** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/changesetSolution} Official Quickbase API documentation
    */
@@ -1064,7 +1103,9 @@ export interface QuickbaseClient {
    *   @param {number} params.recordId _Required parameter with properties_
    *   @param {boolean} params.xQBLErrorsAsSuccess _Optional parameter with properties_
    *
-   * @returns {Promise<ChangesetSolutionFromRecord200Response>} _Promise resolving to the changesetSolutionFromRecord response_
+   * @returns {Promise<ChangesetSolutionFromRecord200Response>} _Promise resolving to the changesetSolutionFromRecord response with properties_
+   *   - **id** (`string`, optional) _Type: string_
+   *   - **changes** (`any`, optional) _Type: any_
    *
    * @see {@link https://developer.quickbase.com/operation/changesetSolutionFromRecord} Official Quickbase API documentation
    */

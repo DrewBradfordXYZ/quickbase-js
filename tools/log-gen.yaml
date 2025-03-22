@@ -922,11 +922,11 @@ tree:
                           type: >-
                             file
                     - name: >-
-                        index.md.7e0F_hhC.js
+                        index.md.C7bJw-2z.js
                       type: >-
                         file
                     - name: >-
-                        index.md.7e0F_hhC.lean.js
+                        index.md.C7bJw-2z.lean.js
                       type: >-
                         file
                     - name: >-
@@ -1056,6 +1056,14 @@ tree:
             vanillajs.html
           type: >-
             file
+    - name: >-
+        fix-spec.log
+      type: >-
+        file
+    - name: >-
+        gen-openapi-post.log
+      type: >-
+        file
     - name: >-
         index.md
       type: >-
@@ -1565,6 +1573,394 @@ tree:
             console.log("Script
             completed");
         - name: >-
+            post-process-generated.ts
+          type: >-
+            file
+          contents: >
+            #!/usr/bin/env
+            node
+
+
+            import
+            {
+            readFileSync,
+            writeFileSync,
+            existsSync,
+            mkdirSync
+            }
+            from
+            "fs";
+
+            import
+            {
+            join,
+            dirname
+            }
+            from
+            "path";
+
+            import
+            {
+            fileURLToPath
+            }
+            from
+            "url";
+
+
+            const
+            __dirname
+            =
+            dirname(fileURLToPath(import.meta.url));
+
+            const
+            GENERATED_DIR
+            =
+            join(__dirname,
+            "..",
+            "src",
+            "generated");
+
+            const
+            MODELS_DIR
+            =
+            join(GENERATED_DIR,
+            "models");
+
+            const
+            SPEC_FILE
+            =
+            join(__dirname,
+            "output",
+            "quickbase-fixed.json");
+
+
+            /**
+             * Converts a string to PascalCase.
+             * @param str - The string to convert (e.g., "get_fields" -> "GetFields").
+             */
+            function
+            toPascalCase(str:
+            string):
+            string
+            {
+              return str.replace(/(^\w|_\w)/g, (match) =>
+                match.replace("_", "").toUpperCase()
+              );
+            }
+
+
+            /**
+             * Ensures a directory exists, creating it recursively if necessary.
+             * @param dir - The directory path to check or create.
+             */
+            function
+            ensureDir(dir:
+            string)
+            {
+              if (!existsSync(dir)) {
+                mkdirSync(dir, { recursive: true });
+              }
+            }
+
+
+            /**
+             * Maps OpenAPI schema types to TypeScript types.
+             * @param openApiType - The OpenAPI type (e.g., "integer", "string").
+             * @returns The corresponding TypeScript type.
+             */
+            function
+            mapOpenApiTypeToTs(openApiType:
+            string):
+            string
+            {
+              switch (openApiType) {
+                case "integer":
+                case "number":
+                  return "number";
+                case "string":
+                  return "string";
+                case "boolean":
+                  return "boolean";
+                case "object":
+                  return "object";
+                default:
+                  return "any";
+              }
+            }
+
+
+            function
+            generateItemsInnerInterface(
+              itemSchema: any,
+              itemName: string
+            ):
+            string
+            {
+              const properties = itemSchema?.properties || {};
+              const propsStr = Object.entries(properties)
+                .map(([key, prop]: [string, any]) => {
+                  let type;
+                  if (key === "permissions" && prop.type === "array") {
+                    type = "Permission[]";
+                  } else if (key === "properties" && prop.type === "object") {
+                    type = "{ [key: string]: any }"; // Flexible object
+                  } else {
+                    type = mapOpenApiTypeToTs(prop.type);
+                  }
+                  const isRequired = itemSchema.required?.includes(key);
+                  return `  ${key}${isRequired ? "" : "?"}: ${type};`;
+                })
+                .join("\n");
+
+              return `
+            /*
+            Auto-generated
+            by
+            post-process-generated.ts
+            */
+
+            import
+            {
+            mapValues
+            }
+            from
+            '../runtime';
+
+            import
+            {
+            Permission
+            }
+            from
+            './Permission';
+
+            /**
+             * Auto-generated model for ${itemName}
+             */
+            export
+            interface
+            ${itemName}
+            {
+
+            ${propsStr}
+
+            }
+
+
+            export
+            function
+            ${itemName}FromJSON(json:
+            any):
+            ${itemName}
+            {
+              return json || {};
+            }
+
+
+            export
+            function
+            ${itemName}ToJSON(value?:
+            ${itemName}
+            |
+            null):
+            any
+            {
+              return value || {};
+            }
+              `.trim();
+            }
+
+
+            /**
+             * Main function to post-process generated files from the OpenAPI spec.
+             */
+            function
+            postProcessGeneratedFiles()
+            {
+              console.log("Starting post-processing...");
+              console.log("Spec file path:", SPEC_FILE);
+
+              try {
+                if (!existsSync(SPEC_FILE)) {
+                  console.error(
+                    `Spec file ${SPEC_FILE} not found. Run 'npm run fix-spec' first.`
+                  );
+                  process.exit(1);
+                }
+
+                const spec = JSON.parse(readFileSync(SPEC_FILE, "utf8"));
+                console.log("Spec loaded successfully.");
+
+                const responseMap: Record<string, string> = {};
+                for (const pathKey in spec.paths) {
+                  const pathObj = spec.paths[pathKey];
+                  if (!pathObj || typeof pathObj !== "object") {
+                    console.log(`Invalid path object for ${pathKey}:`, pathObj);
+                    continue;
+                  }
+                  for (const method in pathObj) {
+                    const operation = pathObj[method];
+                    const opId =
+                      operation.operationId || `${method}${pathKey.replace(/\W/g, "")}`;
+                    const response = operation.responses?.["200"];
+                    if (response && response.schema?.$ref) {
+                      const refName = response.schema.$ref.split("/").pop() || "";
+                      responseMap[opId] = refName;
+                      console.log(`Mapped ${opId} to ${refName}`);
+                    }
+                  }
+                }
+
+                for (const [opId, refName] of Object.entries(responseMap)) {
+                  try {
+                    const def = spec.definitions[refName];
+                    if (!def) {
+                      console.log(`Definition for ${refName} not found; skipping`);
+                      continue;
+                    }
+
+                    if (def.type === "array") {
+                      const itemRef = def.items?.$ref
+                        ? def.items.$ref.split("/").pop()
+                        : `${toPascalCase(refName)}ItemsInner`;
+                      const responseFile = join(MODELS_DIR, `${toPascalCase(refName)}.ts`);
+                      const itemsFile = join(MODELS_DIR, `${itemRef}.ts`);
+
+                      if (!existsSync(itemsFile)) {
+                        console.log(`Creating missing ${itemRef}.ts`);
+                        const content = def.items?.$ref
+                          ? `
+            /*
+            Auto-generated
+            by
+            post-process-generated.ts
+            */
+
+            import
+            {
+            mapValues
+            }
+            from
+            '../runtime';
+
+            /**
+             * Auto-generated model for ${itemRef}
+             */
+            export
+            interface
+            ${itemRef}
+            {
+              [key: string]: any; // Placeholder; refine as needed
+            }
+
+
+            export
+            function
+            ${itemRef}FromJSON(json:
+            any):
+            ${itemRef}
+            {
+              return json || {};
+            }
+
+
+            export
+            function
+            ${itemRef}ToJSON(value?:
+            ${itemRef}
+            |
+            null):
+            any
+            {
+              return value || {};
+            }
+
+            `
+                          : generateItemsInnerInterface(def.items || {}, itemRef);
+                        ensureDir(MODELS_DIR);
+                        writeFileSync(itemsFile, content.trim(), "utf8");
+                      }
+
+                      if (existsSync(responseFile)) {
+                        console.log(`Rewriting ${refName}.ts as array`);
+                        const content = `
+            /*
+            Auto-generated
+            by
+            post-process-generated.ts
+            */
+
+            import
+            {
+            ${itemRef},
+            ${itemRef}FromJSON,
+            ${itemRef}ToJSON
+            }
+            from
+            './${itemRef}';
+
+
+            /**
+             * Response for ${opId}
+             */
+            export
+            type
+            ${toPascalCase(refName)}
+            =
+            ${itemRef}[];
+
+
+            /**
+             * Convert JSON to ${toPascalCase(refName)}
+             */
+            export
+            function
+            ${toPascalCase(refName)}FromJSON(json:
+            any):
+            ${toPascalCase(
+                          refName
+                        )} {
+              if (!json) return [];
+              return json.map(${itemRef}FromJSON);
+            }
+
+
+            /**
+             * Convert ${toPascalCase(refName)} to JSON
+             */
+            export
+            function
+            ${toPascalCase(refName)}ToJSON(value?:
+            ${toPascalCase(
+                          refName
+                        )} | null): any {
+              if (!value) return [];
+              return value.map(${itemRef}ToJSON);
+            }
+
+            `;
+                        writeFileSync(responseFile, content.trim(), "utf8");
+                      }
+                    }
+                  } catch (error) {
+                    console.error(`Error processing ${refName}:`, error);
+                  }
+                }
+
+                console.log("Post-processing complete.");
+              } catch (error) {
+                console.error("Error in post-processing:", error);
+                process.exit(1);
+              }
+            }
+
+
+            //
+            Execute
+            the
+            post-processing
+
+            postProcessGeneratedFiles();
+        - name: >-
             regenerate-client.ts
           type: >-
             file
@@ -1789,9 +2185,6 @@ tree:
               type: >-
                 file
               contents: >
-                //
-                schema/enhance-general.ts
-
                 import
                 {
                 Operation,
@@ -1816,28 +2209,6 @@ tree:
                 void
                 {
                   spec.definitions = spec.definitions || {};
-
-                  // Local function to wrap top-level arrays and refine items
-                  function wrapTopLevelArrays(schema: any, responseName: string): any {
-                    if (schema.type === "array") {
-                      console.log(
-                        `Wrapping ${responseName} in an object with 'items' property`
-                      );
-                      // Remove additionalProperties from items to ensure typing
-                      if (schema.items && "additionalProperties" in schema.items) {
-                        delete schema.items.additionalProperties;
-                        console.log(`Removed additionalProperties from ${responseName}.items`);
-                      }
-                      return {
-                        type: "object",
-                        properties: {
-                          items: schema,
-                        },
-                        description: `A response containing a list for ${responseName}`,
-                      };
-                    }
-                    return schema; // Return unchanged if not a top-level array
-                  }
 
                   if (!spec.definitions["Record"]) {
                     spec.definitions["Record"] = {
@@ -1897,11 +2268,11 @@ tree:
                                 `Adding ${responseName} to definitions for ${pathKey}(${method})`
                               );
                               let schemaToUse = response.schema;
-                              // Apply general fix for top-level arrays
-                              schemaToUse = wrapTopLevelArrays(schemaToUse, responseName);
+                              // Only infer from example if schema is truly empty
                               if (
-                                !schemaToUse.type ||
-                                (schemaToUse.type === "array" && !schemaToUse.items)
+                                !schemaToUse.type &&
+                                !schemaToUse.items &&
+                                !schemaToUse.properties
                               ) {
                                 if (response["x-amf-mediaType"]) {
                                   const mediaType = response["x-amf-mediaType"];
@@ -2904,6 +3275,104 @@ tree:
         package.json
       type: >-
         file
+      contents: >
+        {
+          "name": "quickbase-js",
+          "version": "0.1.0-beta.9",
+          "description": "QuickBase JavaScript client for frameworks and vanilla JS",
+          "type": "module",
+          "main": "dist/esm/quickbase.js",
+          "module": "dist/esm/quickbase.js",
+          "types": "dist/esm/quickbase.d.ts",
+          "publishConfig": {
+            "access": "public"
+          },
+          "exports": {
+            ".": {
+              "types": "./dist/esm/quickbase.d.ts",
+              "import": {
+                "minified": "./dist/esm/quickbase.min.js",
+                "default": "./dist/esm/quickbase.js"
+              },
+              "require": {
+                "minified": "./dist/umd/quickbase.umd.min.js",
+                "default": "./dist/umd/quickbase.umd.js"
+              },
+              "umd:types": "./dist/umd/quickbase.umd.d.ts"
+            }
+          },
+          "scripts": {
+            "build": "npm run build:esm && npm run build:umd",
+            "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-esm.js",
+            "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-umd.js",
+            "release": "standard-version",
+            "release:beta": "standard-version --prerelease beta",
+            "release:alpha": "standard-version --prerelease alpha",
+            "release:push": "npm run release:beta && git push --follow-tags origin main",
+            "release:publish": "npm run release:push && npm publish --tag beta",
+            "release:stable": "standard-version && git push --follow-tags origin main && npm publish",
+            "docs:dev": "vitepress dev docs",
+            "docs:build": "vitepress build docs",
+            "docs:preview": "vitepress preview docs",
+            "fix-spec": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/fix-spec-main.ts",
+            "gen:openapi": "rimraf src/generated && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/regenerate-client.ts",
+            "gen:openapi:post": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/post-process-generated.ts",
+            "gen:openapi:all": "npm run fix-spec && npm run gen:openapi && npm run gen:openapi:post",
+            "gen:unified": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generate-unified-interface.ts",
+            "gen:docsdata": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' open-api/generateDocsJson.ts",
+            "gen:all": "npm run fix-spec && npm run gen:openapi && npm run gen:unified && npm run gen:docsdata && npm run docs:build",
+            "log-gen": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' tools/log-gen.ts",
+            "test:all": "vitest run tests/vitest/**/**/*.test.ts --reporter=basic && playwright test tests/playwright/qb --config playwright.config.ts --reporter=dot --quiet",
+            "test:pw:qb:all": "playwright test tests/playwright/qb --config playwright.config.ts",
+            "test:vitest:all": "vitest run tests/vitest/**/**/*.test.ts",
+            "test:vitest:qb": "vitest run tests/vitest/qb/**/*.test.ts",
+            "test:vitest:unit": "vitest run tests/vitest/unit/**/*.test.ts",
+            "test:vitest:qb:apps": "vitest run tests/vitest/qb/apps/*.test.ts",
+            "test:vitest:qb:auth": "vitest run tests/vitest/qb/auth/*.test.ts",
+            "test:vitest:qb:fields": "vitest run tests/vitest/qb/fields/*.test.ts",
+            "test:vitest:qb:records": "vitest run tests/vitest/qb/records/*.test.ts",
+            "test:vitest:qb:tables": "vitest run tests/vitest/qb/tables/*.test.ts",
+            "test:vitest:unit:apps": "vitest run tests/vitest/unit/apps/*.test.ts",
+            "test:vitest:unit:auth": "vitest run tests/vitest/unit/auth/*.test.ts",
+            "test:vitest:unit:fields": "vitest run tests/vitest/unit/fields/*.test.ts",
+            "test:vitest:unit:formulas": "vitest run tests/vitest/unit/formulas/*.test.ts",
+            "test:vitest:unit:records": "vitest run tests/vitest/unit/records/*.test.ts",
+            "test:vitest:unit:tables": "vitest run tests/vitest/unit/tables/*.test.ts",
+            "test:pw:qb:auth": "playwright test tests/playwright/qb/auth"
+          },
+          "devDependencies": {
+            "@openapitools/openapi-generator-cli": "^2.18.4",
+            "@playwright/test": "^1.51.0",
+            "@rollup/plugin-commonjs": "^28.0.3",
+            "@rollup/plugin-node-resolve": "^16.0.1",
+            "@rollup/plugin-terser": "^0.4.4",
+            "@rollup/plugin-typescript": "^12.1.2",
+            "@types/fast-json-patch": "^1.0.4",
+            "@types/js-yaml": "^4.0.9",
+            "@types/node": "^22.13.10",
+            "dotenv": "^16.4.7",
+            "express": "^4.21.2",
+            "fast-json-patch": "^3.1.1",
+            "glob": "^10.4.5",
+            "js-yaml": "^4.1.0",
+            "jsdom": "^26.0.0",
+            "node-fetch": "^3.3.2",
+            "openapi-schema-validator": "^12.1.3",
+            "openapi-types": "^12.1.3",
+            "openapi-typescript": "^7.6.1",
+            "rimraf": "^5.0.10",
+            "rollup": "^4.35.0",
+            "rollup-plugin-dts": "^6.1.1",
+            "standard-version": "^9.5.0",
+            "ts-morph": "^25.0.1",
+            "ts-node": "^10.9.2",
+            "tslib": "^2.8.1",
+            "typescript": "^5.8.2",
+            "undici-types": "^7.5.0",
+            "vitepress": "^1.6.3",
+            "vitest": "^3.0.8"
+          }
+        }
     - name: >-
         playwright.config.ts
       type: >-
@@ -3074,6 +3543,10 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    ChangesetSolution200ResponseItemsInner.ts
+                  type: >-
+                    file
+                - name: >-
                     ChangesetSolution400Response.ts
                   type: >-
                     file
@@ -3091,6 +3564,10 @@ tree:
                     file
                 - name: >-
                     ChangesetSolutionFromRecord200Response.ts
+                  type: >-
+                    file
+                - name: >-
+                    ChangesetSolutionFromRecord200ResponseItemsInner.ts
                   type: >-
                     file
                 - name: >-
@@ -3162,6 +3639,10 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    CreateSolution200ResponseItemsInner.ts
+                  type: >-
+                    file
+                - name: >-
                     CreateSolution400Response.ts
                   type: >-
                     file
@@ -3187,6 +3668,10 @@ tree:
                     file
                 - name: >-
                     CreateSolutionFromRecord200ResponseInnerCreatedResourcesInnerAppsInner.ts
+                  type: >-
+                    file
+                - name: >-
+                    CreateSolutionFromRecord200ResponseItemsInner.ts
                   type: >-
                     file
                 - name: >-
@@ -3314,6 +3799,10 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    ExportSolutionToRecord200ResponseItemsInner.ts
+                  type: >-
+                    file
+                - name: >-
                     ExportSolutionToRecord400Response.ts
                   type: >-
                     file
@@ -3362,6 +3851,10 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    GetFieldUsage200ResponseItemsInner.ts
+                  type: >-
+                    file
+                - name: >-
                     GetFields200Response.ts
                   type: >-
                     file
@@ -3373,170 +3866,71 @@ tree:
                     GetFieldsUsage200Response.ts
                   type: >-
                     file
-                  contents: >+
+                  contents: >-
                     /*
-                    tslint:disable
+                    Auto-generated
+                    by
+                    post-process-generated.ts
                     */
-
-                    /*
-                    eslint-disable
-                    */
-
-                    /**
-                     * Quick Base API
-                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
-                     *
-                     * The version of the OpenAPI document: 1.0.0
-                     * 
-                     *
-                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
-                     * https://openapi-generator.tech
-                     * Do not edit the class manually.
-                     */
 
                     import
                     {
-                    mapValues
+                    GetFieldsUsage200ResponseItemsInner,
+                    GetFieldsUsage200ResponseItemsInnerFromJSON,
+                    GetFieldsUsage200ResponseItemsInnerToJSON
                     }
                     from
-                    '../runtime';
+                    './GetFieldsUsage200ResponseItemsInner';
 
-                    import
+
+                    /**
+                     * Response for getFieldsUsage
+                     */
+                    export
                     type
-                    {
-                    GetFieldsUsage200ResponseItemsInner
-                    }
-                    from
-                    './GetFieldsUsage200ResponseItemsInner';
-
-                    import
-                    {
-                        GetFieldsUsage200ResponseItemsInnerFromJSON,
-                        GetFieldsUsage200ResponseItemsInnerFromJSONTyped,
-                        GetFieldsUsage200ResponseItemsInnerToJSON,
-                        GetFieldsUsage200ResponseItemsInnerToJSONTyped,
-                    }
-                    from
-                    './GetFieldsUsage200ResponseItemsInner';
+                    GetFieldsUsage200Response
+                    =
+                    GetFieldsUsage200ResponseItemsInner[];
 
 
                     /**
-                     * A response containing a list for getFieldsUsage200Response
-                     * @export
-                     * @interface GetFieldsUsage200Response
+                     * Convert JSON to GetFieldsUsage200Response
                      */
-                    export
-                    interface
-                    GetFieldsUsage200Response
-                    {
-                        /**
-                         * 
-                         * @type {Array<GetFieldsUsage200ResponseItemsInner>}
-                         * @memberof GetFieldsUsage200Response
-                         */
-                        items?: Array<GetFieldsUsage200ResponseItemsInner>;
-                    }
-
-
-                    /**
-                     * Check if a given object implements the GetFieldsUsage200Response interface.
-                     */
-                    export
-                    function
-                    instanceOfGetFieldsUsage200Response(value:
-                    object):
-                    value
-                    is
-                    GetFieldsUsage200Response
-                    {
-                        return true;
-                    }
-
-
                     export
                     function
                     GetFieldsUsage200ResponseFromJSON(json:
                     any):
                     GetFieldsUsage200Response
                     {
-                        return GetFieldsUsage200ResponseFromJSONTyped(json, false);
+                      if (!json) return [];
+                      return json.map(GetFieldsUsage200ResponseItemsInnerFromJSON);
                     }
 
 
+                    /**
+                     * Convert GetFieldsUsage200Response to JSON
+                     */
                     export
                     function
-                    GetFieldsUsage200ResponseFromJSONTyped(json:
-                    any,
-                    ignoreDiscriminator:
-                    boolean):
-                    GetFieldsUsage200Response
-                    {
-                        if (json == null) {
-                            return json;
-                        }
-                        return {
-                            
-                            'items': json['items'] == null ? undefined : ((json['items'] as Array<any>).map(GetFieldsUsage200ResponseItemsInnerFromJSON)),
-                        };
-                    }
-
-
-                    export
-                    function
-                    GetFieldsUsage200ResponseToJSON(json:
-                    any):
-                    GetFieldsUsage200Response
-                    {
-                        return GetFieldsUsage200ResponseToJSONTyped(json, false);
-                    }
-
-
-                    export
-                    function
-                    GetFieldsUsage200ResponseToJSONTyped(value?:
+                    GetFieldsUsage200ResponseToJSON(value?:
                     GetFieldsUsage200Response
                     |
-                    null,
-                    ignoreDiscriminator:
-                    boolean
-                    =
-                    false):
+                    null):
                     any
                     {
-                        if (value == null) {
-                            return value;
-                        }
-
-                        return {
-                            
-                            'items': value['items'] == null ? undefined : ((value['items'] as Array<any>).map(GetFieldsUsage200ResponseItemsInnerToJSON)),
-                        };
+                      if (!value) return [];
+                      return value.map(GetFieldsUsage200ResponseItemsInnerToJSON);
                     }
-
                 - name: >-
                     GetFieldsUsage200ResponseItemsInner.ts
                   type: >-
                     file
-                  contents: >+
+                  contents: >-
                     /*
-                    tslint:disable
+                    Auto-generated
+                    by
+                    post-process-generated.ts
                     */
-
-                    /*
-                    eslint-disable
-                    */
-
-                    /**
-                     * Quick Base API
-                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
-                     *
-                     * The version of the OpenAPI document: 1.0.0
-                     * 
-                     *
-                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
-                     * https://openapi-generator.tech
-                     * Do not edit the class manually.
-                     */
 
                     import
                     {
@@ -3545,44 +3939,22 @@ tree:
                     from
                     '../runtime';
 
+                    import
+                    {
+                    Permission
+                    }
+                    from
+                    './Permission';
+
                     /**
-                     * 
-                     * @export
-                     * @interface GetFieldsUsage200ResponseItemsInner
+                     * Auto-generated model for GetFieldsUsage200ResponseItemsInner
                      */
                     export
                     interface
                     GetFieldsUsage200ResponseItemsInner
                     {
-                        /**
-                         * Basic information about the field.
-                         * @type {{ [key: string]: any; }}
-                         * @memberof GetFieldsUsage200ResponseItemsInner
-                         */
-                        field: { [key: string]: any; };
-                        /**
-                         * Usage Information about the field.
-                         * @type {{ [key: string]: any; }}
-                         * @memberof GetFieldsUsage200ResponseItemsInner
-                         */
-                        usage: { [key: string]: any; };
-                    }
-
-
-                    /**
-                     * Check if a given object implements the GetFieldsUsage200ResponseItemsInner interface.
-                     */
-                    export
-                    function
-                    instanceOfGetFieldsUsage200ResponseItemsInner(value:
-                    object):
-                    value
-                    is
-                    GetFieldsUsage200ResponseItemsInner
-                    {
-                        if (!('field' in value) || value['field'] === undefined) return false;
-                        if (!('usage' in value) || value['usage'] === undefined) return false;
-                        return true;
+                      field: object;
+                      usage: object;
                     }
 
 
@@ -3592,62 +3964,20 @@ tree:
                     any):
                     GetFieldsUsage200ResponseItemsInner
                     {
-                        return GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json, false);
+                      return json || {};
                     }
 
 
                     export
                     function
-                    GetFieldsUsage200ResponseItemsInnerFromJSONTyped(json:
-                    any,
-                    ignoreDiscriminator:
-                    boolean):
-                    GetFieldsUsage200ResponseItemsInner
-                    {
-                        if (json == null) {
-                            return json;
-                        }
-                        return {
-                            
-                            'field': json['field'],
-                            'usage': json['usage'],
-                        };
-                    }
-
-
-                    export
-                    function
-                    GetFieldsUsage200ResponseItemsInnerToJSON(json:
-                    any):
-                    GetFieldsUsage200ResponseItemsInner
-                    {
-                        return GetFieldsUsage200ResponseItemsInnerToJSONTyped(json, false);
-                    }
-
-
-                    export
-                    function
-                    GetFieldsUsage200ResponseItemsInnerToJSONTyped(value?:
+                    GetFieldsUsage200ResponseItemsInnerToJSON(value?:
                     GetFieldsUsage200ResponseItemsInner
                     |
-                    null,
-                    ignoreDiscriminator:
-                    boolean
-                    =
-                    false):
+                    null):
                     any
                     {
-                        if (value == null) {
-                            return value;
-                        }
-
-                        return {
-                            
-                            'field': value['field'],
-                            'usage': value['usage'],
-                        };
+                      return value || {};
                     }
-
                 - name: >-
                     GetRelationships200Response.ts
                   type: >-
@@ -3841,6 +4171,10 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    UpdateSolution200ResponseItemsInner.ts
+                  type: >-
+                    file
+                - name: >-
                     UpdateSolution400Response.ts
                   type: >-
                     file
@@ -3858,6 +4192,10 @@ tree:
                     file
                 - name: >-
                     UpdateSolutionToRecord200ResponseInner.ts
+                  type: >-
+                    file
+                - name: >-
+                    UpdateSolutionToRecord200ResponseItemsInner.ts
                   type: >-
                     file
                 - name: >-
@@ -3921,7 +4259,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-21T19:56:12.122Z
+                2025-03-21T20:09:55.119Z
 
                 import
                 {
@@ -4429,23 +4767,7 @@ tree:
                    *   @param {string} params.tableId _Required parameter with properties_
                    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
                    *
-                   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
-                   *   - **items** (`GetFields200ResponseItemsInner[]`, optional) __
-                   *     *   - **id** (`number`, required) _The id of the field, unique to this table._
-                   *     *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
-                   *     *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
-                   *     *   - **label** (`string`, optional) _The label (name) of the field._
-                   *     *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
-                   *     *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
-                   *     *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
-                   *     *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
-                   *     *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
-                   *     *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
-                   *     *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
-                   *     *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
-                   *     *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
-                   *     *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-                   *     *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
+                   * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response_
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFields} Official Quickbase API documentation
                    */
@@ -4584,10 +4906,7 @@ tree:
                    *   @param {number} params.skip _Optional parameter with properties_
                    *   @param {number} params.top _Optional parameter with properties_
                    *
-                   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
-                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
-                   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
-                   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
+                   * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response_
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
                    */
@@ -4599,10 +4918,7 @@ tree:
                    *   @param {string} params.tableId _Required parameter with properties_
                    *   @param {number} params.fieldId _Required parameter with properties_
                    *
-                   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
-                   *   - **items** (`GetFieldsUsage200ResponseItemsInner[]`, optional) __
-                   *     *   - **field** (`{ [key: string]: any; }`, required) _Basic information about the field._
-                   *     *   - **usage** (`{ [key: string]: any; }`, required) _Usage Information about the field._
+                   * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response_
                    *
                    * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
                    */
