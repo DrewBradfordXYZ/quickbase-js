@@ -117,13 +117,13 @@ _User options:_
 
 _Advanced user options:_
 
-- **`tempTokenLifespan`** (`number`, optional): The lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
-
 - **`throttle`** (`{ rate: number; burst: number }`, optional): Configures rate limiting, where `rate` is requests per second and `burst` is the maximum burst of requests. Defaults to `{ rate: 10, burst: 10 }`.
 
 - **`maxRetries`** (`number`, optional): The maximum number of retries for failed requests. Defaults to `3`.
 
 - **`retryDelay`** (`number`, optional): The base delay (in milliseconds) between retries, which increases exponentially. Defaults to `1000`.
+
+- **`tempTokenLifespan`** (`number`, optional): The lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
 
 - **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
 
@@ -148,6 +148,8 @@ _Overrides and development options:_
 - **`throttle`**: Adjust this to handle 429 Too Many Requests errors. Controls API request pacing to avoid hitting rate limits. For example, `{ rate: 5, burst: 20 }` allows 5 requests per second with a burst capacity of 20.
 
 - **`tokenCache`**: Temporary tokens are cached with their dbid with a `tempTokenLifespan`. This is automatically setup for you when `useTempTokens` is enabled.
+
+---
 
 ### Development workflow
 
