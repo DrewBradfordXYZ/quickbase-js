@@ -1,4 +1,4 @@
-// Generated on 2025-03-22T00:06:07.021Z
+// Generated on 2025-03-22T00:26:16.252Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -103,12 +103,12 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppEvents200Response>} _Promise resolving to the getAppEvents response with properties_
-   *   - **isActive** (`boolean`, optional) _Type: boolean_
-   *   - **type** (`string`, optional) _Type: string_
-   *   - **name** (`string`, optional) _Type: string_
-   *   - **url** (`string`, optional) _Type: string_
-   *   - **owner** (`object`, optional) _Type: object_
-   *   - **tableId** (`string`, optional) _Type: string_
+   *   - **isActive** (`boolean`, optional) _Indication of whether current event is active._
+   *   - **type** (`string`, optional) _Type of an event._
+   *   - **name** (`string`, optional) _The name of the event. This property is not returned for automations._
+   *   - **url** (`string`, optional) _The url to automation that can be accessed from the browser. Only returned for automations._
+   *   - **owner** (`object`, optional) _The user that owns the event._
+   *   - **tableId** (`string`, optional) _The unique identifier of the table to which event belongs to._
    *
    * @see {@link https://developer.quickbase.com/operation/getAppEvents} Official Quickbase API documentation
    */
@@ -178,22 +178,22 @@ export interface QuickbaseClient {
    *   @param {string} params.appId _Required parameter with properties_
    *
    * @returns {Promise<GetAppTables200Response>} _Promise resolving to the getAppTables response with properties_
-   *   - **name** (`string`, optional) _Type: string_
-   *   - **id** (`string`, optional) _Type: string_
-   *   - **alias** (`string`, optional) _Type: string_
-   *   - **description** (`string`, optional) _Type: string_
-   *   - **created** (`string`, optional) _Type: string_
-   *   - **updated** (`string`, optional) _Type: string_
-   *   - **nextRecordId** (`number`, optional) _Type: number_
-   *   - **nextFieldId** (`number`, optional) _Type: number_
-   *   - **defaultSortFieldId** (`number`, optional) _Type: number_
-   *   - **defaultSortOrder** (`string`, optional) _Type: string_
-   *   - **keyFieldId** (`number`, optional) _Type: number_
-   *   - **singleRecordName** (`string`, optional) _Type: string_
-   *   - **pluralRecordName** (`string`, optional) _Type: string_
-   *   - **sizeLimit** (`string`, optional) _Type: string_
-   *   - **spaceUsed** (`string`, optional) _Type: string_
-   *   - **spaceRemaining** (`string`, optional) _Type: string_
+   *   - **name** (`string`, optional) _The name of the table._
+   *   - **id** (`string`, optional) _The unique identifier (dbid) of the table._
+   *   - **alias** (`string`, optional) _The automatically-created table alias for the table._
+   *   - **description** (`string`, optional) _The description of the table, as configured by an application administrator._
+   *   - **created** (`string`, optional) _The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
+   *   - **updated** (`string`, optional) _The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
+   *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
+   *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
+   *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
+   *   - **defaultSortOrder** (`string`, optional) _The configuration of the default sort order on the table._
+   *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
+   *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
+   *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
+   *   - **sizeLimit** (`string`, optional) _The size limit for the table._
+   *   - **spaceUsed** (`string`, optional) _The amount of space currently being used by the table._
+   *   - **spaceRemaining** (`string`, optional) _The amount of space remaining for use by the table._
    *
    * @see {@link https://developer.quickbase.com/operation/getAppTables} Official Quickbase API documentation
    */
@@ -351,15 +351,15 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *
    * @returns {Promise<GetTableReports200Response>} _Promise resolving to the getTableReports response with properties_
-   *   - **id** (`string`, optional) _Type: string_
-   *   - **name** (`string`, optional) _Type: string_
-   *   - **type** (`string`, optional) _Type: string_
-   *   - **description** (`string`, optional) _Type: string_
-   *   - **ownerId** (`number`, optional) _Type: number_
-   *   - **query** (`object`, optional) _Type: object_
-   *   - **properties** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
-   *   - **usedLast** (`string`, optional) _Type: string_
-   *   - **usedCount** (`number`, optional) _Type: number_
+   *   - **id** (`string`, optional) _The identifier of the report, unique to the table._
+   *   - **name** (`string`, optional) _The configured name of the report._
+   *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
+   *   - **description** (`string`, optional) _The configured description of a report._
+   *   - **ownerId** (`number`, optional) _Optional, showed only for personal reports. The user ID of report owner._
+   *   - **query** (`object`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
+   *   - **properties** (`{ [key: string]: any; }`, optional) _A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)_
+   *   - **usedLast** (`string`, optional) _The instant at which a report was last used._
+   *   - **usedCount** (`number`, optional) _The number of times a report has been used._
    *
    * @see {@link https://developer.quickbase.com/operation/getTableReports} Official Quickbase API documentation
    */
@@ -411,20 +411,20 @@ export interface QuickbaseClient {
    *   @param {boolean} params.includeFieldPerms _Optional parameter with properties_
    *
    * @returns {Promise<GetFields200Response>} _Promise resolving to the getFields response with properties_
-   *   - **id** (`number`, required) _Type: number_
-   *   - **fieldType** (`string`, optional) _Type: string_
-   *   - **mode** (`string`, optional) _Type: string_
-   *   - **label** (`string`, optional) _Type: string_
-   *   - **noWrap** (`boolean`, optional) _Type: boolean_
-   *   - **bold** (`boolean`, optional) _Type: boolean_
-   *   - **required** (`boolean`, optional) _Type: boolean_
-   *   - **appearsByDefault** (`boolean`, optional) _Type: boolean_
-   *   - **findEnabled** (`boolean`, optional) _Type: boolean_
-   *   - **unique** (`boolean`, optional) _Type: boolean_
-   *   - **doesDataCopy** (`boolean`, optional) _Type: boolean_
-   *   - **fieldHelp** (`string`, optional) _Type: string_
-   *   - **audited** (`boolean`, optional) _Type: boolean_
-   *   - **properties** (`{ [key: string]: any; }`, optional) _Type: { [key: string]: any; }_
+   *   - **id** (`number`, required) _The id of the field, unique to this table._
+   *   - **fieldType** (`string`, optional) _The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)._
+   *   - **mode** (`string`, optional) _For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank._
+   *   - **label** (`string`, optional) _The label (name) of the field._
+   *   - **noWrap** (`boolean`, optional) _Indicates if the field is configured to not wrap when displayed in the product._
+   *   - **bold** (`boolean`, optional) _Indicates if the field is configured to display in bold in the product._
+   *   - **required** (`boolean`, optional) _Indicates if the field is marked required._
+   *   - **appearsByDefault** (`boolean`, optional) _Indicates if the field is marked as a default in reports._
+   *   - **findEnabled** (`boolean`, optional) _Indicates if the field is marked as searchable._
+   *   - **unique** (`boolean`, optional) _Indicates if the field is marked unique._
+   *   - **doesDataCopy** (`boolean`, optional) _Indicates if the field data will copy when a user copies the record._
+   *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
+   *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
+   *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
    *   - **permissions** (`Permission[]`, optional) __
    *     *   - **role** (`string`, required) _The role name_
    *     *   - **permissionType** (`string`, required) _Permission type (e.g., View, Modify)_
@@ -568,8 +568,8 @@ export interface QuickbaseClient {
    *   @param {number} params.top _Optional parameter with properties_
    *
    * @returns {Promise<GetFieldsUsage200Response>} _Promise resolving to the getFieldsUsage response with properties_
-   *   - **field** (`object`, required) _Type: object_
-   *   - **usage** (`object`, required) _Type: object_
+   *   - **field** (`object`, required) _Basic information about the field._
+   *   - **usage** (`object`, required) _Usage Information about the field._
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldsUsage} Official Quickbase API documentation
    */
@@ -582,8 +582,8 @@ export interface QuickbaseClient {
    *   @param {number} params.fieldId _Required parameter with properties_
    *
    * @returns {Promise<GetFieldUsage200Response>} _Promise resolving to the getFieldUsage response with properties_
-   *   - **field** (`object`, required) _Type: object_
-   *   - **usage** (`object`, required) _Type: object_
+   *   - **field** (`object`, required) _Basic information about the field._
+   *   - **usage** (`object`, required) _Usage Information about the field._
    *
    * @see {@link https://developer.quickbase.com/operation/getFieldUsage} Official Quickbase API documentation
    */

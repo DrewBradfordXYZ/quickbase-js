@@ -399,32 +399,38 @@
       {
         "name": "isActive",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indication of whether current event is active."
       },
       {
         "name": "type",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "Type of an event."
       },
       {
         "name": "name",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The name of the event. This property is not returned for automations."
       },
       {
         "name": "url",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The url to automation that can be accessed from the browser. Only returned for automations."
       },
       {
         "name": "owner",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": "The user that owns the event."
       },
       {
         "name": "tableId",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The unique identifier of the table to which event belongs to."
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/getAppEvents"
@@ -706,82 +712,98 @@
       {
         "name": "name",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The name of the table."
       },
       {
         "name": "id",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The unique identifier (dbid) of the table."
       },
       {
         "name": "alias",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The automatically-created table alias for the table."
       },
       {
         "name": "description",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The description of the table, as configured by an application administrator."
       },
       {
         "name": "created",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)."
       },
       {
         "name": "updated",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)."
       },
       {
         "name": "nextRecordId",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "The incremental Record ID that will be used when the next record is created, as determined when the API call was ran."
       },
       {
         "name": "nextFieldId",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "The incremental Field ID that will be used when the next field is created, as determined when the API call was ran."
       },
       {
         "name": "defaultSortFieldId",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "The id of the field that is configured for default sorting."
       },
       {
         "name": "defaultSortOrder",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The configuration of the default sort order on the table."
       },
       {
         "name": "keyFieldId",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID."
       },
       {
         "name": "singleRecordName",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The builder-configured singular noun of the table."
       },
       {
         "name": "pluralRecordName",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The builder-configured plural noun of the table."
       },
       {
         "name": "sizeLimit",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The size limit for the table."
       },
       {
         "name": "spaceUsed",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The amount of space currently being used by the table."
       },
       {
         "name": "spaceRemaining",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The amount of space remaining for use by the table."
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/getAppTables"
@@ -1364,47 +1386,56 @@
       {
         "name": "id",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The identifier of the report, unique to the table."
       },
       {
         "name": "name",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The configured name of the report."
       },
       {
         "name": "type",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The type of report in Quickbase (e.g., chart)."
       },
       {
         "name": "description",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The configured description of a report."
       },
       {
         "name": "ownerId",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "Optional, showed only for personal reports. The user ID of report owner."
       },
       {
         "name": "query",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": "The query definition as configured in Quickbase that gets executed when the report is run."
       },
       {
         "name": "properties",
         "type": "{ [key: string]: any; }",
-        "required": false
+        "required": false,
+        "jsdoc": "A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)"
       },
       {
         "name": "usedLast",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The instant at which a report was last used."
       },
       {
         "name": "usedCount",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": "The number of times a report has been used."
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/getTableReports"
@@ -1580,77 +1611,92 @@
       {
         "name": "id",
         "type": "number",
-        "required": true
+        "required": true,
+        "jsdoc": "The id of the field, unique to this table."
       },
       {
         "name": "fieldType",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html)."
       },
       {
         "name": "mode",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank."
       },
       {
         "name": "label",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The label (name) of the field."
       },
       {
         "name": "noWrap",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is configured to not wrap when displayed in the product."
       },
       {
         "name": "bold",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is configured to display in bold in the product."
       },
       {
         "name": "required",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is marked required."
       },
       {
         "name": "appearsByDefault",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is marked as a default in reports."
       },
       {
         "name": "findEnabled",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is marked as searchable."
       },
       {
         "name": "unique",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is marked unique."
       },
       {
         "name": "doesDataCopy",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field data will copy when a user copies the record."
       },
       {
         "name": "fieldHelp",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": "The configured help text shown to users within the product."
       },
       {
         "name": "audited",
         "type": "boolean",
-        "required": false
+        "required": false,
+        "jsdoc": "Indicates if the field is being tracked as part of Quickbase Audit Logs."
       },
       {
         "name": "properties",
         "type": "{ [key: string]: any; }",
-        "required": false
+        "required": false,
+        "jsdoc": "Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type."
       },
       {
         "name": "permissions",
         "type": "Permission[]",
         "required": false,
+        "jsdoc": "Field Permissions for different roles.",
         "properties": [
           {
             "name": "role",
@@ -2285,12 +2331,14 @@
       {
         "name": "field",
         "type": "object",
-        "required": true
+        "required": true,
+        "jsdoc": "Basic information about the field."
       },
       {
         "name": "usage",
         "type": "object",
-        "required": true
+        "required": true,
+        "jsdoc": "Usage Information about the field."
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/getFieldsUsage"
@@ -2321,12 +2369,14 @@
       {
         "name": "field",
         "type": "object",
-        "required": true
+        "required": true,
+        "jsdoc": "Basic information about the field."
       },
       {
         "name": "usage",
         "type": "object",
-        "required": true
+        "required": true,
+        "jsdoc": "Usage Information about the field."
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/getFieldUsage"
@@ -3611,22 +3661,26 @@
       {
         "name": "solutionId",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "alias",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "createdResources",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "warnings",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/updateSolution"
@@ -3657,22 +3711,26 @@
       {
         "name": "solutionId",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "alias",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "createdResources",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "warnings",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/createSolution"
@@ -3724,12 +3782,14 @@
       {
         "name": "record_id",
         "type": "number",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "filename",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/exportSolutionToRecord"
@@ -3774,22 +3834,26 @@
       {
         "name": "solutionId",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "alias",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "createdResources",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "warnings",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/createSolutionFromRecord"
@@ -3841,22 +3905,26 @@
       {
         "name": "solutionId",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "alias",
         "type": "object",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "resources",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "warnings",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/updateSolutionToRecord"
@@ -3894,12 +3962,14 @@
       {
         "name": "id",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "changes",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/changesetSolution"
@@ -3951,12 +4021,14 @@
       {
         "name": "id",
         "type": "string",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       },
       {
         "name": "changes",
         "type": "any",
-        "required": false
+        "required": false,
+        "jsdoc": ""
       }
     ],
     "docLink": "https://developer.quickbase.com/operation/changesetSolutionFromRecord"
