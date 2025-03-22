@@ -11,51 +11,47 @@ export function generateJsDoc({
   returnTypeDetails,
   docLink,
 }: JsDocOptions): string {
-  const jsDocLines: string[] = [
-    `  /**`,
-    `   * ${summary}`,
-    `   *`,
-    `   * @param {Object} params _Object containing the parameters for_ ${opId}`,
-  ];
+  const jsDocLines: string[] = [`  /**`, `   * ${summary}`, `   *`];
 
   if (paramDetails.length > 0) {
+    jsDocLines.push(
+      `   * @param {Object} params - Object containing the parameters for ${opId}.`
+    );
     paramDetails.forEach((p) => {
+      const paramDesc = p.description || "No description provided.";
+      const optionalMark = p.required ? "" : " (Optional)";
       jsDocLines.push(
-        `   *   @param {${p.type}} params.${p.name} _${
-          p.required ? "Required" : "Optional"
-        } parameter with properties_`
+        `   * @param {${p.type}} ${p.required ? "" : "["}params.${p.name}${
+          p.required ? "" : "]"
+        } - ${paramDesc}${optionalMark}`
       );
       if (p.properties.length > 0) {
         p.properties.forEach((prop) => {
           const propDesc = getPropertyDescription(prop);
           jsDocLines.push(
-            `   *     - **${prop.name}** (\`${prop.type}\`${
-              prop.required ? ", required" : ", optional"
-            }) _${propDesc}_`
+            `   *   - **${prop.name}** (\`${prop.type}\`, ${
+              prop.required ? "required" : "optional"
+            }) - ${propDesc}`
           );
         });
       }
     });
   } else {
-    jsDocLines.push(`   *   No parameters`);
+    jsDocLines.push(`   * No parameters.`);
   }
 
   jsDocLines.push(`   *`);
   if (returnTypeDetails.length > 0) {
     jsDocLines.push(
-      `   * @returns {Promise<${returnType}>} _Promise resolving to the ${opId} response with properties_`
+      `   * @returns {Promise<${returnType}>} - Promise resolving to the ${opId} response.`
     );
     const renderProperties = (props: PropertyDetail[], indent: string) => {
       props.forEach((prop) => {
-        // Only include description if it’s not just repeating the type
-        const propDesc =
-          prop.properties && prop.properties.length > 0
-            ? "" // Skip description for complex types with nested properties
-            : getPropertyDescription(prop);
+        const propDesc = getPropertyDescription(prop);
         jsDocLines.push(
-          `${indent}*   - **${prop.name}** (\`${prop.type}\`${
-            prop.required ? ", required" : ", optional"
-          }) _${propDesc}_`
+          `${indent}*   - **${prop.name}** (\`${prop.type}\`, ${
+            prop.required ? "required" : "optional"
+          }) - ${propDesc}`
         );
         if (prop.properties && prop.properties.length > 0) {
           renderProperties(prop.properties, `${indent}*     `);
@@ -65,14 +61,14 @@ export function generateJsDoc({
     renderProperties(returnTypeDetails, `   `);
   } else {
     jsDocLines.push(
-      `   * @returns {Promise<${returnType}>} _Promise resolving to the ${opId} response_`
+      `   * @returns {Promise<${returnType}>} - Promise resolving to the ${opId} response.`
     );
   }
 
   jsDocLines.push(
     `   *`,
-    `   * @see {@link ${docLink}} Official Quickbase API documentation`,
-    `   */`
+    `   * @see ${docLink} - Official Quickbase API documentation`
   );
+  jsDocLines.push(`   */`);
   return jsDocLines.join("\n");
 }
