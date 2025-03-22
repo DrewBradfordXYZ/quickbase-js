@@ -2,7 +2,7 @@
 
 A Typescript library for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
 
-API Methods and their interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI typescript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
+API Methods and their interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI TypeScript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
 
 Request throttling along with 429 and 401 error handling is built in.
 
@@ -24,7 +24,7 @@ npm install --save quickbase-js
 
 #### CDN install.
 
-Find and select the latest version. UMD is recommened for code pages.
+Find and select the latest version. UMD is recommended for code pages.
 
 <a href="https://www.jsdelivr.com/package/npm/quickbase-js?tab=files" target="_blank">CDN Files</a>
 
@@ -33,7 +33,7 @@ Find and select the latest version. UMD is recommened for code pages.
 <html>
   <head>
     <title>Quickbase</title>
-    <!-- Replace xx.xx.xx with the latest version -->
+    <!-- Replace xx.xx.xx with the latest version from CDN Files-->
     <script src="https://cdn.jsdelivr.net/npm/quickbase-js@xx.xx.xx/dist/umd/quickbase.umd.min.js"></script>
   </head>
   <body>
