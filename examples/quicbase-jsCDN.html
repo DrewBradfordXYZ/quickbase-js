@@ -17,12 +17,12 @@
         if (typeof QuickbaseJS === "undefined") {
             document.getElementById("result").textContent = "Error: Failed to load QuickbaseJS library.";
         } else {
-            var qbClient = QuickbaseJS.quickbase({
+            var qb = QuickbaseJS.quickbase({
                 realm,
                 useTempTokens: true
             });
 
-            qbClient.getApp({ appId })
+            qb.getApp({ appId })
                 .then(function (app) {
                     document.getElementById("result").textContent = "App Name: " + app.name;
                 })

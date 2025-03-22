@@ -1,22 +1,62 @@
 # quickbase-js
 
-A Typescript library using the QuickBase OpenAPI spec and the typescipt-fetch generator. This library is designed for both browser and Node.js environments. Code pages have first class support.
+A Typescript library for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
 
-Authentication methods: `Temporary Tokens`, `User Tokens`, `SSO`.
+API Methods and their interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI typescript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
+
+Request throttling along with 429 and 401 error handling is built in.
+
+Authentication methods are handled in an opinionated manner. See configuration options for details and available settings.
+
+Authentication methods: `User Tokens`, `Temporary Tokens`, `SSO`.
 
 ## API Documentation
 
-https://quickbase-js.netlify.app/
+- https://quickbase-js.netlify.app/
 
 ## Installation
+
+#### Node.js
 
 ```bash
 npm install --save quickbase-js
 ```
 
-## Examples
+#### CDN example.
 
-### Auth: User Token
+Find and select the latest version. UMD is recommened for code pages.
+
+- https://www.jsdelivr.com/package/npm/quickbase-js?tab=files
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quickbase</title>
+    <!-- Replace xx.xx.xx with the latest version -->
+    <script src="https://cdn.jsdelivr.net/npm/quickbase-js@xx.xx.xx/dist/umd/quickbase.umd.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const realm = ""; // Replace with your realm
+      const appId = ""; // Replace with your app ID
+
+      const qb = QuickbaseJS.quickbase({
+        realm,
+        useTempTokens: true,
+      });
+
+      qb.getApp({ appId })
+        .then((app) => console.log(app.name))
+        .catch((err) => console.log(err.message));
+    </script>
+  </body>
+</html>
+```
+
+## Authentication Examples
+
+### User Token
 
 ```javascript
 import { quickbase } from "quickbase-js"; // Adjust the import path as needed
@@ -45,7 +85,7 @@ const getAppDetails = async () => {
 getAppDetails();
 ```
 
-### Auth: Temporary Tokens (Code Pages)
+### Temporary Tokens (Code Pages)
 
 ```javascript
 import { quickbase } from "quickbase-js"; // Adjust the import path as needed
@@ -73,7 +113,7 @@ const getAppDetails = async () => {
 getAppDetails();
 ```
 
-### Auth: SSO
+### SSO Token
 
 ```javascript
 import { quickbase } from "quickbase-js"; // Adjust the import path as needed
