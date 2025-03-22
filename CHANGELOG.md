@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.10](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.9...v0.1.0-beta.10) (2025-03-22)
+
+
+### Features
+
+* add descriptions to post-processed openapi files ([a607817](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a607817156fb265f5198fc3b21189e7205f08c54))
+* Add VitePress docs build to docs-dist for GitHub Pages ([db84f94](https://github.com/DrewBradfordXYZ/quickbase-js/commit/db84f946affe2111de5d8bc339c17dd66db6dddb))
+* Add VitePress site ([92b941c](https://github.com/DrewBradfordXYZ/quickbase-js/commit/92b941cfba75f482dc542c948d8a48ad6338ff8f))
+* align jsDoc parsing with the richness of the vitepress's DocsJson ([1059bbb](https://github.com/DrewBradfordXYZ/quickbase-js/commit/1059bbb72274416a8825e663ee52abac5d17d585))
+* Configure GitHub Action to deploy VitePress from docs/.vitepress/dist ([90c1507](https://github.com/DrewBradfordXYZ/quickbase-js/commit/90c1507cf1a5642ec6197fa36b5f498e67da543d))
+* extractHttpMethod, a more targeted approach to getting the HTTP method ([d64bda3](https://github.com/DrewBradfordXYZ/quickbase-js/commit/d64bda3dbf511bf74522de4362e62281f375bd01))
+* generate-unified-interface.ts and generateDocsJson.ts are functionally separated ([030c62d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/030c62dd73d489eca893e6fa745f6361bae77857))
+* generate-unified-interface.ts and generateDocsJson.ts are separated and DRY using sharedUtils.ts ([6426fda](https://github.com/DrewBradfordXYZ/quickbase-js/commit/6426fda8c28fe3f4922a6341d6edf44330b82526))
+* ItemsInner has basic properties ([24a5631](https://github.com/DrewBradfordXYZ/quickbase-js/commit/24a56315c1211aa07ae68e7a2760d49b1628669c))
+* jsDoc and docsJson uses the new post-process structure ([f87572d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/f87572ddc25e31013abb50463b1362a881a759b3))
+* jsdoc styling ([fd41d3d](https://github.com/DrewBradfordXYZ/quickbase-js/commit/fd41d3de26b5f48c3926c7813eeeb564746be816))
+* make open-api files more dry with common utils and tweak jsdoc removing repitive descriptions for nested properties ([ff98f84](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ff98f845ddda44faa3a0bf6a0a68bff3d0d41188))
+* refactor fetchTempToken into TempTokenStrategy ([8203833](https://github.com/DrewBradfordXYZ/quickbase-js/commit/8203833b0126e35d5a11596dbf5ce13c36db66f7))
+* refactored out generateDocsJson.ts ([0973f0f](https://github.com/DrewBradfordXYZ/quickbase-js/commit/0973f0fa4d2d2547b47e11e06cda23b628bd52ec))
+* wrapTopLevelArrays fixing empty some 200 return type files ([f26e047](https://github.com/DrewBradfordXYZ/quickbase-js/commit/f26e0470a46368ee0a24c5cf4c0c2045c1d20e77))
+
+
+### Bug Fixes
+
+* github code page deploy update ([9305c36](https://github.com/DrewBradfordXYZ/quickbase-js/commit/9305c36220cf016cc0cda32a66882c989c07f4fa))
+* Update workflow to use JamesIves/github-pages-deploy-action ([5bd7342](https://github.com/DrewBradfordXYZ/quickbase-js/commit/5bd73421ea00080e5b67ecf5b64a639117fa542c))
+
 ## [0.1.0-beta.9](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.8...v0.1.0-beta.9) (2025-03-20)
 
 
