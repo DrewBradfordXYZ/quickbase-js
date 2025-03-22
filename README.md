@@ -12,21 +12,21 @@ Authentication methods: `User Tokens`, `Temporary Tokens`, `SSO`.
 
 ## API Documentation
 
-- https://quickbase-js.netlify.app/
+<a href="https://quickbase-js.netlify.app/" target="_blank"> Documentation</a>
 
 ## Installation
 
-#### Node.js
+#### Node.js install
 
 ```bash
 npm install --save quickbase-js
 ```
 
-#### CDN example.
+#### CDN install.
 
 Find and select the latest version. UMD is recommened for code pages.
 
-- https://www.jsdelivr.com/package/npm/quickbase-js?tab=files
+<a href="https://www.jsdelivr.com/package/npm/quickbase-js?tab=files" target="_blank">CDN Files</a>
 
 ```html
 <!DOCTYPE html>
