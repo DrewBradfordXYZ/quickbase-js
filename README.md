@@ -1,18 +1,14 @@
 # quickbase-js
 
-A Typescript library for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
+A Typescript API client for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
 
-API methods and interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI TypeScript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
-
-Request throttling along with 429 and 401 error handling is built in.
+Support for various authentication strategies (`user token`, `temporary tokens`, `SSO token`), `rate limiting`, `429` and `401` error handling retries and automatic `date` conversion. It uses a Proxy to dynamically invoke API methods derived from the OpenAPI specification.
 
 Authentication methods are handled in an opinionated manner. See configuration options for details and available settings.
 
-Authentication methods: `User Tokens`, `Temporary Tokens`, `SSO Tokens`.
-
 ## API Documentation
 
-<a href="https://quickbase-js.netlify.app/" target="_blank"> Documentation</a>
+<a href="https://quickbase-js.netlify.app/" target="_blank"> Documentation</a> for quickbase-js.
 
 ## Installation
 
@@ -26,7 +22,7 @@ npm install --save quickbase-js
 
 Find and select the latest version. UMD is recommended for code pages.
 
-<a href="https://www.jsdelivr.com/package/npm/quickbase-js?tab=files" target="_blank">CDN Files</a>
+<a href="https://www.jsdelivr.com/package/npm/quickbase-js?tab=files" target="_blank">CDN Files</a> for quickbase-js
 
 ```html
 <!DOCTYPE html>
