@@ -8,7 +8,7 @@ Request throttling along with 429 and 401 error handling is built in.
 
 Authentication methods are handled in an opinionated manner. See configuration options for details and available settings.
 
-Authentication methods: `User Tokens`, `Temporary Tokens`, `SSO`.
+Authentication methods: `User Tokens`, `Temporary Tokens`, `SSO Tokens`.
 
 ## API Documentation
 
