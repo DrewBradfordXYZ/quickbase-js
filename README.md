@@ -2,7 +2,7 @@
 
 A Typescript library for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
 
-API Methods and interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI TypeScript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
+API methods and interfaces are entirely generated from the QuickBase OpenAPI spec. The OpenAPI TypeScript-fetch generator is used giving both browser and Node.js environments first class support. Builds are available in ESM and UMD formats.
 
 Request throttling along with 429 and 401 error handling is built in.
 
