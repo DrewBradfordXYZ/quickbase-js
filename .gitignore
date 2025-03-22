@@ -5,9 +5,6 @@ yarn-error.log
 
 # Generated files (optional, depending on versioning preference)
 /src/generated/
-/src/generated-old/
-generated/
-generated-old/
 
 # API Documentation website
 docs/.vitepress/dist/

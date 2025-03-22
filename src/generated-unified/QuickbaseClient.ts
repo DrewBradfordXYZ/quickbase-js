@@ -1,4 +1,4 @@
-// Generated on 2025-03-22T00:26:16.252Z
+// Generated on 2025-03-22T01:45:52.579Z
 import { AddManagersToGroup200Response, AddManagersToGroupRequest, AddMembersToGroup200Response, AddMembersToGroupRequest, AddSubgroupsToGroup200Response, AddSubgroupsToGroupRequest, Audit200Response, ChangesetSolution200Response, ChangesetSolutionFromRecord200Response, CloneUserToken200Response, CopyApp200Response, CopyAppRequest, CreateApp200Response, CreateAppRequest, CreateField200Response, CreateFieldRequest, CreateRelationship200Response, CreateRelationshipRequest, CreateSolution200Response, CreateSolutionFromRecord200Response, CreateTable200Response, CreateTableRequest, DeactivateUserToken200Response, DeleteApp200Response, DeleteAppRequest, DeleteFields200Response, DeleteFieldsRequest, DeleteFile200Response, DeleteRecords200Response, DeleteRecordsRequest, DeleteRelationship200Response, DeleteTable200Response, DeleteUserToken200Response, DenyUsers200Response, DenyUsersAndGroups200Response, DenyUsersAndGroupsRequest, DenyUsersRequest, DownloadFile200Response, ExchangeSsoToken200Response, ExportSolution200Response, ExportSolutionToRecord200Response, GenerateDocument200Response, GetApp200Response, GetAppEvents200Response, GetAppTables200Response, GetField200Response, GetFieldUsage200Response, GetFields200Response, GetFieldsUsage200Response, GetRelationships200Response, GetReport200Response, GetTable200Response, GetTableReports200Response, GetTempTokenDBID200Response, GetUsers200Response, GetUsersRequest, PlatformAnalyticEventSummaries200Response, PlatformAnalyticReads200Response, RemoveManagersFromGroup200Response, RemoveManagersFromGroupRequest, RemoveMembersFromGroup200Response, RemoveMembersFromGroupRequest, RemoveSubgroupsFromGroup200Response, RemoveSubgroupsFromGroupRequest, RunFormula200Response, RunQuery200Response, RunQueryRequest, RunReport200Response, TransferUserToken200Response, UndenyUsers200Response, UndenyUsersRequest, UpdateApp200Response, UpdateAppRequest, UpdateField200Response, UpdateFieldRequest, UpdateRelationship200Response, UpdateRelationshipRequest, UpdateSolution200Response, UpdateSolutionToRecord200Response, UpdateTable200Response, UpdateTableRequest, Upsert200Response, Upsert207Response, UpsertRequest } from "../generated/models";
 
 export interface QuickbaseClient {
@@ -21,9 +21,9 @@ export interface QuickbaseClient {
    *   - **memoryInfo** (`object`, optional) _Application memory info_
    *   - **id** (`string`, optional) _The unique identifier for this application._
    *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
+   *   - **variables** (`any`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
    *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
+   *   - **securityProperties** (`object`, optional) _Security properties of the application_
    *
    * @see {@link https://developer.quickbase.com/operation/createApp} Official Quickbase API documentation
    */
@@ -45,9 +45,9 @@ export interface QuickbaseClient {
    *   - **memoryInfo** (`object`, optional) _Application memory info_
    *   - **id** (`string`, optional) _The unique identifier for this application._
    *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
+   *   - **variables** (`any`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
    *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
+   *   - **securityProperties** (`object`, optional) _Security properties of the application_
    *
    * @see {@link https://developer.quickbase.com/operation/getApp} Official Quickbase API documentation
    */
@@ -73,9 +73,9 @@ export interface QuickbaseClient {
    *   - **memoryInfo** (`object`, optional) _Application memory info_
    *   - **id** (`string`, optional) _The unique identifier for this application._
    *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
+   *   - **variables** (`any`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
    *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
-   *   - **securityProperties** (`{ [key: string]: any; }`, optional) _Security properties of the application_
+   *   - **securityProperties** (`object`, optional) _Security properties of the application_
    *
    * @see {@link https://developer.quickbase.com/operation/updateApp} Official Quickbase API documentation
    */
@@ -132,7 +132,7 @@ export interface QuickbaseClient {
    *   - **timeZone** (`string`, optional) _A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone._
    *   - **id** (`string`, optional) _The unique identifier for this application._
    *   - **hasEveryoneOnTheInternet** (`boolean`, optional) _Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html)_
-   *   - **variables** (`{ [key: string]: any; }[]`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
+   *   - **variables** (`any`, optional) _The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html)_
    *   - **ancestorId** (`string`, optional) _The id of the app from which this app was copied_
    *   - **dataClassification** (`string`, optional) _The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans._
    *
@@ -160,7 +160,7 @@ export interface QuickbaseClient {
    *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
    *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
    *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-   *   - **defaultSortOrder** (`CreateTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
+   *   - **defaultSortOrder** (`string`, optional) _The configuration of the default sort order on the table._
    *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
    *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
    *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
@@ -215,7 +215,7 @@ export interface QuickbaseClient {
    *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
    *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
    *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-   *   - **defaultSortOrder** (`GetTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
+   *   - **defaultSortOrder** (`string`, optional) _The configuration of the default sort order on the table._
    *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
    *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
    *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
@@ -246,7 +246,7 @@ export interface QuickbaseClient {
    *   - **nextRecordId** (`number`, optional) _The incremental Record ID that will be used when the next record is created, as determined when the API call was ran._
    *   - **nextFieldId** (`number`, optional) _The incremental Field ID that will be used when the next field is created, as determined when the API call was ran._
    *   - **defaultSortFieldId** (`number`, optional) _The id of the field that is configured for default sorting._
-   *   - **defaultSortOrder** (`UpdateTable200ResponseDefaultSortOrderEnum`, optional) _The configuration of the default sort order on the table._
+   *   - **defaultSortOrder** (`string`, optional) _The configuration of the default sort order on the table._
    *   - **keyFieldId** (`number`, optional) _The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID._
    *   - **singleRecordName** (`string`, optional) _The builder-configured singular noun of the table._
    *   - **pluralRecordName** (`string`, optional) _The builder-configured plural noun of the table._
@@ -278,8 +278,8 @@ export interface QuickbaseClient {
    *   @param {string} params.tableId _Required parameter with properties_
    *
    * @returns {Promise<GetRelationships200Response>} _Promise resolving to the getRelationships response with properties_
-   *   - **relationships** (`{ [key: string]: any; }[]`, required) _The relationships in a table._
-   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful._
+   *   - **relationships** (`any`, required) _The relationships in a table._
+   *   - **metadata** (`object`, optional) _Additional information about the results that may be helpful._
    *
    * @see {@link https://developer.quickbase.com/operation/getRelationships} Official Quickbase API documentation
    */
@@ -299,10 +299,10 @@ export interface QuickbaseClient {
    *   - **id** (`number`, required) _The relationship id (foreign key field id)._
    *   - **parentTableId** (`string`, required) _The parent table id of the relationship._
    *   - **childTableId** (`string`, required) _The child table id of the relationship._
-   *   - **foreignKeyField** (`{ [key: string]: any; }`, optional) _The foreign key field information._
+   *   - **foreignKeyField** (`object`, optional) _The foreign key field information._
    *   - **isCrossApp** (`boolean`, required) _Whether this is a cross-app relationship._
-   *   - **lookupFields** (`{ [key: string]: any; }[]`, optional) _The lookup fields array._
-   *   - **summaryFields** (`{ [key: string]: any; }[]`, optional) _The summary fields array._
+   *   - **lookupFields** (`any`, optional) _The lookup fields array._
+   *   - **summaryFields** (`any`, optional) _The summary fields array._
    *
    * @see {@link https://developer.quickbase.com/operation/createRelationship} Official Quickbase API documentation
    */
@@ -323,10 +323,10 @@ export interface QuickbaseClient {
    *   - **id** (`number`, required) _The relationship id (foreign key field id)._
    *   - **parentTableId** (`string`, required) _The parent table id of the relationship._
    *   - **childTableId** (`string`, required) _The child table id of the relationship._
-   *   - **foreignKeyField** (`{ [key: string]: any; }`, optional) _The foreign key field information._
+   *   - **foreignKeyField** (`object`, optional) _The foreign key field information._
    *   - **isCrossApp** (`boolean`, required) _Whether this is a cross-app relationship._
-   *   - **lookupFields** (`{ [key: string]: any; }[]`, optional) _The lookup fields array._
-   *   - **summaryFields** (`{ [key: string]: any; }[]`, optional) _The summary fields array._
+   *   - **lookupFields** (`any`, optional) _The lookup fields array._
+   *   - **summaryFields** (`any`, optional) _The summary fields array._
    *
    * @see {@link https://developer.quickbase.com/operation/updateRelationship} Official Quickbase API documentation
    */
@@ -377,7 +377,7 @@ export interface QuickbaseClient {
    *   - **type** (`string`, optional) _The type of report in Quickbase (e.g., chart)._
    *   - **description** (`string`, optional) _The configured description of a report._
    *   - **ownerId** (`number`, optional) _Optional, showed only for personal reports. The user ID of report owner._
-   *   - **query** (`{ [key: string]: any; }`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
+   *   - **query** (`object`, optional) _The query definition as configured in Quickbase that gets executed when the report is run._
    *   - **properties** (`{ [key: string]: any; }`, optional) _A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes)_
    *   - **usedLast** (`string`, optional) _The instant at which a report was last used._
    *   - **usedCount** (`number`, optional) _The number of times a report has been used._
@@ -396,9 +396,9 @@ export interface QuickbaseClient {
    *   @param {any} params.body _Optional parameter with properties_
    *
    * @returns {Promise<RunReport200Response>} _Promise resolving to the runReport response with properties_
-   *   - **fields** (`{ [key: string]: any; }[]`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
-   *   - **data** (`string[]`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
-   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
+   *   - **fields** (`any`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
+   *   - **data** (`any`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
+   *   - **metadata** (`object`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
    *
    * @see {@link https://developer.quickbase.com/operation/runReport} Official Quickbase API documentation
    */
@@ -469,7 +469,10 @@ export interface QuickbaseClient {
    *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
    *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
    *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
+   *   - **permissions** (`Permission[]`, optional) __
+   *     *   - **role** (`string`, required) _The role name_
+   *     *   - **permissionType** (`string`, required) _Permission type (e.g., View, Modify)_
+   *     *   - **roleId** (`number`, required) _The role identifier_
    *
    * @see {@link https://developer.quickbase.com/operation/createField} Official Quickbase API documentation
    */
@@ -483,8 +486,8 @@ export interface QuickbaseClient {
    *     - **fieldIds** (`number[]`, required) _Type: number[]_
    *
    * @returns {Promise<DeleteFields200Response>} _Promise resolving to the deleteFields response with properties_
-   *   - **deletedFieldIds** (`number[]`, required) _List of field ids to were deleted._
-   *   - **errors** (`string[]`, required) _List of errors found._
+   *   - **deletedFieldIds** (`any`, required) _List of field ids to were deleted._
+   *   - **errors** (`any`, required) _List of errors found._
    *
    * @see {@link https://developer.quickbase.com/operation/deleteFields} Official Quickbase API documentation
    */
@@ -512,7 +515,10 @@ export interface QuickbaseClient {
    *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
    *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
    *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
+   *   - **permissions** (`Permission[]`, optional) __
+   *     *   - **role** (`string`, required) _The role name_
+   *     *   - **permissionType** (`string`, required) _Permission type (e.g., View, Modify)_
+   *     *   - **roleId** (`number`, required) _The role identifier_
    *
    * @see {@link https://developer.quickbase.com/operation/getField} Official Quickbase API documentation
    */
@@ -554,7 +560,10 @@ export interface QuickbaseClient {
    *   - **fieldHelp** (`string`, optional) _The configured help text shown to users within the product._
    *   - **audited** (`boolean`, optional) _Indicates if the field is being tracked as part of Quickbase Audit Logs._
    *   - **properties** (`{ [key: string]: any; }`, optional) _Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type._
-   *   - **permissions** (`object[]`, optional) _Field Permissions for different roles._
+   *   - **permissions** (`Permission[]`, optional) __
+   *     *   - **role** (`string`, required) _The role name_
+   *     *   - **permissionType** (`string`, required) _Permission type (e.g., View, Modify)_
+   *     *   - **roleId** (`number`, required) _The role identifier_
    *
    * @see {@link https://developer.quickbase.com/operation/updateField} Official Quickbase API documentation
    */
@@ -610,8 +619,8 @@ export interface QuickbaseClient {
    *     - **fieldsToReturn** (`number[]`, optional) _Type: number[]_
    *
    * @returns {Promise<Upsert200Response | Upsert207Response>} _Promise resolving to the upsert response with properties_
-   *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
-   *   - **data** (`string[]`, optional) _The data that is expected to be returned._
+   *   - **metadata** (`object`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
+   *   - **data** (`any`, optional) _The data that is expected to be returned._
    *   - **metadata** (`{ [key: string]: any; }`, optional) _Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed._
    *   - **data** (`string[]`, optional) _The data that is expected to be returned._
    *
@@ -645,9 +654,9 @@ export interface QuickbaseClient {
    *     - **options** (`RunQueryRequestOptions`, optional) _Type: RunQueryRequestOptions_
    *
    * @returns {Promise<RunQuery200Response>} _Promise resolving to the runQuery response with properties_
-   *   - **fields** (`{ [key: string]: any; }[]`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
-   *   - **data** (`string[]`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
-   *   - **metadata** (`{ [key: string]: any; }`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
+   *   - **fields** (`any`, optional) _An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs._
+   *   - **data** (`any`, optional) _An array of objects that either represents the record data or summarized values, depending on the report type._
+   *   - **metadata** (`object`, optional) _Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed._
    *
    * @see {@link https://developer.quickbase.com/operation/runQuery} Official Quickbase API documentation
    */
@@ -673,8 +682,8 @@ export interface QuickbaseClient {
    *
    * @returns {Promise<ExchangeSsoToken200Response>} _Promise resolving to the exchangeSsoToken response with properties_
    *   - **access_token** (`string`, optional) _The security token issued by the authorization server in response to the token exchange request. The identifier `access_token` is used for historical reasons and the issued token need not be an OAuth access token._
-   *   - **issued_token_type** (`ExchangeSsoToken200ResponseIssuedTokenTypeEnum`, optional) _An identifier for the representation of the issued security token._
-   *   - **token_type** (`"N_A"`, optional) _Will always return `N_A`_
+   *   - **issued_token_type** (`string`, optional) _An identifier for the representation of the issued security token._
+   *   - **token_type** (`string`, optional) _Will always return `N_A`_
    *
    * @see {@link https://developer.quickbase.com/operation/exchangeSsoToken} Official Quickbase API documentation
    */
@@ -687,7 +696,7 @@ export interface QuickbaseClient {
    *
    * @returns {Promise<CloneUserToken200Response>} _Promise resolving to the cloneUserToken response with properties_
    *   - **active** (`boolean`, optional) _Whether the user token is active._
-   *   - **apps** (`{ [key: string]: any; }[]`, optional) _The list of apps this user token is assigned to._
+   *   - **apps** (`any`, optional) _The list of apps this user token is assigned to._
    *   - **lastUsed** (`string`, optional) _The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
    *   - **description** (`string`, optional) _User Token description._
    *   - **id** (`number`, optional) _User Token id._
@@ -705,7 +714,7 @@ export interface QuickbaseClient {
    *
    * @returns {Promise<TransferUserToken200Response>} _Promise resolving to the transferUserToken response with properties_
    *   - **active** (`boolean`, optional) _Whether the user token is active._
-   *   - **apps** (`{ [key: string]: any; }[]`, optional) _The list of apps this user token is assigned to._
+   *   - **apps** (`any`, optional) _The list of apps this user token is assigned to._
    *   - **lastUsed** (`string`, optional) _The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone)._
    *   - **description** (`string`, optional) _User Token description._
    *   - **id** (`number`, optional) _User Token id._
@@ -748,7 +757,7 @@ export interface QuickbaseClient {
    *   @param {number} params.versionNumber _Required parameter with properties_
    *
    * @returns {Promise<DownloadFile200Response>} _Promise resolving to the downloadFile response with properties_
-   *   - **data** (`Blob`, optional) _Type: Blob_
+   *   - **data** (`string`, optional) _Type: string_
    *
    * @see {@link https://developer.quickbase.com/operation/downloadFile} Official Quickbase API documentation
    */
@@ -766,7 +775,7 @@ export interface QuickbaseClient {
    *   - **versionNumber** (`number`, optional) _The number of deleted version._
    *   - **fileName** (`string`, optional) _The name of file associated with deleted version._
    *   - **uploaded** (`string`, optional) _The timestamp when the version was originally uploaded._
-   *   - **creator** (`{ [key: string]: any; }`, optional) _The user that uploaded version._
+   *   - **creator** (`object`, optional) _The user that uploaded version._
    *
    * @see {@link https://developer.quickbase.com/operation/deleteFile} Official Quickbase API documentation
    */
@@ -780,8 +789,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<GetUsers200Response>} _Promise resolving to the getUsers response with properties_
-   *   - **users** (`{ [key: string]: any; }[]`, required) _A list of users found in an account with the given criterias_
-   *   - **metadata** (`{ [key: string]: any; }`, required) _Additional request information_
+   *   - **users** (`any`, required) _A list of users found in an account with the given criterias_
+   *   - **metadata** (`object`, required) _Additional request information_
    *
    * @see {@link https://developer.quickbase.com/operation/getUsers} Official Quickbase API documentation
    */
@@ -795,8 +804,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<DenyUsers200Response>} _Promise resolving to the denyUsers response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
-   *   - **success** (`string[]`, required) _A list of users that have successfully been denied._
+   *   - **failure** (`any`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
+   *   - **success** (`any`, required) _A list of users that have successfully been denied._
    *
    * @see {@link https://developer.quickbase.com/operation/denyUsers} Official Quickbase API documentation
    */
@@ -811,8 +820,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<DenyUsersAndGroups200Response>} _Promise resolving to the denyUsersAndGroups response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
-   *   - **success** (`string[]`, required) _A list of users that have successfully been denied._
+   *   - **failure** (`any`, required) _A list of users that couldn't be denied. This also includes the ID's of users that are not valid._
+   *   - **success** (`any`, required) _A list of users that have successfully been denied._
    *
    * @see {@link https://developer.quickbase.com/operation/denyUsersAndGroups} Official Quickbase API documentation
    */
@@ -826,8 +835,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<UndenyUsers200Response>} _Promise resolving to the undenyUsers response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn't be undenied. This also includes the ID's of users that are not valid._
-   *   - **success** (`string[]`, required) _A list of users that have successfully been undenied._
+   *   - **failure** (`any`, required) _A list of users that couldn't be undenied. This also includes the ID's of users that are not valid._
+   *   - **success** (`any`, required) _A list of users that have successfully been undenied._
    *
    * @see {@link https://developer.quickbase.com/operation/undenyUsers} Official Quickbase API documentation
    */
@@ -841,8 +850,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<AddMembersToGroup200Response>} _Promise resolving to the addMembersToGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
-   *   - **success** (`string[]`, required) _A list of users that have been added to the group successfully._
+   *   - **failure** (`any`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
+   *   - **success** (`any`, required) _A list of users that have been added to the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/addMembersToGroup} Official Quickbase API documentation
    */
@@ -856,8 +865,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<RemoveMembersFromGroup200Response>} _Promise resolving to the removeMembersFromGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
-   *   - **success** (`string[]`, required) _A list of users that have been removed from the group successfully._
+   *   - **failure** (`any`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
+   *   - **success** (`any`, required) _A list of users that have been removed from the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/removeMembersFromGroup} Official Quickbase API documentation
    */
@@ -871,8 +880,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<AddManagersToGroup200Response>} _Promise resolving to the addManagersToGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
-   *   - **success** (`string[]`, required) _A list of users that have been added to the group successfully._
+   *   - **failure** (`any`, required) _A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group._
+   *   - **success** (`any`, required) _A list of users that have been added to the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/addManagersToGroup} Official Quickbase API documentation
    */
@@ -886,8 +895,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<RemoveManagersFromGroup200Response>} _Promise resolving to the removeManagersFromGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
-   *   - **success** (`string[]`, required) _A list of users that have been removed from the group successfully._
+   *   - **failure** (`any`, required) _A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users._
+   *   - **success** (`any`, required) _A list of users that have been removed from the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/removeManagersFromGroup} Official Quickbase API documentation
    */
@@ -901,8 +910,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<AddSubgroupsToGroup200Response>} _Promise resolving to the addSubgroupsToGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of child groups that couldn’t be added to the group. This includes a list of IDs that represent invalid groups and groups that have already been added to the group._
-   *   - **success** (`string[]`, required) _A list of child groups that have been added to the group successfully._
+   *   - **failure** (`any`, required) _A list of child groups that couldn’t be added to the group. This includes a list of IDs that represent invalid groups and groups that have already been added to the group._
+   *   - **success** (`any`, required) _A list of child groups that have been added to the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/addSubgroupsToGroup} Official Quickbase API documentation
    */
@@ -916,8 +925,8 @@ export interface QuickbaseClient {
    *     - **userIds** (`string[]`, required) _Type: string[]_
    *
    * @returns {Promise<RemoveSubgroupsFromGroup200Response>} _Promise resolving to the removeSubgroupsFromGroup response with properties_
-   *   - **failure** (`string[]`, required) _A list of child groups that couldn’t be removed from the group. This includes a list of IDs that represent invalid groups._
-   *   - **success** (`string[]`, required) _A list of child groups that have been removed from the group successfully._
+   *   - **failure** (`any`, required) _A list of child groups that couldn’t be removed from the group. This includes a list of IDs that represent invalid groups._
+   *   - **success** (`any`, required) _A list of child groups that have been removed from the group successfully._
    *
    * @see {@link https://developer.quickbase.com/operation/removeSubgroupsFromGroup} Official Quickbase API documentation
    */
@@ -930,7 +939,7 @@ export interface QuickbaseClient {
    *
    * @returns {Promise<Audit200Response>} _Promise resolving to the audit response with properties_
    *   - **queryId** (`string`, required) _Query id of the requested audit log._
-   *   - **events** (`{ [key: string]: any; }[]`, optional) _All events of the audit log._
+   *   - **events** (`any`, optional) _All events of the audit log._
    *   - **nextToken** (`string`, optional) _Token to fetch the next 1000 logs._
    *
    * @see {@link https://developer.quickbase.com/operation/audit} Official Quickbase API documentation
@@ -943,8 +952,8 @@ export interface QuickbaseClient {
    *   @param {string} params.day _Optional parameter with properties_
    *
    * @returns {Promise<PlatformAnalyticReads200Response>} _Promise resolving to the platformAnalyticReads response with properties_
-   *   - **date** (`Date`, required) _The date of the requested summary._
-   *   - **reads** (`{ [key: string]: any; }`, required) _Total reads for the specified date._
+   *   - **date** (`string`, required) _The date of the requested summary._
+   *   - **reads** (`object`, required) _Total reads for the specified date._
    *
    * @see {@link https://developer.quickbase.com/operation/platformAnalyticReads} Official Quickbase API documentation
    */
@@ -958,22 +967,13 @@ export interface QuickbaseClient {
    *
    * @returns {Promise<PlatformAnalyticEventSummaries200Response>} _Promise resolving to the platformAnalyticEventSummaries response with properties_
    *   - **accountId** (`string`, required) _The ID of the account the events are associated with._
-   *   - **start** (`Date`, required) _The start date and time of the requested summaries in ISO 8601 time format._
-   *   - **end** (`Date`, required) _The end date and time of the requested summaries in ISO 8601 time format._
-   *   - **groupBy** (`PlatformAnalyticEventSummaries200ResponseGroupByEnum`, required) _How the events should be grouped._
-   *   - **where** (`PlatformAnalyticEventSummaries200ResponseWhereInner[]`, required) __
-   *     *   - **id** (`string`, required) _Id of the item to filter by._
-   *     *   - **type** (`PlatformAnalyticEventSummaries200ResponseWhereInnerTypeEnum`, required) _The type of item to filter by._
-   *   - **results** (`PlatformAnalyticEventSummaries200ResponseResultsInner[]`, required) __
-   *     *   - **eventTypes** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInner[]`, required) __
-   *     *     *   - **billingCategory** (`PlatformAnalyticEventSummaries200ResponseResultsInnerEventTypesInnerBillingCategoryEnum`, optional) _Billing category of the event type._
-   *     *     *   - **count** (`number`, optional) _Count of events associated with that event type and Application/User._
-   *     *     *   - **eventType** (`string`, optional) _Event type_
-   *     *   - **id** (`string`, required) _Id of the Application/User._
-   *     *   - **name** (`string`, required) _Name of the Application/User._
-   *     *   - **totals** (`PlatformAnalyticEventSummaries200ResponseResultsInnerTotals`, required) _Type: PlatformAnalyticEventSummaries200ResponseResultsInnerTotals_
-   *   - **metadata** (`PlatformAnalyticEventSummaries200ResponseMetadata`, optional) _Type: PlatformAnalyticEventSummaries200ResponseMetadata_
-   *   - **totals** (`PlatformAnalyticEventSummaries200ResponseTotals`, optional) _Type: PlatformAnalyticEventSummaries200ResponseTotals_
+   *   - **start** (`string`, required) _The start date and time of the requested summaries in ISO 8601 time format._
+   *   - **end** (`string`, required) _The end date and time of the requested summaries in ISO 8601 time format._
+   *   - **groupBy** (`string`, required) _How the events should be grouped._
+   *   - **where** (`any`, required) _Type: any_
+   *   - **results** (`any`, required) _An array of objects that contains Application/User information and an events object with summaries by event type._
+   *   - **metadata** (`object`, optional) _Additional information about the results that may be helpful._
+   *   - **totals** (`object`, optional) _Totals by billing category for all queried events._
    *
    * @see {@link https://developer.quickbase.com/operation/platformAnalyticEventSummaries} Official Quickbase API documentation
    */
