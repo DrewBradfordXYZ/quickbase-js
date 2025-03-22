@@ -17,9 +17,9 @@ const excludeDirs: string[] = [
 
 // prettier-ignore
 const includeFolders: string[] = [
-  "open-api/utils",
-  "open-api/schema",
-  "open-api"
+  // "open-api/utils",
+  // "open-api/schema",
+  // "open-api"
 ];
 
 // prettier-ignore
@@ -34,8 +34,8 @@ const includeRecursiveFolders: string[] = [
 
 // prettier-ignore
 const includeFiles: string[] = [
-  "package.json",
-  "tests/setup.ts",
+  // "package.json",
+  // "tests/setup.ts",
   // "vitest.config.ts",
 
   // "open-api/generate-unified-interface.ts",
@@ -51,15 +51,14 @@ const includeFiles: string[] = [
   "src/quickbaseClient.ts",
   "src/invokeMethod.ts",
   "src/generated-unified/QuickbaseClient.ts",
-  // "src/authorizationStrategy.ts",
-  // "src/rateLimiter.ts",
+  "src/authorizationStrategy.ts",
+  "src/rateLimiter.ts",
   // "src/RateLimitError.ts",
-  // "src/ThrottleBucket.ts",
-  // "src/tokenCache.ts",
-  // "src/utils.ts",
-
-  "src/generated/models/GetFieldsUsage200Response.ts",
-  "src/generated/models/GetFieldsUsage200ResponseItemsInner.ts",
+  "src/ThrottleBucket.ts",
+  "src/tokenCache.ts",
+  "src/utils.ts",
+  // "src/generated/models/GetFieldsUsage200Response.ts",
+  // "src/generated/models/GetFieldsUsage200ResponseItemsInner.ts",
   // "src/generated/runtime.ts",
   // "src/generated/apis/AuthApi.ts",
   // "src/generated/apis/FieldsApi.ts",
