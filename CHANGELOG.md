@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.12](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.11...v0.1.0-beta.12) (2025-03-23)
+
+
+### Features
+
+* enable true concurrency with throttle bucket ([8dc4dee](https://github.com/DrewBradfordXYZ/quickbase-js/commit/8dc4deeaddb4365f4f64a8bd07390c7071f739f7))
+
 ## [0.1.0-beta.11](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2025-03-23)
 
 
