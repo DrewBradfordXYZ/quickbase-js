@@ -1,5 +1,4 @@
 // src/authorizationStrategy.ts
-
 import { TokenCache } from "./tokenCache";
 
 export interface AuthorizationStrategy {
@@ -16,7 +15,7 @@ export interface AuthorizationStrategy {
 }
 
 export class TempTokenStrategy implements AuthorizationStrategy {
-  private pendingFetches: Map<string, Promise<string>> = new Map(); // Added: Tracks ongoing token fetches by dbid
+  private pendingFetches: Map<string, Promise<string>> = new Map();
 
   constructor(
     private tokenCache: TokenCache,
@@ -61,16 +60,13 @@ export class TempTokenStrategy implements AuthorizationStrategy {
   async getToken(dbid: string): Promise<string | undefined> {
     let token = this.tokenCache.get(dbid) || this.initialTempToken;
     if (!token && dbid) {
-      // Check if a fetch is already in progress for this dbid
       if (this.pendingFetches.has(dbid)) {
         console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
-        return this.pendingFetches.get(dbid); // Return the existing promise
+        return this.pendingFetches.get(dbid);
       }
-      // Start a new fetch and store the promise
-      const fetchPromise = this.fetchTempToken(dbid).finally(() => {
-        // Clean up the pending fetch once it resolves or rejects
-        this.pendingFetches.delete(dbid);
-      });
+      const fetchPromise = this.fetchTempToken(dbid).finally(() =>
+        this.pendingFetches.delete(dbid)
+      );
       this.pendingFetches.set(dbid, fetchPromise);
       token = await fetchPromise;
     }
@@ -107,10 +103,9 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       return null;
     }
     if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-    // Reuse getToken to leverage the pending fetch logic
     const newToken = await this.getToken(dbid);
     if (newToken) {
-      this.tokenCache.set(dbid, newToken); // Ensure cache is updated
+      this.tokenCache.set(dbid, newToken);
       return newToken;
     }
     return null;
@@ -118,7 +113,10 @@ export class TempTokenStrategy implements AuthorizationStrategy {
 }
 
 export class UserTokenStrategy implements AuthorizationStrategy {
-  constructor(private userToken: string) {}
+  constructor(
+    private userToken: string,
+    private baseUrl: string = "https://api.quickbase.com/v1" // Added for consistency, unused
+  ) {}
 
   async getToken(_dbid: string): Promise<string> {
     return this.userToken;
@@ -149,23 +147,32 @@ export class UserTokenStrategy implements AuthorizationStrategy {
 
 export class SsoTokenStrategy implements AuthorizationStrategy {
   private currentToken: string | undefined;
+  private pendingFetches: Map<string, Promise<string>> = new Map();
 
   constructor(
     private samlToken: string,
     private realm: string,
     private fetchApi: typeof fetch,
-    private debug: boolean = false
+    private debug: boolean = false,
+    private baseUrl: string = "https://api.quickbase.com/v1" // Added and used
   ) {}
 
   async getToken(_dbid: string): Promise<string | undefined> {
     if (!this.currentToken) {
-      this.currentToken = await this.fetchSsoToken({
+      if (this.pendingFetches.has("sso")) {
+        if (this.debug)
+          console.log("[getToken] Waiting for existing SSO fetch");
+        return this.pendingFetches.get("sso");
+      }
+      const fetchPromise = this.fetchSsoToken({
         grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
         requested_token_type:
           "urn:quickbase:params:oauth:token-type:temp_token",
         subject_token: this.samlToken,
         subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-      });
+      }).finally(() => this.pendingFetches.delete("sso"));
+      this.pendingFetches.set("sso", fetchPromise);
+      this.currentToken = await fetchPromise;
     }
     return this.currentToken;
   }
@@ -208,18 +215,15 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
       subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
     };
 
-    const response = await this.fetchApi(
-      `https://api.quickbase.com/v1/auth/oauth/token`,
-      {
-        method: "POST",
-        headers: {
-          "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        credentials: "omit",
-      }
-    );
+    const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+      method: "POST",
+      headers: {
+        "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      credentials: "omit",
+    });
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({}));
@@ -249,18 +253,15 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
     subject_token: string;
     subject_token_type: string;
   }): Promise<string> {
-    const response = await this.fetchApi(
-      `https://api.quickbase.com/v1/auth/oauth/token`,
-      {
-        method: "POST",
-        headers: {
-          "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-        credentials: "omit",
-      }
-    );
+    const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+      method: "POST",
+      headers: {
+        "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+      credentials: "omit",
+    });
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({}));

@@ -1,5 +1,4 @@
 // src/quickbaseClient.ts
-
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -9,7 +8,7 @@ import {
   getParamNames,
   transformDates,
   extractHttpMethod,
-} from "./utils"; // Updated import
+} from "./utils";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import {
   TempTokenStrategy,
@@ -82,7 +81,13 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   }
 
   const authStrategy: AuthorizationStrategy = useSso
-    ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
+    ? new SsoTokenStrategy(
+        samlToken || "",
+        realm,
+        effectiveFetch,
+        debug,
+        baseUrl
+      )
     : useTempTokens
     ? new TempTokenStrategy(
         tokenCache,
@@ -91,7 +96,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         realm,
         baseUrl
       )
-    : new UserTokenStrategy(userToken || "");
+    : new UserTokenStrategy(userToken || "", baseUrl);
 
   const baseHeaders: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
