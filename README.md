@@ -155,37 +155,29 @@ _User options:_
 
 _Advanced user options:_
 
-- **`throttle`** (`{ rate: number; burst: number }`, optional): Configures rate limiting, where `rate` is requests per second and `burst` is the maximum burst of requests. Defaults to `{ rate: 10, burst: 10 }`.
-
+- **`throttle`** (`{ rate: number; burst: number }`, optional): Configures rate limiting to manage how many API requests are sent at once and how quickly additional requests follow. Defaults to `{ rate: 5, burst: 3 }`.
+  - **`burst`**: The number of requests that can start immediately (concurrent calls). Default is `3`, meaning up to 3 requests run at the same time.
+  - **`rate`**: The number of requests allowed per second after the initial burst. Default is `5`, pacing extra requests at one every ~200ms.
+  - **How It Works**: Taking the default setting for example: requests in general take ~500ms to finish. Imagine having 6 requests, 3 start right away finishing at ~500ms. Because the rate is set to 200ms, 2 request tokens have built up during this time, so the next 2 requests are sent out immediately when the first 3 finnish, leaving 1 burst spot available. The third request waits the extra 100ms to be dispatched starting at ~600ms using up the remaining burst spot, which takes another ~500ms to finish. All requests finishing around ~1100ms total. This keeps you safely under Quickbase’s 10 requests/sec limit while maximizing speed. A more liberal setting of `{ rate: 10, burst: 5 }` allows 5 requests at once, with request tokens building up every ~100ms, finishing 6 requests in ~1000ms.
 - **`maxRetries`** (`number`, optional): The maximum number of retries for failed requests. Defaults to `3`.
-
 - **`retryDelay`** (`number`, optional): The base delay (in milliseconds) between retries, which increases exponentially. Defaults to `1000`.
-
 - **`tempTokenLifespan`** (`number`, optional): The lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
-
 - **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
 
 _Overrides and development options:_
 
-- **`fetchApi`** (`typeof fetch`, optional): For browser environments, this defaults to the built-in `fetch`. In Node.js, you are able to use `node-fetch` or another compatible library.
-
+- **`fetchApi`** (`typeof fetch`, optional): For browser environments, this defaults to the built-in `fetch`. In Node.js, you can use `node-fetch` or another compatible library.
 - **`baseUrl`** (`string`, optional): The base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.
-
 - **`debug`** (`boolean`, optional): Enables debug logging to the console. Defaults to `false`.
-
-- **`tempToken`** (`string`, optional): If you would like to override the default behavior of tempTokens you can provide your own tempToken.
-
-- **`tokenCache`** (`TokenCache`, optional): If you would like to use your own token cache, you can provide an instance of `TokenCache`.
+- **`tempToken`** (`string`, optional): Overrides the default behavior of tempTokens by providing your own tempToken.
+- **`tokenCache`** (`TokenCache`, optional): Allows you to use your own token cache instance.
 
 ---
 
 #### Configuration Notes
 
-- **Authentication**: There are three mutually exclusive authentication methods: `userToken`, `useTempTokens` and `useSso` with `samlToken`. Only one auth method may be active at a time.
-
-- **`throttle`**: Adjust this to handle 429 Too Many Requests errors. Controls API request pacing to avoid hitting rate limits. For example, `{ rate: 5, burst: 20 }` allows 5 requests per second with a burst capacity of 20.
-
-- **`tokenCache`**: Temporary tokens are cached with their dbid with a `tempTokenLifespan`. This is automatically setup for you when `useTempTokens` is enabled.
+- **Authentication**: There are three mutually exclusive authentication methods: `userToken`, `useTempTokens`, and `useSso` with `samlToken`. Only one auth method may be active at a time.
+- **`tokenCache`**: Temporary tokens are cached with their dbid and `tempTokenLifespan`. This is automatically set up when `useTempTokens` is enabled.
 
 ---
 

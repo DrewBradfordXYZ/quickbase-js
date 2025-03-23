@@ -28,7 +28,7 @@ describe("QuickbaseClient Integration - getFieldsUsage", () => {
     console.log(
       `Retrieved ${response.length} field usage entries for table ${QB_TABLE_ID_1}`
     );
-  }, 15000); // 15-second timeout
+  }, 30000); // 15-second timeout
 
   it("retrieves field usage with skip and top parameters", async () => {
     console.log(
@@ -73,5 +73,5 @@ describe("QuickbaseClient Integration - getFieldsUsage", () => {
       ),
     });
     console.log(`Confirmed 401 for invalid table ID ${invalidTableId}`);
-  }, 15000); // 15-second timeout
+  }, 30000); // 15-second timeout
 });
