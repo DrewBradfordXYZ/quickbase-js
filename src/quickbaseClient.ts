@@ -16,7 +16,7 @@ import {
   AuthorizationStrategy,
   SsoTokenStrategy,
 } from "./authorizationStrategy";
-import { ThrottleBucket } from "./ThrottleBucket";
+import { ConcurrentThrottleBucket } from "./ThrottleBucket"; // Updated import
 import { RateLimiter } from "./rateLimiter";
 
 export * from "./generated/models/index";
@@ -66,7 +66,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
   const throttleBucket = throttle
-    ? new ThrottleBucket(throttle.rate, throttle.burst)
+    ? new ConcurrentThrottleBucket(throttle.rate, throttle.burst) // Consistent naming
     : null;
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 

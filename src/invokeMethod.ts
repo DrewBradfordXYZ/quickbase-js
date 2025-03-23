@@ -23,6 +23,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     dbid?: string;
     tableId?: string;
     appId?: string;
+    startTime?: number; // Added for testing post-throttle timing
   },
   methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
   baseHeaders: Record<string, string>,
@@ -41,9 +42,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   const body = hasBody ? params.body : undefined;
   const restParams: any = hasBody
     ? Object.fromEntries(
-        Object.entries(params).filter(([key]) => key !== "body")
+        Object.entries(params).filter(
+          ([key]) => key !== "body" && key !== "startTime"
+        )
       )
-    : { ...params };
+    : { ...params, startTime: undefined };
   const requestParameters: any = {
     ...restParams,
     ...(hasBody ? { generated: body } : {}),
@@ -128,14 +131,21 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   }
 
   while (attempt < maxAttempts) {
+    let acquired = false;
     try {
       await rateLimiter.throttle();
-      const response = await methodInfo.method(
+      acquired = true;
+      const postThrottleTime = Date.now(); // Capture post-throttle time
+      if (params.startTime !== undefined) params.startTime = postThrottleTime; // Update startTime for testing
+      const responsePromise = methodInfo.method(
         requestParameters,
         requestOptions
       );
+      rateLimiter.release(); // Release slot immediately after starting fetch
+      const response = await responsePromise;
       return await processResponse(response);
     } catch (error: unknown) {
+      if (acquired) rateLimiter.release();
       let status: number;
       let message: string;
       let response: Response | undefined;
@@ -147,7 +157,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         response = error;
         ({ message, status } = await parseErrorResponse(response));
       } else {
-        throw error; // Rethrow truly unexpected errors
+        throw error;
       }
 
       if (status === 429) {
@@ -169,7 +179,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         continue;
       }
 
-      // Handle authentication errors
       let newToken: string | null;
       try {
         newToken = await authStrategy.handleError(
@@ -181,10 +190,9 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
           methodName
         );
       } catch (authError) {
-        throw authError; // Propagate the fetchTempToken error and exit immediately
+        throw authError;
       }
 
-      // Only proceed with retry if we have a valid new token
       if (newToken !== null) {
         token = newToken;
         authStrategy.applyHeaders(baseHeaders, token);
@@ -197,7 +205,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         continue;
       }
 
-      // If no new token was provided, throw the original error
       throw new Error(`API Error: ${message} (Status: ${status})`);
     }
   }

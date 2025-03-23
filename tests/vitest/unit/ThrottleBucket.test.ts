@@ -1,23 +1,29 @@
+// test/vitest/unit/ThrottleBucket.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { ThrottleBucket } from "@/ThrottleBucket"; // Adjust path as needed
+import { ConcurrentThrottleBucket } from "@/ThrottleBucket"; // Should work with your alias
 
-describe("ThrottleBucket Unit Tests", () => {
+describe("ConcurrentThrottleBucket Unit Tests", () => {
   it("allows burst capacity immediately", async () => {
-    const bucket = new ThrottleBucket(5, 3); // rate: 5, burst: 3
+    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5, burst: 3
     const startTime = Date.now();
 
-    await Promise.all([bucket.acquire(), bucket.acquire(), bucket.acquire()]);
+    await Promise.all([
+      bucket.acquire().then(() => bucket.release()),
+      bucket.acquire().then(() => bucket.release()),
+      bucket.acquire().then(() => bucket.release()),
+    ]);
 
     const duration = Date.now() - startTime;
     expect(duration).toBeLessThan(50); // All 3 should be instant (within 50ms)
   });
 
   it("delays calls beyond burst at correct rate", async () => {
-    const bucket = new ThrottleBucket(5, 3); // rate: 5 tokens/sec, burst: 3
+    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5 tokens/sec, burst: 3
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
       timings.push(Date.now());
+      bucket.release(); // Release slot
     };
 
     const startTime = Date.now();
@@ -38,11 +44,12 @@ describe("ThrottleBucket Unit Tests", () => {
   });
 
   it("maintains rate over sustained calls", async () => {
-    const bucket = new ThrottleBucket(2, 2); // rate: 2 tokens/sec, burst: 2
+    const bucket = new ConcurrentThrottleBucket(2, 2); // rate: 2 tokens/sec, burst: 2
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
       timings.push(Date.now());
+      bucket.release(); // Release slot
     };
 
     const startTime = Date.now();
@@ -67,11 +74,12 @@ describe("ThrottleBucket Unit Tests", () => {
   });
 
   it("handles high concurrency without exceeding burst", async () => {
-    const bucket = new ThrottleBucket(5, 3); // rate: 5, burst: 3
+    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5, burst: 3
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
       timings.push(Date.now());
+      bucket.release(); // Release slot
     };
 
     const startTime = Date.now();
@@ -83,9 +91,7 @@ describe("ThrottleBucket Unit Tests", () => {
 
     const durations = timings.map((t) => t - startTime);
     expect(durations.length).toBe(10);
-    // First 3 should be instant
-    expect(durations.slice(0, 3).every((d) => d < 50)).toBe(true);
-    // Next calls should be staggered at ~200ms intervals
+    expect(durations.slice(0, 3).every((d) => d < 50)).toBe(true); // First 3 instant
     for (let i = 3; i < 10; i++) {
       const expectedDelay = (i - 2) * 200; // After burst, 200ms per token
       expect(durations[i]).toBeGreaterThanOrEqual(expectedDelay - 50);

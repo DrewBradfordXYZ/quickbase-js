@@ -1,10 +1,10 @@
 // src/rateLimiter.ts
-import { ThrottleBucket } from "./ThrottleBucket";
+import { ConcurrentThrottleBucket } from "./ThrottleBucket"; // Updated import
 import { ResponseError } from "./generated/runtime";
 
 export class RateLimiter {
   constructor(
-    private throttleBucket: ThrottleBucket | null,
+    private throttleBucket: ConcurrentThrottleBucket | null, // Updated type
     public maxRetries: number = 3,
     private retryDelay: number = 1000
   ) {}
@@ -15,8 +15,13 @@ export class RateLimiter {
     }
   }
 
+  release(): void {
+    if (this.throttleBucket) {
+      this.throttleBucket.release();
+    }
+  }
+
   async handle429(error: ResponseError, attempt: number): Promise<number> {
-    // Remove the throw here; let invokeMethod handle exhaustion
     const retryAfter = error.response.headers.get("Retry-After");
     return retryAfter
       ? parseInt(retryAfter, 10) * 1000
