@@ -15,9 +15,9 @@ export interface AuthorizationStrategy {
   ): Promise<string | null>;
 }
 
-// src/authorizationStrategy.ts (partial update)
-
 export class TempTokenStrategy implements AuthorizationStrategy {
+  private pendingFetches: Map<string, Promise<string>> = new Map(); // Added: Tracks ongoing token fetches by dbid
+
   constructor(
     private tokenCache: TokenCache,
     private initialTempToken: string | undefined,
@@ -61,7 +61,18 @@ export class TempTokenStrategy implements AuthorizationStrategy {
   async getToken(dbid: string): Promise<string | undefined> {
     let token = this.tokenCache.get(dbid) || this.initialTempToken;
     if (!token && dbid) {
-      token = await this.fetchTempToken(dbid);
+      // Check if a fetch is already in progress for this dbid
+      if (this.pendingFetches.has(dbid)) {
+        console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
+        return this.pendingFetches.get(dbid); // Return the existing promise
+      }
+      // Start a new fetch and store the promise
+      const fetchPromise = this.fetchTempToken(dbid).finally(() => {
+        // Clean up the pending fetch once it resolves or rejects
+        this.pendingFetches.delete(dbid);
+      });
+      this.pendingFetches.set(dbid, fetchPromise);
+      token = await fetchPromise;
     }
     return token;
   }
@@ -96,9 +107,13 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       return null;
     }
     if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-    const newToken = await this.fetchTempToken(dbid);
-    this.tokenCache.set(dbid, newToken);
-    return newToken;
+    // Reuse getToken to leverage the pending fetch logic
+    const newToken = await this.getToken(dbid);
+    if (newToken) {
+      this.tokenCache.set(dbid, newToken); // Ensure cache is updated
+      return newToken;
+    }
+    return null;
   }
 }
 

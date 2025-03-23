@@ -9,7 +9,7 @@ export * from "./apps/getApp.test.ts";
 export * from "./auth/fetchTempToken401.test.ts";
 export * from "./auth/getTempToken.test.ts";
 export * from "./auth/retryOn401.test.ts";
-export * from "./auth/retryTempTokenTwo401.test.ts";
+export * from "./auth/retryTempTokenMaxRetries.test.ts";
 
 // Fields
 export * from "./fields/getFields.test.ts";

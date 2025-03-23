@@ -1,13 +1,13 @@
 // tests/vitest/unit/quickbaseClient.test.ts
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { quickbase } from "../../../src/quickbaseClient";
+import { quickbase } from "../../../src/quickbaseClient.ts";
 import { mockFetch, QB_APP_ID, QB_REALM } from "../../setup.ts";
 import {
   UpdateAppRequest,
   UpdateApp200Response,
-} from "../../../src/generated/models";
-import { ChangesetSolution200Response } from "../../../src/generated/models";
+} from "../../../src/generated/models/index.ts";
+import { ChangesetSolution200Response } from "../../../src/generated/models/index.ts";
 
 describe("QuickbaseClient Unit - HTTP Method Extraction", () => {
   let clientTemp: ReturnType<typeof quickbase>;
