@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.11](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.10...v0.1.0-beta.11) (2025-03-23)
+
+
+### Features
+
+* only fetch auth dbid once for concurrent requests. temp tokens and SSO ([12f7f31](https://github.com/DrewBradfordXYZ/quickbase-js/commit/12f7f3117b2fd6e5db35d73e945dff0a79ef0481))
+* SSO concurrency tests passes ([caf5fca](https://github.com/DrewBradfordXYZ/quickbase-js/commit/caf5fca4e86b0dda4a75c2856f9324634369f15a))
+* temp token concurrency prevents redundant token fetches. getAppConcurrency.test.ts unit test passes ([2913e7b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/2913e7b38d38ca0ceaa0af21b2e872f7bafb9d99))
+
 ## [0.1.0-beta.10](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.9...v0.1.0-beta.10) (2025-03-22)
 
 
