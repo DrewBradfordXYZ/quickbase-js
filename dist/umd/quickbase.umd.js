@@ -7354,6 +7354,9 @@
                 expiresAt: now + (lifespan || this.tempTokenLifespan),
             });
         }
+        delete(dbid) {
+            this.cache.delete(dbid);
+        }
         clear() {
             this.cache.clear();
         }
@@ -7408,14 +7411,13 @@
         return match ? match[1].toUpperCase() : "GET"; // Fallback to GET if no match
     }
 
-    // src/authorizationStrategy.ts
-    // src/authorizationStrategy.ts (partial update)
     class TempTokenStrategy {
         tokenCache;
         initialTempToken;
         fetchApi;
         realm;
         baseUrl;
+        pendingFetches = new Map();
         constructor(tokenCache, initialTempToken, fetchApi, realm, baseUrl = "https://api.quickbase.com/v1") {
             this.tokenCache = tokenCache;
             this.initialTempToken = initialTempToken;
@@ -7450,7 +7452,13 @@
         async getToken(dbid) {
             let token = this.tokenCache.get(dbid) || this.initialTempToken;
             if (!token && dbid) {
-                token = await this.fetchTempToken(dbid);
+                if (this.pendingFetches.has(dbid)) {
+                    console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
+                    return this.pendingFetches.get(dbid);
+                }
+                const fetchPromise = this.fetchTempToken(dbid).finally(() => this.pendingFetches.delete(dbid));
+                this.pendingFetches.set(dbid, fetchPromise);
+                token = await fetchPromise;
             }
             return token;
         }
@@ -7470,15 +7478,29 @@
             }
             if (debug)
                 console.log(`Refreshing temp token for dbid: ${dbid}`);
-            const newToken = await this.fetchTempToken(dbid);
-            this.tokenCache.set(dbid, newToken);
-            return newToken;
+            // Invalidate the cache for this dbid to force a fresh fetch
+            this.tokenCache.delete(dbid);
+            try {
+                const newToken = await this.getToken(dbid);
+                if (newToken) {
+                    this.tokenCache.set(dbid, newToken);
+                    return newToken;
+                }
+                return null;
+            }
+            catch (error) {
+                if (debug)
+                    console.log(`[${methodName || "method"}] Failed to refresh token:`, error);
+                throw error;
+            }
         }
     }
     class UserTokenStrategy {
         userToken;
-        constructor(userToken) {
+        baseUrl;
+        constructor(userToken, baseUrl = "https://api.quickbase.com/v1") {
             this.userToken = userToken;
+            this.baseUrl = baseUrl;
         }
         async getToken(_dbid) {
             return this.userToken;
@@ -7499,21 +7521,31 @@
         realm;
         fetchApi;
         debug;
+        baseUrl;
         currentToken;
-        constructor(samlToken, realm, fetchApi, debug = false) {
+        pendingFetches = new Map();
+        constructor(samlToken, realm, fetchApi, debug = false, baseUrl = "https://api.quickbase.com/v1") {
             this.samlToken = samlToken;
             this.realm = realm;
             this.fetchApi = fetchApi;
             this.debug = debug;
+            this.baseUrl = baseUrl;
         }
         async getToken(_dbid) {
             if (!this.currentToken) {
-                this.currentToken = await this.fetchSsoToken({
+                if (this.pendingFetches.has("sso")) {
+                    if (this.debug)
+                        console.log("[getToken] Waiting for existing SSO fetch");
+                    return this.pendingFetches.get("sso");
+                }
+                const fetchPromise = this.fetchSsoToken({
                     grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
                     requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
                     subject_token: this.samlToken,
                     subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-                });
+                }).finally(() => this.pendingFetches.delete("sso"));
+                this.pendingFetches.set("sso", fetchPromise);
+                this.currentToken = await fetchPromise;
             }
             return this.currentToken;
         }
@@ -7540,7 +7572,7 @@
                 subject_token: this.samlToken,
                 subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
             };
-            const response = await this.fetchApi(`https://api.quickbase.com/v1/auth/oauth/token`, {
+            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
                 method: "POST",
                 headers: {
                     "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
@@ -7567,7 +7599,7 @@
             return newToken;
         }
         async fetchSsoToken(params) {
-            const response = await this.fetchApi(`https://api.quickbase.com/v1/auth/oauth/token`, {
+            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
                 method: "POST",
                 headers: {
                     "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
@@ -7615,8 +7647,7 @@
     }
 
     // src/invokeMethod.ts
-    async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates) {
-        console.log("[invokeMethod] Starting for method:", methodName);
+    async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1) {
         const methodInfo = methodMap[methodName];
         if (!methodInfo)
             throw new Error(`Method ${methodName} not found`);
@@ -7634,33 +7665,21 @@
             method: methodInfo.httpMethod,
         };
         let dbid = extractDbid(params);
-        console.log("[invokeMethod] Extracted dbid:", dbid);
         let token = dbid
             ? await authStrategy.getToken(dbid)
             : await authStrategy.getToken("");
-        console.log("[invokeMethod] Initial token:", token);
         if (token) {
             authStrategy.applyHeaders(baseHeaders, token);
             requestOptions.headers = { ...baseHeaders };
-            console.log("[invokeMethod] Token found, headers set:", requestOptions.headers);
             if (methodName === "getTempTokenDBID") {
-                console.log("[invokeMethod] Using cached token:", token);
                 return { temporaryAuthorization: token };
             }
         }
-        if (debug) {
-            console.log(`[${methodName}] requestParameters:`, requestParameters);
-            console.log(`[${methodName}] requestOptions:`, requestOptions);
-        }
         async function processResponse(rawResponse) {
-            if (debug)
-                console.log(`[${methodName}] rawResponse:`, rawResponse);
             if (rawResponse instanceof Response) {
                 const contentType = rawResponse.headers
                     .get("Content-Type")
                     ?.toLowerCase();
-                if (debug)
-                    console.log(`[${methodName}] contentType:`, contentType);
                 if (contentType?.includes("application/json")) {
                     const jsonResponse = await rawResponse.json();
                     return transformDates(jsonResponse, convertDates);
@@ -7669,8 +7688,6 @@
             }
             if (rawResponse && typeof rawResponse.value === "function") {
                 const response = await rawResponse.value();
-                if (debug)
-                    console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
                 return transformDates(response, convertDates);
             }
             return transformDates(rawResponse, convertDates);
@@ -7698,28 +7715,17 @@
                 }
             }
             catch (e) {
-                if (debug)
-                    console.log(`[${methodName}] Error parsing response body:`, e);
                 message = "Failed to parse error response";
             }
-            if (debug)
-                console.log("[invokeMethod] Parsed error - status:", status, "message:", message);
             return { message, status };
         }
-        let attempt = 0;
-        const maxAttempts = rateLimiter.maxRetries + 1;
         while (attempt < maxAttempts) {
-            console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
             try {
                 await rateLimiter.throttle();
-                console.log("[invokeMethod] About to call API for method:", methodName);
                 const response = await methodInfo.method(requestParameters, requestOptions);
-                console.log("[invokeMethod] API call completed for method:", methodName);
                 return await processResponse(response);
             }
             catch (error) {
-                if (debug)
-                    console.log("[invokeMethod] Caught error:", error);
                 let status;
                 let message;
                 let response;
@@ -7732,31 +7738,13 @@
                     ({ message, status } = await parseErrorResponse(response));
                 }
                 else {
-                    if (debug)
-                        console.log(`[${methodName}] Unexpected error:`, error);
-                    // Attempt to handle as a fetch error with a response
-                    if (error instanceof Error && "response" in error) {
-                        response = error.response;
-                        if (response instanceof Response) {
-                            ({ message, status } = await parseErrorResponse(response));
-                        }
-                        else {
-                            throw error; // Rethrow if no response
-                        }
-                    }
-                    else {
-                        throw error; // Rethrow truly unexpected errors
-                    }
+                    throw error; // Rethrow truly unexpected errors
                 }
-                if (debug)
-                    console.log("[invokeMethod] Handling error with status:", status);
                 if (status === 429) {
                     if (!(error instanceof ResponseError)) {
                         throw new Error("Expected ResponseError for 429 handling");
                     }
                     const delay = await rateLimiter.handle429(error, attempt + 1);
-                    if (debug)
-                        console.log(`[${methodName}] 429 delay: ${delay}ms`);
                     if (attempt + 1 === maxAttempts) {
                         throw new RateLimitError(`API Error: ${message} (Status: ${status})`, status, response?.headers.get("Retry-After")
                             ? parseInt(response.headers.get("Retry-After"), 10)
@@ -7766,16 +7754,25 @@
                     attempt++;
                     continue;
                 }
-                const newToken = await authStrategy.handleError(status, params, attempt, maxAttempts, debug, methodName);
-                if (newToken) {
+                // Handle authentication errors
+                let newToken;
+                try {
+                    newToken = await authStrategy.handleError(status, params, attempt, maxAttempts, debug, methodName);
+                }
+                catch (authError) {
+                    throw authError; // Propagate the fetchTempToken error and exit immediately
+                }
+                // Only proceed with retry if we have a valid new token
+                if (newToken !== null) {
                     token = newToken;
                     authStrategy.applyHeaders(baseHeaders, token);
                     requestOptions.headers = { ...baseHeaders };
-                    attempt++;
                     if (debug)
                         console.log(`[${methodName}] Retrying with token: ${token.substring(0, 10)}...`);
+                    attempt++;
                     continue;
                 }
+                // If no new token was provided, throw the original error
                 throw new Error(`API Error: ${message} (Status: ${status})`);
             }
         }
@@ -7844,7 +7841,6 @@
         }
     }
 
-    // src/quickbaseClient.ts
     function quickbase(config) {
         const { realm, userToken, tempToken, useTempTokens, useSso, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { rate: 10, burst: 10 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", } = config;
         const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
@@ -7860,10 +7856,10 @@
             throw new Error("No fetch implementation available");
         }
         const authStrategy = useSso
-            ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
+            ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug, baseUrl)
             : useTempTokens
                 ? new TempTokenStrategy(tokenCache, tempToken, effectiveFetch, realm, baseUrl)
-                : new UserTokenStrategy(userToken || "");
+                : new UserTokenStrategy(userToken || "", baseUrl);
         const baseHeaders = {
             "QB-Realm-Hostname": `${realm}.quickbase.com`,
             "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 project: >-
   quickbase-js
 date: >-
-  3/21/2025
+  3/23/2025
 root: >-
   /home/drew/Projects/quickbase-js
 goals:
@@ -728,10 +728,6 @@ tree:
       type: >-
         file
     - name: >-
-        api-examples.md
-      type: >-
-        file
-    - name: >-
         build-common.js
       type: >-
         file
@@ -1057,10 +1053,6 @@ tree:
       type: >-
         file
     - name: >-
-        markdown-examples.md
-      type: >-
-        file
-    - name: >-
         open-api
       type: >-
         directory
@@ -1194,6 +1186,26 @@ tree:
             RateLimitError.ts
           type: >-
             file
+          contents: >
+            //
+            src/RateLimitError.ts
+
+            export
+            class
+            RateLimitError
+            extends
+            Error
+            {
+              public readonly status: number;
+              public readonly retryAfter?: number;
+
+              constructor(message: string, status: number, retryAfter?: number) {
+                super(message);
+                this.name = "RateLimitError";
+                this.status = status;
+                this.retryAfter = retryAfter; // Seconds from Retry-After header, if present
+              }
+            }
         - name: >-
             ThrottleBucket.ts
           type: >-
@@ -1253,7 +1265,6 @@ tree:
             //
             src/authorizationStrategy.ts
 
-
             import
             {
             TokenCache
@@ -1279,18 +1290,14 @@ tree:
             }
 
 
-            //
-            src/authorizationStrategy.ts
-            (partial
-            update)
-
-
             export
             class
             TempTokenStrategy
             implements
             AuthorizationStrategy
             {
+              private pendingFetches: Map<string, Promise<string>> = new Map();
+
               constructor(
                 private tokenCache: TokenCache,
                 private initialTempToken: string | undefined,
@@ -1334,7 +1341,15 @@ tree:
               async getToken(dbid: string): Promise<string | undefined> {
                 let token = this.tokenCache.get(dbid) || this.initialTempToken;
                 if (!token && dbid) {
-                  token = await this.fetchTempToken(dbid);
+                  if (this.pendingFetches.has(dbid)) {
+                    console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
+                    return this.pendingFetches.get(dbid);
+                  }
+                  const fetchPromise = this.fetchTempToken(dbid).finally(() =>
+                    this.pendingFetches.delete(dbid)
+                  );
+                  this.pendingFetches.set(dbid, fetchPromise);
+                  token = await fetchPromise;
                 }
                 return token;
               }
@@ -1369,9 +1384,12 @@ tree:
                   return null;
                 }
                 if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-                const newToken = await this.fetchTempToken(dbid);
-                this.tokenCache.set(dbid, newToken);
-                return newToken;
+                const newToken = await this.getToken(dbid);
+                if (newToken) {
+                  this.tokenCache.set(dbid, newToken);
+                  return newToken;
+                }
+                return null;
               }
             }
 
@@ -1382,7 +1400,10 @@ tree:
             implements
             AuthorizationStrategy
             {
-              constructor(private userToken: string) {}
+              constructor(
+                private userToken: string,
+                private baseUrl: string = "https://api.quickbase.com/v1" // Added for consistency, unused
+              ) {}
 
               async getToken(_dbid: string): Promise<string> {
                 return this.userToken;
@@ -1419,23 +1440,32 @@ tree:
             AuthorizationStrategy
             {
               private currentToken: string | undefined;
+              private pendingFetches: Map<string, Promise<string>> = new Map();
 
               constructor(
                 private samlToken: string,
                 private realm: string,
                 private fetchApi: typeof fetch,
-                private debug: boolean = false
+                private debug: boolean = false,
+                private baseUrl: string = "https://api.quickbase.com/v1" // Added and used
               ) {}
 
               async getToken(_dbid: string): Promise<string | undefined> {
                 if (!this.currentToken) {
-                  this.currentToken = await this.fetchSsoToken({
+                  if (this.pendingFetches.has("sso")) {
+                    if (this.debug)
+                      console.log("[getToken] Waiting for existing SSO fetch");
+                    return this.pendingFetches.get("sso");
+                  }
+                  const fetchPromise = this.fetchSsoToken({
                     grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
                     requested_token_type:
                       "urn:quickbase:params:oauth:token-type:temp_token",
                     subject_token: this.samlToken,
                     subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-                  });
+                  }).finally(() => this.pendingFetches.delete("sso"));
+                  this.pendingFetches.set("sso", fetchPromise);
+                  this.currentToken = await fetchPromise;
                 }
                 return this.currentToken;
               }
@@ -1478,18 +1508,15 @@ tree:
                   subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
                 };
 
-                const response = await this.fetchApi(
-                  `https://api.quickbase.com/v1/auth/oauth/token`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                    credentials: "omit",
-                  }
-                );
+                const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+                  method: "POST",
+                  headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                  credentials: "omit",
+                });
 
                 if (!response.ok) {
                   const errorBody = await response.json().catch(() => ({}));
@@ -1519,18 +1546,15 @@ tree:
                 subject_token: string;
                 subject_token_type: string;
               }): Promise<string> {
-                const response = await this.fetchApi(
-                  `https://api.quickbase.com/v1/auth/oauth/token`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(params),
-                    credentials: "omit",
-                  }
-                );
+                const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+                  method: "POST",
+                  headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(params),
+                  credentials: "omit",
+                });
 
                 if (!response.ok) {
                   const errorBody = await response.json().catch(() => ({}));
@@ -2327,7 +2351,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-22T03:13:09.438Z
+                2025-03-23T16:58:27.294Z
 
                 import
                 {
@@ -3638,6 +3662,10 @@ tree:
             }
 
 
+            //
+            src/invokeMethod.ts
+            (fixed)
+
             export
             async
             function
@@ -3657,7 +3685,9 @@ tree:
               rateLimiter: RateLimiter,
               transformDates: (obj: any, convertStringsToDates: boolean) => any,
               debug: boolean | undefined,
-              convertDates: boolean
+              convertDates: boolean,
+              attempt: number = 0,
+              maxAttempts: number = rateLimiter.maxRetries + 1
             ):
             Promise<ReturnType<QuickbaseClient[K]>>
             {
@@ -3781,9 +3811,6 @@ tree:
                 return { message, status };
               }
 
-              let attempt = 0;
-              const maxAttempts = rateLimiter.maxRetries + 1;
-
               while (attempt < maxAttempts) {
                 console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
                 try {
@@ -3810,17 +3837,7 @@ tree:
                     ({ message, status } = await parseErrorResponse(response));
                   } else {
                     if (debug) console.log(`[${methodName}] Unexpected error:`, error);
-                    // Attempt to handle as a fetch error with a response
-                    if (error instanceof Error && "response" in error) {
-                      response = (error as any).response;
-                      if (response instanceof Response) {
-                        ({ message, status } = await parseErrorResponse(response));
-                      } else {
-                        throw error; // Rethrow if no response
-                      }
-                    } else {
-                      throw error; // Rethrow truly unexpected errors
-                    }
+                    throw error; // Rethrow truly unexpected errors
                   }
 
                   if (debug)
@@ -3846,14 +3863,23 @@ tree:
                     continue;
                   }
 
-                  const newToken = await authStrategy.handleError(
-                    status,
-                    params,
-                    attempt,
-                    maxAttempts,
-                    debug,
-                    methodName
-                  );
+                  // Handle the error and decide whether to retry
+                  let newToken: string | null = null;
+                  try {
+                    newToken = await authStrategy.handleError(
+                      status,
+                      params,
+                      attempt,
+                      maxAttempts,
+                      debug,
+                      methodName
+                    );
+                  } catch (authError) {
+                    if (debug)
+                      console.log(`[${methodName}] Auth strategy error:`, authError);
+                    throw authError; // Propagate the fetchTempToken error and exit
+                  }
+
                   if (newToken) {
                     token = newToken;
                     authStrategy.applyHeaders(baseHeaders, token);
@@ -3878,7 +3904,6 @@ tree:
           contents: >
             //
             src/quickbaseClient.ts
-
 
             import
             {
@@ -3920,9 +3945,6 @@ tree:
             }
             from
             "./utils";
-            //
-            Updated
-            import
 
             import
             {
@@ -4042,7 +4064,13 @@ tree:
               }
 
               const authStrategy: AuthorizationStrategy = useSso
-                ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug)
+                ? new SsoTokenStrategy(
+                    samlToken || "",
+                    realm,
+                    effectiveFetch,
+                    debug,
+                    baseUrl
+                  )
                 : useTempTokens
                 ? new TempTokenStrategy(
                     tokenCache,
@@ -4051,7 +4079,7 @@ tree:
                     realm,
                     baseUrl
                   )
-                : new UserTokenStrategy(userToken || "");
+                : new UserTokenStrategy(userToken || "", baseUrl);
 
               const baseHeaders: HTTPHeaders = {
                 "QB-Realm-Hostname": `${realm}.quickbase.com`,
@@ -4338,6 +4366,10 @@ tree:
             .last-run.json
           type: >-
             file
+        - name: >-
+            test-results.json
+          type: >-
+            file
     - name: >-
         tests
       type: >-
@@ -4368,6 +4400,10 @@ tree:
                         file
                     - name: >-
                         getAppWithTempToken.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        getAppWithTempTokenConcurrency.test.ts
                       type: >-
                         file
                     - name: >-
@@ -4443,7 +4479,15 @@ tree:
                       type: >-
                         file
                     - name: >-
+                        ssoTokenConcurrency.test.ts
+                      type: >-
+                        file
+                    - name: >-
                         ssoTokenIntegrationWithServer.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        userTokenConcurrency.test.ts
                       type: >-
                         file
                 - name: >-
@@ -4581,6 +4625,10 @@ tree:
                       type: >-
                         file
                     - name: >-
+                        getAppConcurrency.test.ts
+                      type: >-
+                        file
+                    - name: >-
                         getAppEvents.test.ts
                       type: >-
                         file
@@ -4615,6 +4663,10 @@ tree:
                         file
                     - name: >-
                         ssoTokenRefresh.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        userTokenConcurrency.test.ts
                       type: >-
                         file
                 - name: >-

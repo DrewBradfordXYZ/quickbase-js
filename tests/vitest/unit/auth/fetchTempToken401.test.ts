@@ -42,7 +42,7 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
           json: () => Promise.resolve({ message: "Temp token fetch failed" }),
         });
       }
-      return Promise.reject(new Error(`Unexpected fetch call: ${url}`));
+      throw new Error(`Unexpected fetch call: ${url}`); // Use throw to stop further retries
     });
 
     const consoleSpy = vi.spyOn(console, "log");
@@ -52,8 +52,26 @@ describe("QuickbaseClient Unit - 401 with fetchTempToken 401", () => {
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      1,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      `https://api.quickbase.com/v1/fields?tableId=${QB_TABLE_ID_1}`,
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `QB-TEMP-TOKEN ${mockToken}`,
+        }),
+      })
+    );
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      3,
+      `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}`,
+      expect.any(Object)
+    );
 
-    // Updated to match the single-argument log from handleError
     expect(consoleSpy).toHaveBeenCalledWith(
       "Authorization error for getFields (temp token), refreshing token:"
     );

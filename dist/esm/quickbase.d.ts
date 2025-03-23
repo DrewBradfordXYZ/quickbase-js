@@ -8051,6 +8051,7 @@ declare class TokenCache {
     constructor(tempTokenLifespan?: number);
     get(dbid: string): string | undefined;
     set(dbid: string, token: string, lifespan?: number): void;
+    delete(dbid: string): void;
     clear(): void;
 }
 

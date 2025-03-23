@@ -103,19 +103,30 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       return null;
     }
     if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-    const newToken = await this.getToken(dbid);
-    if (newToken) {
-      this.tokenCache.set(dbid, newToken);
-      return newToken;
+    // Invalidate the cache for this dbid to force a fresh fetch
+    this.tokenCache.delete(dbid);
+    try {
+      const newToken = await this.getToken(dbid);
+      if (newToken) {
+        this.tokenCache.set(dbid, newToken);
+        return newToken;
+      }
+      return null;
+    } catch (error) {
+      if (debug)
+        console.log(
+          `[${methodName || "method"}] Failed to refresh token:`,
+          error
+        );
+      throw error;
     }
-    return null;
   }
 }
 
 export class UserTokenStrategy implements AuthorizationStrategy {
   constructor(
     private userToken: string,
-    private baseUrl: string = "https://api.quickbase.com/v1" // Added for consistency, unused
+    private baseUrl: string = "https://api.quickbase.com/v1"
   ) {}
 
   async getToken(_dbid: string): Promise<string> {
@@ -154,7 +165,7 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
     private realm: string,
     private fetchApi: typeof fetch,
     private debug: boolean = false,
-    private baseUrl: string = "https://api.quickbase.com/v1" // Added and used
+    private baseUrl: string = "https://api.quickbase.com/v1"
   ) {}
 
   async getToken(_dbid: string): Promise<string | undefined> {

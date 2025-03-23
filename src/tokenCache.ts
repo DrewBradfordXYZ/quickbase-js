@@ -29,6 +29,10 @@ export class TokenCache {
     });
   }
 
+  delete(dbid: string): void {
+    this.cache.delete(dbid);
+  }
+
   clear(): void {
     this.cache.clear();
   }

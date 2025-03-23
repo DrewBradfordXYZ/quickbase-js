@@ -53,7 +53,7 @@ const includeFiles: string[] = [
   "src/generated-unified/QuickbaseClient.ts",
   "src/authorizationStrategy.ts",
   "src/rateLimiter.ts",
-  // "src/RateLimitError.ts",
+  "src/RateLimitError.ts",
   "src/ThrottleBucket.ts",
   "src/tokenCache.ts",
   "src/utils.ts",
