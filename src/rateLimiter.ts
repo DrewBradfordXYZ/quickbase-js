@@ -1,10 +1,10 @@
-// src/rateLimiter.ts
-import { ConcurrentThrottleBucket } from "./ThrottleBucket"; // Updated import
+// src/RateLimiter.ts
 import { ResponseError } from "./generated/runtime";
+import { RateThrottleBucket } from "./RateThrottleBucket";
 
 export class RateLimiter {
   constructor(
-    private throttleBucket: ConcurrentThrottleBucket | null, // Updated type
+    private throttleBucket: RateThrottleBucket | null,
     public maxRetries: number = 3,
     private retryDelay: number = 1000
   ) {}

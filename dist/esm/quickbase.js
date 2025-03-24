@@ -7779,8 +7779,37 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
     throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
 }
 
-// src/ThrottleBucket.ts
-class ConcurrentThrottleBucket {
+// src/Semaphore.ts
+class Semaphore {
+    permits;
+    waiting = [];
+    constructor(maxPermits) {
+        this.permits = maxPermits;
+    }
+    async acquire() {
+        if (this.permits > 0) {
+            this.permits -= 1;
+            return;
+        }
+        return new Promise((resolve, reject) => {
+            this.waiting.push({ resolve, reject });
+        });
+    }
+    release() {
+        this.permits += 1;
+        if (this.waiting.length > 0 && this.permits > 0) {
+            const { resolve } = this.waiting.shift();
+            this.permits -= 1;
+            resolve();
+        }
+    }
+    available() {
+        return this.permits;
+    }
+}
+
+// src/FlowThrottleBucket.ts
+class FlowThrottleBucket {
     tokens;
     maxTokens;
     refillRate;
@@ -7820,31 +7849,46 @@ class ConcurrentThrottleBucket {
         this.semaphore.release();
     }
 }
-class Semaphore {
-    permits;
-    waiting = [];
-    constructor(maxPermits) {
-        this.permits = maxPermits;
+
+// src/BurstAwareThrottleBucket.ts
+class BurstAwareThrottleBucket {
+    maxTokens;
+    windowSeconds;
+    requestTimestamps = [];
+    semaphore;
+    constructor(options) {
+        this.maxTokens = options.maxTokens;
+        this.windowSeconds = options.windowSeconds;
+        this.semaphore = new Semaphore(this.maxTokens);
+    }
+    countRequestsInWindow() {
+        const now = Date.now();
+        this.requestTimestamps = this.requestTimestamps.filter((ts) => now - ts < this.windowSeconds * 1000);
+        return this.requestTimestamps.length;
+    }
+    availableTokens() {
+        const windowCount = this.countRequestsInWindow();
+        return Math.max(0, Math.min(100 - windowCount, this.maxTokens - windowCount));
     }
     async acquire() {
-        if (this.permits > 0) {
-            this.permits -= 1;
-            return;
+        while (true) {
+            const available = this.availableTokens();
+            if (available > 0 && this.semaphore.available() > 0) {
+                await this.semaphore.acquire();
+                this.requestTimestamps.push(Date.now());
+                return;
+            }
+            const now = Date.now();
+            const oldestTimestamp = this.requestTimestamps[0];
+            let waitTime = 100;
+            if (oldestTimestamp) {
+                waitTime = Math.max(0, this.windowSeconds * 1000 - (now - oldestTimestamp));
+            }
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
         }
-        return new Promise((resolve, reject) => {
-            this.waiting.push({ resolve, reject });
-        });
     }
     release() {
-        this.permits += 1;
-        if (this.waiting.length > 0 && this.permits > 0) {
-            const { resolve } = this.waiting.shift();
-            this.permits -= 1;
-            resolve();
-        }
-    }
-    available() {
-        return this.permits;
+        this.semaphore.release();
     }
 }
 
@@ -7852,8 +7896,7 @@ class RateLimiter {
     throttleBucket;
     maxRetries;
     retryDelay;
-    constructor(throttleBucket, // Updated type
-    maxRetries = 3, retryDelay = 1000) {
+    constructor(throttleBucket, maxRetries = 3, retryDelay = 1000) {
         this.throttleBucket = throttleBucket;
         this.maxRetries = maxRetries;
         this.retryDelay = retryDelay;
@@ -7877,12 +7920,16 @@ class RateLimiter {
 }
 
 function quickbase(config) {
-    const { realm, userToken, tempToken, useTempTokens, useSso, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { rate: 5, burst: 3 }, // Updated default to match passing test
+    const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, // Default FlowThrottleBucket
     maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", } = config;
     const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
-    const throttleBucket = throttle
-        ? new ConcurrentThrottleBucket(throttle.rate, throttle.burst)
-        : null;
+    const throttleOptions = throttle;
+    const throttleBucket = throttleOptions.type === "burst-aware"
+        ? new BurstAwareThrottleBucket({
+            maxTokens: throttleOptions.burst || 50,
+            windowSeconds: throttleOptions.windowSeconds || 10,
+        })
+        : new FlowThrottleBucket(throttleOptions.rate || 6, throttleOptions.burst || 50);
     const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
     const defaultFetch = typeof globalThis.window !== "undefined"
         ? globalThis.window.fetch.bind(globalThis.window)

@@ -16,8 +16,10 @@ import {
   AuthorizationStrategy,
   SsoTokenStrategy,
 } from "./authorizationStrategy";
-import { ConcurrentThrottleBucket } from "./ThrottleBucket";
+import { FlowThrottleBucket } from "./FlowThrottleBucket";
+import { BurstAwareThrottleBucket } from "./BurstAwareThrottleBucket";
 import { RateLimiter } from "./rateLimiter";
+import { paginateRecords, isPaginatable } from "./pagination"; // New imports
 
 export * from "./generated/models/index";
 
@@ -34,13 +36,27 @@ export interface QuickbaseConfig {
   fetchApi?: typeof fetch;
   convertDates?: boolean;
   tempTokenLifespan?: number;
-  throttle?: { rate: number; burst: number };
+  throttle?: {
+    type?: "flow" | "burst-aware";
+    rate?: number;
+    burst?: number;
+    windowSeconds?: number;
+  };
   maxRetries?: number;
   retryDelay?: number;
   tokenCache?: TokenCache;
   baseUrl?: string;
+  autoPaginate?: boolean;
 }
 
+export type ThrottleOptions = {
+  type?: "flow" | "burst-aware";
+  rate?: number;
+  burst?: number;
+  windowSeconds?: number;
+};
+
+// Define MethodMap at the top level
 type MethodMap = {
   [K in keyof QuickbaseClient]: MethodInfo<K>;
 };
@@ -50,24 +66,35 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     realm,
     userToken,
     tempToken,
-    useTempTokens,
-    useSso,
+    useTempTokens = false,
+    useSso = false,
     samlToken,
     fetchApi,
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
-    throttle = { rate: 5, burst: 3 }, // Updated default to match passing test
+    throttle = { type: "flow", rate: 6, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
     baseUrl = "https://api.quickbase.com/v1",
+    autoPaginate = true,
   } = config;
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
-  const throttleBucket = throttle
-    ? new ConcurrentThrottleBucket(throttle.rate, throttle.burst)
-    : null;
+
+  const throttleOptions = throttle as ThrottleOptions;
+  const throttleBucket =
+    throttleOptions.type === "burst-aware"
+      ? new BurstAwareThrottleBucket({
+          maxTokens: throttleOptions.burst || 50,
+          windowSeconds: throttleOptions.windowSeconds || 10,
+        })
+      : new FlowThrottleBucket(
+          throttleOptions.rate || 6,
+          throttleOptions.burst || 50
+        );
+
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
   const defaultFetch: typeof fetch | undefined =
@@ -180,7 +207,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             rateLimiter,
             transformDates,
             debug,
-            convertDates
+            convertDates,
+            autoPaginate
           );
       }
       console.log("[proxy] Method not found:", prop);

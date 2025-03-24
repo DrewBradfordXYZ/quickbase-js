@@ -145,7 +145,7 @@ getAppDetails();
 
 The `quickbase` function accepts a `QuickbaseConfig` object with the following options:
 
-_User options:_
+### User Options
 
 - **`realm`** (`string`): Your QuickBase realm (e.g., "company"). This is required and has no default value.
 - **`userToken`** (`string`, optional): A QuickBase user token for authentication. No default is provided.
@@ -153,31 +153,42 @@ _User options:_
 - **`useSso`** (`boolean`, optional): Enables SSO authentication. Defaults to `false`.
 - **`samlToken`** (`string`, optional): A SAML token for SSO authentication. No default is provided.
 
-_Advanced user options:_
+### Advanced User Options
 
-- **`throttle`** (`{ rate: number; burst: number }`, optional): Configures rate limiting to manage how many API requests are sent at once and how quickly additional requests follow. Defaults to `{ rate: 5, burst: 3 }`.
-  - **`burst`**: The number of requests that can start immediately (concurrent calls). Default is `3`, meaning up to 3 requests run at the same time.
-  - **`rate`**: The number of requests allowed per second after the initial burst. Default is `5`, pacing extra requests at one every ~200ms.
-  - **How It Works**: Taking the default setting for example: requests in general take ~500ms to finish. Imagine having 6 requests, 3 start right away finishing at ~500ms. Because the rate is set to 200ms, 2 request tokens have built up during this time, so the 4th and 5th requests are sent out immediately when the first 3 finnish, leaving 1 burst spot available. The 6th request waits the extra 100ms to be dispatched starting at ~600ms using up the remaining burst spot, which takes another ~500ms to finish. All requests finishing around ~1100ms total. This keeps you safely under Quickbase’s 10 requests/sec limit while maximizing speed. A more liberal setting of `{ rate: 10, burst: 5 }` allows 5 requests at once, with request tokens building up every ~100ms, finishing 6 requests in ~1000ms.
-- **`maxRetries`** (`number`, optional): The maximum number of retries for failed requests. Defaults to `3`.
-- **`retryDelay`** (`number`, optional): The base delay (in milliseconds) between retries, which increases exponentially. Defaults to `1000`.
-- **`tempTokenLifespan`** (`number`, optional): The lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
+- **`throttle`** (`{ type?: 'flow' | 'burst-aware'; rate?: number; burst?: number; windowSeconds?: number }`, optional): Configures rate limiting to manage API request throughput. Defaults to `{ type: 'flow', rate: 6, burst: 50 }`.
+  - **`type`**: Throttle strategy:
+    - `'flow'` (default): Uses `FlowThrottleBucket` for a Quick Base-agnostic burst-then-rate flow. Ideal for steady request pacing across any API.
+    - `'burst-aware'`: Uses `BurstAwareThrottleBucket` for Quick Base-specific burst throttling with a sliding window (e.g., 100 requests per 10 seconds).
+  - **`rate`** (`number`): Requests per second after the initial burst (for `'flow'` only). Default is `5`. Over 10 seconds, this allows ~50 requests with default burst.
+  - **`burst`** (`number`): Maximum concurrent requests:
+    - For `'flow'`: Initial burst size (default: 50), followed by `rate`/sec.
+    - For `'burst-aware'`: Burst cap per window (default: 50), waits for window reset if exceeded.
+  - **`windowSeconds`** (`number`, `'burst-aware'` only): Sliding window duration in seconds (default: 10). Caps total requests (e.g., 100 in 10s for QuickBase).
+  - **Examples**:
+    - `{ type: 'flow', rate: 10, burst: 50 }`: ~6s for 100 requests (50 instant, 50 at 10/sec).
+    - `{ type: 'burst-aware', burst: 100, windowSeconds: 10 }`: ~1s for 100 requests, waits 10s for next burst.
+- **`maxRetries`** (`number`, optional): Maximum retries for failed requests. Defaults to `3`.
+- **`retryDelay`** (`number`, optional): Base delay (in milliseconds) between retries, increases exponentially. Defaults to `1000`.
+- **`tempTokenLifespan`** (`number`, optional): Lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
 - **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
 
-_Overrides and development options:_
+### Overrides and Development Options
 
-- **`fetchApi`** (`typeof fetch`, optional): For browser environments, this defaults to the built-in `fetch`. In Node.js, you can use `node-fetch` or another compatible library.
-- **`baseUrl`** (`string`, optional): The base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.
+- **`fetchApi`** (`typeof fetch`, optional): For browser environments, defaults to built-in `fetch`. In Node.js, use `node-fetch` or another compatible library.
+- **`baseUrl`** (`string`, optional): Base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.
 - **`debug`** (`boolean`, optional): Enables debug logging to the console. Defaults to `false`.
-- **`tempToken`** (`string`, optional): Overrides the default behavior of tempTokens by providing your own tempToken.
-- **`tokenCache`** (`TokenCache`, optional): Allows you to use your own token cache instance.
+- **`tempToken`** (`string`, optional): Overrides default tempToken behavior by providing your own token.
+- **`tokenCache`** (`TokenCache`, optional): Allows use of a custom token cache instance.
 
 ---
 
 #### Configuration Notes
 
-- **Authentication**: There are three mutually exclusive authentication methods: `userToken`, `useTempTokens`, and `useSso` with `samlToken`. Only one auth method may be active at a time.
-- **`tokenCache`**: Temporary tokens are cached with their dbid and `tempTokenLifespan`. This is automatically set up when `useTempTokens` is enabled.
+- **Authentication**: Three mutually exclusive methods: `userToken`, `useTempTokens`, and `useSso` with `samlToken`. Only one may be active at a time.
+- **`tokenCache`**: Temporary tokens are cached with their `dbid` and `tempTokenLifespan` when `useTempTokens` is enabled.
+- **Throttling**:
+  - Default `FlowThrottleBucket` (`rate: 5`, `burst: 50`) provides steady request throttling. 10 seconds enables 100 requests, balancing burst and flow across APIs calls, ideal for general use.
+  - Optional `BurstAwareThrottleBucket` optimizes for QuickBase’s theoretical 100 burst requests every 10 seconds limit. Ideal for scenarios where your initial page load requires many API calls. However, you may use up all available requests quickly, causing delays in subsequent requests. If you exceed the burst limit, requests will be queued until the next window resets potentially causing long percieved waits. Check for `429` errors and handle accordingly.
 
 ---
 

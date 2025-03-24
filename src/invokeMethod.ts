@@ -4,6 +4,7 @@ import { RateLimiter } from "./rateLimiter";
 import { RateLimitError } from "./RateLimitError";
 import { ResponseError } from "./generated/runtime";
 import { QuickbaseClient } from "./quickbaseClient";
+import { paginateRecords, isPaginatable } from "./pagination";
 
 export type ApiMethod<K extends keyof QuickbaseClient> = (
   requestParameters: Parameters<QuickbaseClient[K]>[0],
@@ -23,7 +24,9 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     dbid?: string;
     tableId?: string;
     appId?: string;
-    startTime?: number; // Added for testing post-throttle timing
+    startTime?: number;
+    skip?: number; // Added for pagination
+    top?: number; // Added for pagination
   },
   methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
   baseHeaders: Record<string, string>,
@@ -32,6 +35,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   transformDates: (obj: any, convertStringsToDates: boolean) => any,
   debug: boolean | undefined,
   convertDates: boolean,
+  autoPaginate: boolean = true,
   attempt: number = 0,
   maxAttempts: number = rateLimiter.maxRetries + 1
 ): Promise<ReturnType<QuickbaseClient[K]>> {
@@ -81,6 +85,19 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         ?.toLowerCase();
       if (contentType?.includes("application/json")) {
         const jsonResponse = await rawResponse.json();
+        if (autoPaginate && isPaginatable(jsonResponse)) {
+          return paginateRecords(
+            methodName,
+            params,
+            methodMap,
+            baseHeaders,
+            authStrategy,
+            rateLimiter,
+            transformDates,
+            debug,
+            convertDates
+          );
+        }
         return transformDates(jsonResponse, convertDates) as ReturnType<
           QuickbaseClient[K]
         >;
@@ -89,6 +106,19 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     }
     if (rawResponse && typeof rawResponse.value === "function") {
       const response = await rawResponse.value();
+      if (autoPaginate && isPaginatable(response)) {
+        return paginateRecords(
+          methodName,
+          params,
+          methodMap,
+          baseHeaders,
+          authStrategy,
+          rateLimiter,
+          transformDates,
+          debug,
+          convertDates
+        );
+      }
       return transformDates(response, convertDates) as ReturnType<
         QuickbaseClient[K]
       >;
@@ -135,13 +165,13 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     try {
       await rateLimiter.throttle();
       acquired = true;
-      const postThrottleTime = Date.now(); // Capture post-throttle time
-      if (params.startTime !== undefined) params.startTime = postThrottleTime; // Update startTime for testing
+      const postThrottleTime = Date.now();
+      if (params.startTime !== undefined) params.startTime = postThrottleTime;
       const responsePromise = methodInfo.method(
         requestParameters,
         requestOptions
       );
-      rateLimiter.release(); // Release slot immediately after starting fetch
+      rateLimiter.release();
       const response = await responsePromise;
       return await processResponse(response);
     } catch (error: unknown) {

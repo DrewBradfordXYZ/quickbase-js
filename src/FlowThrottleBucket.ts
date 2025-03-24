@@ -1,5 +1,8 @@
-// src/ThrottleBucket.ts
-export class ConcurrentThrottleBucket {
+// src/FlowThrottleBucket.ts
+import { Semaphore } from "./Semaphore";
+import { RateThrottleBucket } from "./RateThrottleBucket";
+
+export class FlowThrottleBucket implements RateThrottleBucket {
   private tokens: number;
   private maxTokens: number;
   private refillRate: number;
@@ -40,38 +43,5 @@ export class ConcurrentThrottleBucket {
 
   release(): void {
     this.semaphore.release();
-  }
-}
-
-class Semaphore {
-  private permits: number;
-  private waiting: Array<{ resolve: () => void; reject: (err: any) => void }> =
-    [];
-
-  constructor(maxPermits: number) {
-    this.permits = maxPermits;
-  }
-
-  async acquire(): Promise<void> {
-    if (this.permits > 0) {
-      this.permits -= 1;
-      return;
-    }
-    return new Promise((resolve, reject) => {
-      this.waiting.push({ resolve, reject });
-    });
-  }
-
-  release(): void {
-    this.permits += 1;
-    if (this.waiting.length > 0 && this.permits > 0) {
-      const { resolve } = this.waiting.shift()!;
-      this.permits -= 1;
-      resolve();
-    }
-  }
-
-  available(): number {
-    return this.permits;
   }
 }

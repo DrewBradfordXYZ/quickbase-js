@@ -1,10 +1,10 @@
 // test/vitest/unit/ThrottleBucket.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { ConcurrentThrottleBucket } from "@/ThrottleBucket"; // Should work with your alias
+import { FlowThrottleBucket } from "@/FlowThrottleBucket"; // Should work with your alias
 
 describe("ConcurrentThrottleBucket Unit Tests", () => {
   it("allows burst capacity immediately", async () => {
-    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5, burst: 3
+    const bucket = new FlowThrottleBucket(5, 3); // rate: 5, burst: 3
     const startTime = Date.now();
 
     await Promise.all([
@@ -18,7 +18,7 @@ describe("ConcurrentThrottleBucket Unit Tests", () => {
   });
 
   it("delays calls beyond burst at correct rate", async () => {
-    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5 tokens/sec, burst: 3
+    const bucket = new FlowThrottleBucket(5, 3); // rate: 5 tokens/sec, burst: 3
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
@@ -44,7 +44,7 @@ describe("ConcurrentThrottleBucket Unit Tests", () => {
   });
 
   it("maintains rate over sustained calls", async () => {
-    const bucket = new ConcurrentThrottleBucket(2, 2); // rate: 2 tokens/sec, burst: 2
+    const bucket = new FlowThrottleBucket(2, 2); // rate: 2 tokens/sec, burst: 2
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
@@ -74,7 +74,7 @@ describe("ConcurrentThrottleBucket Unit Tests", () => {
   });
 
   it("handles high concurrency without exceeding burst", async () => {
-    const bucket = new ConcurrentThrottleBucket(5, 3); // rate: 5, burst: 3
+    const bucket = new FlowThrottleBucket(5, 3); // rate: 5, burst: 3
     const timings: number[] = [];
     const recordTime = async () => {
       await bucket.acquire();
