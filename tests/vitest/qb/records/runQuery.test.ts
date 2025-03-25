@@ -1,4 +1,3 @@
-// tests/vitest/qb/records/runQuery.test.ts
 import { describe, it, expect } from "vitest";
 import { createClient, QB_TABLE_ID_1 } from "../../../setup.ts";
 import {
@@ -128,7 +127,7 @@ describe("QuickbaseClient Integration - runQuery", () => {
         numFields: 2,
         numRecords: 1,
         skip: 0,
-        top: 1,
+        // Removed top: 1, as it should be undefined in the final response
         totalRecords: expect.any(Number),
       });
 

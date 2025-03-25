@@ -1,4 +1,3 @@
-// tests/vitest/unit/records/runQuery.test.ts
 import { describe, test, expect, beforeEach } from "vitest";
 import {
   createClient,
@@ -7,7 +6,7 @@ import {
   QB_USER_TOKEN,
   QB_TABLE_ID_1,
 } from "@tests/setup.ts";
-import { RunQueryRequest, RunQueryResponse } from "@/generated";
+import { RunQueryRequest, RunQuery200Response } from "@/generated";
 
 describe("QuickbaseClient Unit - runQuery", () => {
   let client: ReturnType<typeof createClient>;
@@ -27,7 +26,7 @@ describe("QuickbaseClient Unit - runQuery", () => {
       options: { skip: 0, top: 100, compareWithAppLocalTime: false },
     };
 
-    const mockResponse: RunQueryResponse = {
+    const mockResponse: RunQuery200Response = {
       data: [
         { "3": { value: 1 }, "6": { value: "Task 1" }, "7": { value: "High" } },
       ],
@@ -40,7 +39,7 @@ describe("QuickbaseClient Unit - runQuery", () => {
         numFields: 3,
         numRecords: 1,
         skip: 0,
-        top: 100,
+        // top is omitted or undefined in the final response unless pagination continues
         totalRecords: 1,
       },
     };

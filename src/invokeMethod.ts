@@ -17,6 +17,25 @@ export interface MethodInfo<K extends keyof QuickbaseClient> {
   httpMethod: string;
 }
 
+/**
+ * Invokes a Quick Base API method with the specified parameters, handling authentication, rate limiting, and pagination.
+ * @template K - The method name keyof QuickbaseClient.
+ * @param methodName - The API method to invoke (e.g., "runQuery", "changesetSolution").
+ * @param params - Parameters for the API method, potentially including skip, top, or a body.
+ * @param methodMap - Mapping of method names to their implementation details.
+ * @param baseHeaders - Base HTTP headers for API requests.
+ * @param authStrategy - Strategy for handling authentication tokens.
+ * @param rateLimiter - Rate limiting mechanism to respect API limits.
+ * @param transformDates - Function to transform date strings in the response.
+ * @param debug - If true, logs detailed invocation information.
+ * @param convertDates - If true, converts date strings to Date objects in the response.
+ * @param autoPaginate - If true, automatically paginates multi-page responses (default: true).
+ * @param attempt - Current retry attempt (default: 0).
+ * @param maxAttempts - Maximum number of retry attempts (default: rateLimiter.maxRetries + 1).
+ * @param isPaginating - Indicates if this call is part of an ongoing pagination (default: false).
+ * @returns A promise resolving to the API method's response.
+ * @throws {Error} If the method is not found or retries are exhausted.
+ */
 export async function invokeMethod<K extends keyof QuickbaseClient>(
   methodName: K,
   params: Parameters<QuickbaseClient[K]>[0] & {
@@ -44,7 +63,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
 
   const hasBody = "body" in params && params.body !== undefined;
   const body = hasBody ? params.body : undefined;
-  const options = hasBody && "options" in body ? body.options : undefined;
+  // Safely check for options only if body is an object
+  const options =
+    hasBody && body && typeof body === "object" && "options" in body
+      ? (body as any).options
+      : undefined;
   const adjustedParams = {
     ...params,
     skip:
@@ -116,7 +139,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
             debug,
             convertDates,
             jsonResponse
-          ); // No maxRecords parameter
+          );
         }
         return transformDates(jsonResponse, convertDates) as ReturnType<
           QuickbaseClient[K]
@@ -143,7 +166,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
           debug,
           convertDates,
           response
-        ); // No maxRecords parameter
+        );
       }
       return transformDates(response, convertDates) as ReturnType<
         QuickbaseClient[K]

@@ -1,4 +1,3 @@
-// src/quickbaseClient.ts
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -95,10 +94,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
+  // Default to browser-native fetch, allow fetchApi override
   const defaultFetch: typeof fetch =
-    typeof globalThis.window !== "undefined"
-      ? globalThis.window.fetch.bind(globalThis.window)
-      : require("node-fetch").default;
+    globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
+  if (!defaultFetch && !fetchApi) {
+    throw new Error(
+      "No fetch implementation available. Please provide fetchApi in a Node.js environment without native fetch."
+    );
+  }
   const effectiveFetch = fetchApi || defaultFetch;
 
   const authStrategy: AuthorizationStrategy = useSso
@@ -181,8 +184,8 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const methodMap = buildMethodMap();
 
-  const proxyHandler: ProxyHandler<QuickbaseClient> = {
-    get: (_, prop: string) => {
+  const proxyHandler: globalThis.ProxyHandler<QuickbaseClient> = {
+    get: (_: QuickbaseClient, prop: string) => {
       if (debug) {
         console.log(
           "[proxy] Accessing:",

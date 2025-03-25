@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { quickbase } from "@/quickbaseClient"; // Use the @ alias instead of relative path
+import { quickbase } from "@/quickbaseClient";
 import { mockFetch, QB_APP_ID, QB_REALM } from "../../../setup.ts";
 import {
   UpdateAppRequest,
   UpdateApp200Response,
 } from "../../../../src/generated/models/index.ts";
-import { ChangesetSolution200Response } from "../../../../src/generated/models/index.ts";
+import { ChangesetSolutionFromRecord200Response } from "../../../../src/generated/models/index.ts";
 
 describe("QuickbaseClient Unit - HTTP Method Extraction", () => {
   let clientTemp: ReturnType<typeof quickbase>;
@@ -56,7 +56,9 @@ describe("QuickbaseClient Unit - HTTP Method Extraction", () => {
     dataClassification: "None",
   };
 
-  const mockChangesetResponse: ChangesetSolution200Response = [{ changes: [] }];
+  const mockChangesetResponse: ChangesetSolutionFromRecord200Response = [
+    { changes: [] },
+  ];
 
   const setupMockFetch = () => {
     mockFetch.mockReset();
@@ -107,14 +109,16 @@ describe("QuickbaseClient Unit - HTTP Method Extraction", () => {
     expect(apiCall.method).toBe("POST");
   });
 
-  it("uses PUT for changesetSolution", async () => {
+  it("uses GET for changesetSolutionFromRecord", async () => {
     setupMockFetchForChangeset();
-    await clientUser.changesetSolution({
+    await clientUser.changesetSolutionFromRecord({
       solutionId: "solution1",
-      body: "name: Test Solution\nversion: 1.0",
+      tableId: "table1",
+      fieldId: 6,
+      recordId: "123",
     });
     const apiCall = mockFetch.mock.calls[0][1];
-    expect(apiCall.method).toBe("PUT");
+    expect(apiCall.method).toBe("GET");
   });
 
   it("uses GET for getTable", async () => {

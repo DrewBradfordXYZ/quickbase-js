@@ -7650,39 +7650,79 @@
         }
     }
 
+    /**
+     * Paginates records from a Quick Base API endpoint, handling both skip-based and token-based pagination.
+     * @template K - The method name keyof QuickbaseClient.
+     * @param methodName - The Quick Base API method to invoke (e.g., "runQuery", "getUsers").
+     * @param params - Parameters for the API method, including optional skip and top values.
+     * @param methodMap - Mapping of method names to their implementation details.
+     * @param baseHeaders - Base HTTP headers for API requests.
+     * @param authStrategy - Strategy for handling authentication tokens.
+     * @param rateLimiter - Rate limiting mechanism to respect API limits.
+     * @param transformDates - Function to transform date strings in the response.
+     * @param debug - If true, logs detailed pagination information to the console.
+     * @param convertDates - If true, converts date strings to Date objects in the response.
+     * @param initialResponse - Optional initial response to start pagination from (used by invokeMethod).
+     * @returns A promise resolving to the complete paginated response with all records.
+     * @throws {Error} If no response is received during pagination.
+     */
     async function paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, initialResponse) {
         if (debug)
             console.log("[paginateRecords] Starting with params:", params);
-        const getDataKey = (response) => {
-            return (Object.keys(response).find((key) => Array.isArray(response[key])) ||
-                "data");
-        };
+        /** Extracts the key containing the data array from the response (e.g., "data" or "users"). */
+        const getDataKey = (response) => Object.keys(response).find((key) => Array.isArray(response[key])) || "data";
         const dataKey = initialResponse ? getDataKey(initialResponse) : "data";
         let allRecords = initialResponse ? initialResponse[dataKey] : [];
-        let continuation = initialResponse?.metadata?.skip !== undefined
-            ? {
-                type: "skip",
-                value: initialResponse.metadata.skip +
-                    (initialResponse.metadata.numRecords || 0),
-            }
-            : initialResponse?.metadata.nextPageToken
-                ? {
-                    type: "token",
-                    value: initialResponse.metadata.nextPageToken,
-                    key: "nextPageToken",
-                }
-                : initialResponse?.metadata.nextToken
-                    ? {
-                        type: "token",
-                        value: initialResponse.metadata.nextToken,
-                        key: "nextToken",
-                    }
-                    : { type: "skip", value: params.skip || 0 }; // Default to skip until response indicates otherwise
         let lastResponse = initialResponse;
         let requestCount = 0;
+        /**
+         * Determines the pagination strategy based on response metadata.
+         * @param response - The API response to analyze.
+         * @returns "skip" for skip-based, "token" for token-based, or "none" if no pagination is detected.
+         */
+        const determinePaginationType = (response) => {
+            if (response.metadata.totalRecords !== undefined &&
+                response.metadata.skip !== undefined) {
+                if (debug)
+                    console.log("[paginateRecords] Detected skip-based pagination");
+                return "skip";
+            }
+            if (response.metadata.nextPageToken !== undefined ||
+                response.metadata.nextToken !== undefined) {
+                if (debug)
+                    console.log("[paginateRecords] Detected token-based pagination");
+                return "token";
+            }
+            if (debug)
+                console.log("[paginateRecords] No clear pagination type detected, assuming single-page response");
+            return "none"; // No pagination indicators
+        };
+        let paginationType = initialResponse
+            ? determinePaginationType(initialResponse)
+            : "none"; // Start with no pagination assumption
+        let continuation = initialResponse
+            ? paginationType === "skip"
+                ? {
+                    type: "skip",
+                    value: (initialResponse.metadata.skip ?? 0) +
+                        (initialResponse.metadata.numRecords || allRecords.length),
+                }
+                : paginationType === "token"
+                    ? {
+                        type: "token",
+                        value: initialResponse.metadata.nextPageToken ||
+                            initialResponse.metadata.nextToken ||
+                            "",
+                        key: initialResponse.metadata.nextPageToken !== undefined
+                            ? "nextPageToken"
+                            : "nextToken",
+                    }
+                    : null
+            : null; // No continuation until type is determined
         if (debug) {
             console.log("[paginateRecords] Initial state:", {
                 dataKey,
+                paginationType,
                 continuation,
                 hasInitialResponse: !!initialResponse,
                 totalRecordsSoFar: allRecords.length,
@@ -7692,6 +7732,7 @@
                     ?.value);
             }
         }
+        /** Fetches the next page of records using the provided parameters. */
         const fetchNextPage = async (paginatedParams) => {
             if (debug)
                 console.log("[paginateRecords] Fetching with params:", paginatedParams);
@@ -7699,9 +7740,10 @@
             requestCount++;
             return response;
         };
+        /** Constructs the parameters for the next API request based on the pagination type. */
         const getPaginatedParams = () => {
             const hasBody = "body" in params && params.body !== undefined;
-            if (continuation.type === "skip") {
+            if (paginationType === "skip" && continuation?.type === "skip") {
                 const paginatedOptions = {
                     ...(hasBody && "options" in params.body ? params.body.options : {}),
                     skip: continuation.value,
@@ -7716,20 +7758,22 @@
                     }
                     : { ...params, skip: continuation.value };
             }
-            else if (continuation.value === "" && !lastResponse) {
-                return { ...params }; // Omit nextPageToken for initial token-based call
-            }
-            else {
+            else if (paginationType === "token" && continuation?.type === "token") {
+                if (continuation.value === "" && !lastResponse) {
+                    return { ...params }; // Initial call, no pagination fields
+                }
+                const tokenKey = continuation.key;
                 return hasBody
                     ? {
                         ...params,
                         body: {
                             ...params.body,
-                            [continuation.key]: continuation.value,
+                            [tokenKey]: continuation.value,
                         },
                     }
-                    : { ...params, [continuation.key]: continuation.value };
+                    : { ...params, [tokenKey]: continuation.value };
             }
+            return params; // No pagination or initial call
         };
         if (!initialResponse) {
             const firstParams = getPaginatedParams();
@@ -7737,36 +7781,43 @@
             const actualDataKey = getDataKey(firstResponse);
             allRecords = firstResponse[actualDataKey];
             lastResponse = firstResponse;
+            paginationType = determinePaginationType(firstResponse);
             continuation =
-                firstResponse.metadata.nextPageToken !== undefined ||
-                    firstResponse.metadata.nextToken !== undefined
+                paginationType === "skip"
                     ? {
-                        type: "token",
-                        value: firstResponse.metadata.nextPageToken ??
-                            firstResponse.metadata.nextToken ??
-                            "",
-                        key: firstResponse.metadata.nextPageToken !== undefined
-                            ? "nextPageToken"
-                            : "nextToken",
-                    }
-                    : {
                         type: "skip",
-                        value: continuation.value + firstResponse[actualDataKey].length,
-                    };
+                        value: (firstResponse.metadata.skip ?? 0) +
+                            (firstResponse.metadata.numRecords || allRecords.length),
+                    }
+                    : paginationType === "token"
+                        ? {
+                            type: "token",
+                            value: firstResponse.metadata.nextPageToken ??
+                                firstResponse.metadata.nextToken ??
+                                "",
+                            key: firstResponse.metadata.nextPageToken !== undefined
+                                ? "nextPageToken"
+                                : "nextToken",
+                        }
+                        : null;
         }
         while (true) {
-            const hasMoreSkipBased = lastResponse.metadata.totalRecords !== undefined &&
-                continuation.type === "skip" &&
+            const hasMore = (paginationType === "skip" &&
+                continuation?.type === "skip" &&
+                lastResponse.metadata.totalRecords !== undefined &&
                 continuation.value < lastResponse.metadata.totalRecords &&
-                allRecords.length < lastResponse.metadata.totalRecords;
-            const hasMoreTokenBased = continuation.type === "token" &&
-                (!lastResponse ||
-                    lastResponse.metadata.nextPageToken !== undefined ||
-                    lastResponse.metadata.nextToken !== undefined) &&
-                continuation.value !== "";
-            if (!hasMoreSkipBased && !hasMoreTokenBased) {
-                if (debug)
-                    console.log("[paginateRecords] Stopping: no more data to fetch");
+                allRecords.length < lastResponse.metadata.totalRecords) ||
+                (paginationType === "token" &&
+                    continuation?.type === "token" &&
+                    continuation.value !== "");
+            if (!hasMore) {
+                if (debug) {
+                    console.log("[paginateRecords] Stopping:", paginationType === "skip"
+                        ? "All skip-based records fetched or no more data"
+                        : paginationType === "token"
+                            ? "Token exhausted"
+                            : "No pagination required");
+                }
                 break;
             }
             const paginatedParams = getPaginatedParams();
@@ -7777,8 +7828,10 @@
             if (debug && response[actualDataKey].length > 0) {
                 console.log("[paginateRecords] Fetched records this iteration:", response[actualDataKey].length, "IDs: first:", response[actualDataKey][0]["3"]?.value, "last:", response[actualDataKey][response[actualDataKey].length - 1]["3"]?.value, "Continuation after fetch:", continuation);
             }
-            if (continuation.type === "skip") {
-                const newSkip = continuation.value + response[actualDataKey].length;
+            if (paginationType === "skip") {
+                const newSkip = continuation?.type === "skip"
+                    ? continuation.value + response[actualDataKey].length
+                    : (response.metadata.skip ?? 0) + response[actualDataKey].length;
                 continuation = { type: "skip", value: newSkip };
                 if (response[actualDataKey].length === 0) {
                     if (debug &&
@@ -7786,12 +7839,10 @@
                         newSkip < lastResponse.metadata.totalRecords) {
                         console.warn("[paginateRecords] Warning: Empty response received but records remain", { skip: newSkip, totalRecords: lastResponse.metadata.totalRecords });
                     }
-                    if (debug)
-                        console.log("[paginateRecords] Stopping: no more data returned");
                     break;
                 }
             }
-            else {
+            else if (paginationType === "token") {
                 const newToken = response.metadata.nextPageToken ?? response.metadata.nextToken ?? "";
                 continuation = {
                     type: "token",
@@ -7801,8 +7852,6 @@
                         : "nextToken",
                 };
                 if (continuation.value === "") {
-                    if (debug)
-                        console.log("[paginateRecords] Stopping: no more token");
                     break;
                 }
                 else if (response[actualDataKey].length === 0 && newToken !== "") {
@@ -7819,14 +7868,16 @@
             [finalDataKey]: allRecords,
             fields: lastResponse.fields,
             metadata: {
-                totalRecords: continuation.type === "skip"
+                totalRecords: paginationType === "skip"
                     ? lastResponse.metadata.totalRecords
                     : undefined,
                 numRecords: allRecords.length,
                 numFields: lastResponse.metadata.numFields,
-                skip: continuation.type === "skip" ? 0 : undefined,
-                top: continuation.type === "skip" ? undefined : undefined,
-                ...(continuation.type === "token" && continuation.key
+                skip: paginationType === "skip" ? 0 : undefined,
+                top: paginationType === "skip" ? undefined : undefined,
+                ...(paginationType === "token" &&
+                    continuation?.type === "token" &&
+                    continuation.key
                     ? { [continuation.key]: "" }
                     : {}),
             },
@@ -7838,7 +7889,9 @@
                 numFields: finalResponse.metadata.numFields,
                 skip: finalResponse.metadata.skip,
                 top: finalResponse.metadata.top,
-                ...(continuation.type === "token" && continuation.key
+                ...(paginationType === "token" &&
+                    continuation?.type === "token" &&
+                    continuation.key
                     ? { [continuation.key]: finalResponse.metadata[continuation.key] }
                     : {}),
             });
@@ -7848,6 +7901,11 @@
         }
         return finalResponse;
     }
+    /**
+     * Checks if a response is paginatable based on its structure.
+     * @param response - The response to check.
+     * @returns True if the response has a data array and pagination metadata, false otherwise.
+     */
     function isPaginatable(response) {
         return (response &&
             typeof response === "object" &&
@@ -7861,13 +7919,35 @@
                 "nextToken" in response.metadata));
     }
 
+    /**
+     * Invokes a Quick Base API method with the specified parameters, handling authentication, rate limiting, and pagination.
+     * @template K - The method name keyof QuickbaseClient.
+     * @param methodName - The API method to invoke (e.g., "runQuery", "changesetSolution").
+     * @param params - Parameters for the API method, potentially including skip, top, or a body.
+     * @param methodMap - Mapping of method names to their implementation details.
+     * @param baseHeaders - Base HTTP headers for API requests.
+     * @param authStrategy - Strategy for handling authentication tokens.
+     * @param rateLimiter - Rate limiting mechanism to respect API limits.
+     * @param transformDates - Function to transform date strings in the response.
+     * @param debug - If true, logs detailed invocation information.
+     * @param convertDates - If true, converts date strings to Date objects in the response.
+     * @param autoPaginate - If true, automatically paginates multi-page responses (default: true).
+     * @param attempt - Current retry attempt (default: 0).
+     * @param maxAttempts - Maximum number of retry attempts (default: rateLimiter.maxRetries + 1).
+     * @param isPaginating - Indicates if this call is part of an ongoing pagination (default: false).
+     * @returns A promise resolving to the API method's response.
+     * @throws {Error} If the method is not found or retries are exhausted.
+     */
     async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate = true, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1, isPaginating = false) {
         const methodInfo = methodMap[methodName];
         if (!methodInfo)
             throw new Error(`Method ${methodName} not found`);
         const hasBody = "body" in params && params.body !== undefined;
         const body = hasBody ? params.body : undefined;
-        const options = hasBody && "options" in body ? body.options : undefined;
+        // Safely check for options only if body is an object
+        const options = hasBody && body && typeof body === "object" && "options" in body
+            ? body.options
+            : undefined;
         const adjustedParams = {
             ...params,
             skip: params.skip ?? (options && "skip" in options ? options.skip : undefined),
@@ -7907,7 +7987,7 @@
                     if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
                         if (debug)
                             console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
-                        return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse); // No maxRecords parameter
+                        return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse);
                     }
                     return transformDates(jsonResponse, convertDates);
                 }
@@ -7918,7 +7998,7 @@
                 if (autoPaginate && !isPaginating && isPaginatable(response)) {
                     if (debug)
                         console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
-                    return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response); // No maxRecords parameter
+                    return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response);
                 }
                 return transformDates(response, convertDates);
             }
@@ -8173,9 +8253,11 @@
             })
             : new FlowThrottleBucket(throttleOptions.rate || 6, throttleOptions.burst || 50);
         const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
-        const defaultFetch = typeof globalThis.window !== "undefined"
-            ? globalThis.window.fetch.bind(globalThis.window)
-            : require("node-fetch").default;
+        // Default to browser-native fetch, allow fetchApi override
+        const defaultFetch = globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
+        if (!defaultFetch && !fetchApi) {
+            throw new Error("No fetch implementation available. Please provide fetchApi in a Node.js environment without native fetch.");
+        }
         const effectiveFetch = fetchApi || defaultFetch;
         const authStrategy = useSso
             ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug, baseUrl)
