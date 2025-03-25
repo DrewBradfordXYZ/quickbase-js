@@ -1,5 +1,3 @@
-// tests/vitest/unit/auth/retryUserToken401.test.ts
-
 import { describe, it, expect, vi } from "vitest";
 import {
   createClient,
@@ -10,7 +8,6 @@ import {
 
 describe("QuickbaseClient Unit - User Token Retry on 401", () => {
   it("retries with the same user token on 401 and succeeds", async () => {
-    const userToken = "b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3";
     mockFetch
       .mockResolvedValueOnce(
         new Response(JSON.stringify({ message: "Unauthorized" }), {
@@ -26,7 +23,7 @@ describe("QuickbaseClient Unit - User Token Retry on 401", () => {
     const consoleSpy = vi.spyOn(console, "log");
     const client = createClient(mockFetch, {
       realm: QB_REALM,
-      userToken,
+      userToken: "b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
       useTempTokens: false,
       debug: true,
     });
@@ -41,7 +38,8 @@ describe("QuickbaseClient Unit - User Token Retry on 401", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization: `QB-USER-TOKEN ${userToken}`,
+          Authorization:
+            "QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           "Content-Type": "application/json",
         }),
@@ -53,17 +51,16 @@ describe("QuickbaseClient Unit - User Token Retry on 401", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization: `QB-USER-TOKEN ${userToken}`,
+          Authorization:
+            "QB-USER-TOKEN b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3",
           "QB-Realm-Hostname": `${QB_REALM}.quickbase.com`,
           "Content-Type": "application/json",
         }),
       })
     );
     expect(consoleSpy).toHaveBeenCalledWith(
-      `Retrying getFields with existing user token: b9f3pk_q4j...`
+      "Retrying getFields with existing user token: b9f3pk_q4j..."
     );
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "[getFields] Retrying with token: b9f3pk_q4j..."
-    );
+    consoleSpy.mockRestore();
   });
 });

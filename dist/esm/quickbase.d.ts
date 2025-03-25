@@ -8078,6 +8078,7 @@ interface QuickbaseConfig {
     retryDelay?: number;
     tokenCache?: TokenCache;
     baseUrl?: string;
+    autoPaginate?: boolean;
 }
 type ThrottleOptions = {
     type?: "flow" | "burst-aware";

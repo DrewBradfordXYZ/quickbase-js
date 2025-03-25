@@ -1,18 +1,27 @@
-// src/pagination.ts
 import { QuickbaseClient } from "./quickbaseClient";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import { AuthorizationStrategy } from "./authorizationStrategy";
 import { RateLimiter } from "./rateLimiter";
 
-// Define the paginated response structure
 interface PaginatedResponse<T> {
   data: T[];
+  fields?: { id: number; label: string; type: string }[];
   metadata: {
     totalRecords: number;
     numRecords: number;
     numFields: number;
     skip: number;
     top?: number;
+  };
+}
+
+interface BodyWithOptions {
+  body?: {
+    options?: {
+      sortBy?: Array<{ fieldId: number; order: "ASC" | "DESC" }>;
+      [key: string]: any;
+    };
+    [key: string]: any;
   };
 }
 
@@ -25,16 +34,79 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
   rateLimiter: RateLimiter,
   transformDates: (obj: any, convertStringsToDates: boolean) => any,
   debug: boolean | undefined,
-  convertDates: boolean
+  convertDates: boolean,
+  initialResponse?: PaginatedResponse<any>
 ): Promise<ReturnType<QuickbaseClient[K]>> {
-  let allRecords: any[] = [];
-  let skip = params.skip || 0;
-  const top = params.top || 100; // Default page size
+  if (debug) console.log("[paginateRecords] Starting with params:", params);
 
-  let lastMetadata: PaginatedResponse<any>["metadata"] | undefined; // Store last metadata for numFields
+  let allRecords: any[] = initialResponse ? initialResponse.data : [];
+  let skip = initialResponse
+    ? initialResponse.metadata.skip + initialResponse.metadata.numRecords
+    : params.skip || 0;
+  let lastResponse: PaginatedResponse<any> | undefined = initialResponse;
+  let requestCount = 0;
 
-  while (true) {
-    const paginatedParams = { ...params, skip, top };
+  if (debug) {
+    console.log("[paginateRecords] Initial state:", {
+      skip,
+      hasInitialResponse: !!initialResponse,
+      totalRecordsSoFar: allRecords.length,
+    });
+    if (initialResponse && initialResponse.data.length > 0) {
+      console.log(
+        "[paginateRecords] Initial response IDs: first:",
+        initialResponse.data[0]["3"]?.value,
+        "last:",
+        initialResponse.data[initialResponse.data.length - 1]["3"]?.value
+      );
+    }
+  }
+
+  if (!initialResponse) {
+    const firstParams = { ...params, skip };
+    if (debug)
+      console.log("[paginateRecords] First call with params:", firstParams);
+    const firstResponse = await invokeMethod(
+      methodName,
+      firstParams,
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      debug,
+      convertDates,
+      false
+    );
+    requestCount++;
+    const typedFirstResponse = firstResponse as PaginatedResponse<any>;
+    allRecords = typedFirstResponse.data;
+    lastResponse = typedFirstResponse;
+    skip += typedFirstResponse.data.length;
+  }
+
+  while (
+    skip < lastResponse!.metadata.totalRecords &&
+    allRecords.length < lastResponse!.metadata.totalRecords
+  ) {
+    const hasBody = "body" in params && params.body !== undefined;
+    const paginatedOptions = {
+      ...(hasBody && "options" in params.body! ? params.body!.options : {}),
+      skip,
+      // No top—rely on Quickbase’s default limit
+    };
+    const paginatedParams = hasBody
+      ? {
+          ...params,
+          body: {
+            ...(params as BodyWithOptions).body!,
+            options: paginatedOptions,
+          },
+        }
+      : { ...params, skip };
+
+    if (debug)
+      console.log("[paginateRecords] Paginating with params:", paginatedParams);
     const response = await invokeMethod(
       methodName,
       paginatedParams,
@@ -44,37 +116,61 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       rateLimiter,
       transformDates,
       debug,
-      convertDates
+      convertDates,
+      false,
+      0,
+      rateLimiter.maxRetries + 1,
+      true
     );
-
+    requestCount++;
     const typedResponse = response as PaginatedResponse<any>;
-    const { data, metadata } = typedResponse;
-    allRecords = allRecords.concat(data);
-    lastMetadata = metadata; // Save metadata for final response
+    allRecords = allRecords.concat(typedResponse.data);
+    lastResponse = typedResponse;
 
-    if (debug) {
+    if (debug && typedResponse.data.length > 0) {
       console.log(
-        `[paginateRecords] Fetched ${metadata.numRecords} records, skip: ${skip}, total: ${metadata.totalRecords}`
+        "[paginateRecords] Fetched records this iteration:",
+        typedResponse.data.length,
+        "IDs: first:",
+        typedResponse.data[0]["3"]?.value,
+        "last:",
+        typedResponse.data[typedResponse.data.length - 1]["3"]?.value
       );
     }
 
-    if (metadata.numRecords + metadata.skip >= metadata.totalRecords) {
-      break; // All records fetched
-    }
+    skip += typedResponse.data.length;
 
-    skip += metadata.numRecords; // Next page
+    if (typedResponse.data.length === 0) {
+      if (debug)
+        console.log("[paginateRecords] Stopping: no more data returned");
+      break;
+    }
   }
 
-  return {
-    data: allRecords,
+  const finalResponse = {
+    data: allRecords, // No cap
+    fields: lastResponse!.fields,
     metadata: {
-      totalRecords: allRecords.length,
-      numRecords: allRecords.length,
-      numFields: lastMetadata!.numFields, // Use last metadata
+      totalRecords: lastResponse!.metadata.totalRecords,
+      numRecords: allRecords.length, // Reflect actual fetched count
+      numFields: lastResponse!.metadata.numFields,
       skip: 0,
-      top: allRecords.length,
+      top: undefined,
     },
-  } as ReturnType<QuickbaseClient[K]>;
+  };
+  if (debug) {
+    console.log("[paginateRecords] Final response summary:", {
+      totalRecords: finalResponse.metadata.totalRecords,
+      numRecords: finalResponse.metadata.numRecords,
+      numFields: finalResponse.metadata.numFields,
+      skip: finalResponse.metadata.skip,
+      top: finalResponse.metadata.top,
+    });
+    console.log("[paginateRecords] Pagination stats:", {
+      totalRequests: requestCount,
+    });
+  }
+  return finalResponse as ReturnType<QuickbaseClient[K]>;
 }
 
 export function isPaginatable(

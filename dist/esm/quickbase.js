@@ -7478,6 +7478,8 @@ class TempTokenStrategy {
             const newToken = await this.getToken(dbid);
             if (newToken) {
                 this.tokenCache.set(dbid, newToken);
+                if (debug)
+                    console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
                 return newToken;
             }
             return null;
@@ -7555,6 +7557,8 @@ class SsoTokenStrategy {
         const newToken = await this.refreshSsoToken(debug || this.debug);
         if (newToken) {
             this.currentToken = newToken;
+            if (debug || this.debug)
+                console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
             return newToken;
         }
         return null;
@@ -7640,8 +7644,63 @@ class RateLimitError extends Error {
     }
 }
 
+async function paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, initialResponse) {
+    let allRecords = initialResponse ? initialResponse.data : [];
+    let skip = initialResponse
+        ? initialResponse.metadata.skip + initialResponse.metadata.numRecords
+        : params.skip || 0;
+    const top = params.top || 100;
+    let lastMetadata = initialResponse ? initialResponse.metadata : undefined;
+    const maxRecords = 500;
+    if (!initialResponse) {
+        const firstParams = { ...params, skip, top };
+        const firstResponse = await invokeMethod(methodName, firstParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false);
+        const typedFirstResponse = firstResponse;
+        allRecords = typedFirstResponse.data;
+        lastMetadata = typedFirstResponse.metadata;
+        skip = lastMetadata.skip + lastMetadata.numRecords;
+    }
+    while (skip < lastMetadata.totalRecords && allRecords.length < maxRecords) {
+        const remainingRecords = maxRecords - allRecords.length;
+        const fetchTop = Math.min(top, remainingRecords);
+        const paginatedParams = { ...params, skip, top: fetchTop };
+        const response = await invokeMethod(methodName, paginatedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false, 0, rateLimiter.maxRetries + 1, true);
+        const typedResponse = response;
+        const { data, metadata } = typedResponse;
+        allRecords = allRecords.concat(data);
+        lastMetadata = metadata;
+        if (metadata.numRecords + metadata.skip >= metadata.totalRecords ||
+            allRecords.length >= maxRecords) {
+            break;
+        }
+        skip += metadata.numRecords;
+    }
+    const finalResponse = {
+        data: allRecords,
+        fields: initialResponse?.fields, // Only use fields from initial response
+        metadata: {
+            totalRecords: lastMetadata.totalRecords,
+            numRecords: allRecords.length,
+            numFields: lastMetadata.numFields,
+            skip: 0,
+            top: initialResponse?.metadata.top || top,
+        },
+    };
+    return finalResponse;
+}
+function isPaginatable(response) {
+    return (response &&
+        typeof response === "object" &&
+        "data" in response &&
+        "metadata" in response &&
+        typeof response.metadata === "object" &&
+        "totalRecords" in response.metadata &&
+        "numRecords" in response.metadata &&
+        "skip" in response.metadata);
+}
+
 // src/invokeMethod.ts
-async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1) {
+async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate = true, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1, isPaginating = false) {
     const methodInfo = methodMap[methodName];
     if (!methodInfo)
         throw new Error(`Method ${methodName} not found`);
@@ -7676,12 +7735,18 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
                 ?.toLowerCase();
             if (contentType?.includes("application/json")) {
                 const jsonResponse = await rawResponse.json();
+                if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
+                    return paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse);
+                }
                 return transformDates(jsonResponse, convertDates);
             }
             return rawResponse;
         }
         if (rawResponse && typeof rawResponse.value === "function") {
             const response = await rawResponse.value();
+            if (autoPaginate && !isPaginating && isPaginatable(response)) {
+                return paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response);
+            }
             return transformDates(response, convertDates);
         }
         return transformDates(rawResponse, convertDates);
@@ -7718,11 +7783,15 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
         try {
             await rateLimiter.throttle();
             acquired = true;
-            const postThrottleTime = Date.now(); // Capture post-throttle time
+            const postThrottleTime = Date.now();
             if (params.startTime !== undefined)
-                params.startTime = postThrottleTime; // Update startTime for testing
-            const responsePromise = methodInfo.method(requestParameters, requestOptions);
-            rateLimiter.release(); // Release slot immediately after starting fetch
+                params.startTime = postThrottleTime;
+            const headers = { ...baseHeaders };
+            const responsePromise = methodInfo.method(requestParameters, {
+                ...requestOptions,
+                headers,
+            });
+            rateLimiter.release();
             const response = await responsePromise;
             return await processResponse(response);
         }
@@ -7768,8 +7837,6 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
                 token = newToken;
                 authStrategy.applyHeaders(baseHeaders, token);
                 requestOptions.headers = { ...baseHeaders };
-                if (debug)
-                    console.log(`[${methodName}] Retrying with token: ${token.substring(0, 10)}...`);
                 attempt++;
                 continue;
             }
@@ -7920,8 +7987,7 @@ class RateLimiter {
 }
 
 function quickbase(config) {
-    const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, // Default FlowThrottleBucket
-    maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", } = config;
+    const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 6, burst: 50 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
     const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
     const throttleOptions = throttle;
     const throttleBucket = throttleOptions.type === "burst-aware"
@@ -7933,11 +7999,8 @@ function quickbase(config) {
     const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
     const defaultFetch = typeof globalThis.window !== "undefined"
         ? globalThis.window.fetch.bind(globalThis.window)
-        : undefined;
+        : require("node-fetch").default;
     const effectiveFetch = fetchApi || defaultFetch;
-    if (!effectiveFetch) {
-        throw new Error("No fetch implementation available");
-    }
     const authStrategy = useSso
         ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug, baseUrl)
         : useTempTokens
@@ -7992,19 +8055,23 @@ function quickbase(config) {
     const methodMap = buildMethodMap();
     const proxyHandler = {
         get: (_, prop) => {
-            console.log("[proxy] Accessing:", prop, "in methodMap:", prop in methodMap);
+            if (debug) {
+                console.log("[proxy] Accessing:", prop, "in methodMap:", prop in methodMap);
+            }
             if (prop in methodMap) {
                 const methodName = prop;
-                return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates);
+                return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate);
             }
-            console.log("[proxy] Method not found:", prop);
+            if (debug) {
+                console.log("[proxy] Method not found:", prop);
+            }
             return undefined;
         },
     };
     const proxy = new Proxy({}, proxyHandler);
     if (debug) {
         console.log("[createClient] Config:", config);
-        console.log("[createClient] Proxy created:", proxy);
+        console.log("[createClient] Returning proxy");
     }
     return proxy;
 }

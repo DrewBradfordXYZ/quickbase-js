@@ -1,4 +1,3 @@
-// src/invokeMethod.ts
 import { AuthorizationStrategy, extractDbid } from "./authorizationStrategy";
 import { RateLimiter } from "./rateLimiter";
 import { RateLimitError } from "./RateLimitError";
@@ -25,8 +24,8 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     tableId?: string;
     appId?: string;
     startTime?: number;
-    skip?: number; // Added for pagination
-    top?: number; // Added for pagination
+    skip?: number;
+    top?: number;
   },
   methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
   baseHeaders: Record<string, string>,
@@ -37,24 +36,39 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
   convertDates: boolean,
   autoPaginate: boolean = true,
   attempt: number = 0,
-  maxAttempts: number = rateLimiter.maxRetries + 1
+  maxAttempts: number = rateLimiter.maxRetries + 1,
+  isPaginating: boolean = false
 ): Promise<ReturnType<QuickbaseClient[K]>> {
   const methodInfo = methodMap[methodName];
   if (!methodInfo) throw new Error(`Method ${methodName} not found`);
 
   const hasBody = "body" in params && params.body !== undefined;
   const body = hasBody ? params.body : undefined;
+  const options = hasBody && "options" in body ? body.options : undefined;
+  const adjustedParams = {
+    ...params,
+    skip:
+      params.skip ?? (options && "skip" in options ? options.skip : undefined),
+    top: params.top ?? (options && "top" in options ? options.top : undefined),
+  };
+
   const restParams: any = hasBody
     ? Object.fromEntries(
-        Object.entries(params).filter(
+        Object.entries(adjustedParams).filter(
           ([key]) => key !== "body" && key !== "startTime"
         )
       )
-    : { ...params, startTime: undefined };
+    : { ...adjustedParams, startTime: undefined };
   const requestParameters: any = {
     ...restParams,
     ...(hasBody ? { generated: body } : {}),
   };
+
+  if (debug)
+    console.log(
+      "[invokeMethod] Adjusted params for pagination:",
+      adjustedParams
+    );
 
   const requestOptions: RequestInit = {
     credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
@@ -85,18 +99,24 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         ?.toLowerCase();
       if (contentType?.includes("application/json")) {
         const jsonResponse = await rawResponse.json();
-        if (autoPaginate && isPaginatable(jsonResponse)) {
+        if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
+          if (debug)
+            console.log(
+              "[invokeMethod] Entering pagination with params:",
+              adjustedParams
+            );
           return paginateRecords(
             methodName,
-            params,
+            adjustedParams,
             methodMap,
             baseHeaders,
             authStrategy,
             rateLimiter,
             transformDates,
             debug,
-            convertDates
-          );
+            convertDates,
+            jsonResponse
+          ); // No maxRecords parameter
         }
         return transformDates(jsonResponse, convertDates) as ReturnType<
           QuickbaseClient[K]
@@ -106,18 +126,24 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     }
     if (rawResponse && typeof rawResponse.value === "function") {
       const response = await rawResponse.value();
-      if (autoPaginate && isPaginatable(response)) {
+      if (autoPaginate && !isPaginating && isPaginatable(response)) {
+        if (debug)
+          console.log(
+            "[invokeMethod] Entering pagination with params:",
+            adjustedParams
+          );
         return paginateRecords(
           methodName,
-          params,
+          adjustedParams,
           methodMap,
           baseHeaders,
           authStrategy,
           rateLimiter,
           transformDates,
           debug,
-          convertDates
-        );
+          convertDates,
+          response
+        ); // No maxRecords parameter
       }
       return transformDates(response, convertDates) as ReturnType<
         QuickbaseClient[K]
@@ -167,10 +193,13 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       acquired = true;
       const postThrottleTime = Date.now();
       if (params.startTime !== undefined) params.startTime = postThrottleTime;
-      const responsePromise = methodInfo.method(
-        requestParameters,
-        requestOptions
-      );
+      const headers = { ...baseHeaders };
+      const finalRequest = { ...requestParameters, headers };
+      if (debug) console.log("[invokeMethod] Sending request:", finalRequest);
+      const responsePromise = methodInfo.method(finalRequest, {
+        ...requestOptions,
+        headers,
+      });
       rateLimiter.release();
       const response = await responsePromise;
       return await processResponse(response);
@@ -227,10 +256,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         token = newToken;
         authStrategy.applyHeaders(baseHeaders, token);
         requestOptions.headers = { ...baseHeaders };
-        if (debug)
-          console.log(
-            `[${methodName}] Retrying with token: ${token.substring(0, 10)}...`
-          );
         attempt++;
         continue;
       }

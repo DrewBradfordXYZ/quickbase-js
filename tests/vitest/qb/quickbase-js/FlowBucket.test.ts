@@ -1,6 +1,6 @@
 // tests/vitest/qb/ThrottleBucket.test.ts
 import { describe, it, expect } from "vitest";
-import { quickbase } from "../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/quickbaseClient";
 
 describe("QuickbaseClient with ConcurrentThrottleBucket Integration Tests", () => {
   it("handles concurrent API calls with burst and rate limiting in strict order", async () => {

@@ -19,7 +19,6 @@ import {
 import { FlowThrottleBucket } from "./FlowThrottleBucket";
 import { BurstAwareThrottleBucket } from "./BurstAwareThrottleBucket";
 import { RateLimiter } from "./rateLimiter";
-import { paginateRecords, isPaginatable } from "./pagination"; // New imports
 
 export * from "./generated/models/index";
 
@@ -56,7 +55,6 @@ export type ThrottleOptions = {
   windowSeconds?: number;
 };
 
-// Define MethodMap at the top level
 type MethodMap = {
   [K in keyof QuickbaseClient]: MethodInfo<K>;
 };
@@ -97,15 +95,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
-  const defaultFetch: typeof fetch | undefined =
+  const defaultFetch: typeof fetch =
     typeof globalThis.window !== "undefined"
       ? globalThis.window.fetch.bind(globalThis.window)
-      : undefined;
+      : require("node-fetch").default;
   const effectiveFetch = fetchApi || defaultFetch;
-
-  if (!effectiveFetch) {
-    throw new Error("No fetch implementation available");
-  }
 
   const authStrategy: AuthorizationStrategy = useSso
     ? new SsoTokenStrategy(
@@ -189,12 +183,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const proxyHandler: ProxyHandler<QuickbaseClient> = {
     get: (_, prop: string) => {
-      console.log(
-        "[proxy] Accessing:",
-        prop,
-        "in methodMap:",
-        prop in methodMap
-      );
+      if (debug) {
+        console.log(
+          "[proxy] Accessing:",
+          prop,
+          "in methodMap:",
+          prop in methodMap
+        );
+      }
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
         return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
@@ -211,7 +207,9 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             autoPaginate
           );
       }
-      console.log("[proxy] Method not found:", prop);
+      if (debug) {
+        console.log("[proxy] Method not found:", prop);
+      }
       return undefined;
     },
   };
@@ -220,7 +218,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   if (debug) {
     console.log("[createClient] Config:", config);
-    console.log("[createClient] Proxy created:", proxy);
+    console.log("[createClient] Returning proxy");
   }
 
   return proxy;

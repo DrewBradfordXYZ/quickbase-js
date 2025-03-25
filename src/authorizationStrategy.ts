@@ -1,4 +1,3 @@
-// src/authorizationStrategy.ts
 import { TokenCache } from "./tokenCache";
 
 export interface AuthorizationStrategy {
@@ -109,6 +108,12 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       const newToken = await this.getToken(dbid);
       if (newToken) {
         this.tokenCache.set(dbid, newToken);
+        if (debug)
+          console.log(
+            `[${
+              methodName || "method"
+            }] Retrying with token: ${newToken.substring(0, 10)}...`
+          );
         return newToken;
       }
       return null;
@@ -213,6 +218,12 @@ export class SsoTokenStrategy implements AuthorizationStrategy {
     const newToken = await this.refreshSsoToken(debug || this.debug);
     if (newToken) {
       this.currentToken = newToken;
+      if (debug || this.debug)
+        console.log(
+          `[${
+            methodName || "method"
+          }] Retrying with token: ${newToken.substring(0, 10)}...`
+        );
       return newToken;
     }
     return null;
