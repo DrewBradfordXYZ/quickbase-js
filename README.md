@@ -2,7 +2,7 @@
 
 A Typescript API client for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
 
-Support for various authentication types (`user token`, `temporary tokens`, `SSO token`), `concurrent rate limiting` strategies, auto `pagination`, `js date` conversion, `429` (rate limit) and `401` (auth) error handling retries. It uses a Proxy to dynamically invoke API methods derived from the OpenAPI specification.
+Support for various authentication types (`user token`, `temporary tokens`, `SSO token`), `concurrent rate limiting strategies`, `auto pagination`, `js date conversion`, `429` (rate limit) and `401` (auth) error handling retries. It uses a Proxy to dynamically invoke API methods derived from the OpenAPI specification.
 
 Browser and Node.js support. ESM and UMD builds are available.
 
