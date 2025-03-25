@@ -8243,17 +8243,18 @@
     }
 
     function quickbase(config) {
-        const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 6, burst: 50 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
+        const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, // Changed rate from 6 to 5
+        maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
         const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
         const throttleOptions = throttle;
         const throttleBucket = throttleOptions.type === "burst-aware"
             ? new BurstAwareThrottleBucket({
-                maxTokens: throttleOptions.burst || 50,
+                maxTokens: throttleOptions.burst || 100,
                 windowSeconds: throttleOptions.windowSeconds || 10,
             })
-            : new FlowThrottleBucket(throttleOptions.rate || 6, throttleOptions.burst || 50);
+            : new FlowThrottleBucket(throttleOptions.rate || 5, // Changed rate from 6 to 5
+            throttleOptions.burst || 50);
         const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
-        // Default to browser-native fetch, allow fetchApi override
         const defaultFetch = globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
         if (!defaultFetch && !fetchApi) {
             throw new Error("No fetch implementation available. Please provide fetchApi in a Node.js environment without native fetch.");

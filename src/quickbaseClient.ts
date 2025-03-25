@@ -70,7 +70,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
-    throttle = { type: "flow", rate: 5, burst: 50 },
+    throttle = { type: "flow", rate: 5, burst: 50 }, // Changed rate from 6 to 5
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
@@ -84,17 +84,16 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const throttleBucket =
     throttleOptions.type === "burst-aware"
       ? new BurstAwareThrottleBucket({
-          maxTokens: throttleOptions.burst || 50,
+          maxTokens: throttleOptions.burst || 100,
           windowSeconds: throttleOptions.windowSeconds || 10,
         })
       : new FlowThrottleBucket(
-          throttleOptions.rate || 6,
+          throttleOptions.rate || 5, // Changed rate from 6 to 5
           throttleOptions.burst || 50
         );
 
   const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
-  // Default to browser-native fetch, allow fetchApi override
   const defaultFetch: typeof fetch =
     globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
   if (!defaultFetch && !fetchApi) {
