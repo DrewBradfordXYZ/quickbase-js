@@ -70,7 +70,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
-    throttle = { type: "flow", rate: 6, burst: 50 },
+    throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
