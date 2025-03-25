@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-beta.13](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.12...v0.1.0-beta.13) (2025-03-25)
+
+
+### Features
+
+* BurstAwareThrottleBucket unit integration test pass and pagination unit test passes ([c3ba104](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c3ba104cce51c41758059a81a9ce26eedab6e760))
+* flow throttle rate should be 5 not 6 ([519a640](https://github.com/DrewBradfordXYZ/quickbase-js/commit/519a640a673a6aa0ccf0c784b1762d2449a16612))
+* pagination for skip and token types ([a6d8790](https://github.com/DrewBradfordXYZ/quickbase-js/commit/a6d879075ed430e11964e72a0b88a4ecf9c54c67))
+* pagination integration test passes with skip ([60279c1](https://github.com/DrewBradfordXYZ/quickbase-js/commit/60279c123c7d3a856baefcd774f0e88f790931cd))
+* quickbaseClient uses globalThis.fetch or window.fetch, and fixed breaking tests ([23b7e3a](https://github.com/DrewBradfordXYZ/quickbase-js/commit/23b7e3a0d5aa596e4051f31bf5763eb710cfb6df))
+* throttle defaults and documentation ([ee80248](https://github.com/DrewBradfordXYZ/quickbase-js/commit/ee80248ca54e95b49a9d8b1416be16da7d79a028))
+
 ## [0.1.0-beta.12](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.11...v0.1.0-beta.12) (2025-03-23)
 
 
