@@ -7651,74 +7651,237 @@
     }
 
     async function paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, initialResponse) {
-        let allRecords = initialResponse ? initialResponse.data : [];
-        let skip = initialResponse
-            ? initialResponse.metadata.skip + initialResponse.metadata.numRecords
-            : params.skip || 0;
-        const top = params.top || 100;
-        let lastMetadata = initialResponse ? initialResponse.metadata : undefined;
-        const maxRecords = 500;
-        if (!initialResponse) {
-            const firstParams = { ...params, skip, top };
-            const firstResponse = await invokeMethod(methodName, firstParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false);
-            const typedFirstResponse = firstResponse;
-            allRecords = typedFirstResponse.data;
-            lastMetadata = typedFirstResponse.metadata;
-            skip = lastMetadata.skip + lastMetadata.numRecords;
+        if (debug)
+            console.log("[paginateRecords] Starting with params:", params);
+        const getDataKey = (response) => {
+            return (Object.keys(response).find((key) => Array.isArray(response[key])) ||
+                "data");
+        };
+        const dataKey = initialResponse ? getDataKey(initialResponse) : "data";
+        let allRecords = initialResponse ? initialResponse[dataKey] : [];
+        let continuation = initialResponse?.metadata?.skip !== undefined
+            ? {
+                type: "skip",
+                value: initialResponse.metadata.skip +
+                    (initialResponse.metadata.numRecords || 0),
+            }
+            : initialResponse?.metadata.nextPageToken
+                ? {
+                    type: "token",
+                    value: initialResponse.metadata.nextPageToken,
+                    key: "nextPageToken",
+                }
+                : initialResponse?.metadata.nextToken
+                    ? {
+                        type: "token",
+                        value: initialResponse.metadata.nextToken,
+                        key: "nextToken",
+                    }
+                    : { type: "skip", value: params.skip || 0 }; // Default to skip until response indicates otherwise
+        let lastResponse = initialResponse;
+        let requestCount = 0;
+        if (debug) {
+            console.log("[paginateRecords] Initial state:", {
+                dataKey,
+                continuation,
+                hasInitialResponse: !!initialResponse,
+                totalRecordsSoFar: allRecords.length,
+            });
+            if (initialResponse && initialResponse[dataKey].length > 0) {
+                console.log("[paginateRecords] Initial response IDs: first:", initialResponse[dataKey][0]["3"]?.value, "last:", initialResponse[dataKey][initialResponse[dataKey].length - 1]["3"]
+                    ?.value);
+            }
         }
-        while (skip < lastMetadata.totalRecords && allRecords.length < maxRecords) {
-            const remainingRecords = maxRecords - allRecords.length;
-            const fetchTop = Math.min(top, remainingRecords);
-            const paginatedParams = { ...params, skip, top: fetchTop };
+        const fetchNextPage = async (paginatedParams) => {
+            if (debug)
+                console.log("[paginateRecords] Fetching with params:", paginatedParams);
             const response = await invokeMethod(methodName, paginatedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false, 0, rateLimiter.maxRetries + 1, true);
-            const typedResponse = response;
-            const { data, metadata } = typedResponse;
-            allRecords = allRecords.concat(data);
-            lastMetadata = metadata;
-            if (metadata.numRecords + metadata.skip >= metadata.totalRecords ||
-                allRecords.length >= maxRecords) {
+            requestCount++;
+            return response;
+        };
+        const getPaginatedParams = () => {
+            const hasBody = "body" in params && params.body !== undefined;
+            if (continuation.type === "skip") {
+                const paginatedOptions = {
+                    ...(hasBody && "options" in params.body ? params.body.options : {}),
+                    skip: continuation.value,
+                };
+                return hasBody
+                    ? {
+                        ...params,
+                        body: {
+                            ...params.body,
+                            options: paginatedOptions,
+                        },
+                    }
+                    : { ...params, skip: continuation.value };
+            }
+            else if (continuation.value === "" && !lastResponse) {
+                return { ...params }; // Omit nextPageToken for initial token-based call
+            }
+            else {
+                return hasBody
+                    ? {
+                        ...params,
+                        body: {
+                            ...params.body,
+                            [continuation.key]: continuation.value,
+                        },
+                    }
+                    : { ...params, [continuation.key]: continuation.value };
+            }
+        };
+        if (!initialResponse) {
+            const firstParams = getPaginatedParams();
+            const firstResponse = await fetchNextPage(firstParams);
+            const actualDataKey = getDataKey(firstResponse);
+            allRecords = firstResponse[actualDataKey];
+            lastResponse = firstResponse;
+            continuation =
+                firstResponse.metadata.nextPageToken !== undefined ||
+                    firstResponse.metadata.nextToken !== undefined
+                    ? {
+                        type: "token",
+                        value: firstResponse.metadata.nextPageToken ??
+                            firstResponse.metadata.nextToken ??
+                            "",
+                        key: firstResponse.metadata.nextPageToken !== undefined
+                            ? "nextPageToken"
+                            : "nextToken",
+                    }
+                    : {
+                        type: "skip",
+                        value: continuation.value + firstResponse[actualDataKey].length,
+                    };
+        }
+        while (true) {
+            const hasMoreSkipBased = lastResponse.metadata.totalRecords !== undefined &&
+                continuation.type === "skip" &&
+                continuation.value < lastResponse.metadata.totalRecords &&
+                allRecords.length < lastResponse.metadata.totalRecords;
+            const hasMoreTokenBased = continuation.type === "token" &&
+                (!lastResponse ||
+                    lastResponse.metadata.nextPageToken !== undefined ||
+                    lastResponse.metadata.nextToken !== undefined) &&
+                continuation.value !== "";
+            if (!hasMoreSkipBased && !hasMoreTokenBased) {
+                if (debug)
+                    console.log("[paginateRecords] Stopping: no more data to fetch");
                 break;
             }
-            skip += metadata.numRecords;
+            const paginatedParams = getPaginatedParams();
+            const response = await fetchNextPage(paginatedParams);
+            const actualDataKey = getDataKey(response);
+            allRecords = allRecords.concat(response[actualDataKey]);
+            lastResponse = response;
+            if (debug && response[actualDataKey].length > 0) {
+                console.log("[paginateRecords] Fetched records this iteration:", response[actualDataKey].length, "IDs: first:", response[actualDataKey][0]["3"]?.value, "last:", response[actualDataKey][response[actualDataKey].length - 1]["3"]?.value, "Continuation after fetch:", continuation);
+            }
+            if (continuation.type === "skip") {
+                const newSkip = continuation.value + response[actualDataKey].length;
+                continuation = { type: "skip", value: newSkip };
+                if (response[actualDataKey].length === 0) {
+                    if (debug &&
+                        lastResponse.metadata.totalRecords &&
+                        newSkip < lastResponse.metadata.totalRecords) {
+                        console.warn("[paginateRecords] Warning: Empty response received but records remain", { skip: newSkip, totalRecords: lastResponse.metadata.totalRecords });
+                    }
+                    if (debug)
+                        console.log("[paginateRecords] Stopping: no more data returned");
+                    break;
+                }
+            }
+            else {
+                const newToken = response.metadata.nextPageToken ?? response.metadata.nextToken ?? "";
+                continuation = {
+                    type: "token",
+                    value: newToken,
+                    key: response.metadata.nextPageToken !== undefined
+                        ? "nextPageToken"
+                        : "nextToken",
+                };
+                if (continuation.value === "") {
+                    if (debug)
+                        console.log("[paginateRecords] Stopping: no more token");
+                    break;
+                }
+                else if (response[actualDataKey].length === 0 && newToken !== "") {
+                    if (debug)
+                        console.warn("[paginateRecords] Warning: Empty response with non-empty token, possible API inconsistency", { token: newToken });
+                }
+            }
         }
+        if (!lastResponse) {
+            throw new Error("[paginateRecords] No response received during pagination");
+        }
+        const finalDataKey = getDataKey(lastResponse);
         const finalResponse = {
-            data: allRecords,
-            fields: initialResponse?.fields, // Only use fields from initial response
+            [finalDataKey]: allRecords,
+            fields: lastResponse.fields,
             metadata: {
-                totalRecords: lastMetadata.totalRecords,
+                totalRecords: continuation.type === "skip"
+                    ? lastResponse.metadata.totalRecords
+                    : undefined,
                 numRecords: allRecords.length,
-                numFields: lastMetadata.numFields,
-                skip: 0,
-                top: initialResponse?.metadata.top || top,
+                numFields: lastResponse.metadata.numFields,
+                skip: continuation.type === "skip" ? 0 : undefined,
+                top: continuation.type === "skip" ? undefined : undefined,
+                ...(continuation.type === "token" && continuation.key
+                    ? { [continuation.key]: "" }
+                    : {}),
             },
         };
+        if (debug) {
+            console.log("[paginateRecords] Final response summary:", {
+                totalRecords: finalResponse.metadata.totalRecords,
+                numRecords: finalResponse.metadata.numRecords,
+                numFields: finalResponse.metadata.numFields,
+                skip: finalResponse.metadata.skip,
+                top: finalResponse.metadata.top,
+                ...(continuation.type === "token" && continuation.key
+                    ? { [continuation.key]: finalResponse.metadata[continuation.key] }
+                    : {}),
+            });
+            console.log("[paginateRecords] Pagination stats:", {
+                totalRequests: requestCount,
+            });
+        }
         return finalResponse;
     }
     function isPaginatable(response) {
         return (response &&
             typeof response === "object" &&
-            "data" in response &&
+            Object.keys(response).some((key) => Array.isArray(response[key])) &&
             "metadata" in response &&
             typeof response.metadata === "object" &&
-            "totalRecords" in response.metadata &&
-            "numRecords" in response.metadata &&
-            "skip" in response.metadata);
+            (("totalRecords" in response.metadata &&
+                "numRecords" in response.metadata &&
+                "skip" in response.metadata) ||
+                "nextPageToken" in response.metadata ||
+                "nextToken" in response.metadata));
     }
 
-    // src/invokeMethod.ts
     async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate = true, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1, isPaginating = false) {
         const methodInfo = methodMap[methodName];
         if (!methodInfo)
             throw new Error(`Method ${methodName} not found`);
         const hasBody = "body" in params && params.body !== undefined;
         const body = hasBody ? params.body : undefined;
+        const options = hasBody && "options" in body ? body.options : undefined;
+        const adjustedParams = {
+            ...params,
+            skip: params.skip ?? (options && "skip" in options ? options.skip : undefined),
+            top: params.top ?? (options && "top" in options ? options.top : undefined),
+        };
         const restParams = hasBody
-            ? Object.fromEntries(Object.entries(params).filter(([key]) => key !== "body" && key !== "startTime"))
-            : { ...params, startTime: undefined };
+            ? Object.fromEntries(Object.entries(adjustedParams).filter(([key]) => key !== "body" && key !== "startTime"))
+            : { ...adjustedParams, startTime: undefined };
         const requestParameters = {
             ...restParams,
             ...(hasBody ? { generated: body } : {}),
         };
+        if (debug)
+            console.log("[invokeMethod] Adjusted params for pagination:", adjustedParams);
         const requestOptions = {
             credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
             method: methodInfo.httpMethod,
@@ -7742,7 +7905,9 @@
                 if (contentType?.includes("application/json")) {
                     const jsonResponse = await rawResponse.json();
                     if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
-                        return paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse);
+                        if (debug)
+                            console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
+                        return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse); // No maxRecords parameter
                     }
                     return transformDates(jsonResponse, convertDates);
                 }
@@ -7751,7 +7916,9 @@
             if (rawResponse && typeof rawResponse.value === "function") {
                 const response = await rawResponse.value();
                 if (autoPaginate && !isPaginating && isPaginatable(response)) {
-                    return paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response);
+                    if (debug)
+                        console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
+                    return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response); // No maxRecords parameter
                 }
                 return transformDates(response, convertDates);
             }
@@ -7793,7 +7960,10 @@
                 if (params.startTime !== undefined)
                     params.startTime = postThrottleTime;
                 const headers = { ...baseHeaders };
-                const responsePromise = methodInfo.method(requestParameters, {
+                const finalRequest = { ...requestParameters, headers };
+                if (debug)
+                    console.log("[invokeMethod] Sending request:", finalRequest);
+                const responsePromise = methodInfo.method(finalRequest, {
                     ...requestOptions,
                     headers,
                 });

@@ -1,189 +1,231 @@
-// test/vitest/unit/pagination.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { paginateRecords, isPaginatable } from "@/pagination";
 import { QuickbaseClient } from "@/quickbaseClient";
-import { RateLimiter } from "@/rateLimiter"; // Lowercase
-import { FlowThrottleBucket } from "@/FlowThrottleBucket";
-import { BurstAwareThrottleBucket } from "@/BurstAwareThrottleBucket";
-import * as invokeMethodModule from "@/invokeMethod"; // Import module for mocking
+import * as invokeMethodModule from "@/invokeMethod";
+import { GetUsers200Response, GetUsersRequest } from "@/generated/models";
+
+// Extend GetUsersRequest to include nextPageToken
+interface TestGetUsersRequest extends GetUsersRequest {
+  nextPageToken?: string;
+}
 
 describe("Pagination Unit Tests", () => {
-  it("fetches all pages with FlowThrottleBucket", async () => {
-    const throttleBucket = new FlowThrottleBucket(10, 50); // Rate 10, Burst 50
-    const rateLimiter = new RateLimiter(throttleBucket);
-    const methodMap = {
-      getRecords: {
-        api: {},
-        method: vi.fn(),
-        paramMap: ["tableId"],
-        httpMethod: "GET",
-      },
-    } as any;
+  const methodMap = {
+    runQuery: {
+      api: {},
+      method: vi.fn(),
+      paramMap: ["body"],
+      httpMethod: "POST",
+    },
+    getUsers: {
+      api: {},
+      method: vi.fn(),
+      paramMap: ["body"],
+      httpMethod: "POST",
+    },
+  } as any;
+  const baseHeaders = {};
+  const authStrategy = {
+    getToken: vi.fn(),
+    applyHeaders: vi.fn(),
+    handleError: vi.fn(),
+  } as any;
+  const rateLimiter = {
+    throttle: vi.fn(),
+    release: vi.fn(),
+    maxRetries: 3,
+  } as any;
+  const transformDates = (obj: any) => obj;
 
-    // Mock invokeMethod directly
+  it("fetches all pages for runQuery with skip-based pagination", async () => {
     const mockInvoke = vi
       .spyOn(invokeMethodModule, "invokeMethod")
       .mockResolvedValueOnce({
-        data: Array(25).fill({ id: "record" }),
+        data: Array(2429).fill({ "3": { value: "record" } }),
         metadata: {
-          totalRecords: 100,
-          numRecords: 25,
-          numFields: 3,
+          totalRecords: 5000,
+          numRecords: 2429,
+          numFields: 6,
           skip: 0,
-          top: 25,
         },
       })
       .mockResolvedValueOnce({
-        data: Array(25).fill({ id: "record" }),
+        data: Array(2429).fill({ "3": { value: "record" } }),
         metadata: {
-          totalRecords: 100,
-          numRecords: 25,
-          numFields: 3,
-          skip: 25,
-          top: 25,
+          totalRecords: 5000,
+          numRecords: 2429,
+          numFields: 6,
+          skip: 2429,
         },
       })
       .mockResolvedValueOnce({
-        data: Array(25).fill({ id: "record" }),
+        data: Array(142).fill({ "3": { value: "record" } }),
         metadata: {
-          totalRecords: 100,
-          numRecords: 25,
-          numFields: 3,
-          skip: 50,
-          top: 25,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: Array(25).fill({ id: "record" }),
-        metadata: {
-          totalRecords: 100,
-          numRecords: 25,
-          numFields: 3,
-          skip: 75,
-          top: 25,
+          totalRecords: 5000,
+          numRecords: 142,
+          numFields: 6,
+          skip: 4858,
         },
       });
 
     const result = await paginateRecords(
-      "getRecords",
-      { tableId: "mock-table" },
+      "runQuery",
+      { body: { from: "mock-table", select: [3, 6] } },
       methodMap,
-      {},
-      { getToken: vi.fn(), applyHeaders: vi.fn(), handleError: vi.fn() } as any,
+      baseHeaders,
+      authStrategy,
       rateLimiter,
-      (obj: any) => obj,
+      transformDates,
       false,
       true
     );
 
-    expect(mockInvoke).toHaveBeenCalledTimes(4);
-    expect(result.data.length).toBe(100);
+    expect(mockInvoke).toHaveBeenCalledTimes(3);
+    expect(result.data.length).toBe(5000);
     expect(result.metadata).toEqual({
-      totalRecords: 100,
-      numRecords: 100,
-      numFields: 3,
+      totalRecords: 5000,
+      numRecords: 5000,
+      numFields: 6,
       skip: 0,
-      top: 100,
+      top: undefined,
     });
   });
 
-  it("fetches all pages with BurstAwareThrottleBucket", async () => {
-    const throttleBucket = new BurstAwareThrottleBucket({
-      maxTokens: 80,
-      windowSeconds: 10,
-    });
-    const rateLimiter = new RateLimiter(throttleBucket);
-    const methodMap = {
-      getRecords: {
-        api: {},
-        method: vi.fn(),
-        paramMap: ["tableId"],
-        httpMethod: "GET",
-      },
-    } as any;
-
+  it("fetches all pages for getUsers with token-based pagination", async () => {
     const mockInvoke = vi
       .spyOn(invokeMethodModule, "invokeMethod")
-      .mockResolvedValueOnce({
-        data: Array(50).fill({ id: "record" }),
-        metadata: {
-          totalRecords: 100,
-          numRecords: 50,
-          numFields: 3,
-          skip: 0,
-          top: 100,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: Array(50).fill({ id: "record" }),
-        metadata: {
-          totalRecords: 100,
-          numRecords: 50,
-          numFields: 3,
-          skip: 50,
-          top: 100,
-        },
-      });
+      .mockImplementation(
+        async <K extends keyof QuickbaseClient>(
+          methodName: K,
+          params: Parameters<QuickbaseClient[K]>[0] & {
+            skip?: number;
+            top?: number;
+          },
+          methodMap: any,
+          baseHeaders: any,
+          authStrategy: any,
+          rateLimiter: any,
+          transformDates: any,
+          debug: any,
+          convertDates: any,
+          autoPaginate: any,
+          attempt: any,
+          maxAttempts: any,
+          isPaginating: any
+        ): Promise<ReturnType<QuickbaseClient[K]>> => {
+          if (methodName !== "getUsers")
+            throw new Error("Mock only supports 'getUsers'");
+          const body = (params as { body?: TestGetUsersRequest }).body;
+          const token = body?.nextPageToken;
+          if (!token) {
+            return {
+              users: Array(10).fill({ id: "user1" }),
+              metadata: { nextPageToken: "token1" },
+            } as GetUsers200Response as ReturnType<QuickbaseClient[K]>;
+          } else if (token === "token1") {
+            return {
+              users: Array(5).fill({ id: "user2" }),
+              metadata: { nextPageToken: "token2" },
+            } as GetUsers200Response as ReturnType<QuickbaseClient[K]>;
+          } else if (token === "token2") {
+            return {
+              users: Array(3).fill({ id: "user3" }),
+              metadata: { nextPageToken: "" },
+            } as GetUsers200Response as ReturnType<QuickbaseClient[K]>;
+          }
+          throw new Error("Unexpected token");
+        }
+      );
 
-    const startTime = Date.now();
     const result = await paginateRecords(
-      "getRecords",
-      { tableId: "mock-table" },
+      "getUsers",
+      { body: { userIds: ["id1", "id2"] } },
       methodMap,
-      {},
-      { getToken: vi.fn(), applyHeaders: vi.fn(), handleError: vi.fn() } as any,
+      baseHeaders,
+      authStrategy,
       rateLimiter,
-      (obj: any) => obj,
+      transformDates,
       false,
       true
     );
-    const duration = Date.now() - startTime;
 
-    expect(mockInvoke).toHaveBeenCalledTimes(2);
-    expect(result.data.length).toBe(100);
+    expect(mockInvoke).toHaveBeenCalledTimes(3);
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      1,
+      "getUsers",
+      expect.objectContaining({ body: { userIds: ["id1", "id2"] } }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      true
+    );
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      2,
+      "getUsers",
+      expect.objectContaining({
+        body: { userIds: ["id1", "id2"], nextPageToken: "token1" },
+      }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      true
+    );
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      3,
+      "getUsers",
+      expect.objectContaining({
+        body: { userIds: ["id1", "id2"], nextPageToken: "token2" },
+      }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      true
+    );
+    expect(result.users.length).toBe(18);
     expect(result.metadata).toEqual({
-      totalRecords: 100,
-      numRecords: 100,
-      numFields: 3,
-      skip: 0,
-      top: 100,
+      numRecords: 18,
+      numFields: undefined,
+      nextPageToken: "",
     });
-    expect(duration).toBeLessThan(1000); // Mocked, no real 10s wait
   });
 
-  it("stops when all records are fetched", async () => {
-    const throttleBucket = new FlowThrottleBucket(10, 50);
-    const rateLimiter = new RateLimiter(throttleBucket);
-    const methodMap = {
-      getRecords: {
-        api: {},
-        method: vi.fn(),
-        paramMap: ["tableId"],
-        httpMethod: "GET",
-      },
-    } as any;
-
+  it("stops when all skip-based records are fetched in one page", async () => {
     const mockInvoke = vi
       .spyOn(invokeMethodModule, "invokeMethod")
       .mockResolvedValueOnce({
         data: Array(10).fill({ id: "record" }),
-        metadata: {
-          totalRecords: 10,
-          numRecords: 10,
-          numFields: 3,
-          skip: 0,
-          top: 100,
-        },
+        metadata: { totalRecords: 10, numRecords: 10, numFields: 3, skip: 0 },
       });
 
     const result = await paginateRecords(
-      "getRecords",
-      { tableId: "mock-table" },
+      "runQuery",
+      { body: { from: "mock-table", select: [3] } },
       methodMap,
-      {},
-      { getToken: vi.fn(), applyHeaders: vi.fn(), handleError: vi.fn() } as any,
+      baseHeaders,
+      authStrategy,
       rateLimiter,
-      (obj: any) => obj,
+      transformDates,
       false,
       true
     );
@@ -191,16 +233,19 @@ describe("Pagination Unit Tests", () => {
     expect(mockInvoke).toHaveBeenCalledTimes(1);
     expect(result.data.length).toBe(10);
     expect(result.metadata.totalRecords).toBe(10);
+    expect(result.metadata.numRecords).toBe(10);
   });
 
   it("isPaginatable detects metadata correctly", () => {
-    const validResponse = {
+    const skipResponse = {
       data: [],
       metadata: { totalRecords: 100, numRecords: 25, numFields: 3, skip: 0 },
     };
+    const tokenResponse = { users: [], metadata: { nextPageToken: "abc" } };
     const invalidResponse = { data: [], other: "stuff" };
 
-    expect(isPaginatable(validResponse)).toBe(true);
+    expect(isPaginatable(skipResponse)).toBe(true);
+    expect(isPaginatable(tokenResponse)).toBe(true);
     expect(isPaginatable(invalidResponse)).toBe(false);
   });
 });
