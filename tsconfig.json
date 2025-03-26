@@ -5,7 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "lib": ["ES2015", "ESNext", "DOM"],
-    "types": ["node", "playwright/test", "undici-types"],
+    "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
@@ -18,9 +18,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@tests/*": ["tests/*"],
-      "undici-types": ["node_modules/undici-types/index.d.ts"],
-      "openapi-types": ["node_modules/openapi-types/index.d.ts"],
-      "jsondiffpatch": ["node_modules/jsondiffpatch/lib/index.d.ts"]
+      "openapi-types": ["node_modules/openapi-types/index.d.ts"]
     }
   },
   "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
