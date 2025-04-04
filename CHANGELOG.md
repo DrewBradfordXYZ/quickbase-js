@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.14...v1.0.0) (2025-04-04)
+
+
+### Features
+
+* Add withPaginationDisabled() and withPaginationLimit() for custom pagination behavior ([c352cc4](https://github.com/DrewBradfordXYZ/quickbase-js/commit/c352cc4547022a15dec68cf7d24f99bc106dbadc))
+* finalize test suite for stable release ([4b9088b](https://github.com/DrewBradfordXYZ/quickbase-js/commit/4b9088b3e97cee2af460894d241290f5b1935b23))
+
 ## [0.1.0-beta.14](https://github.com/DrewBradfordXYZ/quickbase-js/compare/v0.1.0-beta.13...v0.1.0-beta.14) (2025-03-26)
 
 
