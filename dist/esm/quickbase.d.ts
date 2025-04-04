@@ -8056,6 +8056,8 @@ declare class TokenCache {
 }
 
 interface QuickbaseClient extends QuickbaseClient$1 {
+    withPaginationDisabled<T>(callback: () => Promise<T>): Promise<T>;
+    withPaginationLimit<T>(limit: number, callback: () => Promise<T>): Promise<T>;
 }
 interface QuickbaseConfig {
     realm: string;

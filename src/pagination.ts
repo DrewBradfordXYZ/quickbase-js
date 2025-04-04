@@ -1,5 +1,3 @@
-// src/pagination.ts
-
 import { QuickbaseClient } from "./quickbaseClient";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import { AuthorizationStrategy } from "./authorizationStrategy";
@@ -150,7 +148,8 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
   }
 
   const fetchNextPage = async (
-    paginatedParams: any
+    paginatedParams: any,
+    isInitial: boolean = false
   ): Promise<PaginatedResponse<any>> => {
     if (debug)
       console.log("[paginateRecords] Fetching with params:", paginatedParams);
@@ -164,10 +163,10 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       transformDates,
       debug,
       convertDates,
-      false,
+      false, // autoPaginate handled by caller
       0,
       rateLimiter.maxRetries + 1,
-      true,
+      !isInitial, // isPaginating: false for initial, true for subsequent
       paginationLimit
     );
     requestCount++;
@@ -185,16 +184,16 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       };
       return hasBody
         ? {
-            ...(params as object), // Narrow to object type
+            ...(params as object),
             body: {
-              ...((params as BodyWithOptions).body as object), // Narrow to object
+              ...((params as BodyWithOptions).body as object),
               options: paginatedOptions,
             },
           }
         : { ...(params as object), skip: continuation.value };
     } else if (paginationType === "token" && continuation?.type === "token") {
       if (continuation.value === "" && !lastResponse) {
-        return { ...(params as object) }; // Initial call
+        return { ...(params as object) };
       }
       const tokenKey = continuation.key;
       return hasBody
@@ -212,7 +211,7 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
 
   if (!initialResponse) {
     const firstParams = getPaginatedParams();
-    const firstResponse = await fetchNextPage(firstParams);
+    const firstResponse = await fetchNextPage(firstParams, true); // Initial call
     const actualDataKey = getDataKey(firstResponse);
     allRecords = firstResponse[actualDataKey];
     lastResponse = firstResponse;

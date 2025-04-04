@@ -1,3 +1,5 @@
+// tests/vitest/unit/quickbase-js/pagination.test.ts
+
 import { describe, it, expect, vi } from "vitest";
 import { paginateRecords, isPaginatable } from "@/pagination";
 import { QuickbaseClient } from "@/quickbaseClient";
@@ -81,6 +83,61 @@ describe("Pagination Unit Tests", () => {
     );
 
     expect(mockInvoke).toHaveBeenCalledTimes(3);
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      1,
+      "runQuery",
+      expect.objectContaining({ body: { from: "mock-table", select: [3, 6] } }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      false,
+      null // paginationLimit
+    );
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      2,
+      "runQuery",
+      expect.objectContaining({
+        body: { from: "mock-table", select: [3, 6], options: { skip: 2429 } },
+      }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      true,
+      null // paginationLimit
+    );
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      3,
+      "runQuery",
+      expect.objectContaining({
+        body: { from: "mock-table", select: [3, 6], options: { skip: 4858 } },
+      }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      true,
+      null // paginationLimit
+    );
     expect(result.data.length).toBe(5000);
     expect(result.metadata).toEqual({
       totalRecords: 5000,
@@ -106,12 +163,13 @@ describe("Pagination Unit Tests", () => {
           authStrategy: any,
           rateLimiter: any,
           transformDates: any,
-          debug: any,
-          convertDates: any,
-          autoPaginate: any,
-          attempt: any,
-          maxAttempts: any,
-          isPaginating: any
+          debug: boolean | undefined,
+          convertDates: boolean,
+          autoPaginate: boolean = true,
+          attempt: number = 0,
+          maxAttempts: number = rateLimiter.maxRetries + 1,
+          isPaginating: boolean = false,
+          paginationLimit: number | null = null // Match invokeMethod signature with default
         ): Promise<ReturnType<QuickbaseClient[K]>> => {
           if (methodName !== "getUsers")
             throw new Error("Mock only supports 'getUsers'");
@@ -164,7 +222,8 @@ describe("Pagination Unit Tests", () => {
       false,
       0,
       4,
-      true
+      false,
+      null // paginationLimit
     );
     expect(mockInvoke).toHaveBeenNthCalledWith(
       2,
@@ -182,7 +241,8 @@ describe("Pagination Unit Tests", () => {
       false,
       0,
       4,
-      true
+      true,
+      null // paginationLimit
     );
     expect(mockInvoke).toHaveBeenNthCalledWith(
       3,
@@ -200,7 +260,8 @@ describe("Pagination Unit Tests", () => {
       false,
       0,
       4,
-      true
+      true,
+      null // paginationLimit
     );
     expect(result.users.length).toBe(18);
     expect(result.metadata).toEqual({
@@ -231,6 +292,23 @@ describe("Pagination Unit Tests", () => {
     );
 
     expect(mockInvoke).toHaveBeenCalledTimes(1);
+    expect(mockInvoke).toHaveBeenNthCalledWith(
+      1,
+      "runQuery",
+      expect.objectContaining({ body: { from: "mock-table", select: [3] } }),
+      methodMap,
+      baseHeaders,
+      authStrategy,
+      rateLimiter,
+      transformDates,
+      false,
+      true,
+      false,
+      0,
+      4,
+      false,
+      null // paginationLimit
+    );
     expect(result.data.length).toBe(10);
     expect(result.metadata.totalRecords).toBe(10);
     expect(result.metadata.numRecords).toBe(10);

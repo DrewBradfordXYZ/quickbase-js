@@ -1,5 +1,3 @@
-// src/quickbaseClient.ts
-
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -25,7 +23,7 @@ export * from "./generated/models/index";
 
 export interface QuickbaseClient extends IQuickbaseClient {
   withPaginationDisabled<T>(callback: () => Promise<T>): Promise<T>;
-  withPaginationLimit<T>(limit: number, callback: () => Promise<T>): Promise<T>; // New method
+  withPaginationLimit<T>(limit: number, callback: () => Promise<T>): Promise<T>;
 }
 
 export interface QuickbaseConfig {
@@ -189,7 +187,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const methodMap = buildMethodMap();
 
   let currentAutoPaginate = autoPaginate;
-  let paginationLimit: number | null = null; // New state for limit
+  let paginationLimit: number | null = null;
 
   const proxyHandler: globalThis.ProxyHandler<QuickbaseClient> = {
     get: (_: QuickbaseClient, prop: string) => {
@@ -220,14 +218,14 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         ): Promise<T> => {
           const originalAutoPaginate = currentAutoPaginate;
           const originalLimit = paginationLimit;
-          currentAutoPaginate = true; // Ensure pagination is enabled
-          paginationLimit = limit; // Set the custom limit
+          currentAutoPaginate = true;
+          paginationLimit = limit;
           try {
             const result = await callback();
             return result;
           } finally {
             currentAutoPaginate = originalAutoPaginate;
-            paginationLimit = originalLimit; // Restore original limit (null by default)
+            paginationLimit = originalLimit;
           }
         };
       }
@@ -247,10 +245,10 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             debug,
             convertDates,
             currentAutoPaginate,
-            0, // attempt
-            rateLimiter.maxRetries + 1, // maxAttempts
-            false, // isPaginating
-            paginationLimit // Pass the limit to invokeMethod
+            0,
+            rateLimiter.maxRetries + 1,
+            false,
+            paginationLimit
           );
       }
       if (debug) {

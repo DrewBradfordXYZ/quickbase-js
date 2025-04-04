@@ -12,11 +12,6 @@ import {
   RunQuery200Response,
 } from "@/generated/models";
 
-// Extend RunQueryRequestOptions to include sortBy (for reference, not used here)
-interface ExtendedRunQueryRequestOptions extends RunQueryRequestOptions {
-  sortBy?: Array<{ fieldId: number; order: "ASC" | "DESC" }>;
-}
-
 describe("QuickbaseClient Integration - Pagination with Skip", () => {
   let qb: QuickbaseClient;
 
@@ -32,11 +27,11 @@ describe("QuickbaseClient Integration - Pagination with Skip", () => {
 
   it(
     "fetches full dataset with auto-pagination and heavy data",
-    { timeout: 30000 }, // 30s for multiple calls
+    { timeout: 120000 }, // 120s to handle 55k+ records
     async () => {
-      const queryOptions: ExtendedRunQueryRequestOptions = {
-        skip: 0, // Start at beginning, no top specified
-        // sortBy removed to test without ordering
+      const queryOptions: RunQueryRequestOptions = {
+        skip: 0, // Start at beginning
+        top: 1000, // Explicit page size to control pagination
       };
 
       const queryRequest: RunQueryRequest = {
@@ -69,17 +64,16 @@ describe("QuickbaseClient Integration - Pagination with Skip", () => {
         console.log(`[Test Complete] Response received in ${duration}ms`, {
           recordCount: response.data.length,
           totalRecords: response.metadata.totalRecords,
-          defaultTop: response.metadata.top,
+          fetchedTop: response.metadata.top,
         });
 
         // Assertions
         expect(response.data).toBeDefined();
-        expect(response.data.length).toBeGreaterThan(2429); // More than initial cap, confirming pagination
+        expect(response.data.length).toBeGreaterThan(2429); // More than initial cap
         expect(response.data.length).toEqual(response.metadata.totalRecords); // Full dataset fetched
         expect(response.metadata).toBeDefined();
-        // Removed expect(response.metadata.totalRecords).toBe(5000)
-        expect(response.metadata.totalRecords).toBeGreaterThanOrEqual(5000); // Flexible minimum, allows growth
-        expect(response.metadata.numFields).toBe(6); // 6 fields with FID 3
+        expect(response.metadata.totalRecords).toBeGreaterThanOrEqual(5000); // Flexible minimum
+        expect(response.metadata.numFields).toBe(6); // 6 fields
         expect(response.metadata.skip).toBe(0); // Initial skip
 
         const sampleRecord = response.data[0];
@@ -87,8 +81,8 @@ describe("QuickbaseClient Integration - Pagination with Skip", () => {
         expect(sampleRecord["6"]?.value).toBeDefined();
         expect(typeof sampleRecord["6"]?.value).toBe("string");
         expect(sampleRecord["6"]?.value.length).toBeGreaterThan(9000); // ~10KB
-        expect(sampleRecord["3"]?.value).toBeDefined(); // Check FID 3 exists
-        expect(typeof sampleRecord["3"]?.value).toBe("number"); // Record ID is numeric
+        expect(sampleRecord["3"]?.value).toBeDefined();
+        expect(typeof sampleRecord["3"]?.value).toBe("number");
 
         // Check for duplicates using Record ID (FID 3)
         const recordIds = response.data.map(
@@ -96,7 +90,7 @@ describe("QuickbaseClient Integration - Pagination with Skip", () => {
         );
         const uniqueRecordIds = new Set(recordIds);
         expect(uniqueRecordIds.size).toEqual(response.data.length); // No duplicates
-        expect(uniqueRecordIds.size).toEqual(response.metadata.totalRecords); // All records unique
+        expect(uniqueRecordIds.size).toEqual(response.metadata.totalRecords); // All unique
 
         console.log(
           `[Integration Test] Fetched ${response.data.length} records in ${duration}ms, totalRecords: ${response.metadata.totalRecords}`

@@ -7647,33 +7647,15 @@ class RateLimitError extends Error {
 /**
  * Paginates records from a Quick Base API endpoint, handling both skip-based and token-based pagination.
  * @template K - The method name keyof QuickbaseClient.
- * @param methodName - The Quick Base API method to invoke (e.g., "runQuery", "getUsers").
- * @param params - Parameters for the API method, including optional skip and top values.
- * @param methodMap - Mapping of method names to their implementation details.
- * @param baseHeaders - Base HTTP headers for API requests.
- * @param authStrategy - Strategy for handling authentication tokens.
- * @param rateLimiter - Rate limiting mechanism to respect API limits.
- * @param transformDates - Function to transform date strings in the response.
- * @param debug - If true, logs detailed pagination information to the console.
- * @param convertDates - If true, converts date strings to Date objects in the response.
- * @param initialResponse - Optional initial response to start pagination from (used by invokeMethod).
- * @returns A promise resolving to the complete paginated response with all records.
- * @throws {Error} If no response is received during pagination.
  */
-async function paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, initialResponse) {
+async function paginateRecords(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, initialResponse, paginationLimit = null) {
     if (debug)
         console.log("[paginateRecords] Starting with params:", params);
-    /** Extracts the key containing the data array from the response (e.g., "data" or "users"). */
     const getDataKey = (response) => Object.keys(response).find((key) => Array.isArray(response[key])) || "data";
     const dataKey = initialResponse ? getDataKey(initialResponse) : "data";
     let allRecords = initialResponse ? initialResponse[dataKey] : [];
     let lastResponse = initialResponse;
     let requestCount = 0;
-    /**
-     * Determines the pagination strategy based on response metadata.
-     * @param response - The API response to analyze.
-     * @returns "skip" for skip-based, "token" for token-based, or "none" if no pagination is detected.
-     */
     const determinePaginationType = (response) => {
         if (response.metadata.totalRecords !== undefined &&
             response.metadata.skip !== undefined) {
@@ -7689,11 +7671,11 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
         }
         if (debug)
             console.log("[paginateRecords] No clear pagination type detected, assuming single-page response");
-        return "none"; // No pagination indicators
+        return "none";
     };
     let paginationType = initialResponse
         ? determinePaginationType(initialResponse)
-        : "none"; // Start with no pagination assumption
+        : "none";
     let continuation = initialResponse
         ? paginationType === "skip"
             ? {
@@ -7712,7 +7694,7 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
                         : "nextToken",
                 }
                 : null
-        : null; // No continuation until type is determined
+        : null;
     if (debug) {
         console.log("[paginateRecords] Initial state:", {
             dataKey,
@@ -7720,26 +7702,29 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
             continuation,
             hasInitialResponse: !!initialResponse,
             totalRecordsSoFar: allRecords.length,
+            paginationLimit,
         });
         if (initialResponse && initialResponse[dataKey].length > 0) {
             console.log("[paginateRecords] Initial response IDs: first:", initialResponse[dataKey][0]["3"]?.value, "last:", initialResponse[dataKey][initialResponse[dataKey].length - 1]["3"]
                 ?.value);
         }
     }
-    /** Fetches the next page of records using the provided parameters. */
-    const fetchNextPage = async (paginatedParams) => {
+    const fetchNextPage = async (paginatedParams, isInitial = false) => {
         if (debug)
             console.log("[paginateRecords] Fetching with params:", paginatedParams);
-        const response = await invokeMethod(methodName, paginatedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false, 0, rateLimiter.maxRetries + 1, true);
+        const response = await invokeMethod(methodName, paginatedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, false, // autoPaginate handled by caller
+        0, rateLimiter.maxRetries + 1, !isInitial, // isPaginating: false for initial, true for subsequent
+        paginationLimit);
         requestCount++;
         return response;
     };
-    /** Constructs the parameters for the next API request based on the pagination type. */
     const getPaginatedParams = () => {
         const hasBody = "body" in params && params.body !== undefined;
         if (paginationType === "skip" && continuation?.type === "skip") {
             const paginatedOptions = {
-                ...(hasBody && "options" in params.body ? params.body.options : {}),
+                ...(hasBody && "options" in params.body
+                    ? params.body.options
+                    : {}),
                 skip: continuation.value,
             };
             return hasBody
@@ -7754,7 +7739,7 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
         }
         else if (paginationType === "token" && continuation?.type === "token") {
             if (continuation.value === "" && !lastResponse) {
-                return { ...params }; // Initial call, no pagination fields
+                return { ...params };
             }
             const tokenKey = continuation.key;
             return hasBody
@@ -7767,11 +7752,11 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
                 }
                 : { ...params, [tokenKey]: continuation.value };
         }
-        return params; // No pagination or initial call
+        return { ...params };
     };
     if (!initialResponse) {
         const firstParams = getPaginatedParams();
-        const firstResponse = await fetchNextPage(firstParams);
+        const firstResponse = await fetchNextPage(firstParams, true); // Initial call
         const actualDataKey = getDataKey(firstResponse);
         allRecords = firstResponse[actualDataKey];
         lastResponse = firstResponse;
@@ -7804,6 +7789,12 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
             (paginationType === "token" &&
                 continuation?.type === "token" &&
                 continuation.value !== "");
+        if (paginationLimit !== null && allRecords.length >= paginationLimit) {
+            if (debug) {
+                console.log("[paginateRecords] Stopping: Reached pagination limit", paginationLimit);
+            }
+            break;
+        }
         if (!hasMore) {
             if (debug) {
                 console.log("[paginateRecords] Stopping:", paginationType === "skip"
@@ -7817,10 +7808,12 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
         const paginatedParams = getPaginatedParams();
         const response = await fetchNextPage(paginatedParams);
         const actualDataKey = getDataKey(response);
-        allRecords = allRecords.concat(response[actualDataKey]);
+        const remainingCapacity = paginationLimit !== null ? paginationLimit - allRecords.length : Infinity;
+        const recordsToAdd = response[actualDataKey].slice(0, Math.min(remainingCapacity, response[actualDataKey].length));
+        allRecords = allRecords.concat(recordsToAdd);
         lastResponse = response;
         if (debug && response[actualDataKey].length > 0) {
-            console.log("[paginateRecords] Fetched records this iteration:", response[actualDataKey].length, "IDs: first:", response[actualDataKey][0]["3"]?.value, "last:", response[actualDataKey][response[actualDataKey].length - 1]["3"]?.value, "Continuation after fetch:", continuation);
+            console.log("[paginateRecords] Fetched records this iteration:", recordsToAdd.length, "IDs: first:", recordsToAdd[0]["3"]?.value, "last:", recordsToAdd[recordsToAdd.length - 1]["3"]?.value, "Continuation after fetch:", continuation);
         }
         if (paginationType === "skip") {
             const newSkip = continuation?.type === "skip"
@@ -7895,11 +7888,6 @@ async function paginateRecords(methodName, params, methodMap, baseHeaders, authS
     }
     return finalResponse;
 }
-/**
- * Checks if a response is paginatable based on its structure.
- * @param response - The response to check.
- * @returns True if the response has a data array and pagination metadata, false otherwise.
- */
 function isPaginatable(response) {
     return (response &&
         typeof response === "object" &&
@@ -7913,32 +7901,12 @@ function isPaginatable(response) {
             "nextToken" in response.metadata));
 }
 
-/**
- * Invokes a Quick Base API method with the specified parameters, handling authentication, rate limiting, and pagination.
- * @template K - The method name keyof QuickbaseClient.
- * @param methodName - The API method to invoke (e.g., "runQuery", "changesetSolution").
- * @param params - Parameters for the API method, potentially including skip, top, or a body.
- * @param methodMap - Mapping of method names to their implementation details.
- * @param baseHeaders - Base HTTP headers for API requests.
- * @param authStrategy - Strategy for handling authentication tokens.
- * @param rateLimiter - Rate limiting mechanism to respect API limits.
- * @param transformDates - Function to transform date strings in the response.
- * @param debug - If true, logs detailed invocation information.
- * @param convertDates - If true, converts date strings to Date objects in the response.
- * @param autoPaginate - If true, automatically paginates multi-page responses (default: true).
- * @param attempt - Current retry attempt (default: 0).
- * @param maxAttempts - Maximum number of retry attempts (default: rateLimiter.maxRetries + 1).
- * @param isPaginating - Indicates if this call is part of an ongoing pagination (default: false).
- * @returns A promise resolving to the API method's response.
- * @throws {Error} If the method is not found or retries are exhausted.
- */
-async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate = true, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1, isPaginating = false) {
+async function invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate = true, attempt = 0, maxAttempts = rateLimiter.maxRetries + 1, isPaginating = false, paginationLimit = null) {
     const methodInfo = methodMap[methodName];
     if (!methodInfo)
         throw new Error(`Method ${methodName} not found`);
     const hasBody = "body" in params && params.body !== undefined;
     const body = hasBody ? params.body : undefined;
-    // Safely check for options only if body is an object
     const options = hasBody && body && typeof body === "object" && "options" in body
         ? body.options
         : undefined;
@@ -7981,7 +7949,7 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
                 if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
                     if (debug)
                         console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
-                    return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse);
+                    return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, jsonResponse, paginationLimit);
                 }
                 return transformDates(jsonResponse, convertDates);
             }
@@ -7992,7 +7960,7 @@ async function invokeMethod(methodName, params, methodMap, baseHeaders, authStra
             if (autoPaginate && !isPaginating && isPaginatable(response)) {
                 if (debug)
                     console.log("[invokeMethod] Entering pagination with params:", adjustedParams);
-                return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response);
+                return paginateRecords(methodName, adjustedParams, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, response, paginationLimit);
             }
             return transformDates(response, convertDates);
         }
@@ -8237,8 +8205,7 @@ class RateLimiter {
 }
 
 function quickbase(config) {
-    const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, // Changed rate from 6 to 5
-    maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
+    const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
     const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
     const throttleOptions = throttle;
     const throttleBucket = throttleOptions.type === "burst-aware"
@@ -8246,8 +8213,7 @@ function quickbase(config) {
             maxTokens: throttleOptions.burst || 100,
             windowSeconds: throttleOptions.windowSeconds || 10,
         })
-        : new FlowThrottleBucket(throttleOptions.rate || 5, // Changed rate from 6 to 5
-        throttleOptions.burst || 50);
+        : new FlowThrottleBucket(throttleOptions.rate || 5, throttleOptions.burst || 50);
     const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
     const defaultFetch = globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
     if (!defaultFetch && !fetchApi) {
@@ -8306,14 +8272,45 @@ function quickbase(config) {
         return methodMap;
     }
     const methodMap = buildMethodMap();
+    let currentAutoPaginate = autoPaginate;
+    let paginationLimit = null;
     const proxyHandler = {
         get: (_, prop) => {
             if (debug) {
                 console.log("[proxy] Accessing:", prop, "in methodMap:", prop in methodMap);
             }
+            if (prop === "withPaginationDisabled") {
+                return async (callback) => {
+                    const originalAutoPaginate = currentAutoPaginate;
+                    currentAutoPaginate = false;
+                    try {
+                        const result = await callback();
+                        return result;
+                    }
+                    finally {
+                        currentAutoPaginate = originalAutoPaginate;
+                    }
+                };
+            }
+            if (prop === "withPaginationLimit") {
+                return async (limit, callback) => {
+                    const originalAutoPaginate = currentAutoPaginate;
+                    const originalLimit = paginationLimit;
+                    currentAutoPaginate = true;
+                    paginationLimit = limit;
+                    try {
+                        const result = await callback();
+                        return result;
+                    }
+                    finally {
+                        currentAutoPaginate = originalAutoPaginate;
+                        paginationLimit = originalLimit;
+                    }
+                };
+            }
             if (prop in methodMap) {
                 const methodName = prop;
-                return (params) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, autoPaginate);
+                return (params = {}) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, currentAutoPaginate, 0, rateLimiter.maxRetries + 1, false, paginationLimit);
             }
             if (debug) {
                 console.log("[proxy] Method not found:", prop);

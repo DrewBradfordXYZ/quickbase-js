@@ -1,5 +1,3 @@
-// src/invokeMethod.ts
-
 import { AuthorizationStrategy, extractDbid } from "./authorizationStrategy";
 import { RateLimiter } from "./rateLimiter";
 import { RateLimitError } from "./RateLimitError";
@@ -52,7 +50,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       ? (body as any).options
       : undefined;
   const adjustedParams = {
-    ...(params as object), // Narrow to object type to fix ts(2698)
+    ...(params as object),
     skip:
       params.skip ?? (options && "skip" in options ? options.skip : undefined),
     top: params.top ?? (options && "top" in options ? options.top : undefined),

@@ -31,7 +31,7 @@ test(
 
     const expectedAppData = {
       id: appId,
-      name: "qb-copy",
+      name: "quickbase-js testing",
       created: expect.any(Date),
       updated: expect.any(Date),
       description: "",

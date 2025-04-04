@@ -20,7 +20,7 @@ test(
 
     expect(result).toEqual({
       id: getAppId,
-      name: "qb-copy",
+      name: "quickbase-js testing",
       created: expect.any(Date),
       updated: expect.any(Date),
       description: "",

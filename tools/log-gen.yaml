@@ -4466,7 +4466,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-25T22:56:49.051Z
+                2025-04-04T20:20:31.632Z
 
                 import
                 {
@@ -5800,7 +5800,6 @@ tree:
                 startTime?: number;
                 skip?: number;
                 top?: number;
-                disablePagination?: boolean; // Add per-call override
               },
               methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
               baseHeaders: Record<string, string>,
@@ -5812,7 +5811,8 @@ tree:
               autoPaginate: boolean = true,
               attempt: number = 0,
               maxAttempts: number = rateLimiter.maxRetries + 1,
-              isPaginating: boolean = false
+              isPaginating: boolean = false,
+              paginationLimit: number | null = null
             ):
             Promise<ReturnType<QuickbaseClient[K]>>
             {
@@ -5826,7 +5826,7 @@ tree:
                   ? (body as any).options
                   : undefined;
               const adjustedParams = {
-                ...params,
+                ...(params as object), // Narrow to object type to fix ts(2698)
                 skip:
                   params.skip ?? (options && "skip" in options ? options.skip : undefined),
                 top: params.top ?? (options && "top" in options ? options.top : undefined),
@@ -5835,11 +5835,10 @@ tree:
               const restParams: any = hasBody
                 ? Object.fromEntries(
                     Object.entries(adjustedParams).filter(
-                      ([key]) =>
-                        key !== "body" && key !== "startTime" && key !== "disablePagination"
+                      ([key]) => key !== "body" && key !== "startTime"
                     )
                   )
-                : { ...adjustedParams, startTime: undefined, disablePagination: undefined };
+                : { ...adjustedParams, startTime: undefined };
               const requestParameters: any = {
                 ...restParams,
                 ...(hasBody ? { generated: body } : {}),
@@ -5871,12 +5870,6 @@ tree:
                 }
               }
 
-              // Determine effective pagination setting: per-call override takes precedence
-              const effectiveAutoPaginate =
-                params.disablePagination !== undefined
-                  ? !params.disablePagination
-                  : autoPaginate;
-
               async function processResponse(
                 rawResponse: any
               ): Promise<ReturnType<QuickbaseClient[K]>> {
@@ -5886,11 +5879,7 @@ tree:
                     ?.toLowerCase();
                   if (contentType?.includes("application/json")) {
                     const jsonResponse = await rawResponse.json();
-                    if (
-                      effectiveAutoPaginate &&
-                      !isPaginating &&
-                      isPaginatable(jsonResponse)
-                    ) {
+                    if (autoPaginate && !isPaginating && isPaginatable(jsonResponse)) {
                       if (debug)
                         console.log(
                           "[invokeMethod] Entering pagination with params:",
@@ -5906,7 +5895,8 @@ tree:
                         transformDates,
                         debug,
                         convertDates,
-                        jsonResponse
+                        jsonResponse,
+                        paginationLimit
                       );
                     }
                     return transformDates(jsonResponse, convertDates) as ReturnType<
@@ -5917,7 +5907,7 @@ tree:
                 }
                 if (rawResponse && typeof rawResponse.value === "function") {
                   const response = await rawResponse.value();
-                  if (effectiveAutoPaginate && !isPaginating && isPaginatable(response)) {
+                  if (autoPaginate && !isPaginating && isPaginatable(response)) {
                     if (debug)
                       console.log(
                         "[invokeMethod] Entering pagination with params:",
@@ -5933,7 +5923,8 @@ tree:
                       transformDates,
                       debug,
                       convertDates,
-                      response
+                      response,
+                      paginationLimit
                     );
                   }
                   return transformDates(response, convertDates) as ReturnType<
@@ -6161,7 +6152,10 @@ tree:
             QuickbaseClient
             extends
             IQuickbaseClient
-            {}
+            {
+              withPaginationDisabled<T>(callback: () => Promise<T>): Promise<T>;
+              withPaginationLimit<T>(limit: number, callback: () => Promise<T>): Promise<T>; // New method
+            }
 
 
             export
@@ -6342,6 +6336,9 @@ tree:
 
               const methodMap = buildMethodMap();
 
+              let currentAutoPaginate = autoPaginate;
+              let paginationLimit: number | null = null; // New state for limit
+
               const proxyHandler: globalThis.ProxyHandler<QuickbaseClient> = {
                 get: (_: QuickbaseClient, prop: string) => {
                   if (debug) {
@@ -6352,12 +6349,40 @@ tree:
                       prop in methodMap
                     );
                   }
+                  if (prop === "withPaginationDisabled") {
+                    return async <T>(callback: () => Promise<T>): Promise<T> => {
+                      const originalAutoPaginate = currentAutoPaginate;
+                      currentAutoPaginate = false;
+                      try {
+                        const result = await callback();
+                        return result;
+                      } finally {
+                        currentAutoPaginate = originalAutoPaginate;
+                      }
+                    };
+                  }
+                  if (prop === "withPaginationLimit") {
+                    return async <T>(
+                      limit: number,
+                      callback: () => Promise<T>
+                    ): Promise<T> => {
+                      const originalAutoPaginate = currentAutoPaginate;
+                      const originalLimit = paginationLimit;
+                      currentAutoPaginate = true; // Ensure pagination is enabled
+                      paginationLimit = limit; // Set the custom limit
+                      try {
+                        const result = await callback();
+                        return result;
+                      } finally {
+                        currentAutoPaginate = originalAutoPaginate;
+                        paginationLimit = originalLimit; // Restore original limit (null by default)
+                      }
+                    };
+                  }
                   if (prop in methodMap) {
                     const methodName = prop as keyof QuickbaseClient;
                     return (
-                      params: Parameters<QuickbaseClient[typeof methodName]>[0] & {
-                        disablePagination?: boolean;
-                      } = {}
+                      params: Parameters<QuickbaseClient[typeof methodName]>[0] = {}
                     ) =>
                       invokeMethod(
                         methodName,
@@ -6369,9 +6394,11 @@ tree:
                         transformDates,
                         debug,
                         convertDates,
-                        params.disablePagination !== undefined
-                          ? !params.disablePagination
-                          : autoPaginate // Per-call override
+                        currentAutoPaginate,
+                        0, // attempt
+                        rateLimiter.maxRetries + 1, // maxAttempts
+                        false, // isPaginating
+                        paginationLimit // Pass the limit to invokeMethod
                       );
                   }
                   if (debug) {

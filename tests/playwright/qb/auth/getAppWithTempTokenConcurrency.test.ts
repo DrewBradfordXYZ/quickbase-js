@@ -1,6 +1,5 @@
-// tests/playwright/qb/auth/getAppWithTempTokenConcurrency.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbase } from "../../../../src/quickbaseClient.ts"; // Keep .ts for now
+import { quickbase } from "../../../../src/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -87,7 +86,7 @@ test.describe("QuickbaseClient Integration - getApp with Temporary Token Concurr
     const client = quickbase({
       realm,
       useTempTokens: true,
-      debug: true, // Enable debug logs to verify concurrency behavior
+      debug: true,
       fetchApi: async (url: RequestInfo | URL, init?: RequestInit) => {
         const effectiveInit = init || {};
         fetchInits.push({ url: String(url), init: effectiveInit });
@@ -132,14 +131,12 @@ test.describe("QuickbaseClient Integration - getApp with Temporary Token Concurr
       },
     });
 
-    // Make three concurrent getApp requests
     const concurrentRequests = [
       client.getApp({ appId }),
       client.getApp({ appId }),
       client.getApp({ appId }),
     ];
 
-    // Wait for all responses to complete
     await Promise.all([
       page.waitForResponse(`https://api.quickbase.com/v1/apps/${appId}`, {
         timeout: 30000,
@@ -154,10 +151,9 @@ test.describe("QuickbaseClient Integration - getApp with Temporary Token Concurr
 
     const results = await Promise.all(concurrentRequests);
 
-    // Expected app data (based on your previous test)
     const expectedAppData = {
       id: appId,
-      name: "qb-copy",
+      name: "quickbase-js testing", // Updated to match actual app name
       created: expect.any(Date),
       updated: expect.any(Date),
       description: "",
@@ -178,23 +174,21 @@ test.describe("QuickbaseClient Integration - getApp with Temporary Token Concurr
       variables: [{ name: "TestVar", value: "TestValue" }],
     };
 
-    // Assert all results match the expected data
     expect(results).toHaveLength(3);
     results.forEach((result) => {
       expect(result).toEqual(expectedAppData);
     });
 
-    // Verify token fetch behavior
     const tokenFetchInits = fetchInits.filter((entry) =>
       entry.url.includes(`/auth/temporary/${appId}`)
     );
-    expect(tokenFetchInits).toHaveLength(1); // Only one token fetch should occur
+    expect(tokenFetchInits).toHaveLength(1);
     expect(tokenFetchInits[0].init.credentials).toBe("include");
 
     const appFetchInits = fetchInits.filter((entry) =>
       entry.url.includes(`/apps/${appId}`)
     );
-    expect(appFetchInits).toHaveLength(3); // Three getApp requests
+    expect(appFetchInits).toHaveLength(3);
     appFetchInits.forEach((init) => {
       expect(init.init.credentials).toBe("omit");
       expect(init.init.headers).toHaveProperty("Authorization");
