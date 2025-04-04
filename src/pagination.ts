@@ -1,3 +1,5 @@
+// src/pagination.ts
+
 import { QuickbaseClient } from "./quickbaseClient";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import { AuthorizationStrategy } from "./authorizationStrategy";
@@ -8,25 +10,15 @@ import { RateLimiter } from "./rateLimiter";
  * @template T - The type of items in the data array.
  */
 interface PaginatedResponse<T> {
-  /** The key containing the array of records (e.g., "data" or "users") and additional metadata. */
   [key: string]: T[] | any;
-  /** Optional array of field definitions for the records. */
   fields?: { id: number; label: string; type: string }[];
-  /** Metadata describing the pagination state. */
   metadata: {
-    /** Total number of records available (skip-based pagination). */
     totalRecords?: number;
-    /** Number of records in the current page. */
     numRecords?: number;
-    /** Number of fields in the records. */
     numFields?: number;
-    /** Number of records skipped in the current page (skip-based pagination). */
     skip?: number;
-    /** Maximum number of records per page (skip-based pagination). */
     top?: number;
-    /** Token for the next page (token-based pagination). */
     nextPageToken?: string;
-    /** Alternative token for the next page (token-based pagination). */
     nextToken?: string;
   };
 }
@@ -35,28 +27,17 @@ interface PaginatedResponse<T> {
  * Represents a request body that may include pagination options.
  */
 interface BodyWithOptions {
-  /** Optional request body containing pagination parameters. */
   body?: {
-    /** Optional pagination options for skip-based requests. */
     options?: {
-      /** Sorting criteria for the records. */
       sortBy?: Array<{ fieldId: number; order: "ASC" | "DESC" }>;
-      /** Number of records to skip. */
       skip?: number;
-      /** Maximum number of records to return per page. */
       top?: number;
-      /** Token for the next page (token-based pagination). */
       nextPageToken?: string;
-      /** Alternative token for the next page (token-based pagination). */
       nextToken?: string;
-      /** Additional arbitrary options. */
       [key: string]: any;
     };
-    /** Token for the next page (token-based pagination, directly in body). */
     nextPageToken?: string;
-    /** Alternative token for the next page (token-based pagination, directly in body). */
     nextToken?: string;
-    /** Additional arbitrary body properties. */
     [key: string]: any;
   };
 }
@@ -65,24 +46,12 @@ interface BodyWithOptions {
  * Defines the continuation state for pagination, either skip-based or token-based.
  */
 type PaginationContinuation =
-  | { type: "skip"; value: number } // Skip-based: number of records to skip next
-  | { type: "token"; value: string; key: "nextPageToken" | "nextToken" }; // Token-based: token for the next page
+  | { type: "skip"; value: number }
+  | { type: "token"; value: string; key: "nextPageToken" | "nextToken" };
 
 /**
  * Paginates records from a Quick Base API endpoint, handling both skip-based and token-based pagination.
  * @template K - The method name keyof QuickbaseClient.
- * @param methodName - The Quick Base API method to invoke (e.g., "runQuery", "getUsers").
- * @param params - Parameters for the API method, including optional skip and top values.
- * @param methodMap - Mapping of method names to their implementation details.
- * @param baseHeaders - Base HTTP headers for API requests.
- * @param authStrategy - Strategy for handling authentication tokens.
- * @param rateLimiter - Rate limiting mechanism to respect API limits.
- * @param transformDates - Function to transform date strings in the response.
- * @param debug - If true, logs detailed pagination information to the console.
- * @param convertDates - If true, converts date strings to Date objects in the response.
- * @param initialResponse - Optional initial response to start pagination from (used by invokeMethod).
- * @returns A promise resolving to the complete paginated response with all records.
- * @throws {Error} If no response is received during pagination.
  */
 export async function paginateRecords<K extends keyof QuickbaseClient>(
   methodName: K,
@@ -94,11 +63,11 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
   transformDates: (obj: any, convertStringsToDates: boolean) => any,
   debug: boolean | undefined,
   convertDates: boolean,
-  initialResponse?: PaginatedResponse<any>
+  initialResponse?: PaginatedResponse<any>,
+  paginationLimit: number | null = null
 ): Promise<ReturnType<QuickbaseClient[K]>> {
   if (debug) console.log("[paginateRecords] Starting with params:", params);
 
-  /** Extracts the key containing the data array from the response (e.g., "data" or "users"). */
   const getDataKey = (response: PaginatedResponse<any>): string =>
     Object.keys(response).find((key) => Array.isArray(response[key])) || "data";
 
@@ -107,11 +76,6 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
   let lastResponse: PaginatedResponse<any> | undefined = initialResponse;
   let requestCount = 0;
 
-  /**
-   * Determines the pagination strategy based on response metadata.
-   * @param response - The API response to analyze.
-   * @returns "skip" for skip-based, "token" for token-based, or "none" if no pagination is detected.
-   */
   const determinePaginationType = (
     response: PaginatedResponse<any>
   ): "skip" | "token" | "none" => {
@@ -135,12 +99,12 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       console.log(
         "[paginateRecords] No clear pagination type detected, assuming single-page response"
       );
-    return "none"; // No pagination indicators
+    return "none";
   };
 
   let paginationType: "skip" | "token" | "none" = initialResponse
     ? determinePaginationType(initialResponse)
-    : "none"; // Start with no pagination assumption
+    : "none";
 
   let continuation: PaginationContinuation | null = initialResponse
     ? paginationType === "skip"
@@ -163,7 +127,7 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
               : "nextToken",
         }
       : null
-    : null; // No continuation until type is determined
+    : null;
 
   if (debug) {
     console.log("[paginateRecords] Initial state:", {
@@ -172,6 +136,7 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       continuation,
       hasInitialResponse: !!initialResponse,
       totalRecordsSoFar: allRecords.length,
+      paginationLimit,
     });
     if (initialResponse && initialResponse[dataKey].length > 0) {
       console.log(
@@ -184,7 +149,6 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
     }
   }
 
-  /** Fetches the next page of records using the provided parameters. */
   const fetchNextPage = async (
     paginatedParams: any
   ): Promise<PaginatedResponse<any>> => {
@@ -203,45 +167,47 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
       false,
       0,
       rateLimiter.maxRetries + 1,
-      true
+      true,
+      paginationLimit
     );
     requestCount++;
     return response as PaginatedResponse<any>;
   };
 
-  /** Constructs the parameters for the next API request based on the pagination type. */
   const getPaginatedParams = (): any => {
     const hasBody = "body" in params && params.body !== undefined;
     if (paginationType === "skip" && continuation?.type === "skip") {
       const paginatedOptions = {
-        ...(hasBody && "options" in params.body! ? params.body!.options : {}),
+        ...(hasBody && "options" in (params as BodyWithOptions).body!
+          ? (params as BodyWithOptions).body!.options
+          : {}),
         skip: continuation.value,
       };
       return hasBody
         ? {
-            ...params,
+            ...(params as object), // Narrow to object type
             body: {
-              ...(params as BodyWithOptions).body!,
+              ...((params as BodyWithOptions).body as object), // Narrow to object
               options: paginatedOptions,
             },
           }
-        : { ...params, skip: continuation.value };
+        : { ...(params as object), skip: continuation.value };
     } else if (paginationType === "token" && continuation?.type === "token") {
       if (continuation.value === "" && !lastResponse) {
-        return { ...params }; // Initial call, no pagination fields
+        return { ...(params as object) }; // Initial call
       }
       const tokenKey = continuation.key;
       return hasBody
         ? {
-            ...params,
+            ...(params as object),
             body: {
-              ...(params as BodyWithOptions).body!,
+              ...((params as BodyWithOptions).body as object),
               [tokenKey]: continuation.value,
             },
           }
-        : { ...params, [tokenKey]: continuation.value };
+        : { ...(params as object), [tokenKey]: continuation.value };
     }
-    return params; // No pagination or initial call
+    return { ...(params as object) };
   };
 
   if (!initialResponse) {
@@ -285,6 +251,16 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
         continuation?.type === "token" &&
         continuation.value !== "");
 
+    if (paginationLimit !== null && allRecords.length >= paginationLimit) {
+      if (debug) {
+        console.log(
+          "[paginateRecords] Stopping: Reached pagination limit",
+          paginationLimit
+        );
+      }
+      break;
+    }
+
     if (!hasMore) {
       if (debug) {
         console.log(
@@ -302,17 +278,24 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
     const paginatedParams = getPaginatedParams();
     const response = await fetchNextPage(paginatedParams);
     const actualDataKey = getDataKey(response);
-    allRecords = allRecords.concat(response[actualDataKey]);
+
+    const remainingCapacity =
+      paginationLimit !== null ? paginationLimit - allRecords.length : Infinity;
+    const recordsToAdd = response[actualDataKey].slice(
+      0,
+      Math.min(remainingCapacity, response[actualDataKey].length)
+    );
+    allRecords = allRecords.concat(recordsToAdd);
     lastResponse = response;
 
     if (debug && response[actualDataKey].length > 0) {
       console.log(
         "[paginateRecords] Fetched records this iteration:",
-        response[actualDataKey].length,
+        recordsToAdd.length,
         "IDs: first:",
-        response[actualDataKey][0]["3"]?.value,
+        recordsToAdd[0]["3"]?.value,
         "last:",
-        response[actualDataKey][response[actualDataKey].length - 1]["3"]?.value,
+        recordsToAdd[recordsToAdd.length - 1]["3"]?.value,
         "Continuation after fetch:",
         continuation
       );
@@ -406,11 +389,6 @@ export async function paginateRecords<K extends keyof QuickbaseClient>(
   return finalResponse as ReturnType<QuickbaseClient[K]>;
 }
 
-/**
- * Checks if a response is paginatable based on its structure.
- * @param response - The response to check.
- * @returns True if the response has a data array and pagination metadata, false otherwise.
- */
 export function isPaginatable(
   response: any
 ): response is PaginatedResponse<any> {

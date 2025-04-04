@@ -1,7 +1,7 @@
 project: >-
   quickbase-js
 date: >-
-  3/23/2025
+  4/4/2025
 root: >-
   /home/drew/Projects/quickbase-js
 goals:
@@ -1174,6 +1174,10 @@ tree:
       type: >-
         file
     - name: >-
+        quickbase-js-0.1.0-beta.13.tgz
+      type: >-
+        file
+    - name: >-
         rollup.config.js
       type: >-
         file
@@ -1182,6 +1186,14 @@ tree:
       type: >-
         directory
       children:
+        - name: >-
+            BurstAwareThrottleBucket.ts
+          type: >-
+            file
+        - name: >-
+            FlowThrottleBucket.ts
+          type: >-
+            file
         - name: >-
             RateLimitError.ts
           type: >-
@@ -1207,64 +1219,18 @@ tree:
               }
             }
         - name: >-
-            ThrottleBucket.ts
+            RateThrottleBucket.ts
           type: >-
             file
-          contents: >
-            //
-            src/ThrottleBucket.ts
-
-            export
-            class
-            ThrottleBucket
-            {
-              private tokens: number;
-              private maxTokens: number;
-              private refillRate: number; // Tokens per second
-              private lastRefill: number;
-              private pending: Promise<void> = Promise.resolve(); // Queue for sequential execution
-
-              constructor(rate: number, burst: number) {
-                this.tokens = burst;
-                this.maxTokens = burst;
-                this.refillRate = rate;
-                this.lastRefill = Date.now();
-              }
-
-              private refill(): void {
-                const now = Date.now();
-                const elapsed = (now - this.lastRefill) / 1000; // Seconds elapsed
-                const newTokens = elapsed * this.refillRate;
-                this.tokens = Math.min(this.maxTokens, this.tokens + newTokens);
-                this.lastRefill = now;
-              }
-
-              async acquire(): Promise<void> {
-                // Chain the new acquisition onto the pending queue
-                const previous = this.pending;
-                this.pending = (async () => {
-                  await previous; // Wait for prior calls to complete
-                  this.refill();
-                  if (this.tokens >= 1) {
-                    this.tokens -= 1;
-                    return;
-                  }
-                  const waitTime = ((1 - this.tokens) / this.refillRate) * 1000; // ms until next token
-                  await new Promise((resolve) => setTimeout(resolve, waitTime));
-                  this.refill();
-                  this.tokens -= 1;
-                })();
-                await this.pending;
-              }
-            }
+        - name: >-
+            Semaphore.ts
+          type: >-
+            file
         - name: >-
             authorizationStrategy.ts
           type: >-
             file
           contents: >
-            //
-            src/authorizationStrategy.ts
-
             import
             {
             TokenCache
@@ -1384,12 +1350,29 @@ tree:
                   return null;
                 }
                 if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-                const newToken = await this.getToken(dbid);
-                if (newToken) {
-                  this.tokenCache.set(dbid, newToken);
-                  return newToken;
+                // Invalidate the cache for this dbid to force a fresh fetch
+                this.tokenCache.delete(dbid);
+                try {
+                  const newToken = await this.getToken(dbid);
+                  if (newToken) {
+                    this.tokenCache.set(dbid, newToken);
+                    if (debug)
+                      console.log(
+                        `[${
+                          methodName || "method"
+                        }] Retrying with token: ${newToken.substring(0, 10)}...`
+                      );
+                    return newToken;
+                  }
+                  return null;
+                } catch (error) {
+                  if (debug)
+                    console.log(
+                      `[${methodName || "method"}] Failed to refresh token:`,
+                      error
+                    );
+                  throw error;
                 }
-                return null;
               }
             }
 
@@ -1402,7 +1385,7 @@ tree:
             {
               constructor(
                 private userToken: string,
-                private baseUrl: string = "https://api.quickbase.com/v1" // Added for consistency, unused
+                private baseUrl: string = "https://api.quickbase.com/v1"
               ) {}
 
               async getToken(_dbid: string): Promise<string> {
@@ -1447,7 +1430,7 @@ tree:
                 private realm: string,
                 private fetchApi: typeof fetch,
                 private debug: boolean = false,
-                private baseUrl: string = "https://api.quickbase.com/v1" // Added and used
+                private baseUrl: string = "https://api.quickbase.com/v1"
               ) {}
 
               async getToken(_dbid: string): Promise<string | undefined> {
@@ -1495,6 +1478,12 @@ tree:
                 const newToken = await this.refreshSsoToken(debug || this.debug);
                 if (newToken) {
                   this.currentToken = newToken;
+                  if (debug || this.debug)
+                    console.log(
+                      `[${
+                        methodName || "method"
+                      }] Retrying with token: ${newToken.substring(0, 10)}...`
+                    );
                   return newToken;
                 }
                 return null;
@@ -1629,6 +1618,470 @@ tree:
                     AppsApi.ts
                   type: >-
                     file
+                  contents: >
+                    /*
+                    tslint:disable
+                    */
+
+                    /*
+                    eslint-disable
+                    */
+
+                    /**
+                     * Quick Base API
+                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                     *
+                     * The version of the OpenAPI document: 1.0.0
+                     * 
+                     *
+                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                     * https://openapi-generator.tech
+                     * Do not edit the class manually.
+                     */
+
+
+                    import
+                    *
+                    as
+                    runtime
+                    from
+                    '../runtime';
+
+                    import
+                    type
+                    {
+                      CopyApp200Response,
+                      CopyAppRequest,
+                      CreateApp200Response,
+                      CreateAppRequest,
+                      DeleteApp200Response,
+                      DeleteAppRequest,
+                      GetApp200Response,
+                      GetAppEvents200Response,
+                      UpdateApp200Response,
+                      UpdateAppRequest,
+                    }
+                    from
+                    '../models/index';
+
+                    import
+                    {
+                        CopyApp200ResponseFromJSON,
+                        CopyApp200ResponseToJSON,
+                        CopyAppRequestFromJSON,
+                        CopyAppRequestToJSON,
+                        CreateApp200ResponseFromJSON,
+                        CreateApp200ResponseToJSON,
+                        CreateAppRequestFromJSON,
+                        CreateAppRequestToJSON,
+                        DeleteApp200ResponseFromJSON,
+                        DeleteApp200ResponseToJSON,
+                        DeleteAppRequestFromJSON,
+                        DeleteAppRequestToJSON,
+                        GetApp200ResponseFromJSON,
+                        GetApp200ResponseToJSON,
+                        GetAppEvents200ResponseFromJSON,
+                        GetAppEvents200ResponseToJSON,
+                        UpdateApp200ResponseFromJSON,
+                        UpdateApp200ResponseToJSON,
+                        UpdateAppRequestFromJSON,
+                        UpdateAppRequestToJSON,
+                    }
+                    from
+                    '../models/index';
+
+
+                    export
+                    interface
+                    CopyAppOperationRequest
+                    {
+                        appId: string;
+                        generated?: CopyAppRequest;
+                    }
+
+
+                    export
+                    interface
+                    CreateAppOperationRequest
+                    {
+                        generated?: CreateAppRequest;
+                    }
+
+
+                    export
+                    interface
+                    DeleteAppOperationRequest
+                    {
+                        appId: string;
+                        generated?: DeleteAppRequest;
+                    }
+
+
+                    export
+                    interface
+                    GetAppRequest
+                    {
+                        appId: string;
+                    }
+
+
+                    export
+                    interface
+                    GetAppEventsRequest
+                    {
+                        appId: string;
+                    }
+
+
+                    export
+                    interface
+                    UpdateAppOperationRequest
+                    {
+                        appId: string;
+                        generated?: UpdateAppRequest;
+                    }
+
+
+                    /**
+                     * AppsApi - interface
+                     * 
+                     * @export
+                     * @interface AppsApiInterface
+                     */
+                    export
+                    interface
+                    AppsApiInterface
+                    {
+                        /**
+                         * Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.
+                         * @summary Copy an app
+                         * @param {string} appId The unique identifier of an app
+                         * @param {CopyAppRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        copyAppRaw(requestParameters: CopyAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CopyApp200Response>>;
+
+                        /**
+                         * Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.
+                         * Copy an app
+                         */
+                        copyApp(requestParameters: CopyAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CopyApp200Response>;
+
+                        /**
+                         * Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.
+                         * @summary Create an app
+                         * @param {CreateAppRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        createAppRaw(requestParameters: CreateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApp200Response>>;
+
+                        /**
+                         * Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.
+                         * Create an app
+                         */
+                        createApp(requestParameters: CreateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateApp200Response>;
+
+                        /**
+                         * Deletes an entire application, including all of the tables and data.
+                         * @summary Delete an app
+                         * @param {string} appId The unique identifier of an app
+                         * @param {DeleteAppRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        deleteAppRaw(requestParameters: DeleteAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteApp200Response>>;
+
+                        /**
+                         * Deletes an entire application, including all of the tables and data.
+                         * Delete an app
+                         */
+                        deleteApp(requestParameters: DeleteAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteApp200Response>;
+
+                        /**
+                         * Returns the main properties of an application, including application variables.
+                         * @summary Get an app
+                         * @param {string} appId The unique identifier of an app
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        getAppRaw(requestParameters: GetAppRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetApp200Response>>;
+
+                        /**
+                         * Returns the main properties of an application, including application variables.
+                         * Get an app
+                         */
+                        getApp(requestParameters: GetAppRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetApp200Response>;
+
+                        /**
+                         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+                         * @summary Get app events
+                         * @param {string} appId The unique identifier of an app
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        getAppEventsRaw(requestParameters: GetAppEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetAppEvents200Response>>;
+
+                        /**
+                         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+                         * Get app events
+                         */
+                        getAppEvents(requestParameters: GetAppEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetAppEvents200Response>;
+
+                        /**
+                         * Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.
+                         * @summary Update an app
+                         * @param {string} appId The unique identifier of an app
+                         * @param {UpdateAppRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AppsApiInterface
+                         */
+                        updateAppRaw(requestParameters: UpdateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateApp200Response>>;
+
+                        /**
+                         * Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.
+                         * Update an app
+                         */
+                        updateApp(requestParameters: UpdateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateApp200Response>;
+
+                    }
+
+
+                    /**
+                     * 
+                     */
+                    export
+                    class
+                    AppsApi
+                    extends
+                    runtime.BaseAPI
+                    implements
+                    AppsApiInterface
+                    {
+
+                        /**
+                         * Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.
+                         * Copy an app
+                         */
+                        async copyAppRaw(requestParameters: CopyAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CopyApp200Response>> {
+                            if (requestParameters['appId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'appId',
+                                    'Required parameter "appId" was null or undefined when calling copyApp().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/apps/{appId}/copy`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: CopyAppRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => CopyApp200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Copies the specified application. The new application will have the same schema as the original. See below for additional copy options.
+                         * Copy an app
+                         */
+                        async copyApp(requestParameters: CopyAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CopyApp200Response> {
+                            const response = await this.copyAppRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.
+                         * Create an app
+                         */
+                        async createAppRaw(requestParameters: CreateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateApp200Response>> {
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/apps`,
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: CreateAppRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => CreateApp200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Creates an application in an account. You must have application creation rights in the respective account. Main properties and application variables can be set with this API.
+                         * Create an app
+                         */
+                        async createApp(requestParameters: CreateAppOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateApp200Response> {
+                            const response = await this.createAppRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Deletes an entire application, including all of the tables and data.
+                         * Delete an app
+                         */
+                        async deleteAppRaw(requestParameters: DeleteAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteApp200Response>> {
+                            if (requestParameters['appId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'appId',
+                                    'Required parameter "appId" was null or undefined when calling deleteApp().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/apps/{appId}`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                                method: 'DELETE',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: DeleteAppRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => DeleteApp200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Deletes an entire application, including all of the tables and data.
+                         * Delete an app
+                         */
+                        async deleteApp(requestParameters: DeleteAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteApp200Response> {
+                            const response = await this.deleteAppRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Returns the main properties of an application, including application variables.
+                         * Get an app
+                         */
+                        async getAppRaw(requestParameters: GetAppRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetApp200Response>> {
+                            if (requestParameters['appId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'appId',
+                                    'Required parameter "appId" was null or undefined when calling getApp().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/apps/{appId}`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetApp200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Returns the main properties of an application, including application variables.
+                         * Get an app
+                         */
+                        async getApp(requestParameters: GetAppRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetApp200Response> {
+                            const response = await this.getAppRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+                         * Get app events
+                         */
+                        async getAppEventsRaw(requestParameters: GetAppEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetAppEvents200Response>> {
+                            if (requestParameters['appId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'appId',
+                                    'Required parameter "appId" was null or undefined when calling getAppEvents().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/apps/{appId}/events`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetAppEvents200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Get a list of events that can be triggered based on data or user actions in this application, includes: Email notification, Reminders, Subscriptions, QB Actions, Webhooks, record change triggered Automations (does not include scheduled).
+                         * Get app events
+                         */
+                        async getAppEvents(requestParameters: GetAppEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetAppEvents200Response> {
+                            const response = await this.getAppEventsRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.
+                         * Update an app
+                         */
+                        async updateAppRaw(requestParameters: UpdateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateApp200Response>> {
+                            if (requestParameters['appId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'appId',
+                                    'Required parameter "appId" was null or undefined when calling updateApp().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/apps/{appId}`.replace(`{${"appId"}}`, encodeURIComponent(String(requestParameters['appId']))),
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: UpdateAppRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => UpdateApp200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Updates the main properties and/or application variables for a specific application. Any properties of the app that you do not specify in the request body will remain unchanged.
+                         * Update an app
+                         */
+                        async updateApp(requestParameters: UpdateAppOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateApp200Response> {
+                            const response = await this.updateAppRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                    }
                 - name: >-
                     AuditApi.ts
                   type: >-
@@ -1637,6 +2090,204 @@ tree:
                     AuthApi.ts
                   type: >-
                     file
+                  contents: >
+                    /*
+                    tslint:disable
+                    */
+
+                    /*
+                    eslint-disable
+                    */
+
+                    /**
+                     * Quick Base API
+                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                     *
+                     * The version of the OpenAPI document: 1.0.0
+                     * 
+                     *
+                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                     * https://openapi-generator.tech
+                     * Do not edit the class manually.
+                     */
+
+
+                    import
+                    *
+                    as
+                    runtime
+                    from
+                    '../runtime';
+
+                    import
+                    type
+                    {
+                      ExchangeSsoToken200Response,
+                      ExchangeSsoTokenRequest,
+                      GetTempTokenDBID200Response,
+                    }
+                    from
+                    '../models/index';
+
+                    import
+                    {
+                        ExchangeSsoToken200ResponseFromJSON,
+                        ExchangeSsoToken200ResponseToJSON,
+                        ExchangeSsoTokenRequestFromJSON,
+                        ExchangeSsoTokenRequestToJSON,
+                        GetTempTokenDBID200ResponseFromJSON,
+                        GetTempTokenDBID200ResponseToJSON,
+                    }
+                    from
+                    '../models/index';
+
+
+                    export
+                    interface
+                    ExchangeSsoTokenOperationRequest
+                    {
+                        generated?: ExchangeSsoTokenRequest;
+                    }
+
+
+                    export
+                    interface
+                    GetTempTokenDBIDRequest
+                    {
+                        dbid: string;
+                        qBAppToken?: string;
+                    }
+
+
+                    /**
+                     * AuthApi - interface
+                     * 
+                     * @export
+                     * @interface AuthApiInterface
+                     */
+                    export
+                    interface
+                    AuthApiInterface
+                    {
+                        /**
+                         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+                         * @summary Exchange an SSO token
+                         * @param {ExchangeSsoTokenRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AuthApiInterface
+                         */
+                        exchangeSsoTokenRaw(requestParameters: ExchangeSsoTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExchangeSsoToken200Response>>;
+
+                        /**
+                         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+                         * Exchange an SSO token
+                         */
+                        exchangeSsoToken(requestParameters: ExchangeSsoTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExchangeSsoToken200Response>;
+
+                        /**
+                         * Use this endpoint to get a temporary authorization token, scoped to either an app or a table. It can only be used inside of code pages for client-side authentication because it relies on the browser session. Learn more about [extending Quickbase](https://helpv2.quickbase.com/hc/en-us/articles/4570341709844-Extending-Quickbase). You can then use this token to make other API calls (see [authorization](../auth)).  This token expires in 5 minutes.
+                         * @summary Get a temporary token for a dbid
+                         * @param {string} dbid The unique identifier of an app or table.
+                         * @param {string} [qBAppToken] Your Quickbase app token
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof AuthApiInterface
+                         */
+                        getTempTokenDBIDRaw(requestParameters: GetTempTokenDBIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTempTokenDBID200Response>>;
+
+                        /**
+                         * Use this endpoint to get a temporary authorization token, scoped to either an app or a table. It can only be used inside of code pages for client-side authentication because it relies on the browser session. Learn more about [extending Quickbase](https://helpv2.quickbase.com/hc/en-us/articles/4570341709844-Extending-Quickbase). You can then use this token to make other API calls (see [authorization](../auth)).  This token expires in 5 minutes.
+                         * Get a temporary token for a dbid
+                         */
+                        getTempTokenDBID(requestParameters: GetTempTokenDBIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTempTokenDBID200Response>;
+
+                    }
+
+
+                    /**
+                     * 
+                     */
+                    export
+                    class
+                    AuthApi
+                    extends
+                    runtime.BaseAPI
+                    implements
+                    AuthApiInterface
+                    {
+
+                        /**
+                         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+                         * Exchange an SSO token
+                         */
+                        async exchangeSsoTokenRaw(requestParameters: ExchangeSsoTokenOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ExchangeSsoToken200Response>> {
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/auth/oauth/token`,
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: ExchangeSsoTokenRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => ExchangeSsoToken200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Use this endpoint to exchange a SAML assertion for a Quickbase token following [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693.html). Callers can choose to return a token compatible with SCIM, XML, or RESTful APIs. The token duration is determined by the [SAML timeout session time](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example#:~:text=Setting%20SAML%20timeout%20session%20time). You must be able to create a SAML assertion in your code to use this endpoint. The SAML assertion is verified against the configuration on the realm. Learn more about about [SAML assertions](https://helpv2.quickbase.com/hc/en-us/articles/4570410646420-SAML-assertion-example).
+                         * Exchange an SSO token
+                         */
+                        async exchangeSsoToken(requestParameters: ExchangeSsoTokenOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ExchangeSsoToken200Response> {
+                            const response = await this.exchangeSsoTokenRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Use this endpoint to get a temporary authorization token, scoped to either an app or a table. It can only be used inside of code pages for client-side authentication because it relies on the browser session. Learn more about [extending Quickbase](https://helpv2.quickbase.com/hc/en-us/articles/4570341709844-Extending-Quickbase). You can then use this token to make other API calls (see [authorization](../auth)).  This token expires in 5 minutes.
+                         * Get a temporary token for a dbid
+                         */
+                        async getTempTokenDBIDRaw(requestParameters: GetTempTokenDBIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTempTokenDBID200Response>> {
+                            if (requestParameters['dbid'] == null) {
+                                throw new runtime.RequiredError(
+                                    'dbid',
+                                    'Required parameter "dbid" was null or undefined when calling getTempTokenDBID().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            if (requestParameters['qBAppToken'] != null) {
+                                headerParameters['qBAppToken'] = String(requestParameters['qBAppToken']);
+                            }
+
+                            const response = await this.request({
+                                path: `/auth/temporary/{dbid}`.replace(`{${"dbid"}}`, encodeURIComponent(String(requestParameters['dbid']))),
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetTempTokenDBID200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Use this endpoint to get a temporary authorization token, scoped to either an app or a table. It can only be used inside of code pages for client-side authentication because it relies on the browser session. Learn more about [extending Quickbase](https://helpv2.quickbase.com/hc/en-us/articles/4570341709844-Extending-Quickbase). You can then use this token to make other API calls (see [authorization](../auth)).  This token expires in 5 minutes.
+                         * Get a temporary token for a dbid
+                         */
+                        async getTempTokenDBID(requestParameters: GetTempTokenDBIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTempTokenDBID200Response> {
+                            const response = await this.getTempTokenDBIDRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                    }
                 - name: >-
                     DocumentTemplatesApi.ts
                   type: >-
@@ -1645,6 +2296,612 @@ tree:
                     FieldsApi.ts
                   type: >-
                     file
+                  contents: >
+                    /*
+                    tslint:disable
+                    */
+
+                    /*
+                    eslint-disable
+                    */
+
+                    /**
+                     * Quick Base API
+                     * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                     *
+                     * The version of the OpenAPI document: 1.0.0
+                     * 
+                     *
+                     * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                     * https://openapi-generator.tech
+                     * Do not edit the class manually.
+                     */
+
+
+                    import
+                    *
+                    as
+                    runtime
+                    from
+                    '../runtime';
+
+                    import
+                    type
+                    {
+                      CreateField200Response,
+                      CreateFieldRequest,
+                      DeleteFields200Response,
+                      DeleteFieldsRequest,
+                      GetField200Response,
+                      GetFieldUsage200Response,
+                      GetFields200Response,
+                      GetFieldsUsage200Response,
+                      UpdateField200Response,
+                      UpdateFieldRequest,
+                    }
+                    from
+                    '../models/index';
+
+                    import
+                    {
+                        CreateField200ResponseFromJSON,
+                        CreateField200ResponseToJSON,
+                        CreateFieldRequestFromJSON,
+                        CreateFieldRequestToJSON,
+                        DeleteFields200ResponseFromJSON,
+                        DeleteFields200ResponseToJSON,
+                        DeleteFieldsRequestFromJSON,
+                        DeleteFieldsRequestToJSON,
+                        GetField200ResponseFromJSON,
+                        GetField200ResponseToJSON,
+                        GetFieldUsage200ResponseFromJSON,
+                        GetFieldUsage200ResponseToJSON,
+                        GetFields200ResponseFromJSON,
+                        GetFields200ResponseToJSON,
+                        GetFieldsUsage200ResponseFromJSON,
+                        GetFieldsUsage200ResponseToJSON,
+                        UpdateField200ResponseFromJSON,
+                        UpdateField200ResponseToJSON,
+                        UpdateFieldRequestFromJSON,
+                        UpdateFieldRequestToJSON,
+                    }
+                    from
+                    '../models/index';
+
+
+                    export
+                    interface
+                    CreateFieldOperationRequest
+                    {
+                        tableId: string;
+                        generated?: CreateFieldRequest;
+                    }
+
+
+                    export
+                    interface
+                    DeleteFieldsOperationRequest
+                    {
+                        tableId: string;
+                        generated?: DeleteFieldsRequest;
+                    }
+
+
+                    export
+                    interface
+                    GetFieldRequest
+                    {
+                        tableId: string;
+                        fieldId: number;
+                        includeFieldPerms?: boolean;
+                    }
+
+
+                    export
+                    interface
+                    GetFieldUsageRequest
+                    {
+                        tableId: string;
+                        fieldId: number;
+                    }
+
+
+                    export
+                    interface
+                    GetFieldsRequest
+                    {
+                        tableId: string;
+                        includeFieldPerms?: boolean;
+                    }
+
+
+                    export
+                    interface
+                    GetFieldsUsageRequest
+                    {
+                        tableId: string;
+                        skip?: number;
+                        top?: number;
+                    }
+
+
+                    export
+                    interface
+                    UpdateFieldOperationRequest
+                    {
+                        tableId: string;
+                        fieldId: number;
+                        generated?: UpdateFieldRequest;
+                    }
+
+
+                    /**
+                     * FieldsApi - interface
+                     * 
+                     * @export
+                     * @interface FieldsApiInterface
+                     */
+                    export
+                    interface
+                    FieldsApiInterface
+                    {
+                        /**
+                         * Creates a field within a table, including the custom permissions of that field.
+                         * @summary Create a field
+                         * @param {string} tableId The unique identifier of the table.
+                         * @param {CreateFieldRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        createFieldRaw(requestParameters: CreateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateField200Response>>;
+
+                        /**
+                         * Creates a field within a table, including the custom permissions of that field.
+                         * Create a field
+                         */
+                        createField(requestParameters: CreateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateField200Response>;
+
+                        /**
+                         * Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.
+                         * @summary Delete field(s)
+                         * @param {string} tableId The unique identifier of the table.
+                         * @param {DeleteFieldsRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        deleteFieldsRaw(requestParameters: DeleteFieldsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteFields200Response>>;
+
+                        /**
+                         * Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.
+                         * Delete field(s)
+                         */
+                        deleteFields(requestParameters: DeleteFieldsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteFields200Response>;
+
+                        /**
+                         * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+                         * @summary Get field
+                         * @param {string} tableId The unique identifier (dbid) of the table.
+                         * @param {number} fieldId The unique identifier (fid) of the field.
+                         * @param {boolean} [includeFieldPerms] Set to \&#39;true\&#39; if you\&#39;d like to get back the custom permissions for the field(s).
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        getFieldRaw(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetField200Response>>;
+
+                        /**
+                         * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+                         * Get field
+                         */
+                        getField(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetField200Response>;
+
+                        /**
+                         * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+                         * @summary Get usage for a field
+                         * @param {string} tableId The unique identifier (dbid) of the table.
+                         * @param {number} fieldId The unique identifier (fid) of the field.
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        getFieldUsageRaw(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFieldUsage200Response>>;
+
+                        /**
+                         * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for a field
+                         */
+                        getFieldUsage(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFieldUsage200Response>;
+
+                        /**
+                         * Gets the properties for all fields in a specific table. The properties for each field are the same as in Get field.
+                         * @summary Get fields for a table
+                         * @param {string} tableId The unique identifier (dbid) of the table.
+                         * @param {boolean} [includeFieldPerms] Set to \&#39;true\&#39; if you\&#39;d like to get back the custom permissions for the field(s).
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        getFieldsRaw(requestParameters: GetFieldsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFields200Response>>;
+
+                        /**
+                         * Gets the properties for all fields in a specific table. The properties for each field are the same as in Get field.
+                         * Get fields for a table
+                         */
+                        getFields(requestParameters: GetFieldsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFields200Response>;
+
+                        /**
+                         * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+                         * @summary Get usage for all fields
+                         * @param {string} tableId The unique identifier (dbid) of the table.
+                         * @param {number} [skip] The number of fields to skip from the list.
+                         * @param {number} [top] The maximum number of fields to return.
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        getFieldsUsageRaw(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFieldsUsage200Response>>;
+
+                        /**
+                         * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for all fields
+                         */
+                        getFieldsUsage(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFieldsUsage200Response>;
+
+                        /**
+                         * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+                         * @summary Update a field
+                         * @param {string} tableId The unique identifier of the table.
+                         * @param {number} fieldId The unique identifier (fid) of the field.
+                         * @param {UpdateFieldRequest} [generated] 
+                         * @param {*} [options] Override http request option.
+                         * @throws {RequiredError}
+                         * @memberof FieldsApiInterface
+                         */
+                        updateFieldRaw(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateField200Response>>;
+
+                        /**
+                         * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+                         * Update a field
+                         */
+                        updateField(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateField200Response>;
+
+                    }
+
+
+                    /**
+                     * 
+                     */
+                    export
+                    class
+                    FieldsApi
+                    extends
+                    runtime.BaseAPI
+                    implements
+                    FieldsApiInterface
+                    {
+
+                        /**
+                         * Creates a field within a table, including the custom permissions of that field.
+                         * Create a field
+                         */
+                        async createFieldRaw(requestParameters: CreateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateField200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling createField().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/fields`,
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: CreateFieldRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => CreateField200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Creates a field within a table, including the custom permissions of that field.
+                         * Create a field
+                         */
+                        async createField(requestParameters: CreateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateField200Response> {
+                            const response = await this.createFieldRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.
+                         * Delete field(s)
+                         */
+                        async deleteFieldsRaw(requestParameters: DeleteFieldsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DeleteFields200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling deleteFields().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/fields`,
+                                method: 'DELETE',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: DeleteFieldsRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => DeleteFields200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.
+                         * Delete field(s)
+                         */
+                        async deleteFields(requestParameters: DeleteFieldsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DeleteFields200Response> {
+                            const response = await this.deleteFieldsRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+                         * Get field
+                         */
+                        async getFieldRaw(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetField200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling getField().'
+                                );
+                            }
+
+                            if (requestParameters['fieldId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'fieldId',
+                                    'Required parameter "fieldId" was null or undefined when calling getField().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            if (requestParameters['includeFieldPerms'] != null) {
+                                queryParameters['includeFieldPerms'] = requestParameters['includeFieldPerms'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/fields/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetField200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Gets the properties of an individual field, based on field id.   Properties present on all field types are returned at the top level. Properties unique to a specific type of field are returned under the \'properties\' attribute. Please see [Field types page](../fieldInfo) for more details on the properties for each field type.
+                         * Get field
+                         */
+                        async getField(requestParameters: GetFieldRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetField200Response> {
+                            const response = await this.getFieldRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for a field
+                         */
+                        async getFieldUsageRaw(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFieldUsage200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling getFieldUsage().'
+                                );
+                            }
+
+                            if (requestParameters['fieldId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'fieldId',
+                                    'Required parameter "fieldId" was null or undefined when calling getFieldUsage().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/fields/usage/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetFieldUsage200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Get a single fields usage statistics. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for a field
+                         */
+                        async getFieldUsage(requestParameters: GetFieldUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFieldUsage200Response> {
+                            const response = await this.getFieldUsageRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Gets the properties for all fields in a specific table. The properties for each field are the same as in Get field.
+                         * Get fields for a table
+                         */
+                        async getFieldsRaw(requestParameters: GetFieldsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFields200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling getFields().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            if (requestParameters['includeFieldPerms'] != null) {
+                                queryParameters['includeFieldPerms'] = requestParameters['includeFieldPerms'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/fields`,
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetFields200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Gets the properties for all fields in a specific table. The properties for each field are the same as in Get field.
+                         * Get fields for a table
+                         */
+                        async getFields(requestParameters: GetFieldsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFields200Response> {
+                            const response = await this.getFieldsRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for all fields
+                         */
+                        async getFieldsUsageRaw(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetFieldsUsage200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling getFieldsUsage().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            if (requestParameters['skip'] != null) {
+                                queryParameters['skip'] = requestParameters['skip'];
+                            }
+
+                            if (requestParameters['top'] != null) {
+                                queryParameters['top'] = requestParameters['top'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            const response = await this.request({
+                                path: `/fields/usage`,
+                                method: 'GET',
+                                headers: headerParameters,
+                                query: queryParameters,
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => GetFieldsUsage200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Get all the field usage statistics for a table. This is a summary of the information that can be found in the usage table of field properties.
+                         * Get usage for all fields
+                         */
+                        async getFieldsUsage(requestParameters: GetFieldsUsageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetFieldsUsage200Response> {
+                            const response = await this.getFieldsUsageRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                        /**
+                         * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+                         * Update a field
+                         */
+                        async updateFieldRaw(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UpdateField200Response>> {
+                            if (requestParameters['tableId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'tableId',
+                                    'Required parameter "tableId" was null or undefined when calling updateField().'
+                                );
+                            }
+
+                            if (requestParameters['fieldId'] == null) {
+                                throw new runtime.RequiredError(
+                                    'fieldId',
+                                    'Required parameter "fieldId" was null or undefined when calling updateField().'
+                                );
+                            }
+
+                            const queryParameters: any = {};
+
+                            if (requestParameters['tableId'] != null) {
+                                queryParameters['tableId'] = requestParameters['tableId'];
+                            }
+
+                            const headerParameters: runtime.HTTPHeaders = {};
+
+                            headerParameters['Content-Type'] = 'application/json';
+
+                            const response = await this.request({
+                                path: `/fields/{fieldId}`.replace(`{${"fieldId"}}`, encodeURIComponent(String(requestParameters['fieldId']))),
+                                method: 'POST',
+                                headers: headerParameters,
+                                query: queryParameters,
+                                body: UpdateFieldRequestToJSON(requestParameters['generated']),
+                            }, initOverrides);
+
+                            return new runtime.JSONApiResponse(response, (jsonValue) => UpdateField200ResponseFromJSON(jsonValue));
+                        }
+
+                        /**
+                         * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+                         * Update a field
+                         */
+                        async updateField(requestParameters: UpdateFieldOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UpdateField200Response> {
+                            const response = await this.updateFieldRaw(requestParameters, initOverrides);
+                            return await response.value();
+                        }
+
+                    }
                 - name: >-
                     FilesApi.ts
                   type: >-
@@ -2066,10 +3323,132 @@ tree:
                     GetFieldsUsage200Response.ts
                   type: >-
                     file
+                  contents: >-
+                    /*
+                    Auto-generated
+                    by
+                    post-process-generated.ts
+                    */
+
+                    import
+                    {
+                    GetFieldsUsage200ResponseItemsInner,
+                    GetFieldsUsage200ResponseItemsInnerFromJSON,
+                    GetFieldsUsage200ResponseItemsInnerToJSON
+                    }
+                    from
+                    './GetFieldsUsage200ResponseItemsInner';
+
+
+                    /**
+                     * Response for getFieldsUsage
+                     */
+                    export
+                    type
+                    GetFieldsUsage200Response
+                    =
+                    GetFieldsUsage200ResponseItemsInner[];
+
+
+                    /**
+                     * Convert JSON to GetFieldsUsage200Response
+                     */
+                    export
+                    function
+                    GetFieldsUsage200ResponseFromJSON(json:
+                    any):
+                    GetFieldsUsage200Response
+                    {
+                      if (!json) return [];
+                      return json.map(GetFieldsUsage200ResponseItemsInnerFromJSON);
+                    }
+
+
+                    /**
+                     * Convert GetFieldsUsage200Response to JSON
+                     */
+                    export
+                    function
+                    GetFieldsUsage200ResponseToJSON(value?:
+                    GetFieldsUsage200Response
+                    |
+                    null):
+                    any
+                    {
+                      if (!value) return [];
+                      return value.map(GetFieldsUsage200ResponseItemsInnerToJSON);
+                    }
                 - name: >-
                     GetFieldsUsage200ResponseItemsInner.ts
                   type: >-
                     file
+                  contents: >-
+                    /*
+                    Auto-generated
+                    by
+                    post-process-generated.ts
+                    */
+
+                    import
+                    {
+                    mapValues
+                    }
+                    from
+                    '../runtime';
+
+                    import
+                    {
+                    Permission
+                    }
+                    from
+                    './Permission';
+
+
+                    /**
+                     * Auto-generated model for GetFieldsUsage200ResponseItemsInner
+                     */
+                    export
+                    interface
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                      /**
+                     * Basic information about the field.
+                     * @type {object}
+                     */
+                      field: object;
+                      /**
+                     * Usage Information about the field.
+                     * @type {object}
+                     */
+                      usage: object;
+                      /**
+                       * Allows additional unspecified properties
+                       * @type {any}
+                       */
+                      [key: string]: any;
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerFromJSON(json:
+                    any):
+                    GetFieldsUsage200ResponseItemsInner
+                    {
+                      return json || {};
+                    }
+
+
+                    export
+                    function
+                    GetFieldsUsage200ResponseItemsInnerToJSON(value?:
+                    GetFieldsUsage200ResponseItemsInner
+                    |
+                    null):
+                    any
+                    {
+                      return value || {};
+                    }
                 - name: >-
                     GetRelationships200Response.ts
                   type: >-
@@ -2338,6 +3717,742 @@ tree:
                 runtime.ts
               type: >-
                 file
+              contents: >
+                /*
+                tslint:disable
+                */
+
+                /*
+                eslint-disable
+                */
+
+                /**
+                 * Quick Base API
+                 * No description provided (generated by Openapi Generator https://github.com/openapitools/openapi-generator)
+                 *
+                 * The version of the OpenAPI document: 1.0.0
+                 * 
+                 *
+                 * NOTE: This class is auto generated by OpenAPI Generator (https://openapi-generator.tech).
+                 * https://openapi-generator.tech
+                 * Do not edit the class manually.
+                 */
+
+
+                export
+                const
+                BASE_PATH
+                =
+                "https://api.quickbase.com/v1".replace(/\/+$/,
+                "");
+
+
+                export
+                interface
+                ConfigurationParameters
+                {
+                    basePath?: string; // override base path
+                    fetchApi?: FetchAPI; // override for fetch implementation
+                    middleware?: Middleware[]; // middleware to apply before/after fetch requests
+                    queryParamsStringify?: (params: HTTPQuery) => string; // stringify function for query strings
+                    username?: string; // parameter for basic security
+                    password?: string; // parameter for basic security
+                    apiKey?: string | Promise<string> | ((name: string) => string | Promise<string>); // parameter for apiKey security
+                    accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string | Promise<string>); // parameter for oauth2 security
+                    headers?: HTTPHeaders; //header params we want to use on every request
+                    credentials?: RequestCredentials; //value for the credentials param we want to use on each request
+                }
+
+
+                export
+                class
+                Configuration
+                {
+                    constructor(private configuration: ConfigurationParameters = {}) {}
+
+                    set config(configuration: Configuration) {
+                        this.configuration = configuration;
+                    }
+
+                    get basePath(): string {
+                        return this.configuration.basePath != null ? this.configuration.basePath : BASE_PATH;
+                    }
+
+                    get fetchApi(): FetchAPI | undefined {
+                        return this.configuration.fetchApi;
+                    }
+
+                    get middleware(): Middleware[] {
+                        return this.configuration.middleware || [];
+                    }
+
+                    get queryParamsStringify(): (params: HTTPQuery) => string {
+                        return this.configuration.queryParamsStringify || querystring;
+                    }
+
+                    get username(): string | undefined {
+                        return this.configuration.username;
+                    }
+
+                    get password(): string | undefined {
+                        return this.configuration.password;
+                    }
+
+                    get apiKey(): ((name: string) => string | Promise<string>) | undefined {
+                        const apiKey = this.configuration.apiKey;
+                        if (apiKey) {
+                            return typeof apiKey === 'function' ? apiKey : () => apiKey;
+                        }
+                        return undefined;
+                    }
+
+                    get accessToken(): ((name?: string, scopes?: string[]) => string | Promise<string>) | undefined {
+                        const accessToken = this.configuration.accessToken;
+                        if (accessToken) {
+                            return typeof accessToken === 'function' ? accessToken : async () => accessToken;
+                        }
+                        return undefined;
+                    }
+
+                    get headers(): HTTPHeaders | undefined {
+                        return this.configuration.headers;
+                    }
+
+                    get credentials(): RequestCredentials | undefined {
+                        return this.configuration.credentials;
+                    }
+                }
+
+
+                export
+                const
+                DefaultConfig
+                =
+                new
+                Configuration();
+
+
+                /**
+                 * This is the base class for all generated API classes.
+                 */
+                export
+                class
+                BaseAPI
+                {
+
+                    private static readonly jsonRegex = new RegExp('^(:?application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$', 'i');
+                    private middleware: Middleware[];
+
+                    constructor(protected configuration = DefaultConfig) {
+                        this.middleware = configuration.middleware;
+                    }
+
+                    withMiddleware<T extends BaseAPI>(this: T, ...middlewares: Middleware[]) {
+                        const next = this.clone<T>();
+                        next.middleware = next.middleware.concat(...middlewares);
+                        return next;
+                    }
+
+                    withPreMiddleware<T extends BaseAPI>(this: T, ...preMiddlewares: Array<Middleware['pre']>) {
+                        const middlewares = preMiddlewares.map((pre) => ({ pre }));
+                        return this.withMiddleware<T>(...middlewares);
+                    }
+
+                    withPostMiddleware<T extends BaseAPI>(this: T, ...postMiddlewares: Array<Middleware['post']>) {
+                        const middlewares = postMiddlewares.map((post) => ({ post }));
+                        return this.withMiddleware<T>(...middlewares);
+                    }
+
+                    /**
+                     * Check if the given MIME is a JSON MIME.
+                     * JSON MIME examples:
+                     *   application/json
+                     *   application/json; charset=UTF8
+                     *   APPLICATION/JSON
+                     *   application/vnd.company+json
+                     * @param mime - MIME (Multipurpose Internet Mail Extensions)
+                     * @return True if the given MIME is JSON, false otherwise.
+                     */
+                    protected isJsonMime(mime: string | null | undefined): boolean {
+                        if (!mime) {
+                            return false;
+                        }
+                        return BaseAPI.jsonRegex.test(mime);
+                    }
+
+                    protected async request(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction): Promise<Response> {
+                        const { url, init } = await this.createFetchParams(context, initOverrides);
+                        const response = await this.fetchApi(url, init);
+                        if (response && (response.status >= 200 && response.status < 300)) {
+                            return response;
+                        }
+                        throw new ResponseError(response, 'Response returned an error code');
+                    }
+
+                    private async createFetchParams(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction) {
+                        let url = this.configuration.basePath + context.path;
+                        if (context.query !== undefined && Object.keys(context.query).length !== 0) {
+                            // only add the querystring to the URL if there are query parameters.
+                            // this is done to avoid urls ending with a "?" character which buggy webservers
+                            // do not handle correctly sometimes.
+                            url += '?' + this.configuration.queryParamsStringify(context.query);
+                        }
+
+                        const headers = Object.assign({}, this.configuration.headers, context.headers);
+                        Object.keys(headers).forEach(key => headers[key] === undefined ? delete headers[key] : {});
+
+                        const initOverrideFn =
+                            typeof initOverrides === "function"
+                                ? initOverrides
+                                : async () => initOverrides;
+
+                        const initParams = {
+                            method: context.method,
+                            headers,
+                            body: context.body,
+                            credentials: this.configuration.credentials,
+                        };
+
+                        const overriddenInit: RequestInit = {
+                            ...initParams,
+                            ...(await initOverrideFn({
+                                init: initParams,
+                                context,
+                            }))
+                        };
+
+                        let body: any;
+                        if (isFormData(overriddenInit.body)
+                            || (overriddenInit.body instanceof URLSearchParams)
+                            || isBlob(overriddenInit.body)) {
+                          body = overriddenInit.body;
+                        } else if (this.isJsonMime(headers['Content-Type'])) {
+                          body = JSON.stringify(overriddenInit.body);
+                        } else {
+                          body = overriddenInit.body;
+                        }
+
+                        const init: RequestInit = {
+                            ...overriddenInit,
+                            body
+                        };
+
+                        return { url, init };
+                    }
+
+                    private fetchApi = async (url: string, init: RequestInit) => {
+                        let fetchParams = { url, init };
+                        for (const middleware of this.middleware) {
+                            if (middleware.pre) {
+                                fetchParams = await middleware.pre({
+                                    fetch: this.fetchApi,
+                                    ...fetchParams,
+                                }) || fetchParams;
+                            }
+                        }
+                        let response: Response | undefined = undefined;
+                        try {
+                            response = await (this.configuration.fetchApi || fetch)(fetchParams.url, fetchParams.init);
+                        } catch (e) {
+                            for (const middleware of this.middleware) {
+                                if (middleware.onError) {
+                                    response = await middleware.onError({
+                                        fetch: this.fetchApi,
+                                        url: fetchParams.url,
+                                        init: fetchParams.init,
+                                        error: e,
+                                        response: response ? response.clone() : undefined,
+                                    }) || response;
+                                }
+                            }
+                            if (response === undefined) {
+                              if (e instanceof Error) {
+                                throw new FetchError(e, 'The request failed and the interceptors did not return an alternative response');
+                              } else {
+                                throw e;
+                              }
+                            }
+                        }
+                        for (const middleware of this.middleware) {
+                            if (middleware.post) {
+                                response = await middleware.post({
+                                    fetch: this.fetchApi,
+                                    url: fetchParams.url,
+                                    init: fetchParams.init,
+                                    response: response.clone(),
+                                }) || response;
+                            }
+                        }
+                        return response;
+                    }
+
+                    /**
+                     * Create a shallow clone of `this` by constructing a new instance
+                     * and then shallow cloning data members.
+                     */
+                    private clone<T extends BaseAPI>(this: T): T {
+                        const constructor = this.constructor as any;
+                        const next = new constructor(this.configuration);
+                        next.middleware = this.middleware.slice();
+                        return next;
+                    }
+                };
+
+
+                function
+                isBlob(value:
+                any):
+                value
+                is
+                Blob
+                {
+                    return typeof Blob !== 'undefined' && value instanceof Blob;
+                }
+
+
+                function
+                isFormData(value:
+                any):
+                value
+                is
+                FormData
+                {
+                    return typeof FormData !== "undefined" && value instanceof FormData;
+                }
+
+
+                export
+                class
+                ResponseError
+                extends
+                Error
+                {
+                    override name: "ResponseError" = "ResponseError";
+                    constructor(public response: Response, msg?: string) {
+                        super(msg);
+                    }
+                }
+
+
+                export
+                class
+                FetchError
+                extends
+                Error
+                {
+                    override name: "FetchError" = "FetchError";
+                    constructor(public cause: Error, msg?: string) {
+                        super(msg);
+                    }
+                }
+
+
+                export
+                class
+                RequiredError
+                extends
+                Error
+                {
+                    override name: "RequiredError" = "RequiredError";
+                    constructor(public field: string, msg?: string) {
+                        super(msg);
+                    }
+                }
+
+
+                export
+                const
+                COLLECTION_FORMATS
+                =
+                {
+                    csv: ",",
+                    ssv: " ",
+                    tsv: "\t",
+                    pipes: "|",
+                };
+
+
+                export
+                type
+                FetchAPI
+                =
+                WindowOrWorkerGlobalScope['fetch'];
+
+
+                export
+                type
+                Json
+                =
+                any;
+
+                export
+                type
+                HTTPMethod
+                =
+                'GET'
+                |
+                'POST'
+                |
+                'PUT'
+                |
+                'PATCH'
+                |
+                'DELETE'
+                |
+                'OPTIONS'
+                |
+                'HEAD';
+
+                export
+                type
+                HTTPHeaders
+                =
+                {
+                [key:
+                string]:
+                string
+                };
+
+                export
+                type
+                HTTPQuery
+                =
+                {
+                [key:
+                string]:
+                string
+                |
+                number
+                |
+                null
+                |
+                boolean
+                |
+                Array<string
+                |
+                number
+                |
+                null
+                |
+                boolean>
+                |
+                Set<string
+                |
+                number
+                |
+                null
+                |
+                boolean>
+                |
+                HTTPQuery
+                };
+
+                export
+                type
+                HTTPBody
+                =
+                Json
+                |
+                FormData
+                |
+                URLSearchParams;
+
+                export
+                type
+                HTTPRequestInit
+                =
+                {
+                headers?:
+                HTTPHeaders;
+                method:
+                HTTPMethod;
+                credentials?:
+                RequestCredentials;
+                body?:
+                HTTPBody
+                };
+
+                export
+                type
+                ModelPropertyNaming
+                =
+                'camelCase'
+                |
+                'snake_case'
+                |
+                'PascalCase'
+                |
+                'original';
+
+
+                export
+                type
+                InitOverrideFunction
+                =
+                (requestContext:
+                {
+                init:
+                HTTPRequestInit,
+                context:
+                RequestOpts
+                })
+                =>
+                Promise<RequestInit>
+
+
+                export
+                interface
+                FetchParams
+                {
+                    url: string;
+                    init: RequestInit;
+                }
+
+
+                export
+                interface
+                RequestOpts
+                {
+                    path: string;
+                    method: HTTPMethod;
+                    headers: HTTPHeaders;
+                    query?: HTTPQuery;
+                    body?: HTTPBody;
+                }
+
+
+                export
+                function
+                querystring(params:
+                HTTPQuery,
+                prefix:
+                string
+                =
+                ''):
+                string
+                {
+                    return Object.keys(params)
+                        .map(key => querystringSingleKey(key, params[key], prefix))
+                        .filter(part => part.length > 0)
+                        .join('&');
+                }
+
+
+                function
+                querystringSingleKey(key:
+                string,
+                value:
+                string
+                |
+                number
+                |
+                null
+                |
+                undefined
+                |
+                boolean
+                |
+                Array<string
+                |
+                number
+                |
+                null
+                |
+                boolean>
+                |
+                Set<string
+                |
+                number
+                |
+                null
+                |
+                boolean>
+                |
+                HTTPQuery,
+                keyPrefix:
+                string
+                =
+                ''):
+                string
+                {
+                    const fullKey = keyPrefix + (keyPrefix.length ? `[${key}]` : key);
+                    if (value instanceof Array) {
+                        const multiValue = value.map(singleValue => encodeURIComponent(String(singleValue)))
+                            .join(`&${encodeURIComponent(fullKey)}=`);
+                        return `${encodeURIComponent(fullKey)}=${multiValue}`;
+                    }
+                    if (value instanceof Set) {
+                        const valueAsArray = Array.from(value);
+                        return querystringSingleKey(key, valueAsArray, keyPrefix);
+                    }
+                    if (value instanceof Date) {
+                        return `${encodeURIComponent(fullKey)}=${encodeURIComponent(value.toISOString())}`;
+                    }
+                    if (value instanceof Object) {
+                        return querystring(value as HTTPQuery, fullKey);
+                    }
+                    return `${encodeURIComponent(fullKey)}=${encodeURIComponent(String(value))}`;
+                }
+
+
+                export
+                function
+                exists(json:
+                any,
+                key:
+                string)
+                {
+                    const value = json[key];
+                    return value !== null && value !== undefined;
+                }
+
+
+                export
+                function
+                mapValues(data:
+                any,
+                fn:
+                (item:
+                any)
+                =>
+                any)
+                {
+                  return Object.keys(data).reduce(
+                    (acc, key) => ({ ...acc, [key]: fn(data[key]) }),
+                    {}
+                  );
+                }
+
+
+                export
+                function
+                canConsumeForm(consumes:
+                Consume[]):
+                boolean
+                {
+                    for (const consume of consumes) {
+                        if ('multipart/form-data' === consume.contentType) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+
+                export
+                interface
+                Consume
+                {
+                    contentType: string;
+                }
+
+
+                export
+                interface
+                RequestContext
+                {
+                    fetch: FetchAPI;
+                    url: string;
+                    init: RequestInit;
+                }
+
+
+                export
+                interface
+                ResponseContext
+                {
+                    fetch: FetchAPI;
+                    url: string;
+                    init: RequestInit;
+                    response: Response;
+                }
+
+
+                export
+                interface
+                ErrorContext
+                {
+                    fetch: FetchAPI;
+                    url: string;
+                    init: RequestInit;
+                    error: unknown;
+                    response?: Response;
+                }
+
+
+                export
+                interface
+                Middleware
+                {
+                    pre?(context: RequestContext): Promise<FetchParams | void>;
+                    post?(context: ResponseContext): Promise<Response | void>;
+                    onError?(context: ErrorContext): Promise<Response | void>;
+                }
+
+
+                export
+                interface
+                ApiResponse<T>
+                {
+                    raw: Response;
+                    value(): Promise<T>;
+                }
+
+
+                export
+                interface
+                ResponseTransformer<T>
+                {
+                    (json: any): T;
+                }
+
+
+                export
+                class
+                JSONApiResponse<T>
+                {
+                    constructor(public raw: Response, private transformer: ResponseTransformer<T> = (jsonValue: any) => jsonValue) {}
+
+                    async value(): Promise<T> {
+                        return this.transformer(await this.raw.json());
+                    }
+                }
+
+
+                export
+                class
+                VoidApiResponse
+                {
+                    constructor(public raw: Response) {}
+
+                    async value(): Promise<void> {
+                        return undefined;
+                    }
+                }
+
+
+                export
+                class
+                BlobApiResponse
+                {
+                    constructor(public raw: Response) {}
+
+                    async value(): Promise<Blob> {
+                        return await this.raw.blob();
+                    };
+                }
+
+
+                export
+                class
+                TextApiResponse
+                {
+                    constructor(public raw: Response) {}
+
+                    async value(): Promise<string> {
+                        return await this.raw.text();
+                    };
+                }
         - name: >-
             generated-unified
           type: >-
@@ -2351,7 +4466,7 @@ tree:
                 //
                 Generated
                 on
-                2025-03-23T16:58:27.294Z
+                2025-03-25T22:56:49.051Z
 
                 import
                 {
@@ -3632,6 +5747,14 @@ tree:
             from
             "./quickbaseClient";
 
+            import
+            {
+            paginateRecords,
+            isPaginatable
+            }
+            from
+            "./pagination";
+
 
             export
             type
@@ -3662,10 +5785,6 @@ tree:
             }
 
 
-            //
-            src/invokeMethod.ts
-            (fixed)
-
             export
             async
             function
@@ -3678,6 +5797,10 @@ tree:
                 dbid?: string;
                 tableId?: string;
                 appId?: string;
+                startTime?: number;
+                skip?: number;
+                top?: number;
+                disablePagination?: boolean; // Add per-call override
               },
               methodMap: { [P in keyof QuickbaseClient]: MethodInfo<P> },
               baseHeaders: Record<string, string>,
@@ -3686,27 +5809,47 @@ tree:
               transformDates: (obj: any, convertStringsToDates: boolean) => any,
               debug: boolean | undefined,
               convertDates: boolean,
+              autoPaginate: boolean = true,
               attempt: number = 0,
-              maxAttempts: number = rateLimiter.maxRetries + 1
+              maxAttempts: number = rateLimiter.maxRetries + 1,
+              isPaginating: boolean = false
             ):
             Promise<ReturnType<QuickbaseClient[K]>>
             {
-              console.log("[invokeMethod] Starting for method:", methodName);
-
               const methodInfo = methodMap[methodName];
               if (!methodInfo) throw new Error(`Method ${methodName} not found`);
 
               const hasBody = "body" in params && params.body !== undefined;
               const body = hasBody ? params.body : undefined;
+              const options =
+                hasBody && body && typeof body === "object" && "options" in body
+                  ? (body as any).options
+                  : undefined;
+              const adjustedParams = {
+                ...params,
+                skip:
+                  params.skip ?? (options && "skip" in options ? options.skip : undefined),
+                top: params.top ?? (options && "top" in options ? options.top : undefined),
+              };
+
               const restParams: any = hasBody
                 ? Object.fromEntries(
-                    Object.entries(params).filter(([key]) => key !== "body")
+                    Object.entries(adjustedParams).filter(
+                      ([key]) =>
+                        key !== "body" && key !== "startTime" && key !== "disablePagination"
+                    )
                   )
-                : { ...params };
+                : { ...adjustedParams, startTime: undefined, disablePagination: undefined };
               const requestParameters: any = {
                 ...restParams,
                 ...(hasBody ? { generated: body } : {}),
               };
+
+              if (debug)
+                console.log(
+                  "[invokeMethod] Adjusted params for pagination:",
+                  adjustedParams
+                );
 
               const requestOptions: RequestInit = {
                 credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
@@ -3714,44 +5857,58 @@ tree:
               };
 
               let dbid: string | undefined = extractDbid(params);
-              console.log("[invokeMethod] Extracted dbid:", dbid);
-
               let token = dbid
                 ? await authStrategy.getToken(dbid)
                 : await authStrategy.getToken("");
-              console.log("[invokeMethod] Initial token:", token);
 
               if (token) {
                 authStrategy.applyHeaders(baseHeaders, token);
                 requestOptions.headers = { ...baseHeaders };
-                console.log(
-                  "[invokeMethod] Token found, headers set:",
-                  requestOptions.headers
-                );
                 if (methodName === "getTempTokenDBID") {
-                  console.log("[invokeMethod] Using cached token:", token);
                   return { temporaryAuthorization: token } as ReturnType<
                     QuickbaseClient[K]
                   >;
                 }
               }
 
-              if (debug) {
-                console.log(`[${methodName}] requestParameters:`, requestParameters);
-                console.log(`[${methodName}] requestOptions:`, requestOptions);
-              }
+              // Determine effective pagination setting: per-call override takes precedence
+              const effectiveAutoPaginate =
+                params.disablePagination !== undefined
+                  ? !params.disablePagination
+                  : autoPaginate;
 
               async function processResponse(
                 rawResponse: any
               ): Promise<ReturnType<QuickbaseClient[K]>> {
-                if (debug) console.log(`[${methodName}] rawResponse:`, rawResponse);
                 if (rawResponse instanceof Response) {
                   const contentType = rawResponse.headers
                     .get("Content-Type")
                     ?.toLowerCase();
-                  if (debug) console.log(`[${methodName}] contentType:`, contentType);
                   if (contentType?.includes("application/json")) {
                     const jsonResponse = await rawResponse.json();
+                    if (
+                      effectiveAutoPaginate &&
+                      !isPaginating &&
+                      isPaginatable(jsonResponse)
+                    ) {
+                      if (debug)
+                        console.log(
+                          "[invokeMethod] Entering pagination with params:",
+                          adjustedParams
+                        );
+                      return paginateRecords(
+                        methodName,
+                        adjustedParams,
+                        methodMap,
+                        baseHeaders,
+                        authStrategy,
+                        rateLimiter,
+                        transformDates,
+                        debug,
+                        convertDates,
+                        jsonResponse
+                      );
+                    }
                     return transformDates(jsonResponse, convertDates) as ReturnType<
                       QuickbaseClient[K]
                     >;
@@ -3760,8 +5917,25 @@ tree:
                 }
                 if (rawResponse && typeof rawResponse.value === "function") {
                   const response = await rawResponse.value();
-                  if (debug)
-                    console.log(`[${methodName}] Resolved JSONApiResponse:`, response);
+                  if (effectiveAutoPaginate && !isPaginating && isPaginatable(response)) {
+                    if (debug)
+                      console.log(
+                        "[invokeMethod] Entering pagination with params:",
+                        adjustedParams
+                      );
+                    return paginateRecords(
+                      methodName,
+                      adjustedParams,
+                      methodMap,
+                      baseHeaders,
+                      authStrategy,
+                      rateLimiter,
+                      transformDates,
+                      debug,
+                      convertDates,
+                      response
+                    );
+                  }
                   return transformDates(response, convertDates) as ReturnType<
                     QuickbaseClient[K]
                   >;
@@ -3798,33 +5972,30 @@ tree:
                     message = (await response.text()) || message;
                   }
                 } catch (e) {
-                  if (debug) console.log(`[${methodName}] Error parsing response body:`, e);
                   message = "Failed to parse error response";
                 }
-                if (debug)
-                  console.log(
-                    "[invokeMethod] Parsed error - status:",
-                    status,
-                    "message:",
-                    message
-                  );
                 return { message, status };
               }
 
               while (attempt < maxAttempts) {
-                console.log("[invokeMethod] Attempt:", attempt + 1, "of", maxAttempts);
+                let acquired = false;
                 try {
                   await rateLimiter.throttle();
-                  console.log("[invokeMethod] About to call API for method:", methodName);
-                  const response = await methodInfo.method(
-                    requestParameters,
-                    requestOptions
-                  );
-                  console.log("[invokeMethod] API call completed for method:", methodName);
+                  acquired = true;
+                  const postThrottleTime = Date.now();
+                  if (params.startTime !== undefined) params.startTime = postThrottleTime;
+                  const headers = { ...baseHeaders };
+                  const finalRequest = { ...requestParameters, headers };
+                  if (debug) console.log("[invokeMethod] Sending request:", finalRequest);
+                  const responsePromise = methodInfo.method(finalRequest, {
+                    ...requestOptions,
+                    headers,
+                  });
+                  rateLimiter.release();
+                  const response = await responsePromise;
                   return await processResponse(response);
                 } catch (error: unknown) {
-                  if (debug) console.log("[invokeMethod] Caught error:", error);
-
+                  if (acquired) rateLimiter.release();
                   let status: number;
                   let message: string;
                   let response: Response | undefined;
@@ -3836,19 +6007,14 @@ tree:
                     response = error;
                     ({ message, status } = await parseErrorResponse(response));
                   } else {
-                    if (debug) console.log(`[${methodName}] Unexpected error:`, error);
-                    throw error; // Rethrow truly unexpected errors
+                    throw error;
                   }
-
-                  if (debug)
-                    console.log("[invokeMethod] Handling error with status:", status);
 
                   if (status === 429) {
                     if (!(error instanceof ResponseError)) {
                       throw new Error("Expected ResponseError for 429 handling");
                     }
                     const delay = await rateLimiter.handle429(error, attempt + 1);
-                    if (debug) console.log(`[${methodName}] 429 delay: ${delay}ms`);
                     if (attempt + 1 === maxAttempts) {
                       throw new RateLimitError(
                         `API Error: ${message} (Status: ${status})`,
@@ -3863,8 +6029,7 @@ tree:
                     continue;
                   }
 
-                  // Handle the error and decide whether to retry
-                  let newToken: string | null = null;
+                  let newToken: string | null;
                   try {
                     newToken = await authStrategy.handleError(
                       status,
@@ -3875,20 +6040,14 @@ tree:
                       methodName
                     );
                   } catch (authError) {
-                    if (debug)
-                      console.log(`[${methodName}] Auth strategy error:`, authError);
-                    throw authError; // Propagate the fetchTempToken error and exit
+                    throw authError;
                   }
 
-                  if (newToken) {
+                  if (newToken !== null) {
                     token = newToken;
                     authStrategy.applyHeaders(baseHeaders, token);
                     requestOptions.headers = { ...baseHeaders };
                     attempt++;
-                    if (debug)
-                      console.log(
-                        `[${methodName}] Retrying with token: ${token.substring(0, 10)}...`
-                      );
                     continue;
                   }
 
@@ -3898,12 +6057,17 @@ tree:
               throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
             }
         - name: >-
+            pagination.ts
+          type: >-
+            file
+        - name: >-
             quickbaseClient.ts
           type: >-
             file
           contents: >
             //
             src/quickbaseClient.ts
+
 
             import
             {
@@ -3966,10 +6130,17 @@ tree:
 
             import
             {
-            ThrottleBucket
+            FlowThrottleBucket
             }
             from
-            "./ThrottleBucket";
+            "./FlowThrottleBucket";
+
+            import
+            {
+            BurstAwareThrottleBucket
+            }
+            from
+            "./BurstAwareThrottleBucket";
 
             import
             {
@@ -4007,12 +6178,30 @@ tree:
               fetchApi?: typeof fetch;
               convertDates?: boolean;
               tempTokenLifespan?: number;
-              throttle?: { rate: number; burst: number };
+              throttle?: {
+                type?: "flow" | "burst-aware";
+                rate?: number;
+                burst?: number;
+                windowSeconds?: number;
+              };
               maxRetries?: number;
               retryDelay?: number;
               tokenCache?: TokenCache;
               baseUrl?: string;
+              autoPaginate?: boolean;
             }
+
+
+            export
+            type
+            ThrottleOptions
+            =
+            {
+              type?: "flow" | "burst-aware";
+              rate?: number;
+              burst?: number;
+              windowSeconds?: number;
+            };
 
 
             type
@@ -4033,35 +6222,45 @@ tree:
                 realm,
                 userToken,
                 tempToken,
-                useTempTokens,
-                useSso,
+                useTempTokens = false,
+                useSso = false,
                 samlToken,
                 fetchApi,
                 debug,
                 convertDates = true,
                 tempTokenLifespan = 290000,
-                throttle = { rate: 10, burst: 10 },
+                throttle = { type: "flow", rate: 5, burst: 50 },
                 maxRetries = 3,
                 retryDelay = 1000,
                 tokenCache: providedTokenCache,
                 baseUrl = "https://api.quickbase.com/v1",
+                autoPaginate = true,
               } = config;
 
               const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
-              const throttleBucket = throttle
-                ? new ThrottleBucket(throttle.rate, throttle.burst)
-                : null;
+
+              const throttleOptions = throttle as ThrottleOptions;
+              const throttleBucket =
+                throttleOptions.type === "burst-aware"
+                  ? new BurstAwareThrottleBucket({
+                      maxTokens: throttleOptions.burst || 100,
+                      windowSeconds: throttleOptions.windowSeconds || 10,
+                    })
+                  : new FlowThrottleBucket(
+                      throttleOptions.rate || 5,
+                      throttleOptions.burst || 50
+                    );
+
               const rateLimiter = new RateLimiter(throttleBucket, maxRetries, retryDelay);
 
-              const defaultFetch: typeof fetch | undefined =
-                typeof globalThis.window !== "undefined"
-                  ? globalThis.window.fetch.bind(globalThis.window)
-                  : undefined;
-              const effectiveFetch = fetchApi || defaultFetch;
-
-              if (!effectiveFetch) {
-                throw new Error("No fetch implementation available");
+              const defaultFetch: typeof fetch =
+                globalThis.fetch || globalThis.window?.fetch?.bind(globalThis.window);
+              if (!defaultFetch && !fetchApi) {
+                throw new Error(
+                  "No fetch implementation available. Please provide fetchApi in a Node.js environment without native fetch."
+                );
               }
+              const effectiveFetch = fetchApi || defaultFetch;
 
               const authStrategy: AuthorizationStrategy = useSso
                 ? new SsoTokenStrategy(
@@ -4143,17 +6342,23 @@ tree:
 
               const methodMap = buildMethodMap();
 
-              const proxyHandler: ProxyHandler<QuickbaseClient> = {
-                get: (_, prop: string) => {
-                  console.log(
-                    "[proxy] Accessing:",
-                    prop,
-                    "in methodMap:",
-                    prop in methodMap
-                  );
+              const proxyHandler: globalThis.ProxyHandler<QuickbaseClient> = {
+                get: (_: QuickbaseClient, prop: string) => {
+                  if (debug) {
+                    console.log(
+                      "[proxy] Accessing:",
+                      prop,
+                      "in methodMap:",
+                      prop in methodMap
+                    );
+                  }
                   if (prop in methodMap) {
                     const methodName = prop as keyof QuickbaseClient;
-                    return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
+                    return (
+                      params: Parameters<QuickbaseClient[typeof methodName]>[0] & {
+                        disablePagination?: boolean;
+                      } = {}
+                    ) =>
                       invokeMethod(
                         methodName,
                         params,
@@ -4163,10 +6368,15 @@ tree:
                         rateLimiter,
                         transformDates,
                         debug,
-                        convertDates
+                        convertDates,
+                        params.disablePagination !== undefined
+                          ? !params.disablePagination
+                          : autoPaginate // Per-call override
                       );
                   }
-                  console.log("[proxy] Method not found:", prop);
+                  if (debug) {
+                    console.log("[proxy] Method not found:", prop);
+                  }
                   return undefined;
                 },
               };
@@ -4175,7 +6385,7 @@ tree:
 
               if (debug) {
                 console.log("[createClient] Config:", config);
-                console.log("[createClient] Proxy created:", proxy);
+                console.log("[createClient] Returning proxy");
               }
 
               return proxy;
@@ -4186,14 +6396,7 @@ tree:
             file
           contents: >
             //
-            src/rateLimiter.ts
-
-            import
-            {
-            ThrottleBucket
-            }
-            from
-            "./ThrottleBucket";
+            src/RateLimiter.ts
 
             import
             {
@@ -4202,13 +6405,20 @@ tree:
             from
             "./generated/runtime";
 
+            import
+            {
+            RateThrottleBucket
+            }
+            from
+            "./RateThrottleBucket";
+
 
             export
             class
             RateLimiter
             {
               constructor(
-                private throttleBucket: ThrottleBucket | null,
+                private throttleBucket: RateThrottleBucket | null,
                 public maxRetries: number = 3,
                 private retryDelay: number = 1000
               ) {}
@@ -4219,8 +6429,13 @@ tree:
                 }
               }
 
+              release(): void {
+                if (this.throttleBucket) {
+                  this.throttleBucket.release();
+                }
+              }
+
               async handle429(error: ResponseError, attempt: number): Promise<number> {
-                // Remove the throw here; let invokeMethod handle exhaustion
                 const retryAfter = error.response.headers.get("Retry-After");
                 return retryAfter
                   ? parseInt(retryAfter, 10) * 1000
@@ -4269,6 +6484,10 @@ tree:
                   token,
                   expiresAt: now + (lifespan || this.tempTokenLifespan),
                 });
+              }
+
+              delete(dbid: string): void {
+                this.cache.delete(dbid);
               }
 
               clear(): void {
@@ -4363,13 +6582,45 @@ tree:
         directory
       children:
         - name: >-
-            .last-run.json
+            .playwright-artifacts-0
           type: >-
-            file
+            directory
+          children:
+            - name: >-
+                traces
+              type: >-
+                directory
+              children: []
         - name: >-
-            test-results.json
+            .playwright-artifacts-1
           type: >-
-            file
+            directory
+          children:
+            - name: >-
+                traces
+              type: >-
+                directory
+              children: []
+        - name: >-
+            .playwright-artifacts-2
+          type: >-
+            directory
+          children:
+            - name: >-
+                traces
+              type: >-
+                directory
+              children: []
+        - name: >-
+            .playwright-artifacts-3
+          type: >-
+            directory
+          children:
+            - name: >-
+                traces
+              type: >-
+                directory
+              children: []
     - name: >-
         tests
       type: >-
@@ -4426,6 +6677,158 @@ tree:
             setup.ts
           type: >-
             file
+          contents: >
+            //
+            @tests/setup.ts
+
+            import
+            {
+            vi
+            }
+            from
+            "vitest";
+
+            import
+            {
+            quickbase
+            }
+            from
+            "../src/quickbaseClient.ts";
+
+            import
+            type
+            {
+            QuickbaseConfig
+            }
+            from
+            "../src/quickbaseClient.ts";
+
+            import
+            dotenv
+            from
+            "dotenv";
+
+
+            //
+            Load
+            environment
+            variables
+            from
+            .env
+            file
+
+            dotenv.config({
+            path:
+            "./.env"
+            });
+            //
+            Assumes
+            .env
+            is
+            at
+            project
+            root
+
+
+            export
+            const
+            mockFetch
+            =
+            vi.fn();
+
+
+            export
+            const
+            QB_REALM
+            =
+            process.env.QB_REALM
+            ||
+            "test-realm";
+
+            export
+            const
+            QB_USER_TOKEN
+            =
+              process.env.QB_USER_TOKEN || "user-token-1234567890";
+            export
+            const
+            QB_APP_ID
+            =
+            process.env.QB_APP_ID
+            ||
+            "app-id-1234567890";
+
+            export
+            const
+            QB_TABLE_ID_1
+            =
+              process.env.QB_TABLE_ID_1 || "table-id-1-1234567890";
+            export
+            const
+            QB_TABLE_ID_2
+            =
+              process.env.QB_TABLE_ID_2 || "table-id-2-1234567890";
+
+            //
+            Mock
+            env
+            variables
+            for
+            consistency,
+            using
+            .env
+            values
+            if
+            available
+
+            vi.stubEnv("QB_REALM",
+            QB_REALM);
+
+            vi.stubEnv("QB_USER_TOKEN",
+            QB_USER_TOKEN);
+
+            vi.stubEnv("QB_APP_ID",
+            QB_APP_ID);
+
+            vi.stubEnv("QB_TABLE_ID_1",
+            QB_TABLE_ID_1);
+
+            vi.stubEnv("QB_TABLE_ID_2",
+            QB_TABLE_ID_2);
+
+
+            export
+            const
+            createClient
+            =
+            (
+              fetchApi?: any,
+              config: Partial<QuickbaseConfig> = {}
+            )
+            =>
+            {
+              // Use loaded env vars with fallbacks for safety
+              const realm = QB_REALM;
+              const userToken = QB_USER_TOKEN;
+
+              const client = quickbase({
+                realm,
+                userToken,
+                debug: true,
+                fetchApi,
+                throttle: { rate: 10, burst: 10 }, // Throttle at 10 req/s with 10 burst capacity
+                ...config, // Allow overrides if provided
+              });
+              console.log("[createClient] Config:", {
+                realm,
+                userToken,
+                debug: true,
+                throttle: { rate: 10, burst: 10 },
+                ...config,
+              });
+              console.log("[createClient] Returning:", client);
+              return client;
+            };
         - name: >-
             vitest
           type: >-
@@ -4537,6 +6940,27 @@ tree:
                   type: >-
                     file
                 - name: >-
+                    quickbase-js
+                  type: >-
+                    directory
+                  children:
+                    - name: >-
+                        BurstAwareThrottleBucket.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        FlowBucket.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        paginationControl.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        paginationSkip.test.ts
+                      type: >-
+                        file
+                - name: >-
                     records
                   type: >-
                     directory
@@ -4599,10 +7023,6 @@ tree:
               type: >-
                 directory
               children:
-                - name: >-
-                    ThrottleBucket.test.ts
-                  type: >-
-                    file
                 - name: >-
                     apps
                   type: >-
@@ -4716,13 +7136,34 @@ tree:
                   type: >-
                     file
                 - name: >-
-                    quickbaseClientHttpMethods.test.ts
+                    quickbase-js
                   type: >-
-                    file
-                - name: >-
-                    rateLimit.test.ts
-                  type: >-
-                    file
+                    directory
+                  children:
+                    - name: >-
+                        BurstAwareThrottleBucket.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        FlowBucket.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        pagination.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        quickbaseClientHttpMethods.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        rateLimit.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        tokenLifespan.test.ts
+                      type: >-
+                        file
                 - name: >-
                     records
                   type: >-
@@ -4781,14 +7222,6 @@ tree:
                         updateTable.test.ts
                       type: >-
                         file
-                - name: >-
-                    tokenLifespan.test.ts
-                  type: >-
-                    file
-                - name: >-
-                    umd.test.ts
-                  type: >-
-                    file
     - name: >-
         tools
       type: >-
@@ -4827,3 +7260,59 @@ tree:
         vitest.config.ts
       type: >-
         file
+      contents: >
+        import
+        {
+        defineConfig
+        }
+        from
+        "vitest/config";
+
+        import
+        path
+        from
+        "path";
+
+        import
+        dotenv
+        from
+        "dotenv";
+
+
+        //
+        Load
+        .env
+        variables
+        before
+        tests
+        run
+
+        dotenv.config({
+        path:
+        path.resolve(__dirname,
+        ".env")
+        });
+
+
+        export
+        default
+        defineConfig({
+          test: {
+            environment: "jsdom",
+            include: ["tests/vitest/**/**/*.test.ts"],
+            setupFiles: ["tests/setup.ts"], // Relative path from root
+            pool: "forks",
+            poolOptions: {
+              forks: {
+                singleFork: true, // Run tests sequentially
+              },
+            },
+            testTimeout: 10000, // Global timeout of 10 seconds for all tests
+          },
+          resolve: {
+            alias: {
+              "@": path.resolve(__dirname, "./src"), // For src/ imports
+              "@tests": path.resolve(__dirname, "./tests"), // For tests/ imports
+            },
+          },
+        });

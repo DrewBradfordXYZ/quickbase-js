@@ -6,11 +6,17 @@ export * from "./apps/createApp.test.ts";
 export * from "./apps/deleteApp.test.ts";
 export * from "./apps/getApp.test.ts";
 
+// Auth
+export * from "./auth/fetchTempToken401.test.ts";
+export * from "./auth/getTempToken.test.ts";
+export * from "./auth/retryOn401.test.ts";
+export * from "./auth/retryTempTokenMaxRetries.test.ts";
+
 // Fields
+export * from "./fields/getFields.test.ts";
+export * from "./fields/getField.test.ts";
 export * from "./fields/createField.test.ts";
 export * from "./fields/deleteFields.test.ts";
-export * from "./fields/getFields.test.ts";
-export * from "./fields/getField.test.ts"; // Added new getField test
 export * from "./fields/getFieldsUsage.test.ts";
 export * from "./fields/getFieldUsage.test.ts";
 
@@ -26,4 +32,7 @@ export * from "./tables/getAppTables.test.ts";
 export * from "./tables/getRelationships.test.ts";
 export * from "./tables/getTable.test.ts";
 export * from "./tables/updateTable.test.ts";
-export * from "./tables/updateRelationship.test.ts";
+export * from "./tables/createRelationship.test.ts";
+
+// Quickbase-js
+export * from "./quickbase-js/paginationControl.test.ts"; // New export

@@ -1,3 +1,5 @@
+// src/quickbaseClient.ts
+
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -21,7 +23,10 @@ import { RateLimiter } from "./rateLimiter";
 
 export * from "./generated/models/index";
 
-export interface QuickbaseClient extends IQuickbaseClient {}
+export interface QuickbaseClient extends IQuickbaseClient {
+  withPaginationDisabled<T>(callback: () => Promise<T>): Promise<T>;
+  withPaginationLimit<T>(limit: number, callback: () => Promise<T>): Promise<T>; // New method
+}
 
 export interface QuickbaseConfig {
   realm: string;
@@ -70,7 +75,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
-    throttle = { type: "flow", rate: 5, burst: 50 }, // Changed rate from 6 to 5
+    throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
@@ -88,7 +93,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           windowSeconds: throttleOptions.windowSeconds || 10,
         })
       : new FlowThrottleBucket(
-          throttleOptions.rate || 5, // Changed rate from 6 to 5
+          throttleOptions.rate || 5,
           throttleOptions.burst || 50
         );
 
@@ -183,6 +188,9 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const methodMap = buildMethodMap();
 
+  let currentAutoPaginate = autoPaginate;
+  let paginationLimit: number | null = null; // New state for limit
+
   const proxyHandler: globalThis.ProxyHandler<QuickbaseClient> = {
     get: (_: QuickbaseClient, prop: string) => {
       if (debug) {
@@ -193,9 +201,41 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           prop in methodMap
         );
       }
+      if (prop === "withPaginationDisabled") {
+        return async <T>(callback: () => Promise<T>): Promise<T> => {
+          const originalAutoPaginate = currentAutoPaginate;
+          currentAutoPaginate = false;
+          try {
+            const result = await callback();
+            return result;
+          } finally {
+            currentAutoPaginate = originalAutoPaginate;
+          }
+        };
+      }
+      if (prop === "withPaginationLimit") {
+        return async <T>(
+          limit: number,
+          callback: () => Promise<T>
+        ): Promise<T> => {
+          const originalAutoPaginate = currentAutoPaginate;
+          const originalLimit = paginationLimit;
+          currentAutoPaginate = true; // Ensure pagination is enabled
+          paginationLimit = limit; // Set the custom limit
+          try {
+            const result = await callback();
+            return result;
+          } finally {
+            currentAutoPaginate = originalAutoPaginate;
+            paginationLimit = originalLimit; // Restore original limit (null by default)
+          }
+        };
+      }
       if (prop in methodMap) {
         const methodName = prop as keyof QuickbaseClient;
-        return (params: Parameters<QuickbaseClient[typeof methodName]>[0]) =>
+        return (
+          params: Parameters<QuickbaseClient[typeof methodName]>[0] = {}
+        ) =>
           invokeMethod(
             methodName,
             params,
@@ -206,7 +246,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
             transformDates,
             debug,
             convertDates,
-            autoPaginate
+            currentAutoPaginate,
+            0, // attempt
+            rateLimiter.maxRetries + 1, // maxAttempts
+            false, // isPaginating
+            paginationLimit // Pass the limit to invokeMethod
           );
       }
       if (debug) {

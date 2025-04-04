@@ -211,6 +211,95 @@ The `quickbase` function accepts a `QuickbaseConfig` object with the following o
 
 ---
 
+### Pagination Control
+
+The library supports automatic pagination for methods like `runQuery` when `autoPaginate` is enabled (default: `true`). To temporarily disable or constrain pagination for a specific operation without altering the global configuration, use the `withPaginationDisabled()` or `withPaginationLimit()` methods.
+
+#### `withPaginationDisabled(callback)`
+
+- **Description**: Executes an asynchronous callback with pagination temporarily disabled, restoring the original `autoPaginate` setting afterward. Useful for fetching only the initial page of results without modifying method signatures or global settings.
+- **Parameters**:
+  - `callback`: `() => Promise<T>` - An async function containing the API call(s) to execute without pagination.
+- **Returns**: `Promise<T>` - The result of the callback.
+- **Example**:
+
+```javascript
+import { quickbase } from "quickbase-js"; // Adjust the import path as needed
+
+const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
+const QB_USER_TOKEN = ""; // Your QuickBase user token (e.g., 'b12345_abcde...')
+const QB_TABLE_ID = ""; // Your table ID (e.g., 'bxyz789')
+
+const qb = quickbase({
+  realm: QB_REALM,
+  userToken: QB_USER_TOKEN,
+  autoPaginate: true, // Pagination enabled by default
+});
+
+const runLimitedQuery = async () => {
+  try {
+    const result = await qb.withPaginationDisabled(async () => {
+      return qb.runQuery({
+        body: {
+          from: QB_TABLE_ID,
+          select: [3], // Example field ID
+          options: { top: 2 }, // Fetch only 2 records
+        },
+      });
+    });
+    console.log("Fetched records:", result.data.length); // Outputs: 2
+  } catch (error) {
+    console.error("Error running query:", error.message);
+  }
+};
+
+runLimitedQuery();
+```
+
+#### `withPaginationLimit(limit, callback)`
+
+- **Description**: Executes an asynchronous callback with pagination enabled but limited to a specified number of records, restoring the original `autoPaginate` setting afterward. Useful for fetching a precise number of records (e.g., 100) from a larger dataset, stopping pagination once the limit is reached, without modifying method signatures or global settings.
+- **Parameters**:
+  - `limit`: `number` - The maximum number of records to fetch across all pages.
+  - `callback`: `() => Promise<T>` - An async function containing the API call(s) to execute with the pagination limit.
+- **Returns**: `Promise<T>` - The result of the callback, containing up to `limit` records.
+- **Example**:
+
+```javascript
+import { quickbase } from "quickbase-js"; // Adjust the import path as needed
+
+const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
+const QB_USER_TOKEN = ""; // Your QuickBase user token (e.g., 'b12345_abcde...')
+const QB_TABLE_ID = ""; // Your table ID (e.g., 'bxyz789')
+
+const qb = quickbase({
+  realm: QB_REALM,
+  userToken: QB_USER_TOKEN,
+  autoPaginate: true, // Pagination enabled by default
+});
+
+const runCappedQuery = async () => {
+  try {
+    const result = await qb.withPaginationLimit(100, async () => {
+      return qb.runQuery({
+        body: {
+          from: QB_TABLE_ID,
+          select: [3], // Example field ID
+          options: { top: 25 }, // Fetch 25 records per page
+        },
+      });
+    });
+    console.log("Fetched records:", result.data.length); // Outputs: 100
+  } catch (error) {
+    console.error("Error running query:", error.message);
+  }
+};
+
+runCappedQuery();
+```
+
+---
+
 ### Development workflow
 
 ```bash
