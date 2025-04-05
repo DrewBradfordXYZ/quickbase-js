@@ -260,6 +260,10 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
 
   const proxy = new Proxy<QuickbaseClient>({} as QuickbaseClient, proxyHandler);
 
+  // Prevent tree-shaking by statically referencing the methods
+  proxy.withPaginationDisabled;
+  proxy.withPaginationLimit;
+
   if (debug) {
     console.log("[createClient] Config:", config);
     console.log("[createClient] Returning proxy");

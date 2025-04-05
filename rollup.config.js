@@ -45,7 +45,15 @@ export default [
         noEmitOnError: true, // Fail on TypeScript errors
         // Use Rollup to emit JavaScript, overriding noEmit for this build
       }),
-      isProd && terser(), // Minification for production
+      isProd &&
+        terser({
+          keep_fnames: true, // Preserve function names for generated API methods
+          mangle: {
+            properties: {
+              regex: /^(withPaginationDisabled|withPaginationLimit)$/, // Preserve only these property names
+            },
+          },
+        }), // Minification for production with custom settings
     ],
   },
   // UMD Build
@@ -67,7 +75,15 @@ export default [
         noEmitOnError: true, // Fail on TypeScript errors
         // Use Rollup to emit JavaScript, overriding noEmit for this build
       }),
-      isProd && terser(), // Minification for production
+      isProd &&
+        terser({
+          keep_fnames: true, // Preserve function names for generated API methods
+          mangle: {
+            properties: {
+              regex: /^(withPaginationDisabled|withPaginationLimit)$/, // Preserve only these property names
+            },
+          },
+        }), // Minification for production with custom settings
     ],
   },
   // ESM Declarations

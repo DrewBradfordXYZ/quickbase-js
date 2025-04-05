@@ -47,7 +47,18 @@ await createBundle(
 console.log("Building minified ESM bundle...");
 await createBundle(
   "dist/temp/quickbaseClient.js",
-  [nodeResolve({ preferBuiltins: true }), commonjs(), terser()],
+  [
+    nodeResolve({ preferBuiltins: true }),
+    commonjs(),
+    terser({
+      keep_fnames: true, // Preserve function names for generated API methods
+      mangle: {
+        properties: {
+          regex: /^(withPaginationDisabled|withPaginationLimit)$/, // Preserve only these property names
+        },
+      },
+    }),
+  ],
   "esm",
   {
     dir: "dist/esm",
