@@ -577,7 +577,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
       console.log(
         `[TicketTokenStrategy] Authorization error for ${
           methodName || "method"
-        }, refreshing token`
+        }, attempting token refresh`
       );
     }
 
@@ -593,7 +593,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
       return null;
     }
 
-    await this.ticketCache.delete("ticket");
+    // Clear only the token cache initially
     this.tokenCache.delete(dbid);
 
     try {
@@ -612,13 +612,43 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     } catch (error) {
       if (debug) {
         console.log(
-          `[TicketTokenStrategy] Failed to refresh token for ${
+          `[TicketTokenStrategy] Token refresh failed for ${
             methodName || "method"
-          }:`,
+          }, attempting ticket refresh:`,
           error
         );
       }
-      throw error;
+
+      // If token refresh fails, clear ticket cache and try again
+      await this.ticketCache.delete("ticket");
+
+      try {
+        const newToken = await this.getToken(dbid);
+        if (newToken) {
+          if (debug) {
+            console.log(
+              `[TicketTokenStrategy] Retrying ${
+                methodName || "method"
+              } with token after ticket refresh: ${newToken.substring(
+                0,
+                10
+              )}...`
+            );
+          }
+          return newToken;
+        }
+        return null;
+      } catch (error) {
+        if (debug) {
+          console.log(
+            `[TicketTokenStrategy] Failed to refresh token after ticket refresh for ${
+              methodName || "method"
+            }:`,
+            error
+          );
+        }
+        throw error;
+      }
     }
   }
 }
