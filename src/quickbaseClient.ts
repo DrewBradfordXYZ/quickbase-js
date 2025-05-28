@@ -1,3 +1,4 @@
+// src/quickbaseClient.ts
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -14,11 +15,18 @@ import {
   UserTokenStrategy,
   AuthorizationStrategy,
   SsoTokenStrategy,
+  TicketTokenStrategy,
+  CredentialProvider,
+  Credentials,
 } from "./authorizationStrategy";
 import { FlowThrottleBucket } from "./FlowThrottleBucket";
 import { BurstAwareThrottleBucket } from "./BurstAwareThrottleBucket";
 import { RateLimiter } from "./rateLimiter";
-
+import {
+  TicketCache,
+  InMemoryCache,
+  LocalStorageTicketCache,
+} from "./TicketCache";
 export * from "./generated/models/index";
 
 export interface QuickbaseClient extends IQuickbaseClient {
@@ -30,13 +38,17 @@ export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
+  credentials?: Credentials;
+  credentialProvider?: CredentialProvider;
   useTempTokens?: boolean;
   useSso?: boolean;
+  useTicketAuth?: boolean;
   samlToken?: string;
   debug?: boolean;
   fetchApi?: typeof fetch;
   convertDates?: boolean;
   tempTokenLifespan?: number;
+  ticketLifespan?: number;
   throttle?: {
     type?: "flow" | "burst-aware";
     rate?: number;
@@ -46,6 +58,7 @@ export interface QuickbaseConfig {
   maxRetries?: number;
   retryDelay?: number;
   tokenCache?: TokenCache;
+  ticketCache?: TicketCache<TicketData>;
   baseUrl?: string;
   autoPaginate?: boolean;
 }
@@ -57,6 +70,11 @@ export type ThrottleOptions = {
   windowSeconds?: number;
 };
 
+interface TicketData {
+  ticket: string;
+  cookies: string;
+}
+
 type MethodMap = {
   [K in keyof QuickbaseClient]: MethodInfo<K>;
 };
@@ -66,22 +84,32 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     realm,
     userToken,
     tempToken,
+    credentials,
+    credentialProvider,
     useTempTokens = false,
     useSso = false,
+    useTicketAuth = false,
     samlToken,
     fetchApi,
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
+    ticketLifespan = 24 * 60 * 60 * 1000,
     throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
     tokenCache: providedTokenCache,
+    ticketCache: providedTicketCache,
     baseUrl = "https://api.quickbase.com/v1",
     autoPaginate = true,
   } = config;
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
+  const ticketCache =
+    providedTicketCache ||
+    (typeof window !== "undefined" && window.localStorage
+      ? new LocalStorageTicketCache<TicketData>()
+      : new InMemoryCache<TicketData>());
 
   const throttleOptions = throttle as ThrottleOptions;
   const throttleBucket =
@@ -112,6 +140,18 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         realm,
         effectiveFetch,
         debug,
+        baseUrl
+      )
+    : useTicketAuth
+    ? new TicketTokenStrategy(
+        credentials || { username: "", password: "", appToken: "" },
+        credentialProvider,
+        realm,
+        effectiveFetch,
+        tokenCache,
+        ticketCache,
+        debug,
+        ticketLifespan,
         baseUrl
       )
     : useTempTokens

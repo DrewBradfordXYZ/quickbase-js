@@ -68,12 +68,6 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
     ...(hasBody ? { generated: body } : {}),
   };
 
-  if (debug)
-    console.log(
-      "[invokeMethod] Adjusted params for pagination:",
-      adjustedParams
-    );
-
   const requestOptions: RequestInit = {
     credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
     method: methodInfo.httpMethod,
@@ -174,15 +168,7 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
         typeof response.json === "function"
       ) {
         const errorBody = await response.json();
-        if (
-          errorBody &&
-          typeof errorBody === "object" &&
-          "message" in errorBody
-        ) {
-          message = errorBody.message;
-        } else {
-          message = "Invalid error response format";
-        }
+        message = errorBody.message || "Invalid error response format";
       } else if (typeof response.text === "function") {
         message = (await response.text()) || message;
       }
@@ -208,9 +194,11 @@ export async function invokeMethod<K extends keyof QuickbaseClient>(
       });
       rateLimiter.release();
       const response = await responsePromise;
+      if (debug) console.log("[invokeMethod] Received response:", response);
       return await processResponse(response);
     } catch (error: unknown) {
       if (acquired) rateLimiter.release();
+      if (debug) console.log("[invokeMethod] Caught error:", error);
       let status: number;
       let message: string;
       let response: Response | undefined;
