@@ -12,7 +12,6 @@ export {
   TicketPromptSessionSource,
   TicketPromptCallback,
   TicketPromptSessionSourceConfig,
-  TicketLocalStorageSessionSource,
-  LocalStorageSessionSourceConfig,
   TicketInMemorySessionSource,
+  LocalStorageSessionSourceConfig,
 } from "./credential-sources/credentialSources";
