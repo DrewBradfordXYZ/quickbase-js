@@ -1,3 +1,4 @@
+// src/auth/TempTokenStrategy.ts
 import { AuthorizationStrategy } from "./types";
 import { TokenCache } from "../cache/TokenCache";
 import { extractDbid } from "./utils";
@@ -50,7 +51,8 @@ export class TempTokenStrategy implements AuthorizationStrategy {
   }
 
   async getToken(dbid: string): Promise<string | undefined> {
-    let token = this.tokenCache.get(dbid) || this.initialTempToken;
+    const cachedEntry = this.tokenCache.get(dbid);
+    let token = cachedEntry ? cachedEntry.token : this.initialTempToken;
     if (!token && dbid) {
       if (this.pendingFetches.has(dbid)) {
         console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);

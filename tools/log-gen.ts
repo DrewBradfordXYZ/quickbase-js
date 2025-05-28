@@ -17,53 +17,64 @@ const excludeDirs: string[] = [
 
 // prettier-ignore
 const includeFolders: string[] = [
-  // "open-api/utils",
-  // "open-api/schema",
-  // "open-api"
+  // "tests/playwright/qb/auth",
+  // "tests/vitest/qb/apps",
+  // "tests/vitest/qb/auth",
+  // "tests/vitest/qb/fields",
+  // "tests/vitest/qb/formulas",
+  // "tests/vitest/qb/quickbase-js",
+  // "tests/vitest/qb/records",
+  // "tests/vitest/qb/tables",
+  // "tests/vitest/unit/apps",
+  // "tests/vitest/unit/auth",
+  // "tests/vitest/unit/fields",
+  // "tests/vitest/unit/formulas",
+  // "tests/vitest/unit/quickbase-js",
+  // "tests/vitest/unit/records",
+  // "tests/vitest/unit/tables",
+  // "tests/vitest" // Contains quickbase-ticket-curl.test.ts directly
 ];
 
 // prettier-ignore
 const includeRecursiveFolders: string[] = [
-  // "open-api/schema/tags",
-  // "open-api",
-  // "tools"
-  // "tests",
   // "tests/vitest/unit",
   // "tests/vitest/qb"
 ];
 
 // prettier-ignore
 const includeFiles: string[] = [
-  // "package.json",
-  // "tests/setup.ts",
-  // "vitest.config.ts",
+  // Client-related files
+  "src/client/index.ts",
+  "src/client/invokeMethod.ts",
+  "src/client/pagination.ts",
+  "src/client/quickbaseClient.ts",
 
-  // "open-api/generate-unified-interface.ts",
-  // "open-api/utils/generateDocsJson.ts",
+  // Authentication-related files
+  "src/auth/index.ts",
+  "src/auth/types.ts",
+  "src/auth/utils.ts",
+  "src/auth/TempTokenStrategy.ts",
+  "src/auth/UserTokenStrategy.ts",
+  "src/auth/SsoTokenStrategy.ts",
+  "src/auth/TicketTokenStrategy.ts",
 
-  // "tsconfig.json",
-  // "tsconfig.build.json",
-  "rollup.config.js",
-  "build-common.js",
-  "build-umd.js",
-  "build-esm.js",
+  // Cache-related files
+  "src/cache/index.ts",
+  "src/cache/TicketCache.ts",
+  "src/cache/TokenCache.ts",
 
-  "src/quickbaseClient.ts",
-  "src/invokeMethod.ts",
-  "src/generated-unified/QuickbaseClient.ts",
-  "src/authorizationStrategy.ts",
-  // "src/rateLimiter.ts",
-  // "src/RateLimitError.ts",
-  // "src/ThrottleBucket.ts",
-  "src/tokenCache.ts",
-  "src/utils.ts",
-  // "src/generated/models/GetFieldsUsage200Response.ts",
-  // "src/generated/models/GetFieldsUsage200ResponseItemsInner.ts",
-  // "src/generated/runtime.ts",
-  // "src/generated/apis/AuthApi.ts",
-  // "src/generated/apis/FieldsApi.ts",
-  // "src/generated/apis/AppsApi.ts",
+  // Rate-limiting-related files
+  "src/rate-limiting/index.ts",
+  "src/rate-limiting/RateThrottleBucket.ts",
+  "src/rate-limiting/FlowThrottleBucket.ts",
+  "src/rate-limiting/BurstAwareThrottleBucket.ts",
+  "src/rate-limiting/RateLimiter.ts",
+  "src/rate-limiting/RateLimitError.ts",
 
+  // Utility files
+  "src/utils/index.ts",
+  "src/utils/Semaphore.ts",
+  "src/utils/QuickbaseUtils.ts",
 ];
 
 const projectGoals: string[] = [

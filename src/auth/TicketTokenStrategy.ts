@@ -1,3 +1,5 @@
+// src/auth/TicketTokenStrategy.ts
+
 import { parseStringPromise } from "xml2js";
 import {
   AuthorizationStrategy,
@@ -9,8 +11,14 @@ import { TokenCache } from "../cache/TokenCache";
 import { TicketCache } from "../cache/TicketCache";
 import { extractDbid } from "./utils";
 
+interface ApiError extends Error {
+  status?: number;
+  details?: any;
+}
+
 export class TicketTokenStrategy implements AuthorizationStrategy {
   private pendingTicketFetch: Promise<TicketData> | null = null;
+  private pendingTokenFetches: Map<string, Promise<string>> = new Map();
 
   constructor(
     private credentials: Credentials,
@@ -21,6 +29,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     private ticketCache: TicketCache<TicketData>,
     private debug: boolean = false,
     private ticketLifespanHours: number = 12,
+    private ticketRefreshThreshold: number = 0.1,
     private baseUrl: string = "https://api.quickbase.com/v1"
   ) {
     this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000;
@@ -78,7 +87,11 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
         );
 
         if (!response.ok) {
-          throw new Error(`API_Authenticate failed: ${response.status}`);
+          const error: ApiError = new Error(
+            `API_Authenticate failed: ${response.status}`
+          );
+          error.status = response.status;
+          throw error;
         }
 
         const xml = await response.text();
@@ -87,9 +100,11 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
         const errcode = parsed.qdbapi.errcode?.[0];
 
         if (errcode !== "0") {
-          throw new Error(
+          const error: ApiError = new Error(
             `API_Authenticate error: ${parsed.qdbapi.errtext?.[0] || "Unknown"}`
           );
+          error.status = parseInt(errcode, 10);
+          throw error;
         }
 
         if (!ticket) {
@@ -114,11 +129,17 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
             `[TicketTokenStrategy] Fetched and cached ticket: ${ticket.substring(
               0,
               10
-            )}...`
+            )}...`,
+            `Expires in: ${(this.ticketLifespan / 3600000).toFixed(2)} hours`
           );
         }
 
         return ticketData;
+      } catch (error) {
+        if (this.debug) {
+          console.error("[TicketTokenStrategy] Ticket fetch failed:", error);
+        }
+        throw error;
       } finally {
         this.pendingTicketFetch = null;
       }
@@ -132,6 +153,20 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     const now = Date.now();
 
     if (entry && entry.expiresAt > now) {
+      const timeLeft = entry.expiresAt - now;
+      const threshold = this.ticketLifespan * this.ticketRefreshThreshold;
+      if (timeLeft < threshold) {
+        if (this.debug) {
+          console.log(
+            `[TicketTokenStrategy] Ticket nearing expiration (${(
+              timeLeft / 60000
+            ).toFixed(2)} min left), refreshing`
+          );
+        }
+        await this.ticketCache.delete("ticket");
+        const credentials = await this.getCredentials();
+        return this.fetchTicket(credentials);
+      }
       if (this.debug) {
         console.log("[TicketTokenStrategy] Using cached ticket");
       }
@@ -144,69 +179,108 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
   }
 
   private async fetchTempToken(dbid: string): Promise<string> {
-    const { ticket, cookies } = await this.getTicket();
-    const response = await this.fetchApi(
-      `${this.baseUrl}/auth/temporary/${dbid}`,
-      {
-        headers: {
-          "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-          "Content-Type": "application/json",
-          Authorization: `QB-TICKET ${ticket}`,
-          Cookie: cookies,
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-          Origin: `https://${this.realm}.quickbase.com`,
-          Referer: `https://${this.realm}.quickbase.com`,
-        },
+    if (this.pendingTokenFetches.has(dbid)) {
+      if (this.debug) {
+        console.log(
+          `[TicketTokenStrategy] Waiting for pending token fetch for dbid: ${dbid}`
+        );
       }
-    );
-
-    if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({}));
-      console.error("[fetchTempToken] Error response:", {
-        status: response.status,
-        errorBody,
-        dbid,
-        headers: {
-          "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-          Authorization: `QB-TICKET ${ticket}`,
-          Cookie: cookies,
-        },
-      });
-      throw new Error(
-        `getTempTokenDBID failed: ${errorBody.message || response.status}`
-      );
+      return this.pendingTokenFetches.get(dbid)!;
     }
 
-    const json = await response.json();
-    const token = json.temporaryAuthorization;
+    const fetchPromise = (async () => {
+      try {
+        const { ticket, cookies } = await this.getTicket();
+        const response = await this.fetchApi(
+          `${this.baseUrl}/auth/temporary/${dbid}`,
+          {
+            headers: {
+              "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+              "Content-Type": "application/json",
+              Authorization: `QB-TICKET ${ticket}`,
+              Cookie: cookies,
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+              Origin: `https://${this.realm}.quickbase.com`,
+              Referer: `https://${this.realm}.quickbase.com`,
+            },
+          }
+        );
 
-    if (!token) {
-      throw new Error("No temporary token returned from getTempTokenDBID");
-    }
+        if (!response.ok) {
+          const errorBody = await response.json().catch(() => ({}));
+          const error: ApiError = new Error(
+            `getTempTokenDBID failed: ${errorBody.message || response.status}`
+          );
+          error.status = response.status;
+          error.details = errorBody;
+          if (this.debug) {
+            console.error("[fetchTempToken] Error:", {
+              status: response.status,
+              errorBody,
+              dbid,
+              headers: {
+                "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                Authorization: `QB-TICKET ${ticket.substring(0, 10)}...`,
+                Cookie: cookies.substring(0, 20) + "...",
+              },
+            });
+          }
+          throw error;
+        }
 
-    this.tokenCache.set(dbid, token);
-    if (this.debug) {
-      console.log(
-        `[TicketTokenStrategy] Fetched temp token for dbid ${dbid}: ${token.substring(
-          0,
-          10
-        )}...`
-      );
-    }
-    return token;
+        const json = await response.json();
+        const token = json.temporaryAuthorization;
+
+        if (!token) {
+          throw new Error("No temporary token returned from getTempTokenDBID");
+        }
+
+        this.tokenCache.set(dbid, token);
+        if (this.debug) {
+          console.log(
+            `[TicketTokenStrategy] Fetched temp token for dbid ${dbid}: ${token.substring(
+              0,
+              10
+            )}...`
+          );
+        }
+        return token;
+      } finally {
+        this.pendingTokenFetches.delete(dbid);
+      }
+    })();
+
+    this.pendingTokenFetches.set(dbid, fetchPromise);
+    return fetchPromise;
   }
 
   async getToken(dbid: string): Promise<string | undefined> {
     if (!dbid) return undefined;
-    const cachedToken = this.tokenCache.get(dbid);
-    if (cachedToken) {
+    const cachedEntry = this.tokenCache.get(dbid);
+    if (cachedEntry) {
+      const now = Date.now();
+      const timeLeft = cachedEntry.expiresAt - now;
+      const threshold =
+        (this.tokenCache as any).tempTokenLifespan *
+        this.ticketRefreshThreshold;
+      if (timeLeft < threshold) {
+        if (this.debug) {
+          console.log(
+            `[TicketTokenStrategy] Token for dbid ${dbid} nearing expiration (${(
+              timeLeft / 60000
+            ).toFixed(2)} min left), refreshing`
+          );
+        }
+        this.tokenCache.delete(dbid);
+        return this.fetchTempToken(dbid);
+      }
       if (this.debug) {
         console.log(
           `[TicketTokenStrategy] Using cached temp token for dbid ${dbid}`
         );
       }
-      return cachedToken;
+      return cachedEntry.token;
     }
     return this.fetchTempToken(dbid);
   }
@@ -223,21 +297,31 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     debug?: boolean,
     methodName?: string
   ): Promise<string | null> {
-    if (status !== 401 || attempt >= maxAttempts - 1) {
+    if (![401, 429].includes(status)) {
+      if (debug || this.debug) {
+        console.error(
+          `[TicketTokenStrategy] Non-retryable error for ${
+            methodName || "method"
+          }: Status ${status}`
+        );
+      }
       return null;
     }
 
-    if (debug) {
-      console.log(
-        `[TicketTokenStrategy] Authorization error for ${
-          methodName || "method"
-        }, attempting token refresh`
-      );
+    if (attempt >= maxAttempts) {
+      if (debug || this.debug) {
+        console.error(
+          `[TicketTokenStrategy] Exhausted retries (${maxAttempts}) for ${
+            methodName || "method"
+          }`
+        );
+      }
+      return null;
     }
 
     const dbid = extractDbid(params);
     if (!dbid) {
-      if (debug) {
+      if (debug || this.debug) {
         console.log(
           `[TicketTokenStrategy] No dbid available for ${
             methodName || "method"
@@ -247,60 +331,83 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
       return null;
     }
 
-    this.tokenCache.delete(dbid);
+    if (debug || this.debug) {
+      console.log(
+        `[TicketTokenStrategy] Handling error ${status} for ${
+          methodName || "method"
+        }, attempt ${attempt + 1}/${maxAttempts}, dbid: ${dbid}`
+      );
+    }
 
+    // First attempt: Refresh temp token
+    this.tokenCache.delete(dbid);
     try {
       const newToken = await this.getToken(dbid);
       if (newToken) {
-        if (debug) {
+        if (debug || this.debug) {
           console.log(
             `[TicketTokenStrategy] Retrying ${
               methodName || "method"
-            } with token: ${newToken.substring(0, 10)}...`
+            } with new token: ${newToken.substring(0, 8)}...`
           );
         }
         return newToken;
       }
-      return null;
-    } catch (error) {
-      if (debug) {
-        console.log(
+    } catch (error: any) {
+      if (debug || this.debug) {
+        console.error(
           `[TicketTokenStrategy] Token refresh failed for ${
             methodName || "method"
-          }, attempting ticket refresh:`,
-          error
+          }:`,
+          error.message || error
         );
       }
+      if (error.status !== 401) {
+        throw error; // Rethrow non-401 errors
+      }
+      // 401 error: Proceed to ticket refresh
+    }
 
-      await this.ticketCache.delete("ticket");
-
-      try {
-        const newToken = await this.getToken(dbid);
-        if (newToken) {
-          if (debug) {
-            console.log(
-              `[TicketTokenStrategy] Retrying ${
-                methodName || "method"
-              } with token after ticket refresh: ${newToken.substring(
-                0,
-                10
-              )}...`
-            );
-          }
-          return newToken;
-        }
-        return null;
-      } catch (error) {
-        if (debug) {
+    // Second attempt: Refresh ticket and retry
+    if (debug || this.debug) {
+      console.log(
+        `[TicketTokenStrategy] Attempting ticket refresh for ${
+          methodName || "method"
+        }`
+      );
+    }
+    await this.ticketCache.delete("ticket");
+    try {
+      const newToken = await this.getToken(dbid);
+      if (newToken) {
+        if (debug || this.debug) {
           console.log(
-            `[TicketTokenStrategy] Failed to refresh token after ticket refresh for ${
+            `[TicketTokenStrategy] Retrying ${
               methodName || "method"
-            }:`,
-            error
+            } with token after ticket refresh: ${newToken.substring(0, 8)}...`
           );
         }
-        throw error;
+        return newToken;
       }
+    } catch (error: any) {
+      if (debug || this.debug) {
+        console.error(
+          `[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${
+            methodName || "method"
+          }:`,
+          error.message || error
+        );
+      }
+      throw error; // Rethrow to allow invokeMethod to handle retries
     }
+
+    if (debug || this.debug) {
+      console.error(
+        `[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${
+          methodName || "method"
+        }`
+      );
+    }
+    return null;
   }
 }

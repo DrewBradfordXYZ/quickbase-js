@@ -1,4 +1,5 @@
-// src/tokenCache.ts
+// src/cache/TokenCache.ts
+
 interface CachedToken {
   token: string;
   expiresAt: number;
@@ -13,11 +14,11 @@ export class TokenCache {
     this.tempTokenLifespan = tempTokenLifespan;
   }
 
-  get(dbid: string): string | undefined {
+  get(dbid: string): CachedToken | undefined {
     const entry = this.cache.get(dbid);
     const now = Date.now();
-    if (entry && entry.expiresAt > now) return entry.token;
-    if (entry) this.cache.delete(dbid); // Clean up expired temp tokens
+    if (entry && entry.expiresAt > now) return entry;
+    if (entry) this.cache.delete(dbid);
     return undefined;
   }
 

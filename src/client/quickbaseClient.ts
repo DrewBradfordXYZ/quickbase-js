@@ -47,7 +47,8 @@ export interface QuickbaseConfig {
   fetchApi?: typeof fetch;
   convertDates?: boolean;
   tempTokenLifespan?: number;
-  ticketLifespanHours?: number; // Changed from ticketLifespan
+  ticketLifespanHours?: number;
+  ticketRefreshThreshold?: number; // Renamed: Threshold for proactive token/ticket refresh (0 to 1)
   throttle?: {
     type?: "flow" | "burst-aware";
     rate?: number;
@@ -90,10 +91,11 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     useTicketAuth = false,
     samlToken,
     fetchApi,
-    debug,
+    debug = false,
     convertDates = true,
     tempTokenLifespan = 290000,
-    ticketLifespanHours = 12, // Default to 12 hours
+    ticketLifespanHours = 12,
+    ticketRefreshThreshold = 0.1, // Renamed: Default to 10% of lifespan
     throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
@@ -102,6 +104,24 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     baseUrl = "https://api.quickbase.com/v1",
     autoPaginate = true,
   } = config;
+
+  // Validate required config
+  if (!realm) {
+    throw new Error("QuickbaseConfig must include a valid 'realm'");
+  }
+  if (useTicketAuth && !credentials && !credentialProvider) {
+    throw new Error(
+      "Ticket authentication requires 'credentials' or 'credentialProvider'"
+    );
+  }
+  if (useSso && !samlToken) {
+    throw new Error("SSO authentication requires a 'samlToken'");
+  }
+  if (!useTicketAuth && !useSso && !useTempTokens && !userToken) {
+    throw new Error(
+      "At least one authentication method must be provided (userToken, useTempTokens, useSso, or useTicketAuth)"
+    );
+  }
 
   const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
   const ticketCache =
@@ -133,35 +153,47 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   }
   const effectiveFetch = fetchApi || defaultFetch;
 
-  const authStrategy: AuthorizationStrategy = useSso
-    ? new SsoTokenStrategy(
-        samlToken || "",
-        realm,
-        effectiveFetch,
-        debug,
-        baseUrl
-      )
-    : useTicketAuth
-    ? new TicketTokenStrategy(
-        credentials || { username: "", password: "", appToken: "" },
-        credentialProvider,
-        realm,
-        effectiveFetch,
-        tokenCache,
-        ticketCache,
-        debug,
-        ticketLifespanHours, // Pass hours
-        baseUrl
-      )
-    : useTempTokens
-    ? new TempTokenStrategy(
-        tokenCache,
-        tempToken,
-        effectiveFetch,
-        realm,
-        baseUrl
-      )
-    : new UserTokenStrategy(userToken || "", baseUrl);
+  // Set up authentication strategy
+  let authStrategy: AuthorizationStrategy;
+  if (useSso) {
+    authStrategy = new SsoTokenStrategy(
+      samlToken!,
+      realm,
+      effectiveFetch,
+      debug,
+      baseUrl
+    );
+  } else if (useTicketAuth) {
+    authStrategy = new TicketTokenStrategy(
+      credentials || { username: "", password: "", appToken: "" },
+      credentialProvider,
+      realm,
+      effectiveFetch,
+      tokenCache,
+      ticketCache,
+      debug,
+      ticketLifespanHours,
+      ticketRefreshThreshold, // Renamed: Pass ticketRefreshThreshold
+      baseUrl
+    );
+  } else if (useTempTokens) {
+    authStrategy = new TempTokenStrategy(
+      tokenCache,
+      tempToken,
+      effectiveFetch,
+      realm,
+      baseUrl
+    );
+  } else {
+    authStrategy = new UserTokenStrategy(userToken || "", baseUrl);
+  }
+
+  if (debug) {
+    console.log(
+      "[quickbase] Selected auth strategy:",
+      authStrategy.constructor.name
+    );
+  }
 
   const baseHeaders: HTTPHeaders = {
     "QB-Realm-Hostname": `${realm}.quickbase.com`,
@@ -291,9 +323,9 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
           );
       }
       if (debug) {
-        console.log("[proxy] Method not found:", prop);
+        console.error("[proxy] Method not found:", prop);
       }
-      return undefined;
+      throw new Error(`Method '${prop}' not found in QuickbaseClient`);
     },
   };
 
@@ -304,8 +336,23 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   proxy.withPaginationLimit;
 
   if (debug) {
-    console.log("[createClient] Config:", config);
-    console.log("[createClient] Returning proxy");
+    console.log("[quickbase] Config:", {
+      realm,
+      useSso,
+      useTicketAuth,
+      useTempTokens,
+      hasUserToken: !!userToken,
+      debug,
+      tempTokenLifespan,
+      ticketLifespanHours,
+      ticketRefreshThreshold, // Renamed
+      throttle,
+      maxRetries,
+      retryDelay,
+      baseUrl,
+      autoPaginate,
+    });
+    console.log("[quickbase] Returning proxy");
   }
 
   return proxy;

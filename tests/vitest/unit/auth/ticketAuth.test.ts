@@ -6,9 +6,10 @@ import {
   TicketCache,
   TicketCacheEntry,
 } from "../../../../src/cache/TicketCache";
-import { TicketData } from "../../../../src/authorizationStrategy";
+import { TokenCache } from "../../../../src/cache/TokenCache";
+import { TicketData } from "../../../../src/auth/types";
 
-describe("Quickbase Client with Ticket Authentication and Caching", () => {
+describe("TicketTokenStrategy", () => {
   beforeAll(() => {
     const requiredEnvVars = [
       "QB_REALM",
@@ -19,7 +20,7 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
     ];
     for (const envVar of requiredEnvVars) {
       if (!process.env[envVar]) {
-        throw new Error(`Missing required environment variable: ${envVar}`);
+        throw new Error(`Missing required env var: ${envVar}`);
       }
     }
   });
@@ -28,7 +29,7 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
     mockFetch.mockReset();
     // Mock API_Authenticate response
     mockFetch.mockImplementationOnce(async (url, options) => {
-      console.log("[mockFetch] API_Authenticate:", { url, options });
+      console.log("[QuickBase]: API_Authenticate:", { url, options });
       if (
         url === `https://${QB_REALM}.quickbase.com/db/main` &&
         options.method === "POST" &&
@@ -54,46 +55,6 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
       }
       throw new Error(`Unexpected API_Authenticate request: ${url}`);
     });
-    // Mock getTempTokenDBID response
-    mockFetch.mockImplementationOnce(async (url, options) => {
-      console.log("[mockFetch] getTempTokenDBID:", { url, options });
-      if (
-        url ===
-          `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}` &&
-        options.headers["Authorization"] === "QB-TICKET mock-ticket-123"
-      ) {
-        return new Response(
-          JSON.stringify({ temporaryAuthorization: "mock-temp-token-456" }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
-      throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
-    });
-    // Mock runQuery response
-    mockFetch.mockImplementationOnce(async (url, options) => {
-      console.log("[mockFetch] runQuery:", { url, options });
-      if (
-        url === `https://api.quickbase.com/v1/records/query` &&
-        options.method === "POST" &&
-        options.headers["Authorization"] === "QB-TEMP-TOKEN mock-temp-token-456"
-      ) {
-        return new Response(
-          JSON.stringify({
-            data: [{ 3: { value: "test" } }],
-            metadata: { totalRecords: 1, numRecords: 1, skip: 0 },
-            fields: [{ id: 3, label: "Field3", type: "text" }],
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
-      throw new Error(`Unexpected runQuery request: ${url}`);
-    });
   });
 
   it(
@@ -110,6 +71,47 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
         };
       })();
       vi.stubGlobal("window", { localStorage: localStorageMock });
+
+      mockFetch.mockImplementationOnce(async (url, options) => {
+        console.log("[QuickBase]: getTempTokenDBID:", { url, options });
+        if (
+          url ===
+            `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}` &&
+          options.headers["Authorization"] === "QB-TICKET mock-ticket-123"
+        ) {
+          return new Response(
+            JSON.stringify({ temporaryAuthorization: "mock-temp-token-456" }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
+      });
+
+      mockFetch.mockImplementationOnce(async (url, options) => {
+        console.log("[QuickBase]: runQuery:", { url, options });
+        if (
+          url === `https://api.quickbase.com/v1/records/query` &&
+          options.method === "POST" &&
+          options.headers["Authorization"] ===
+            "QB-TEMP-TOKEN mock-temp-token-456"
+        ) {
+          return new Response(
+            JSON.stringify({
+              data: [{ 3: { value: "test" } }],
+              metadata: { totalRecords: 1, numRecords: 1, skip: 0 },
+              fields: [{ id: 3, label: "Field3", type: "text" }],
+            }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        throw new Error(`Unexpected runQuery request: ${url}`);
+      });
 
       const client = createClient(mockFetch, {
         useTicketAuth: true,
@@ -159,6 +161,46 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
       }
     }
 
+    mockFetch.mockImplementationOnce(async (url, options) => {
+      console.log("[QuickBase]: getTempTokenDBID:", { url, options });
+      if (
+        url ===
+          `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}` &&
+        options.headers["Authorization"] === "QB-TICKET mock-ticket-123"
+      ) {
+        return new Response(
+          JSON.stringify({ temporaryAuthorization: "mock-temp-token-456" }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+      throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
+    });
+
+    mockFetch.mockImplementationOnce(async (url, options) => {
+      console.log("[QuickBase]: runQuery:", { url, options });
+      if (
+        url === `https://api.quickbase.com/v1/records/query` &&
+        options.method === "POST" &&
+        options.headers["Authorization"] === "QB-TEMP-TOKEN mock-temp-token-456"
+      ) {
+        return new Response(
+          JSON.stringify({
+            data: [{ 3: { value: "test" } }],
+            metadata: { totalRecords: 1, numRecords: 1, skip: 0 },
+            fields: [{ id: 3, label: "Field3", type: "text" }],
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+      throw new Error(`Unexpected runQuery request: ${url}`);
+    });
+
     const ticketCache = new MockTicketCache<TicketData>();
     const spy = vi.spyOn(ticketCache, "set");
     const client = createClient(mockFetch, {
@@ -188,4 +230,104 @@ describe("Quickbase Client with Ticket Authentication and Caching", () => {
       expect.any(Number)
     );
   });
+
+  it(
+    "proactively refreshes token when nearing expiration with ticketRefreshThreshold",
+    { timeout: 5000 },
+    async () => {
+      // Mock TokenCache to return a token nearing expiration
+      const tokenCache = new TokenCache(300000); // 5 min lifespan
+      const ticketCache = new InMemoryCache<TicketData>();
+
+      // Set up a token with 30s left (threshold: 0.2 * 300000 = 60s)
+      vi.spyOn(tokenCache, "get").mockReturnValue({
+        token: "mock-temp-token-old",
+        expiresAt: Date.now() + 30000, // 30s left
+      });
+
+      // Spy on TokenCache.delete to confirm old token is removed
+      const deleteSpy = vi.spyOn(tokenCache, "delete");
+      const setSpy = vi.spyOn(tokenCache, "set");
+
+      // Mock fetchTempToken response for the new token
+      mockFetch.mockImplementationOnce(async (url, options) => {
+        console.log("[QuickBase]: getTempTokenDBID (refresh):", {
+          url,
+          options,
+        });
+        if (
+          url ===
+            `https://api.quickbase.com/v1/auth/temporary/${QB_TABLE_ID_1}` &&
+          options.headers["Authorization"] === "QB-TICKET mock-ticket-123"
+        ) {
+          return new Response(
+            JSON.stringify({ temporaryAuthorization: "mock-temp-token-new" }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
+      });
+
+      // Mock runQuery response with the new token
+      mockFetch.mockImplementationOnce(async (url, options) => {
+        console.log("[QuickBase]: runQuery (new token):", { url, options });
+        if (
+          url === `https://api.quickbase.com/v1/records/query` &&
+          options.method === "POST" &&
+          options.headers["Authorization"] ===
+            "QB-TEMP-TOKEN mock-temp-token-new"
+        ) {
+          return new Response(
+            JSON.stringify({
+              data: [{ 3: { value: "test" } }],
+              metadata: { totalRecords: 1, numRecords: 1, skip: 0 },
+              fields: [{ id: 3, label: "Field3", type: "text" }],
+            }),
+            {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        throw new Error(`Unexpected runQuery request: ${url}`);
+      });
+
+      const client = createClient(mockFetch, {
+        useTicketAuth: true,
+        credentials: {
+          username: process.env.QB_USERNAME!,
+          password: process.env.QB_PASSWORD!,
+          appToken: process.env.QB_APP_TOKEN!,
+        },
+        ticketCache,
+        tokenCache,
+        ticketRefreshThreshold: 0.2, // Refresh if <60s left
+        debug: true,
+      });
+
+      const response = await client.runQuery({
+        body: {
+          from: QB_TABLE_ID_1,
+          select: [3],
+          options: { top: 1 },
+        },
+      });
+
+      expect(response.data).toBeDefined();
+      expect(deleteSpy).toHaveBeenCalledWith(QB_TABLE_ID_1);
+      expect(setSpy).toHaveBeenCalledWith(QB_TABLE_ID_1, "mock-temp-token-new");
+      expect(response.data[0][3].value).toBe("test");
+      expect(mockFetch).toHaveBeenCalledWith(
+        "https://api.quickbase.com/v1/records/query",
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: "QB-TEMP-TOKEN mock-temp-token-new",
+          }),
+        })
+      );
+    }
+  );
 });
