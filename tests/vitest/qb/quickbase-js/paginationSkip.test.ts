@@ -5,7 +5,7 @@ import {
   QB_REALM,
   QB_USER_TOKEN,
 } from "@tests/setup";
-import { QuickbaseClient } from "@/quickbaseClient";
+import { QuickbaseClient } from "@/client/quickbaseClient";
 import {
   RunQueryRequest,
   RunQueryRequestOptions,

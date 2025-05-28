@@ -1,6 +1,6 @@
 // tests/playwright/qb/auth/getAppWithTempToken.test.ts
 import { test, expect } from "@playwright/test";
-import { quickbase } from "../../../../src/quickbaseClient.ts"; // Keep .ts for now
+import { quickbase } from "../../../../src/client/quickbaseClient.ts"; // Keep .ts for now
 import dotenv from "dotenv";
 
 dotenv.config();

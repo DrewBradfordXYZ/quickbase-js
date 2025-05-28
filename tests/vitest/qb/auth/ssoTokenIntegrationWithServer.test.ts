@@ -1,7 +1,7 @@
 // tests/vitest/qb/auth/ssoTokenIntegrationWithServer.test.ts
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest"; // Add 'vi' to imports
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import { startMockQuickbaseServer } from "./mockQuickbaseServer";
 
 describe("QuickbaseClient Integration - SSO with Mock Server", () => {

@@ -6,7 +6,7 @@ import {
   QB_REALM,
   QB_TABLE_ID_1,
 } from "@tests/setup.ts";
-import { TokenCache } from "../../../../src/tokenCache"; // Corrected path
+import { TokenCache } from "../../../../src/cache/TokenCache"; // Corrected path
 import { AuthApi } from "../../../../src/generated/apis/AuthApi";
 
 describe("QuickbaseClient Unit - getTempTokenDBID", () => {

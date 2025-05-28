@@ -1,5 +1,5 @@
 // src/RateLimiter.ts
-import { ResponseError } from "./generated/runtime";
+import { ResponseError } from "../generated/runtime";
 import { RateThrottleBucket } from "./RateThrottleBucket";
 
 export class RateLimiter {

@@ -1,9 +1,9 @@
 // tests/vitest/unit/quickbase-js/pagination.test.ts
 
 import { describe, it, expect, vi } from "vitest";
-import { paginateRecords, isPaginatable } from "@/pagination";
-import { QuickbaseClient } from "@/quickbaseClient";
-import * as invokeMethodModule from "@/invokeMethod";
+import { paginateRecords, isPaginatable } from "@/client/pagination";
+import { QuickbaseClient } from "@/client/quickbaseClient";
+import * as invokeMethodModule from "@/client/invokeMethod";
 import { GetUsers200Response, GetUsersRequest } from "@/generated/models";
 
 // Extend GetUsersRequest to include nextPageToken

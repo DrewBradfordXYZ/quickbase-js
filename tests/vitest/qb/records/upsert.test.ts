@@ -1,6 +1,6 @@
 // tests/vitest/qb/records/upsert.test.ts
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import { quickbase } from "@/quickbaseClient.ts";
+import { quickbase } from "@/client/quickbaseClient";
 import {
   Upsert200Response,
   Upsert207Response,

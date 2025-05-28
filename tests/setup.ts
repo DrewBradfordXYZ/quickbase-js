@@ -1,7 +1,7 @@
 // tests/setup.ts
 import { vi } from "vitest";
-import { quickbase } from "../src/quickbaseClient";
-import type { QuickbaseConfig } from "../src/quickbaseClient";
+import { quickbase } from "../src/client/quickbaseClient";
+import type { QuickbaseConfig } from "../src/client/quickbaseClient";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "./.env" });

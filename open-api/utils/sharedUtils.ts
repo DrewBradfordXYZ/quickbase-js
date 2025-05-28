@@ -4,7 +4,7 @@ import { OpenAPIV2 } from "openapi-types";
 import { join } from "path";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { Project, PropertySignature, ts } from "ts-morph"; // Import ts from ts-morph
-import { simplifyName } from "../../src/utils.ts";
+import { simplifyName } from "../../src/utils/QuickbaseUtils.ts";
 
 // (Existing interfaces remain unchanged)
 export interface PropertyDetail {

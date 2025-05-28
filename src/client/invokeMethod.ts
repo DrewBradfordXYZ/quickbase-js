@@ -1,7 +1,8 @@
-import { AuthorizationStrategy, extractDbid } from "./authorizationStrategy";
-import { RateLimiter } from "./rateLimiter";
-import { RateLimitError } from "./RateLimitError";
-import { ResponseError } from "./generated/runtime";
+import { AuthorizationStrategy } from "../auth/types";
+import { extractDbid } from "../auth/utils";
+import { RateLimiter } from "../rate-limiting/rateLimiter";
+import { RateLimitError } from "../rate-limiting/RateLimitError";
+import { ResponseError } from "../generated/runtime";
 import { QuickbaseClient } from "./quickbaseClient";
 import { paginateRecords, isPaginatable } from "./pagination";
 

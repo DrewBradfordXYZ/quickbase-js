@@ -1,6 +1,6 @@
 // tests/vitest/qb/apps/getApp.test.ts
 import { test, expect } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 
 test(
   "QuickbaseClient Integration - getApp > fetches real app data from QuickBase",

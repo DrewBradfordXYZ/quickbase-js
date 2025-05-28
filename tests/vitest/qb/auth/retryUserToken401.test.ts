@@ -1,5 +1,8 @@
 import { describe, it, vi, expect, beforeEach } from "vitest";
-import { quickbase, QuickbaseClient } from "../../../../src/quickbaseClient";
+import {
+  quickbase,
+  QuickbaseClient,
+} from "../../../../src/client/quickbaseClient";
 
 describe("QuickbaseClient Integration - User Token Retry on 401", () => {
   let client: QuickbaseClient;

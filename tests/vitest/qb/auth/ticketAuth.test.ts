@@ -1,8 +1,8 @@
 import { test, expect, beforeAll, beforeEach } from "vitest";
 import { vi } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import { createClient, mockFetch, QB_REALM, QB_TABLE_ID_1 } from "@tests/setup";
-import { TicketCacheEntry } from "../../../../src/TicketCache";
+import { TicketCacheEntry } from "../../../../src/cache/TicketCache";
 import { TicketData } from "../../../../src/authorizationStrategy";
 
 beforeAll(() => {

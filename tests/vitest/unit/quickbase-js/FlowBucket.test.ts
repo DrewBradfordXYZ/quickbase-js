@@ -1,6 +1,6 @@
 // test/vitest/unit/ThrottleBucket.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { FlowThrottleBucket } from "@/FlowThrottleBucket"; // Should work with your alias
+import { FlowThrottleBucket } from "@/rate-limiting/FlowThrottleBucket"; // Should work with your alias
 
 describe("ConcurrentThrottleBucket Unit Tests", () => {
   it("allows burst capacity immediately", async () => {

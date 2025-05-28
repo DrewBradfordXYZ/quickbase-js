@@ -1,5 +1,5 @@
 // src/BurstAwareThrottleBucket.ts
-import { Semaphore } from "./Semaphore";
+import { Semaphore } from "../utils/Semaphore";
 import { RateThrottleBucket } from "./RateThrottleBucket";
 
 export class BurstAwareThrottleBucket implements RateThrottleBucket {

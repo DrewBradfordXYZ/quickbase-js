@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { quickbase, QuickbaseClient } from "../../../../src/quickbaseClient.ts";
+import {
+  quickbase,
+  QuickbaseClient,
+} from "../../../../src/client/quickbaseClient.ts";
 import dotenv from "dotenv";
 
 dotenv.config();

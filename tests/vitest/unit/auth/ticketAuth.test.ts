@@ -5,7 +5,7 @@ import {
   LocalStorageTicketCache,
   TicketCache,
   TicketCacheEntry,
-} from "../../../../src/TicketCache";
+} from "../../../../src/cache/TicketCache";
 import { TicketData } from "../../../../src/authorizationStrategy";
 
 describe("Quickbase Client with Ticket Authentication and Caching", () => {

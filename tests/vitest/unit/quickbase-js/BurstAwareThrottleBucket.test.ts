@@ -1,6 +1,6 @@
 // test/vitest/unit/BurstAwareThrottleBucket.test.ts
 import { describe, it, expect } from "vitest";
-import { BurstAwareThrottleBucket } from "@/BurstAwareThrottleBucket";
+import { BurstAwareThrottleBucket } from "@/rate-limiting/BurstAwareThrottleBucket";
 
 describe("BurstAwareThrottleBucket Unit Tests", () => {
   it("allows burst capacity immediately", async () => {

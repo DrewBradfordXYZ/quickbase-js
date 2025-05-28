@@ -1,7 +1,7 @@
 import { QuickbaseClient } from "./quickbaseClient";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
-import { AuthorizationStrategy } from "./authorizationStrategy";
-import { RateLimiter } from "./rateLimiter";
+import { AuthorizationStrategy } from "../auth";
+import { RateLimiter } from "../rate-limiting/rateLimiter";
 
 /**
  * Represents a paginated response from the Quick Base API.

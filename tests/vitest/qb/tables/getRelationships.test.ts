@@ -1,6 +1,6 @@
 // tests/vitest/qb/tables/getRelationships.test.ts
 import { describe, test, expect } from "vitest";
-import { quickbase } from "/home/drew/Projects/quickbase-js/src/quickbaseClient.ts";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import { QB_TABLE_ID_1 } from "/home/drew/Projects/quickbase-js/tests/setup.ts";
 import { GetRelationships200Response } from "/home/drew/Projects/quickbase-js/src/generated/models";
 

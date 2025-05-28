@@ -1,13 +1,13 @@
-import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
-import { Configuration, HTTPHeaders } from "./generated/runtime";
-import * as apis from "./generated/apis";
-import { TokenCache } from "./tokenCache";
+import { QuickbaseClient as IQuickbaseClient } from "../generated-unified/QuickbaseClient";
+import { Configuration, HTTPHeaders } from "../generated/runtime";
+import * as apis from "../generated/apis";
+import { TokenCache } from "../cache/TokenCache";
 import {
   simplifyName,
   getParamNames,
   transformDates,
   extractHttpMethod,
-} from "./utils";
+} from "../utils";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
 import {
   TempTokenStrategy,
@@ -17,16 +17,16 @@ import {
   TicketTokenStrategy,
   CredentialProvider,
   Credentials,
-} from "./authorizationStrategy";
-import { FlowThrottleBucket } from "./FlowThrottleBucket";
-import { BurstAwareThrottleBucket } from "./BurstAwareThrottleBucket";
-import { RateLimiter } from "./rateLimiter";
+} from "../auth";
+import { FlowThrottleBucket } from "../rate-limiting/FlowThrottleBucket";
+import { BurstAwareThrottleBucket } from "../rate-limiting/BurstAwareThrottleBucket";
+import { RateLimiter } from "../rate-limiting/rateLimiter";
 import {
   TicketCache,
   InMemoryCache,
   LocalStorageTicketCache,
-} from "./TicketCache";
-export * from "./generated/models/index";
+} from "../cache/TicketCache";
+export * from "../generated/models/index";
 
 export interface QuickbaseClient extends IQuickbaseClient {
   withPaginationDisabled<T>(callback: () => Promise<T>): Promise<T>;

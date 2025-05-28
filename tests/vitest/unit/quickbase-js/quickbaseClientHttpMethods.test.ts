@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { quickbase } from "@/quickbaseClient";
+import { quickbase } from "@/client/quickbaseClient.ts";
 import { mockFetch, QB_APP_ID, QB_REALM } from "../../../setup.ts";
 import {
   UpdateAppRequest,

@@ -1,6 +1,6 @@
 // tests/vitest/qb/auth/ssoTokenConcurrency.test.ts
 import { test, expect, vi } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import { startMockQuickbaseServer } from "./mockQuickbaseServer";
 import { QB_APP_ID, QB_REALM } from "@tests/setup.ts";
 

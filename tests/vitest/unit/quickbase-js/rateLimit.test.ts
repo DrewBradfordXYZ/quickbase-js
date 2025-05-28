@@ -7,7 +7,7 @@ import {
   QB_REALM,
   QB_USER_TOKEN,
 } from "@tests/setup.ts";
-import { RateLimitError } from "@/RateLimitError";
+import { RateLimitError } from "@/rate-limiting/RateLimitError";
 import { GetApp200Response } from "@/generated/models";
 
 describe("QuickbaseClient Unit - Rate Limit Handling", () => {

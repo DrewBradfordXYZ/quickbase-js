@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 
 test(
   "QuickbaseClient Integration - deleteTable > deletes a table in QuickBase",

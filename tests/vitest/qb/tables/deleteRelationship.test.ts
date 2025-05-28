@@ -1,7 +1,7 @@
 // tests/vitest/qb/tables/deleteRelationship.test.ts
 
 import { test, expect } from "vitest";
-import { quickbase } from "/home/drew/Projects/quickbase-js/src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import {
   QB_REALM,
   QB_USER_TOKEN,

@@ -1,6 +1,6 @@
 // tests/vitest/unit/auth/userTokenConcurrency.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 import { QB_APP_ID, QB_REALM, QB_USER_TOKEN, mockFetch } from "@tests/setup.ts";
 
 describe("QuickbaseClient Unit - UserTokenStrategy Concurrency", () => {

@@ -1,6 +1,6 @@
 // tests/vitest/qb/BurstAwareThrottleBucket.test.ts
 import { describe, it, expect } from "vitest";
-import { quickbase } from "../../../../src/quickbaseClient";
+import { quickbase } from "../../../../src/client/quickbaseClient";
 
 // Set this to true to run the slow test with 80 burst and 100 calls
 const runSlowTests = false;
