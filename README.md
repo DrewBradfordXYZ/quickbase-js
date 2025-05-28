@@ -111,6 +111,128 @@ const getAppDetails = async () => {
 getAppDetails();
 ```
 
+### Ticket Authentication
+
+Use ticket authentication for secure, session-based authentication in browser or Node.js environments. Tickets are obtained using credentials managed by one of three credential sources: InMemory, LocalStorage, or Prompt.
+
+#### InMemorySessionSource
+
+Stores credentials in memory, ideal for ephemeral sessions or server-side use.
+
+```javascript
+import { quickbase } from "quickbase-js";
+
+const QB_REALM = "mycompany";
+const QB_APP_ID = "bxyz789";
+const QB_USERNAME = "user@example.com";
+const QB_PASSWORD = "your-password";
+const QB_APP_TOKEN = "******************";
+
+const qb = quickbase({
+  realm: QB_REALM,
+  useTicketAuth: true,
+  ticketInMemorySessionSource: {
+    initialCredentials: {
+      username: QB_USERNAME,
+      password: QB_PASSWORD,
+      appToken: QB_APP_TOKEN,
+    },
+    debug: true,
+  },
+});
+
+async function getAppDetails() {
+  try {
+    const response = await qb.getApp({ appId: QB_APP_ID });
+    console.log("App Details:", response);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+getAppDetails();
+```
+
+#### LocalStorageSessionSource
+
+Persists credentials in localStorage, suitable for browser-based applications with persistent sessions.
+
+```javascript
+import { quickbase } from "quickbase-js";
+
+const QB_REALM = "mycompany";
+const QB_APP_ID = "bxyz789";
+
+// Pre-populate localStorage with credentials (e.g., via a login form)
+localStorage.setItem(
+  "quickbase-credentials",
+  JSON.stringify({
+    username: "user@example.com",
+    password: "your-password",
+    appToken: "*****************",
+  })
+);
+
+const qb = quickbase({
+  realm: QB_REALM,
+  useTicketAuth: true,
+  ticketLocalStorageSessionSource: {
+    storageKey: "quickbase-credentials",
+    debug: true,
+  },
+});
+
+async function getAppDetails() {
+  try {
+    const response = await qb.getApp({ appId: QB_APP_ID });
+    console.log("App Details:", response);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+getAppDetails();
+```
+
+#### PromptSessionSource
+
+Prompts for credentials via a callback, with optional localStorage persistence, ideal for interactive browser applications.
+
+```javascript
+import { quickbase } from "quickbase-js";
+
+const QB_REALM = "realm-name";
+const QB_APP_ID = "app-id";
+
+const qb = quickbase({
+  realm: QB_REALM,
+  useTicketAuth: true,
+  ticketPromptSessionSource: {
+    promptCallback: async () => {
+      // Example: Prompt user via a form or dialog
+      return {
+        username: prompt("Enter username") || "",
+        password: prompt("Enter password") || "",
+        appToken: prompt("Enter app token") || "",
+      };
+    },
+    localStorageConfig: { storageKey: "quickbase-credentials" },
+    debug: true,
+  },
+});
+
+async function getAppDetails() {
+  try {
+    const response = await qb.getApp({ appId: QB_APP_ID });
+    console.log("App Details:", response);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+
+getAppDetails();
+```
+
 ### SSO Token
 
 ```javascript

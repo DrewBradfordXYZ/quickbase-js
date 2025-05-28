@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.QuickbaseJS = {}));
-})(this, (function (exports) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('xml2js')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'xml2js'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.QuickBase = {}, global.xml2js));
+})(this, (function (exports, xml2js) { 'use strict';
 
     /* tslint:disable */
     /* eslint-disable */
@@ -7331,6 +7331,7 @@
         UsersApi: UsersApi
     });
 
+    // src/cache/TokenCache.ts
     class TokenCache {
         cache;
         tempTokenLifespan;
@@ -7342,9 +7343,9 @@
             const entry = this.cache.get(dbid);
             const now = Date.now();
             if (entry && entry.expiresAt > now)
-                return entry.token;
+                return entry;
             if (entry)
-                this.cache.delete(dbid); // Clean up expired temp tokens
+                this.cache.delete(dbid);
             return undefined;
         }
         set(dbid, token, lifespan) {
@@ -7359,6 +7360,111 @@
         }
         clear() {
             this.cache.clear();
+        }
+    }
+
+    // src/TicketCache.ts
+    class LocalStorageTicketCache {
+        prefix;
+        constructor(prefix = "quickbase-ticket") {
+            this.prefix = prefix;
+        }
+        getKey(key) {
+            return `${this.prefix}:${key}`;
+        }
+        get(key) {
+            if (typeof window === "undefined" || !window.localStorage) {
+                throw new Error("localStorage is not available");
+            }
+            const raw = window.localStorage.getItem(this.getKey(key));
+            if (!raw)
+                return undefined;
+            try {
+                const entry = JSON.parse(raw);
+                if (entry.expiresAt > Date.now()) {
+                    return entry;
+                }
+                this.delete(key);
+                return undefined;
+            }
+            catch {
+                return undefined;
+            }
+        }
+        set(key, value, lifespan) {
+            if (typeof window === "undefined" || !window.localStorage) {
+                throw new Error("localStorage is not available");
+            }
+            const entry = {
+                value,
+                expiresAt: Date.now() + lifespan,
+            };
+            window.localStorage.setItem(this.getKey(key), JSON.stringify(entry));
+        }
+        delete(key) {
+            if (typeof window === "undefined" || !window.localStorage) {
+                return;
+            }
+            window.localStorage.removeItem(this.getKey(key));
+        }
+        clear() {
+            if (typeof window === "undefined" || !window.localStorage) {
+                return;
+            }
+            const keys = Object.keys(window.localStorage).filter((k) => k.startsWith(this.prefix));
+            keys.forEach((k) => window.localStorage.removeItem(k));
+        }
+    }
+    class InMemoryCache {
+        cache = new Map();
+        get(key) {
+            const entry = this.cache.get(key);
+            if (entry && entry.expiresAt > Date.now()) {
+                return entry;
+            }
+            this.cache.delete(key);
+            return undefined;
+        }
+        set(key, value, lifespan) {
+            this.cache.set(key, {
+                value,
+                expiresAt: Date.now() + lifespan,
+            });
+        }
+        delete(key) {
+            this.cache.delete(key);
+        }
+        clear() {
+            this.cache.clear();
+        }
+    }
+
+    // src/Semaphore.ts
+    class Semaphore {
+        permits;
+        waiting = [];
+        constructor(maxPermits) {
+            this.permits = maxPermits;
+        }
+        async acquire() {
+            if (this.permits > 0) {
+                this.permits -= 1;
+                return;
+            }
+            return new Promise((resolve, reject) => {
+                this.waiting.push({ resolve, reject });
+            });
+        }
+        release() {
+            this.permits += 1;
+            if (this.waiting.length > 0 && this.permits > 0) {
+                const { resolve } = this.waiting.shift();
+                this.permits -= 1;
+                resolve();
+            }
+        }
+        available() {
+            return this.permits;
         }
     }
 
@@ -7411,225 +7517,6 @@
         return match ? match[1].toUpperCase() : "GET"; // Fallback to GET if no match
     }
 
-    class TempTokenStrategy {
-        tokenCache;
-        initialTempToken;
-        fetchApi;
-        realm;
-        baseUrl;
-        pendingFetches = new Map();
-        constructor(tokenCache, initialTempToken, fetchApi, realm, baseUrl = "https://api.quickbase.com/v1") {
-            this.tokenCache = tokenCache;
-            this.initialTempToken = initialTempToken;
-            this.fetchApi = fetchApi;
-            this.realm = realm;
-            this.baseUrl = baseUrl;
-        }
-        async fetchTempToken(dbid) {
-            const headers = {
-                "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                "Content-Type": "application/json",
-            };
-            const response = await this.fetchApi(`${this.baseUrl}/auth/temporary/${dbid}`, {
-                method: "GET",
-                headers,
-                credentials: "include",
-            });
-            if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({}));
-                const message = errorBody.message || "Unknown error";
-                throw new Error(`API Error: ${message} (Status: ${response.status})`);
-            }
-            const tokenResult = await response.json();
-            const token = tokenResult.temporaryAuthorization;
-            if (!token) {
-                throw new Error("API Error: No temporary token returned from API (Status: 200)");
-            }
-            this.tokenCache.set(dbid, token);
-            console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
-            return token;
-        }
-        async getToken(dbid) {
-            let token = this.tokenCache.get(dbid) || this.initialTempToken;
-            if (!token && dbid) {
-                if (this.pendingFetches.has(dbid)) {
-                    console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
-                    return this.pendingFetches.get(dbid);
-                }
-                const fetchPromise = this.fetchTempToken(dbid).finally(() => this.pendingFetches.delete(dbid));
-                this.pendingFetches.set(dbid, fetchPromise);
-                token = await fetchPromise;
-            }
-            return token;
-        }
-        applyHeaders(headers, token) {
-            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
-        }
-        async handleError(status, params, attempt, maxAttempts, debug, methodName) {
-            if (status !== 401 || attempt >= maxAttempts - 1)
-                return null;
-            if (debug)
-                console.log(`Authorization error for ${methodName || "method"} (temp token), refreshing token:`);
-            const dbid = extractDbid(params);
-            if (!dbid) {
-                if (debug)
-                    console.log(`No dbid available for ${methodName || "method"}, skipping token refresh`);
-                return null;
-            }
-            if (debug)
-                console.log(`Refreshing temp token for dbid: ${dbid}`);
-            // Invalidate the cache for this dbid to force a fresh fetch
-            this.tokenCache.delete(dbid);
-            try {
-                const newToken = await this.getToken(dbid);
-                if (newToken) {
-                    this.tokenCache.set(dbid, newToken);
-                    if (debug)
-                        console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
-                    return newToken;
-                }
-                return null;
-            }
-            catch (error) {
-                if (debug)
-                    console.log(`[${methodName || "method"}] Failed to refresh token:`, error);
-                throw error;
-            }
-        }
-    }
-    class UserTokenStrategy {
-        userToken;
-        baseUrl;
-        constructor(userToken, baseUrl = "https://api.quickbase.com/v1") {
-            this.userToken = userToken;
-            this.baseUrl = baseUrl;
-        }
-        async getToken(_dbid) {
-            return this.userToken;
-        }
-        applyHeaders(headers, token) {
-            headers["Authorization"] = `QB-USER-TOKEN ${token}`;
-        }
-        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
-            if (status !== 401 || attempt >= maxAttempts - 1)
-                return null;
-            if (debug)
-                console.log(`Retrying ${methodName || "method"} with existing user token: ${this.userToken.substring(0, 10)}...`);
-            return this.userToken;
-        }
-    }
-    class SsoTokenStrategy {
-        samlToken;
-        realm;
-        fetchApi;
-        debug;
-        baseUrl;
-        currentToken;
-        pendingFetches = new Map();
-        constructor(samlToken, realm, fetchApi, debug = false, baseUrl = "https://api.quickbase.com/v1") {
-            this.samlToken = samlToken;
-            this.realm = realm;
-            this.fetchApi = fetchApi;
-            this.debug = debug;
-            this.baseUrl = baseUrl;
-        }
-        async getToken(_dbid) {
-            if (!this.currentToken) {
-                if (this.pendingFetches.has("sso")) {
-                    if (this.debug)
-                        console.log("[getToken] Waiting for existing SSO fetch");
-                    return this.pendingFetches.get("sso");
-                }
-                const fetchPromise = this.fetchSsoToken({
-                    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-                    requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
-                    subject_token: this.samlToken,
-                    subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-                }).finally(() => this.pendingFetches.delete("sso"));
-                this.pendingFetches.set("sso", fetchPromise);
-                this.currentToken = await fetchPromise;
-            }
-            return this.currentToken;
-        }
-        applyHeaders(headers, token) {
-            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
-        }
-        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
-            if (status !== 401 || attempt >= maxAttempts - 1)
-                return null;
-            if (debug || this.debug) {
-                console.log(`Authorization error for ${methodName || "method"} (SSO), refreshing token`);
-            }
-            const newToken = await this.refreshSsoToken(debug || this.debug);
-            if (newToken) {
-                this.currentToken = newToken;
-                if (debug || this.debug)
-                    console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
-                return newToken;
-            }
-            return null;
-        }
-        async refreshSsoToken(debug = false) {
-            const payload = {
-                grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-                requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
-                subject_token: this.samlToken,
-                subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
-            };
-            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
-                method: "POST",
-                headers: {
-                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-                credentials: "omit",
-            });
-            if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({}));
-                if (debug) {
-                    console.log(`[SSO Refresh] Failed: ${response.status}`, errorBody);
-                }
-                throw new Error(`SSO token refresh failed: ${errorBody.message || "Unknown error"}`);
-            }
-            const result = await response.json();
-            const newToken = result.access_token;
-            if (!newToken) {
-                throw new Error("No access token returned from SSO token exchange");
-            }
-            if (debug) {
-                console.log(`[SSO Refresh] New token: ${newToken.substring(0, 10)}...`);
-            }
-            return newToken;
-        }
-        async fetchSsoToken(params) {
-            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
-                method: "POST",
-                headers: {
-                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(params),
-                credentials: "omit",
-            });
-            if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({}));
-                if (this.debug) {
-                    console.log(`[fetchSsoToken] Failed: ${response.status}`, errorBody);
-                }
-                throw new Error(`SSO token fetch failed: ${errorBody.message || "Unknown error"}`);
-            }
-            const result = await response.json();
-            const newToken = result.access_token;
-            if (!newToken) {
-                throw new Error("No access token returned from SSO token exchange");
-            }
-            if (this.debug) {
-                console.log(`[fetchSsoToken] Fetched token: ${newToken.substring(0, 10)}...`);
-            }
-            return newToken;
-        }
-    }
     function extractDbid(params) {
         return (params.dbid ||
             params.tableId ||
@@ -7928,8 +7815,6 @@
             ...restParams,
             ...(hasBody ? { generated: body } : {}),
         };
-        if (debug)
-            console.log("[invokeMethod] Adjusted params for pagination:", adjustedParams);
         const requestOptions = {
             credentials: methodName === "getTempTokenDBID" ? "include" : "omit",
             method: methodInfo.httpMethod,
@@ -7981,14 +7866,7 @@
                 if (contentType.includes("application/json") &&
                     typeof response.json === "function") {
                     const errorBody = await response.json();
-                    if (errorBody &&
-                        typeof errorBody === "object" &&
-                        "message" in errorBody) {
-                        message = errorBody.message;
-                    }
-                    else {
-                        message = "Invalid error response format";
-                    }
+                    message = errorBody.message || "Invalid error response format";
                 }
                 else if (typeof response.text === "function") {
                     message = (await response.text()) || message;
@@ -8017,11 +7895,15 @@
                 });
                 rateLimiter.release();
                 const response = await responsePromise;
+                if (debug)
+                    console.log("[invokeMethod] Received response:", response);
                 return await processResponse(response);
             }
             catch (error) {
                 if (acquired)
                     rateLimiter.release();
+                if (debug)
+                    console.log("[invokeMethod] Caught error:", error);
                 let status;
                 let message;
                 let response;
@@ -8068,35 +7950,6 @@
             }
         }
         throw new Error(`API Error: Exhausted retries after ${maxAttempts} attempts`);
-    }
-
-    // src/Semaphore.ts
-    class Semaphore {
-        permits;
-        waiting = [];
-        constructor(maxPermits) {
-            this.permits = maxPermits;
-        }
-        async acquire() {
-            if (this.permits > 0) {
-                this.permits -= 1;
-                return;
-            }
-            return new Promise((resolve, reject) => {
-                this.waiting.push({ resolve, reject });
-            });
-        }
-        release() {
-            this.permits += 1;
-            if (this.waiting.length > 0 && this.permits > 0) {
-                const { resolve } = this.waiting.shift();
-                this.permits -= 1;
-                resolve();
-            }
-        }
-        available() {
-            return this.permits;
-        }
     }
 
     // src/FlowThrottleBucket.ts
@@ -8210,9 +8063,733 @@
         }
     }
 
+    class TempTokenStrategy {
+        tokenCache;
+        initialTempToken;
+        fetchApi;
+        realm;
+        baseUrl;
+        pendingFetches = new Map();
+        constructor(tokenCache, initialTempToken, fetchApi, realm, baseUrl = "https://api.quickbase.com/v1") {
+            this.tokenCache = tokenCache;
+            this.initialTempToken = initialTempToken;
+            this.fetchApi = fetchApi;
+            this.realm = realm;
+            this.baseUrl = baseUrl;
+        }
+        async fetchTempToken(dbid) {
+            const headers = {
+                "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                Origin: `https://${this.realm}.quickbase.com`,
+                Referer: `https://${this.realm}.quickbase.com`,
+            };
+            const response = await this.fetchApi(`${this.baseUrl}/auth/temporary/${dbid}`, {
+                method: "GET",
+                headers,
+                credentials: "include",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                const message = errorBody.message || "Unknown error";
+                throw new Error(`API Error: ${message} (Status: ${response.status})`);
+            }
+            const tokenResult = await response.json();
+            const token = tokenResult.temporaryAuthorization;
+            if (!token) {
+                throw new Error("API Error: No temporary token returned from API (Status: 200)");
+            }
+            this.tokenCache.set(dbid, token);
+            console.log(`Fetched and cached new token for dbid: ${dbid}`, token);
+            return token;
+        }
+        async getToken(dbid) {
+            const cachedEntry = this.tokenCache.get(dbid);
+            let token = cachedEntry ? cachedEntry.token : this.initialTempToken;
+            if (!token && dbid) {
+                if (this.pendingFetches.has(dbid)) {
+                    console.log(`[getToken] Waiting for existing fetch for dbid: ${dbid}`);
+                    return this.pendingFetches.get(dbid);
+                }
+                const fetchPromise = this.fetchTempToken(dbid).finally(() => this.pendingFetches.delete(dbid));
+                this.pendingFetches.set(dbid, fetchPromise);
+                token = await fetchPromise;
+            }
+            return token;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+        }
+        async handleError(status, params, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug)
+                console.log(`Authorization error for ${methodName || "method"} (temp token), refreshing token:`);
+            const dbid = extractDbid(params);
+            if (!dbid) {
+                if (debug)
+                    console.log(`No dbid available for ${methodName || "method"}, skipping token refresh`);
+                return null;
+            }
+            if (debug)
+                console.log(`Refreshing temp token for dbid: ${dbid}`);
+            this.tokenCache.delete(dbid);
+            try {
+                const newToken = await this.getToken(dbid);
+                if (newToken) {
+                    this.tokenCache.set(dbid, newToken);
+                    if (debug)
+                        console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
+                    return newToken;
+                }
+                return null;
+            }
+            catch (error) {
+                if (debug)
+                    console.log(`[${methodName || "method"}] Failed to refresh token:`, error);
+                throw error;
+            }
+        }
+    }
+
+    class UserTokenStrategy {
+        userToken;
+        baseUrl;
+        constructor(userToken, baseUrl = "https://api.quickbase.com/v1") {
+            this.userToken = userToken;
+            this.baseUrl = baseUrl;
+        }
+        async getToken(_dbid) {
+            return this.userToken;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-USER-TOKEN ${token}`;
+        }
+        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug)
+                console.log(`Retrying ${methodName || "method"} with existing user token: ${this.userToken.substring(0, 10)}...`);
+            return this.userToken;
+        }
+    }
+
+    class SsoTokenStrategy {
+        samlToken;
+        realm;
+        fetchApi;
+        debug;
+        baseUrl;
+        currentToken;
+        pendingFetches = new Map();
+        constructor(samlToken, realm, fetchApi, debug = false, baseUrl = "https://api.quickbase.com/v1") {
+            this.samlToken = samlToken;
+            this.realm = realm;
+            this.fetchApi = fetchApi;
+            this.debug = debug;
+            this.baseUrl = baseUrl;
+        }
+        async getToken(_dbid) {
+            if (!this.currentToken) {
+                if (this.pendingFetches.has("sso")) {
+                    if (this.debug)
+                        console.log("[getToken] Waiting for existing SSO fetch");
+                    return this.pendingFetches.get("sso");
+                }
+                const fetchPromise = this.fetchSsoToken({
+                    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+                    requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
+                    subject_token: this.samlToken,
+                    subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
+                }).finally(() => this.pendingFetches.delete("sso"));
+                this.pendingFetches.set("sso", fetchPromise);
+                this.currentToken = await fetchPromise;
+            }
+            return this.currentToken;
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+        }
+        async handleError(status, _params, attempt, maxAttempts, debug, methodName) {
+            if (status !== 401 || attempt >= maxAttempts - 1)
+                return null;
+            if (debug || this.debug) {
+                console.log(`Authorization error for ${methodName || "method"} (SSO), refreshing token`);
+            }
+            const newToken = await this.refreshSsoToken(debug || this.debug);
+            if (newToken) {
+                this.currentToken = newToken;
+                if (debug || this.debug)
+                    console.log(`[${methodName || "method"}] Retrying with token: ${newToken.substring(0, 10)}...`);
+                return newToken;
+            }
+            return null;
+        }
+        async refreshSsoToken(debug = false) {
+            const payload = {
+                grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+                requested_token_type: "urn:quickbase:params:oauth:token-type:temp_token",
+                subject_token: this.samlToken,
+                subject_token_type: "urn:ietf:params:oauth:token-type:saml2",
+            };
+            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+                method: "POST",
+                headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+                credentials: "omit",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                if (debug) {
+                    console.log(`[SSO Refresh] Failed: ${response.status}`, errorBody);
+                }
+                throw new Error(`SSO token refresh failed: ${errorBody.message || "Unknown error"}`);
+            }
+            const result = await response.json();
+            const newToken = result.access_token;
+            if (!newToken) {
+                throw new Error("No access token returned from SSO token exchange");
+            }
+            if (debug) {
+                console.log(`[SSO Refresh] New token: ${newToken.substring(0, 10)}...`);
+            }
+            return newToken;
+        }
+        async fetchSsoToken(params) {
+            const response = await this.fetchApi(`${this.baseUrl}/auth/oauth/token`, {
+                method: "POST",
+                headers: {
+                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(params),
+                credentials: "omit",
+            });
+            if (!response.ok) {
+                const errorBody = await response.json().catch(() => ({}));
+                if (this.debug) {
+                    console.log(`[fetchSsoToken] Failed: ${response.status}`, errorBody);
+                }
+                throw new Error(`SSO token fetch failed: ${errorBody.message || "Unknown error"}`);
+            }
+            const result = await response.json();
+            const newToken = result.access_token;
+            if (!newToken) {
+                throw new Error("No access token returned from SSO token exchange");
+            }
+            if (this.debug) {
+                console.log(`[fetchSsoToken] Fetched token: ${newToken.substring(0, 10)}...`);
+            }
+            return newToken;
+        }
+    }
+
+    // src/auth/TicketTokenStrategy.ts
+    class TicketTokenStrategy {
+        credentialSource;
+        realm;
+        fetchApi;
+        tokenCache;
+        ticketCache;
+        debug;
+        ticketLifespanHours;
+        ticketRefreshThreshold;
+        baseUrl;
+        tempTokenLifespan;
+        pendingTicketFetch = null;
+        pendingTokenFetches = new Map();
+        constructor(credentialSource, realm, fetchApi, tokenCache, ticketCache, debug = false, ticketLifespanHours = 12, ticketRefreshThreshold = 0.1, baseUrl = "https://api.quickbase.com/v1", tempTokenLifespan = 3600 * 1000 // Added for type safety
+        ) {
+            this.credentialSource = credentialSource;
+            this.realm = realm;
+            this.fetchApi = fetchApi;
+            this.tokenCache = tokenCache;
+            this.ticketCache = ticketCache;
+            this.debug = debug;
+            this.ticketLifespanHours = ticketLifespanHours;
+            this.ticketRefreshThreshold = ticketRefreshThreshold;
+            this.baseUrl = baseUrl;
+            this.tempTokenLifespan = tempTokenLifespan;
+            this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000;
+        }
+        ticketLifespan;
+        async getCredentials(refresh = false) {
+            try {
+                const creds = refresh && this.credentialSource.refreshCredentials
+                    ? await this.credentialSource.refreshCredentials()
+                    : await this.credentialSource.getCredentials();
+                if (!creds.username || !creds.password || !creds.appToken) {
+                    throw new Error("CredentialSource returned incomplete credentials");
+                }
+                if (this.debug) {
+                    console.log(`[TicketTokenStrategy] Fetched credentials${refresh ? " (refreshed)" : ""}`);
+                }
+                return creds;
+            }
+            catch (error) {
+                if (this.debug) {
+                    console.error("[TicketTokenStrategy] Failed to fetch credentials:", error);
+                }
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                throw new Error(`CredentialSource error: ${errorMessage}`);
+            }
+        }
+        async fetchTicket() {
+            if (this.pendingTicketFetch) {
+                if (this.debug) {
+                    console.log("[TicketTokenStrategy] Waiting for pending ticket fetch");
+                }
+                return this.pendingTicketFetch;
+            }
+            this.pendingTicketFetch = (async () => {
+                try {
+                    const credentials = await this.getCredentials();
+                    const response = await this.fetchApi(`https://${this.realm}.quickbase.com/db/main`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/xml",
+                            Accept: "application/xml",
+                            "QUICKBASE-ACTION": "API_Authenticate",
+                            "QB-App-Token": credentials.appToken,
+                            "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                            Origin: `https://${this.realm}.quickbase.com`,
+                            Referer: `https://${this.realm}.quickbase.com`,
+                        },
+                        body: `<?xml version="1.0" ?>
+            <qdbapi>
+              <username>${credentials.username}</username>
+              <password>${credentials.password}</password>
+              <hours>${this.ticketLifespanHours}</hours>
+              <udata>auth_request</udata>
+            </qdbapi>`,
+                    });
+                    if (!response.ok) {
+                        const error = new Error(`API_Authenticate failed: ${response.status}`);
+                        error.status = response.status;
+                        throw error;
+                    }
+                    const xml = await response.text();
+                    const parsed = await xml2js.parseStringPromise(xml);
+                    const ticket = parsed.qdbapi.ticket?.[0];
+                    const errcode = parsed.qdbapi.errcode?.[0];
+                    if (errcode !== "0") {
+                        const error = new Error(`API_Authenticate error: ${parsed.qdbapi.errtext?.[0] || "Unknown"}`);
+                        error.status = parseInt(errcode, 10);
+                        throw error;
+                    }
+                    if (!ticket) {
+                        throw new Error("No ticket returned from API_Authenticate");
+                    }
+                    const setCookies = response.headers
+                        .get("set-cookie")
+                        ?.split(/,(?=\s*[^\s])/)
+                        .map((c) => c.trim()) || [];
+                    const cookies = setCookies
+                        .filter((c) => c.includes("TICKET") || c.includes("luid"))
+                        .map((c) => c.split(";")[0])
+                        .join("; ");
+                    const ticketData = { ticket, cookies };
+                    await this.ticketCache.set("ticket", ticketData, this.ticketLifespan);
+                    if (this.debug) {
+                        console.log(`[TicketTokenStrategy] Fetched and cached ticket: ${ticket.substring(0, 10)}...`, `Expires in: ${(this.ticketLifespan / 3600000).toFixed(2)} hours`);
+                    }
+                    return ticketData;
+                }
+                catch (error) {
+                    if (this.debug) {
+                        console.error("[TicketTokenStrategy] Ticket fetch failed:", error);
+                    }
+                    throw error;
+                }
+                finally {
+                    this.pendingTicketFetch = null;
+                }
+            })();
+            return this.pendingTicketFetch;
+        }
+        async getTicket() {
+            const entry = await this.ticketCache.get("ticket");
+            const now = Date.now();
+            if (entry && entry.expiresAt > now) {
+                const timeLeft = entry.expiresAt - now;
+                const threshold = this.ticketLifespan * this.ticketRefreshThreshold;
+                if (timeLeft < threshold) {
+                    if (this.debug) {
+                        console.log(`[TicketTokenStrategy] Ticket nearing expiration (${(timeLeft / 60000).toFixed(2)} min left), refreshing`);
+                    }
+                    await this.ticketCache.delete("ticket");
+                    return this.fetchTicket();
+                }
+                if (this.debug) {
+                    console.log("[TicketTokenStrategy] Using cached ticket");
+                }
+                return entry.value;
+            }
+            await this.ticketCache.delete("ticket");
+            return this.fetchTicket();
+        }
+        async fetchTempToken(dbid) {
+            if (this.pendingTokenFetches.has(dbid)) {
+                if (this.debug) {
+                    console.log(`[TicketTokenStrategy] Waiting for pending token fetch for dbid: ${dbid}`);
+                }
+                return this.pendingTokenFetches.get(dbid);
+            }
+            const fetchPromise = (async () => {
+                try {
+                    const { ticket, cookies } = await this.getTicket();
+                    const response = await this.fetchApi(`${this.baseUrl}/auth/temporary/${dbid}`, {
+                        headers: {
+                            "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                            "Content-Type": "application/json",
+                            Authorization: `QB-TICKET ${ticket}`,
+                            Cookie: cookies,
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                            Origin: `https://${this.realm}.quickbase.com`,
+                            Referer: `https://${this.realm}.quickbase.com`,
+                        },
+                    });
+                    if (!response.ok) {
+                        const errorBody = await response.json().catch(() => ({}));
+                        const error = new Error(`getTempTokenDBID failed: ${errorBody.message || response.status}`);
+                        error.status = response.status;
+                        error.details = errorBody;
+                        if (this.debug) {
+                            console.error("[fetchTempToken] Error:", {
+                                status: response.status,
+                                errorBody,
+                                dbid,
+                                headers: {
+                                    "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
+                                    Authorization: `QB-TICKET ${ticket.substring(0, 10)}...`,
+                                    Cookie: cookies.substring(0, 20) + "...",
+                                },
+                            });
+                        }
+                        throw error;
+                    }
+                    const json = await response.json();
+                    const token = json.temporaryAuthorization;
+                    if (!token) {
+                        throw new Error("No temporary token returned from getTempTokenDBID");
+                    }
+                    this.tokenCache.set(dbid, token);
+                    if (this.debug) {
+                        console.log(`[TicketTokenStrategy] Fetched temp token for dbid ${dbid}: ${token.substring(0, 10)}...`);
+                    }
+                    return token;
+                }
+                finally {
+                    this.pendingTokenFetches.delete(dbid);
+                }
+            })();
+            this.pendingTokenFetches.set(dbid, fetchPromise);
+            return fetchPromise;
+        }
+        async getToken(dbid) {
+            if (!dbid)
+                return undefined;
+            const cachedEntry = this.tokenCache.get(dbid);
+            if (cachedEntry) {
+                const now = Date.now();
+                const timeLeft = cachedEntry.expiresAt - now;
+                const threshold = this.tempTokenLifespan * this.ticketRefreshThreshold;
+                if (timeLeft < threshold) {
+                    if (this.debug) {
+                        console.log(`[TicketTokenStrategy] Token for dbid ${dbid} nearing expiration (${(timeLeft / 60000).toFixed(2)} min left), refreshing`);
+                    }
+                    this.tokenCache.delete(dbid);
+                    return this.fetchTempToken(dbid);
+                }
+                if (this.debug) {
+                    console.log(`[TicketTokenStrategy] Using cached temp token for dbid ${dbid}`);
+                }
+                return cachedEntry.token;
+            }
+            return this.fetchTempToken(dbid);
+        }
+        applyHeaders(headers, token) {
+            headers["Authorization"] = `QB-TEMP-TOKEN ${token}`;
+        }
+        async handleError(status, params, attempt, maxAttempts, debug, methodName) {
+            if (![401, 429].includes(status)) {
+                if (debug || this.debug) {
+                    console.error(`[TicketTokenStrategy] Non-retryable error for ${methodName || "method"}: Status ${status}`);
+                }
+                return null;
+            }
+            if (attempt >= maxAttempts) {
+                if (debug || this.debug) {
+                    console.error(`[TicketTokenStrategy] Exhausted retries (${maxAttempts}) for ${methodName || "method"}`);
+                }
+                return null;
+            }
+            const dbid = extractDbid(params);
+            if (!dbid) {
+                if (debug || this.debug) {
+                    console.log(`[TicketTokenStrategy] No dbid available for ${methodName || "method"}, skipping token refresh`);
+                }
+                return null;
+            }
+            if (debug || this.debug) {
+                console.log(`[TicketTokenStrategy] Handling error ${status} for ${methodName || "method"}, attempt ${attempt + 1}/${maxAttempts}, dbid: ${dbid}`);
+            }
+            // First attempt: Refresh temp token
+            this.tokenCache.delete(dbid);
+            try {
+                const newToken = await this.getToken(dbid);
+                if (newToken) {
+                    if (debug || this.debug) {
+                        console.log(`[TicketTokenStrategy] Retrying ${methodName || "method"} with new token: ${newToken.substring(0, 8)}...`);
+                    }
+                    return newToken;
+                }
+            }
+            catch (error) {
+                if (debug || this.debug) {
+                    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                    console.error(`[TicketTokenStrategy] Token refresh failed for ${methodName || "method"}:`, errorMessage);
+                }
+                // Check if error is ApiError with status
+                if (error instanceof Error &&
+                    "status" in error &&
+                    typeof error.status === "number" &&
+                    error.status !== 401) {
+                    throw error; // Rethrow non-401 errors
+                }
+                // 401 error or non-ApiError: Proceed to ticket refresh
+            }
+            // Second attempt: Refresh ticket and retry
+            if (debug || this.debug) {
+                console.log(`[TicketTokenStrategy] Attempting ticket refresh for ${methodName || "method"}`);
+            }
+            await this.ticketCache.delete("ticket");
+            try {
+                const credentials = await this.getCredentials(true); // Request refreshed credentials
+                const newToken = await this.getToken(dbid);
+                if (newToken) {
+                    if (debug || this.debug) {
+                        console.log(`[TicketTokenStrategy] Retrying ${methodName || "method"} with token after ticket refresh: ${newToken.substring(0, 8)}...`);
+                    }
+                    return newToken;
+                }
+            }
+            catch (error) {
+                if (debug || this.debug) {
+                    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                    console.error(`[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${methodName || "method"}:`, errorMessage);
+                }
+                throw error; // Rethrow to allow invokeMethod to handle retries
+            }
+            if (debug || this.debug) {
+                console.error(`[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${methodName || "method"}`);
+            }
+            return null;
+        }
+    }
+
+    // TicketInMemorySessionSource
+    class TicketInMemorySessionSource {
+        credentials = null;
+        debug;
+        constructor(initialCredentials, debug = false) {
+            this.credentials = initialCredentials || null;
+            this.debug = debug;
+        }
+        async getCredentials() {
+            if (!this.credentials) {
+                throw new Error("No credentials set in session");
+            }
+            if (this.debug) {
+                console.log("[TicketInMemorySessionSource] Fetched credentials from session");
+            }
+            return this.credentials;
+        }
+        async refreshCredentials() {
+            if (this.debug) {
+                console.log("[TicketInMemorySessionSource] Refreshing credentials from session");
+            }
+            return this.getCredentials();
+        }
+        setCredentials(creds) {
+            this.credentials = creds;
+            if (this.debug) {
+                console.log("[TicketInMemorySessionSource] Set credentials in session");
+            }
+        }
+        clearCredentials() {
+            this.credentials = null;
+            if (this.debug) {
+                console.log("[TicketInMemorySessionSource] Cleared credentials from session");
+            }
+        }
+    }
+    class TicketLocalStorageSessionSource {
+        storageKey;
+        debug;
+        constructor(config = {}) {
+            this.storageKey = config.storageKey || "quickbase-credentials";
+            this.debug = config.debug || false;
+        }
+        async getCredentials() {
+            if (typeof window === "undefined" || !window.localStorage) {
+                throw new Error("localStorage is not available");
+            }
+            try {
+                const stored = window.localStorage.getItem(this.storageKey);
+                if (!stored) {
+                    throw new Error("No credentials found in localStorage");
+                }
+                const creds = JSON.parse(stored);
+                if (!creds.username || !creds.password || !creds.appToken) {
+                    throw new Error("Incomplete credentials in localStorage");
+                }
+                if (this.debug) {
+                    console.log("[TicketLocalStorageSessionSource] Fetched credentials from localStorage");
+                }
+                return creds;
+            }
+            catch (error) {
+                if (this.debug) {
+                    console.error("[TicketLocalStorageSessionSource] Failed to fetch credentials:", error);
+                }
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                throw new Error(`localStorage error: ${errorMessage}`);
+            }
+        }
+        async refreshCredentials() {
+            if (this.debug) {
+                console.log("[TicketLocalStorageSessionSource] Refreshing credentials from localStorage");
+            }
+            return this.getCredentials();
+        }
+        setCredentials(creds) {
+            if (typeof window === "undefined" || !window.localStorage) {
+                throw new Error("localStorage is not available");
+            }
+            window.localStorage.setItem(this.storageKey, JSON.stringify(creds));
+            if (this.debug) {
+                console.log("[TicketLocalStorageSessionSource] Stored credentials in localStorage");
+            }
+        }
+        clearCredentials() {
+            if (typeof window === "undefined" || !window.localStorage) {
+                return;
+            }
+            window.localStorage.removeItem(this.storageKey);
+            if (this.debug) {
+                console.log("[TicketLocalStorageSessionSource] Cleared credentials from localStorage");
+            }
+        }
+    }
+    class TicketPromptSessionSource {
+        promptCallback;
+        debug;
+        localStorageSource;
+        constructor(config) {
+            this.promptCallback = config.promptCallback;
+            this.debug = config.debug || false;
+            if (config.localStorageConfig) {
+                this.localStorageSource = new TicketLocalStorageSessionSource({
+                    ...config.localStorageConfig,
+                    debug: config.localStorageConfig.debug || this.debug,
+                });
+            }
+        }
+        async getCredentials() {
+            // Try localStorage first if configured
+            if (this.localStorageSource) {
+                try {
+                    const creds = await this.localStorageSource.getCredentials();
+                    if (this.debug) {
+                        console.log("[TicketPromptSessionSource] Fetched credentials from localStorage");
+                    }
+                    return creds;
+                }
+                catch (error) {
+                    if (this.debug) {
+                        console.log("[TicketPromptSessionSource] No valid credentials in localStorage, falling back to prompt:", error);
+                    }
+                }
+            }
+            // Fall back to client prompt
+            try {
+                const creds = await this.promptCallback();
+                if (!creds.username || !creds.password || !creds.appToken) {
+                    throw new Error("Client prompt returned incomplete credentials");
+                }
+                // Store in localStorage if configured
+                if (this.localStorageSource) {
+                    this.localStorageSource.setCredentials(creds);
+                    if (this.debug) {
+                        console.log("[TicketPromptSessionSource] Stored prompted credentials in localStorage");
+                    }
+                }
+                if (this.debug) {
+                    console.log("[TicketPromptSessionSource] Fetched credentials from client prompt");
+                }
+                return creds;
+            }
+            catch (error) {
+                if (this.debug) {
+                    console.error("[TicketPromptSessionSource] Failed to fetch credentials:", error);
+                }
+                const errorMessage = error instanceof Error ? error.message : "Unknown error";
+                throw new Error(`Client prompt error: ${errorMessage}`);
+            }
+        }
+        async refreshCredentials() {
+            if (this.debug) {
+                console.log("[TicketPromptSessionSource] Refreshing credentials");
+            }
+            // If using localStorage, clear it to force a new prompt
+            if (this.localStorageSource) {
+                this.localStorageSource.clearCredentials();
+                if (this.debug) {
+                    console.log("[TicketPromptSessionSource] Cleared localStorage for refresh");
+                }
+            }
+            return this.getCredentials();
+        }
+        clearCredentials() {
+            if (this.localStorageSource) {
+                this.localStorageSource.clearCredentials();
+                if (this.debug) {
+                    console.log("[TicketPromptSessionSource] Cleared stored credentials");
+                }
+            }
+        }
+    }
+
     function quickbase(config) {
-        const { realm, userToken, tempToken, useTempTokens = false, useSso = false, samlToken, fetchApi, debug, convertDates = true, tempTokenLifespan = 290000, throttle = { type: "flow", rate: 5, burst: 50 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
+        const { realm, userToken, tempToken, credentialSource, ticketPromptSessionSource, ticketLocalStorageSessionSource, ticketInMemorySessionSource, useTempTokens = false, useSso = false, useTicketAuth = false, samlToken, fetchApi, debug = false, convertDates = true, tempTokenLifespan = 290000, ticketLifespanHours = 12, ticketRefreshThreshold = 0.1, throttle = { type: "flow", rate: 5, burst: 50 }, maxRetries = 3, retryDelay = 1000, tokenCache: providedTokenCache, ticketCache: providedTicketCache, baseUrl = "https://api.quickbase.com/v1", autoPaginate = true, } = config;
+        // Validate required config
+        if (!realm) {
+            throw new Error("QuickbaseConfig must include a valid 'realm'");
+        }
+        if (useTicketAuth &&
+            !credentialSource &&
+            !ticketPromptSessionSource &&
+            !ticketLocalStorageSessionSource &&
+            !ticketInMemorySessionSource) {
+            throw new Error("Ticket authentication requires a 'credentialSource', 'ticketPromptSessionSource', 'ticketLocalStorageSessionSource', or 'ticketInMemorySessionSource'");
+        }
+        if (useSso && !samlToken) {
+            throw new Error("SSO authentication requires a 'samlToken'");
+        }
+        if (!useTicketAuth && !useSso && !useTempTokens && !userToken) {
+            throw new Error("At least one authentication method must be provided (userToken, useTempTokens, useSso, or useTicketAuth)");
+        }
         const tokenCache = providedTokenCache || new TokenCache(tempTokenLifespan);
+        const ticketCache = providedTicketCache ||
+            (typeof window !== "undefined" && window.localStorage
+                ? new LocalStorageTicketCache()
+                : new InMemoryCache());
         const throttleOptions = throttle;
         const throttleBucket = throttleOptions.type === "burst-aware"
             ? new BurstAwareThrottleBucket({
@@ -8226,11 +8803,42 @@
             throw new Error("No fetch implementation available. Please provide fetchApi in a Node.js environment without native fetch.");
         }
         const effectiveFetch = fetchApi || defaultFetch;
-        const authStrategy = useSso
-            ? new SsoTokenStrategy(samlToken || "", realm, effectiveFetch, debug, baseUrl)
-            : useTempTokens
-                ? new TempTokenStrategy(tokenCache, tempToken, effectiveFetch, realm, baseUrl)
-                : new UserTokenStrategy(userToken || "", baseUrl);
+        // Set up authentication strategy
+        let authStrategy;
+        if (useSso) {
+            authStrategy = new SsoTokenStrategy(samlToken, realm, effectiveFetch, debug, baseUrl);
+        }
+        else if (useTicketAuth) {
+            let effectiveCredentialSource;
+            if (credentialSource) {
+                effectiveCredentialSource = credentialSource;
+            }
+            else if (ticketPromptSessionSource) {
+                effectiveCredentialSource = new TicketPromptSessionSource(ticketPromptSessionSource);
+            }
+            else if (ticketLocalStorageSessionSource) {
+                effectiveCredentialSource = new TicketLocalStorageSessionSource({
+                    ...ticketLocalStorageSessionSource,
+                    debug: ticketLocalStorageSessionSource.debug || debug,
+                });
+            }
+            else if (ticketInMemorySessionSource) {
+                effectiveCredentialSource = new TicketInMemorySessionSource(ticketInMemorySessionSource.initialCredentials, ticketInMemorySessionSource.debug || debug);
+            }
+            else {
+                throw new Error("No valid credential source provided for ticket authentication");
+            }
+            authStrategy = new TicketTokenStrategy(effectiveCredentialSource, realm, effectiveFetch, tokenCache, ticketCache, debug, ticketLifespanHours, ticketRefreshThreshold, baseUrl);
+        }
+        else if (useTempTokens) {
+            authStrategy = new TempTokenStrategy(tokenCache, tempToken, effectiveFetch, realm, baseUrl);
+        }
+        else {
+            authStrategy = new UserTokenStrategy(userToken || "", baseUrl);
+        }
+        if (debug) {
+            console.log("[quickbase] Selected auth strategy:", authStrategy.constructor.name);
+        }
         const baseHeaders = {
             "QB-Realm-Hostname": `${realm}.quickbase.com`,
             "Content-Type": "application/json",
@@ -8319,9 +8927,9 @@
                     return (params = {}) => invokeMethod(methodName, params, methodMap, baseHeaders, authStrategy, rateLimiter, transformDates, debug, convertDates, currentAutoPaginate, 0, rateLimiter.maxRetries + 1, false, paginationLimit);
                 }
                 if (debug) {
-                    console.log("[proxy] Method not found:", prop);
+                    console.error("[proxy] Method not found:", prop);
                 }
-                return undefined;
+                throw new Error(`Method '${prop}' not found in QuickbaseClient`);
             },
         };
         const proxy = new Proxy({}, proxyHandler);
@@ -8329,8 +8937,23 @@
         proxy.withPaginationDisabled;
         proxy.withPaginationLimit;
         if (debug) {
-            console.log("[createClient] Config:", config);
-            console.log("[createClient] Returning proxy");
+            console.log("[quickbase] Config:", {
+                realm,
+                useSso,
+                useTicketAuth,
+                useTempTokens,
+                hasUserToken: !!userToken,
+                debug,
+                tempTokenLifespan,
+                ticketLifespanHours,
+                ticketRefreshThreshold,
+                throttle,
+                maxRetries,
+                retryDelay,
+                baseUrl,
+                autoPaginate,
+            });
+            console.log("[quickbase] Returning proxy");
         }
         return proxy;
     }

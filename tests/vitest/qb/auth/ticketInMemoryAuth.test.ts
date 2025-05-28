@@ -1,4 +1,4 @@
-// tests/vitest/qb/auth/ticketAuthRetry.test.ts
+// tests/vitest/qb/auth/ticketInMemoryAuth.test.ts
 import { test, expect, beforeAll, beforeEach } from "vitest";
 import { vi } from "vitest";
 import {
@@ -14,6 +14,7 @@ import {
   TicketCacheEntry,
   TicketData,
 } from "../../../../src/cache/TicketCache";
+import { TicketInMemorySessionSource } from "../../../../src/auth/credential-sources/credentialSources";
 
 beforeAll(() => {
   const requiredEnvVars = [
@@ -40,7 +41,7 @@ beforeEach(() => {
 });
 
 test.skipIf(process.env.CI)(
-  "QuickbaseClient Integration - runQuery with 401 Retry Requiring Ticket Refresh and Custom 24-Hour Lifespan (Mocked)",
+  "QuickbaseClient Integration - runQuery with TicketInMemorySessionSource and 401 Retry Requiring Ticket Refresh (Mocked)",
   { timeout: 60000 },
   async () => {
     const realm = process.env.QB_REALM || "";
@@ -56,8 +57,20 @@ test.skipIf(process.env.CI)(
       );
     }
 
-    const tokenCache = new TokenCache(300000);
+    const tokenCache = new TokenCache(3600000); // 1 hour lifespan to avoid premature refreshes
     const ticketCache = new LocalStorageTicketCache<TicketData>();
+
+    // Mock localStorage for tickets
+    const localStorageMock = (() => {
+      let store: Record<string, string> = {};
+      return {
+        getItem: (key: string) => store[key] || null,
+        setItem: (key: string, value: string) => (store[key] = value),
+        removeItem: (key: string) => delete store[key],
+        clear: () => (store = {}),
+      };
+    })();
+    vi.stubGlobal("window", { localStorage: localStorageMock });
 
     // Mock API_Authenticate (first ticket, 24 hours)
     mockFetch.mockImplementationOnce(async (url, options) => {
@@ -118,27 +131,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getApp request: ${url}`);
     });
 
-    // Mock getTempTokenDBID for appId (getAppTables)
-    mockFetch.mockImplementationOnce(async (url, options) => {
-      console.log("[mockFetch] getTempTokenDBID (appId for getAppTables):", {
-        url,
-        options,
-      });
-      if (
-        url === `https://api.quickbase.com/v1/auth/temporary/${appId}` &&
-        options.headers["Authorization"] === "QB-TICKET integration-ticket-123"
-      ) {
-        return new Response(
-          JSON.stringify({
-            temporaryAuthorization: "integration-temp-token-app-456",
-          }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
-      }
-      throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
-    });
-
-    // Mock getAppTables
+    // Mock getAppTables (reuses cached token)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] getAppTables:", { url, options });
       if (
@@ -190,27 +183,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getFields request: ${url}`);
     });
 
-    // Mock getTempTokenDBID for tableId (runQuery, first attempt)
-    mockFetch.mockImplementationOnce(async (url, options) => {
-      console.log("[mockFetch] getTempTokenDBID (tableId for runQuery):", {
-        url,
-        options,
-      });
-      if (
-        url === `https://api.quickbase.com/v1/auth/temporary/${tableId}` &&
-        options.headers["Authorization"] === "QB-TICKET integration-ticket-123"
-      ) {
-        return new Response(
-          JSON.stringify({
-            temporaryAuthorization: "integration-temp-token-456",
-          }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
-      }
-      throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
-    });
-
-    // Mock runQuery (401 error on first attempt)
+    // Mock runQuery (401 error on first attempt, reuses cached token)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] runQuery (401):", { url, options });
       if (
@@ -299,9 +272,12 @@ test.skipIf(process.env.CI)(
       ) {
         return new Response(
           JSON.stringify({
-            data: [{ 6: { value: "integration-test" } }],
+            data: [{ 3: { value: 1 }, 6: { value: "integration-test" } }],
             metadata: { totalRecords: 1, numRecords: 1, skip: 0 },
-            fields: [{ id: 6, label: "Field6", type: "text" }],
+            fields: [
+              { id: 3, label: "Record ID#", type: "recordid" },
+              { id: 6, label: "Field6", type: "text" },
+            ],
           }),
           { status: 200, headers: { "Content-Type": "application/json" } }
         );
@@ -309,32 +285,26 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected runQuery request: ${url}`);
     });
 
-    const localStorageMock = (() => {
-      let store: Record<string, string> = {};
-      return {
-        getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => (store[key] = value),
-        removeItem: (key: string) => delete store[key],
-        clear: () => (store = {}),
-      };
-    })();
-    vi.stubGlobal("window", { localStorage: localStorageMock });
-
     const client = createClient(mockFetch, {
       realm,
-      credentials: { username, password, appToken },
       useTicketAuth: true,
       debug: true,
       ticketLifespanHours: 24,
       ticketCache,
       tokenCache,
+      ticketInMemorySessionSource: {
+        initialCredentials: { username, password, appToken },
+        debug: true,
+      },
     });
 
     try {
+      // Validate getApp
       const appResponse = await client.getApp({ appId });
       expect(appResponse.id).toEqual(appId);
       console.log("[Integration] Validated app:", appResponse.name);
 
+      // Validate getAppTables
       const tablesResponse = await client.getAppTables({ appId });
       const tableExists = tablesResponse.some((table) => table.id === tableId);
       expect(tableExists).toBe(
@@ -343,6 +313,7 @@ test.skipIf(process.env.CI)(
       );
       console.log("[Integration] Validated table ID:", tableId);
 
+      // Validate getFields
       const fieldsResponse = await client.getFields({ tableId });
       expect(fieldsResponse.length).toBeGreaterThan(
         0,
@@ -351,18 +322,22 @@ test.skipIf(process.env.CI)(
       const fieldId = fieldsResponse[0].id;
       console.log("[Integration] Using field ID:", fieldId);
 
+      // Validate runQuery with 401 retry
       const response = await client.runQuery({
         body: { from: tableId, select: [fieldId] },
       });
 
       expect(response.data).toBeDefined();
-      expect(response.data).toEqual([{ 6: { value: "integration-test" } }]);
+      expect(response.data).toEqual([
+        { 3: { value: 1 }, 6: { value: "integration-test" } },
+      ]);
       expect(response.metadata).toEqual({
         totalRecords: 1,
         numRecords: 1,
         skip: 0,
       });
 
+      // Validate cached ticket
       const cachedEntry = localStorageMock.getItem("quickbase-ticket:ticket");
       expect(cachedEntry).toBeDefined();
       const parsedEntry: TicketCacheEntry<TicketData> = JSON.parse(
@@ -374,7 +349,7 @@ test.skipIf(process.env.CI)(
       );
 
       console.log(
-        "TicketTokenStrategy: Successfully executed runQuery with 401 retry requiring ticket refresh."
+        "TicketInMemorySessionSource: Successfully executed runQuery with 401 retry requiring ticket refresh."
       );
     } catch (error) {
       console.error("[Integration] Error:", error);

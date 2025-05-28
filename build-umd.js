@@ -1,8 +1,11 @@
+// build-umd.js
 import { rimrafSync } from "rimraf";
 import { join } from "path";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import terser from "@rollup/plugin-terser";
+import { readdirSync, existsSync } from "fs";
+
 import {
   copyAndRewriteTsExtensions,
   compileTypeScript,
@@ -22,6 +25,26 @@ rimrafSync("dist/temp-src");
 // Copy and rewrite TS files
 copyAndRewriteTsExtensions(srcDir, tempSrcDir);
 
+// Wait to ensure file writes are complete
+await new Promise((resolve) => setTimeout(resolve, 1000));
+
+// Verify that dist/temp-src/ contains files
+const tempSrcFiles = readdirSync(tempSrcDir, { recursive: true });
+if (tempSrcFiles.length === 0) {
+  console.error("Error: No files found in dist/temp-src/. Aborting build.");
+  process.exit(1);
+}
+console.log(`Found ${tempSrcFiles.length} files in dist/temp-src/`);
+
+// Verify critical file exists
+const criticalFile = join(tempSrcDir, "client", "quickbaseClient.ts");
+if (!existsSync(criticalFile)) {
+  console.error(
+    `Error: Critical file ${criticalFile} not found. Aborting build.`
+  );
+  process.exit(1);
+}
+
 // Compile TypeScript
 compileTypeScript();
 
@@ -31,13 +54,13 @@ console.log("Building UMD bundles...");
 // Generate unminified UMD bundle
 console.log("Building unminified UMD bundle...");
 await createBundle(
-  "dist/temp/quickbaseClient.js",
-  [nodeResolve({ preferBuiltins: true, browser: true }), commonjs()],
+  "dist/temp/client/quickbaseClient.js", // Updated entry point
+  [nodeResolve({ preferBuiltins: false, browser: true }), commonjs()],
   "umd",
   {
     file: join(process.cwd(), "dist/umd", "quickbase.umd.js"),
     format: "umd",
-    name: "QuickbaseJS",
+    name: "QuickBase", // Consistent with current version
     sourcemap: true,
     globals,
   }
@@ -46,15 +69,15 @@ await createBundle(
 // Generate minified UMD bundle
 console.log("Building minified UMD bundle...");
 await createBundle(
-  "dist/temp/quickbaseClient.js",
+  "dist/temp/client/quickbaseClient.js",
   [
-    nodeResolve({ preferBuiltins: true, browser: true }),
+    nodeResolve({ preferBuiltins: false, browser: true }),
     commonjs(),
     terser({
-      keep_fnames: true, // Preserve function names for generated API methods
+      keep_fnames: true,
       mangle: {
         properties: {
-          regex: /^(withPaginationDisabled|withPaginationLimit)$/, // Preserve only these property names
+          regex: /^(withPaginationDisabled|withPaginationLimit)$/,
         },
       },
     }),
@@ -63,7 +86,7 @@ await createBundle(
   {
     file: join(process.cwd(), "dist/umd", "quickbase.umd.min.js"),
     format: "umd",
-    name: "QuickbaseJS",
+    name: "QuickBase",
     sourcemap: true,
     globals,
   }

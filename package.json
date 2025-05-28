@@ -30,6 +30,7 @@
   ],
   "scripts": {
     "build": "npm run build:esm && npm run build:umd",
+    "clean": "rimraf dist",
     "build:esm": "rimraf dist/esm dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-esm.js",
     "build:umd": "rimraf dist/umd dist/temp dist/temp-src && node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' build-umd.js",
     "release:prepare": "standard-version",

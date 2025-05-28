@@ -1511,8 +1511,8 @@ tree:
                 import
                 {
                   AuthorizationStrategy,
+                  CredentialSource,
                   Credentials,
-                  CredentialProvider,
                   TicketData,
                 }
                 from
@@ -1560,8 +1560,7 @@ tree:
                   private pendingTokenFetches: Map<string, Promise<string>> = new Map();
 
                   constructor(
-                    private credentials: Credentials,
-                    private credentialProvider: CredentialProvider | undefined,
+                    private credentialSource: CredentialSource,
                     private realm: string,
                     private fetchApi: typeof fetch,
                     private tokenCache: TokenCache,
@@ -1569,28 +1568,45 @@ tree:
                     private debug: boolean = false,
                     private ticketLifespanHours: number = 12,
                     private ticketRefreshThreshold: number = 0.1,
-                    private baseUrl: string = "https://api.quickbase.com/v1"
+                    private baseUrl: string = "https://api.quickbase.com/v1",
+                    private tempTokenLifespan: number = 3600 * 1000 // Added for type safety
                   ) {
                     this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000;
                   }
 
                   private ticketLifespan: number;
 
-                  private async getCredentials(): Promise<Credentials> {
-                    if (this.credentialProvider) {
-                      const creds = await this.credentialProvider();
+                  private async getCredentials(refresh: boolean = false): Promise<Credentials> {
+                    try {
+                      const creds =
+                        refresh && this.credentialSource.refreshCredentials
+                          ? await this.credentialSource.refreshCredentials()
+                          : await this.credentialSource.getCredentials();
+                      if (!creds.username || !creds.password || !creds.appToken) {
+                        throw new Error("CredentialSource returned incomplete credentials");
+                      }
                       if (this.debug) {
-                        console.log("[TicketTokenStrategy] Fetched credentials via provider");
+                        console.log(
+                          `[TicketTokenStrategy] Fetched credentials${
+                            refresh ? " (refreshed)" : ""
+                          }`
+                        );
                       }
                       return creds;
+                    } catch (error: unknown) {
+                      if (this.debug) {
+                        console.error(
+                          "[TicketTokenStrategy] Failed to fetch credentials:",
+                          error
+                        );
+                      }
+                      const errorMessage =
+                        error instanceof Error ? error.message : "Unknown error";
+                      throw new Error(`CredentialSource error: ${errorMessage}`);
                     }
-                    if (this.debug) {
-                      console.log("[TicketTokenStrategy] Using stored credentials");
-                    }
-                    return this.credentials;
                   }
 
-                  private async fetchTicket(credentials: Credentials): Promise<TicketData> {
+                  private async fetchTicket(): Promise<TicketData> {
                     if (this.pendingTicketFetch) {
                       if (this.debug) {
                         console.log("[TicketTokenStrategy] Waiting for pending ticket fetch");
@@ -1600,6 +1616,7 @@ tree:
 
                     this.pendingTicketFetch = (async () => {
                       try {
+                        const credentials = await this.getCredentials();
                         const response = await this.fetchApi(
                           `https://${this.realm}.quickbase.com/db/main`,
                           {
@@ -1616,12 +1633,12 @@ tree:
                               Referer: `https://${this.realm}.quickbase.com`,
                             },
                             body: `<?xml version="1.0" ?>
-                              <qdbapi>
-                                <username>${credentials.username}</username>
-                                <password>${credentials.password}</password>
-                                <hours>${this.ticketLifespanHours}</hours>
-                                <udata>auth_request</udata>
-                              </qdbapi>`,
+                            <qdbapi>
+                              <username>${credentials.username}</username>
+                              <password>${credentials.password}</password>
+                              <hours>${this.ticketLifespanHours}</hours>
+                              <udata>auth_request</udata>
+                            </qdbapi>`,
                           }
                         );
 
@@ -1703,8 +1720,7 @@ tree:
                           );
                         }
                         await this.ticketCache.delete("ticket");
-                        const credentials = await this.getCredentials();
-                        return this.fetchTicket(credentials);
+                        return this.fetchTicket();
                       }
                       if (this.debug) {
                         console.log("[TicketTokenStrategy] Using cached ticket");
@@ -1713,8 +1729,7 @@ tree:
                     }
 
                     await this.ticketCache.delete("ticket");
-                    const credentials = await this.getCredentials();
-                    return this.fetchTicket(credentials);
+                    return this.fetchTicket();
                   }
 
                   private async fetchTempToken(dbid: string): Promise<string> {
@@ -1800,9 +1815,7 @@ tree:
                     if (cachedEntry) {
                       const now = Date.now();
                       const timeLeft = cachedEntry.expiresAt - now;
-                      const threshold =
-                        (this.tokenCache as any).tempTokenLifespan *
-                        this.ticketRefreshThreshold;
+                      const threshold = this.tempTokenLifespan * this.ticketRefreshThreshold;
                       if (timeLeft < threshold) {
                         if (this.debug) {
                           console.log(
@@ -1847,7 +1860,7 @@ tree:
                       return null;
                     }
 
-                    if (attempt >= maxAttempts - 1) {
+                    if (attempt >= maxAttempts) {
                       if (debug || this.debug) {
                         console.error(
                           `[TicketTokenStrategy] Exhausted retries (${maxAttempts}) for ${
@@ -1878,63 +1891,87 @@ tree:
                       );
                     }
 
+                    // First attempt: Refresh temp token
+                    this.tokenCache.delete(dbid);
                     try {
-                      this.tokenCache.delete(dbid);
-                      let newToken = await this.getToken(dbid);
+                      const newToken = await this.getToken(dbid);
                       if (newToken) {
                         if (debug || this.debug) {
                           console.log(
                             `[TicketTokenStrategy] Retrying ${
                               methodName || "method"
-                            } with new token: ${newToken.substring(0, 10)}...`
+                            } with new token: ${newToken.substring(0, 8)}...`
                           );
                         }
                         return newToken;
                       }
-
+                    } catch (error: unknown) {
                       if (debug || this.debug) {
-                        console.log(
-                          `[TicketTokenStrategy] Token refresh failed, attempting ticket refresh for ${
+                        const errorMessage =
+                          error instanceof Error ? error.message : "Unknown error";
+                        console.error(
+                          `[TicketTokenStrategy] Token refresh failed for ${
                             methodName || "method"
-                          }`
+                          }:`,
+                          errorMessage
                         );
                       }
-                      await this.ticketCache.delete("ticket");
-                      newToken = await this.getToken(dbid);
+                      // Check if error is ApiError with status
+                      if (
+                        error instanceof Error &&
+                        "status" in error &&
+                        typeof (error as ApiError).status === "number" &&
+                        (error as ApiError).status !== 401
+                      ) {
+                        throw error; // Rethrow non-401 errors
+                      }
+                      // 401 error or non-ApiError: Proceed to ticket refresh
+                    }
+
+                    // Second attempt: Refresh ticket and retry
+                    if (debug || this.debug) {
+                      console.log(
+                        `[TicketTokenStrategy] Attempting ticket refresh for ${
+                          methodName || "method"
+                        }`
+                      );
+                    }
+                    await this.ticketCache.delete("ticket");
+                    try {
+                      const credentials = await this.getCredentials(true); // Request refreshed credentials
+                      const newToken = await this.getToken(dbid);
                       if (newToken) {
                         if (debug || this.debug) {
                           console.log(
                             `[TicketTokenStrategy] Retrying ${
                               methodName || "method"
-                            } with token after ticket refresh: ${newToken.substring(0, 10)}...`
+                            } with token after ticket refresh: ${newToken.substring(0, 8)}...`
                           );
                         }
                         return newToken;
                       }
-
+                    } catch (error: unknown) {
                       if (debug || this.debug) {
+                        const errorMessage =
+                          error instanceof Error ? error.message : "Unknown error";
                         console.error(
                           `[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${
                             methodName || "method"
-                          }`
-                        );
-                      }
-                      return null;
-                    } catch (error: any) {
-                      if (debug || this.debug) {
-                        console.error(
-                          `[TicketTokenStrategy] Error during refresh for ${
-                            methodName || "method"
                           }:`,
-                          error.message || error
+                          errorMessage
                         );
                       }
-                      // Allow retry for 401 errors
-                      if (error.status === 401) {
-                        return null;
-                      }
-                      throw error;
+                      throw error; // Rethrow to allow invokeMethod to handle retries
                     }
+
+                    if (debug || this.debug) {
+                      console.error(
+                        `[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${
+                          methodName || "method"
+                        }`
+                      );
+                    }
+                    return null;
                   }
                 }
             - name: >-
@@ -1988,10 +2025,22 @@ tree:
                   }
                 }
             - name: >-
+                credential-sources
+              type: >-
+                directory
+              children:
+                - name: >-
+                    credentialSources.ts
+                  type: >-
+                    file
+            - name: >-
                 index.ts
               type: >-
                 file
               contents: >
+                //
+                src/auth/index.ts
+
                 export
                 *
                 from
@@ -2021,25 +2070,35 @@ tree:
                 *
                 from
                 "./TicketTokenStrategy";
+
+                export
+                *
+                from
+                "./credential-sources/credentialSources";
+
+
+                //
+                Explicit
+                re-exports
+
+                export
+                {
+                  TicketPromptSessionSource,
+                  TicketPromptCallback,
+                  TicketPromptSessionSourceConfig,
+                  TicketLocalStorageSessionSource,
+                  LocalStorageSessionSourceConfig,
+                  TicketInMemorySessionSource,
+                }
+                from
+                "./credential-sources/credentialSources";
             - name: >-
                 types.ts
               type: >-
                 file
               contents: >
-                import
-                {
-                TokenCache
-                }
-                from
-                "../cache/TokenCache";
-
-                import
-                {
-                TicketCache
-                }
-                from
-                "../cache/TicketCache";
-
+                //
+                src/auth/types.ts
 
                 export
                 interface
@@ -2069,14 +2128,12 @@ tree:
 
 
                 export
-                type
-                CredentialProvider
-                =
-                ()
-                =>
-                Promise<Credentials>
-                |
-                Credentials;
+                interface
+                CredentialSource
+                {
+                  getCredentials(): Promise<Credentials>;
+                  refreshCredentials?(): Promise<Credentials>;
+                }
 
 
                 export
@@ -3128,6 +3185,9 @@ tree:
               type: >-
                 file
               contents: >
+                //
+                src/client/quickbaseClient.ts
+
                 import
                 {
                 QuickbaseClient
@@ -3161,6 +3221,15 @@ tree:
 
                 import
                 {
+                  TicketCache,
+                  InMemoryCache,
+                  LocalStorageTicketCache,
+                }
+                from
+                "../cache/TicketCache";
+
+                import
+                {
                   simplifyName,
                   getParamNames,
                   transformDates,
@@ -3176,19 +3245,6 @@ tree:
                 }
                 from
                 "./invokeMethod";
-
-                import
-                {
-                  TempTokenStrategy,
-                  UserTokenStrategy,
-                  AuthorizationStrategy,
-                  SsoTokenStrategy,
-                  TicketTokenStrategy,
-                  CredentialProvider,
-                  Credentials,
-                }
-                from
-                "../auth";
 
                 import
                 {
@@ -3213,12 +3269,38 @@ tree:
 
                 import
                 {
-                  TicketCache,
-                  InMemoryCache,
-                  LocalStorageTicketCache,
+                  CredentialSource,
+                  AuthorizationStrategy,
+                  TempTokenStrategy,
+                  UserTokenStrategy,
+                  SsoTokenStrategy,
+                  TicketTokenStrategy,
+                  Credentials,
                 }
                 from
-                "../cache/TicketCache";
+                "../auth";
+                //
+                Strategies
+                and
+                types
+                from
+                auth
+
+                import
+                {
+                  TicketPromptSessionSource,
+                  TicketPromptSessionSourceConfig,
+                  TicketLocalStorageSessionSource,
+                  LocalStorageSessionSourceConfig,
+                  TicketInMemorySessionSource,
+                  TicketPromptCallback,
+                }
+                from
+                "../auth/credential-sources/credentialSources";
+                //
+                Credential
+                sources
+
 
                 export
                 *
@@ -3244,8 +3326,13 @@ tree:
                   realm: string;
                   userToken?: string;
                   tempToken?: string;
-                  credentials?: Credentials;
-                  credentialProvider?: CredentialProvider;
+                  credentialSource?: CredentialSource;
+                  ticketPromptSessionSource?: TicketPromptSessionSourceConfig;
+                  ticketLocalStorageSessionSource?: LocalStorageSessionSourceConfig;
+                  ticketInMemorySessionSource?: {
+                    initialCredentials?: Credentials;
+                    debug?: boolean;
+                  };
                   useTempTokens?: boolean;
                   useSso?: boolean;
                   useTicketAuth?: boolean;
@@ -3255,7 +3342,7 @@ tree:
                   convertDates?: boolean;
                   tempTokenLifespan?: number;
                   ticketLifespanHours?: number;
-                  ticketRefreshThreshold?: number; // Renamed: Threshold for proactive token/ticket refresh (0 to 1)
+                  ticketRefreshThreshold?: number;
                   throttle?: {
                     type?: "flow" | "burst-aware";
                     rate?: number;
@@ -3295,7 +3382,11 @@ tree:
                 MethodMap
                 =
                 {
-                  [K in keyof QuickbaseClient]: MethodInfo<K>;
+                [K
+                in
+                keyof
+                QuickbaseClient]:
+                MethodInfo<K>
                 };
 
 
@@ -3309,8 +3400,10 @@ tree:
                     realm,
                     userToken,
                     tempToken,
-                    credentials,
-                    credentialProvider,
+                    credentialSource,
+                    ticketPromptSessionSource,
+                    ticketLocalStorageSessionSource,
+                    ticketInMemorySessionSource,
                     useTempTokens = false,
                     useSso = false,
                     useTicketAuth = false,
@@ -3320,7 +3413,7 @@ tree:
                     convertDates = true,
                     tempTokenLifespan = 290000,
                     ticketLifespanHours = 12,
-                    ticketRefreshThreshold = 0.1, // Renamed: Default to 10% of lifespan
+                    ticketRefreshThreshold = 0.1,
                     throttle = { type: "flow", rate: 5, burst: 50 },
                     maxRetries = 3,
                     retryDelay = 1000,
@@ -3334,9 +3427,15 @@ tree:
                   if (!realm) {
                     throw new Error("QuickbaseConfig must include a valid 'realm'");
                   }
-                  if (useTicketAuth && !credentials && !credentialProvider) {
+                  if (
+                    useTicketAuth &&
+                    !credentialSource &&
+                    !ticketPromptSessionSource &&
+                    !ticketLocalStorageSessionSource &&
+                    !ticketInMemorySessionSource
+                  ) {
                     throw new Error(
-                      "Ticket authentication requires 'credentials' or 'credentialProvider'"
+                      "Ticket authentication requires a 'credentialSource', 'ticketPromptSessionSource', 'ticketLocalStorageSessionSource', or 'ticketInMemorySessionSource'"
                     );
                   }
                   if (useSso && !samlToken) {
@@ -3389,16 +3488,37 @@ tree:
                       baseUrl
                     );
                   } else if (useTicketAuth) {
+                    let effectiveCredentialSource: CredentialSource;
+                    if (credentialSource) {
+                      effectiveCredentialSource = credentialSource;
+                    } else if (ticketPromptSessionSource) {
+                      effectiveCredentialSource = new TicketPromptSessionSource(
+                        ticketPromptSessionSource
+                      );
+                    } else if (ticketLocalStorageSessionSource) {
+                      effectiveCredentialSource = new TicketLocalStorageSessionSource({
+                        ...ticketLocalStorageSessionSource,
+                        debug: ticketLocalStorageSessionSource.debug || debug,
+                      });
+                    } else if (ticketInMemorySessionSource) {
+                      effectiveCredentialSource = new TicketInMemorySessionSource(
+                        ticketInMemorySessionSource.initialCredentials,
+                        ticketInMemorySessionSource.debug || debug
+                      );
+                    } else {
+                      throw new Error(
+                        "No valid credential source provided for ticket authentication"
+                      );
+                    }
                     authStrategy = new TicketTokenStrategy(
-                      credentials || { username: "", password: "", appToken: "" },
-                      credentialProvider,
+                      effectiveCredentialSource,
                       realm,
                       effectiveFetch,
                       tokenCache,
                       ticketCache,
                       debug,
                       ticketLifespanHours,
-                      ticketRefreshThreshold, // Renamed: Pass ticketRefreshThreshold
+                      ticketRefreshThreshold,
                       baseUrl
                     );
                   } else if (useTempTokens) {
@@ -3570,7 +3690,7 @@ tree:
                       debug,
                       tempTokenLifespan,
                       ticketLifespanHours,
-                      ticketRefreshThreshold, // Renamed
+                      ticketRefreshThreshold,
                       throttle,
                       maxRetries,
                       retryDelay,
@@ -4818,6 +4938,18 @@ tree:
                       type: >-
                         file
                     - name: >-
+                        ticketInMemoryAuth.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        ticketLocalStorageAuth.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        ticketPromptAuth.test.ts
+                      type: >-
+                        file
+                    - name: >-
                         userTokenConcurrency.test.ts
                       type: >-
                         file
@@ -5019,6 +5151,18 @@ tree:
                         file
                     - name: >-
                         ticketAuth.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        ticketInMemorySessionSource.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        ticketLocalStorageSessionSource.test.ts
+                      type: >-
+                        file
+                    - name: >-
+                        ticketPromptSessionSource.test.ts
                       type: >-
                         file
                     - name: >-

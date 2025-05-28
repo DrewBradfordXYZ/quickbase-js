@@ -1,6 +1,4 @@
-import { TokenCache } from "../cache/TokenCache";
-import { TicketCache } from "../cache/TicketCache";
-
+// src/auth/types.ts
 export interface AuthorizationStrategy {
   getToken(dbid: string): Promise<string | undefined>;
   applyHeaders(headers: Record<string, string>, token: string): void;
@@ -20,7 +18,10 @@ export interface Credentials {
   appToken: string;
 }
 
-export type CredentialProvider = () => Promise<Credentials> | Credentials;
+export interface CredentialSource {
+  getCredentials(): Promise<Credentials>;
+  refreshCredentials?(): Promise<Credentials>;
+}
 
 export interface TicketData {
   ticket: string;

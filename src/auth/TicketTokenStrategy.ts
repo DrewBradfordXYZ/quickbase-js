@@ -1,10 +1,9 @@
 // src/auth/TicketTokenStrategy.ts
-
 import { parseStringPromise } from "xml2js";
 import {
   AuthorizationStrategy,
+  CredentialSource,
   Credentials,
-  CredentialProvider,
   TicketData,
 } from "./types";
 import { TokenCache } from "../cache/TokenCache";
@@ -21,8 +20,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
   private pendingTokenFetches: Map<string, Promise<string>> = new Map();
 
   constructor(
-    private credentials: Credentials,
-    private credentialProvider: CredentialProvider | undefined,
+    private credentialSource: CredentialSource,
     private realm: string,
     private fetchApi: typeof fetch,
     private tokenCache: TokenCache,
@@ -30,28 +28,45 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     private debug: boolean = false,
     private ticketLifespanHours: number = 12,
     private ticketRefreshThreshold: number = 0.1,
-    private baseUrl: string = "https://api.quickbase.com/v1"
+    private baseUrl: string = "https://api.quickbase.com/v1",
+    private tempTokenLifespan: number = 3600 * 1000 // Added for type safety
   ) {
     this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000;
   }
 
   private ticketLifespan: number;
 
-  private async getCredentials(): Promise<Credentials> {
-    if (this.credentialProvider) {
-      const creds = await this.credentialProvider();
+  private async getCredentials(refresh: boolean = false): Promise<Credentials> {
+    try {
+      const creds =
+        refresh && this.credentialSource.refreshCredentials
+          ? await this.credentialSource.refreshCredentials()
+          : await this.credentialSource.getCredentials();
+      if (!creds.username || !creds.password || !creds.appToken) {
+        throw new Error("CredentialSource returned incomplete credentials");
+      }
       if (this.debug) {
-        console.log("[TicketTokenStrategy] Fetched credentials via provider");
+        console.log(
+          `[TicketTokenStrategy] Fetched credentials${
+            refresh ? " (refreshed)" : ""
+          }`
+        );
       }
       return creds;
+    } catch (error: unknown) {
+      if (this.debug) {
+        console.error(
+          "[TicketTokenStrategy] Failed to fetch credentials:",
+          error
+        );
+      }
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      throw new Error(`CredentialSource error: ${errorMessage}`);
     }
-    if (this.debug) {
-      console.log("[TicketTokenStrategy] Using stored credentials");
-    }
-    return this.credentials;
   }
 
-  private async fetchTicket(credentials: Credentials): Promise<TicketData> {
+  private async fetchTicket(): Promise<TicketData> {
     if (this.pendingTicketFetch) {
       if (this.debug) {
         console.log("[TicketTokenStrategy] Waiting for pending ticket fetch");
@@ -61,6 +76,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
 
     this.pendingTicketFetch = (async () => {
       try {
+        const credentials = await this.getCredentials();
         const response = await this.fetchApi(
           `https://${this.realm}.quickbase.com/db/main`,
           {
@@ -77,12 +93,12 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
               Referer: `https://${this.realm}.quickbase.com`,
             },
             body: `<?xml version="1.0" ?>
-              <qdbapi>
-                <username>${credentials.username}</username>
-                <password>${credentials.password}</password>
-                <hours>${this.ticketLifespanHours}</hours>
-                <udata>auth_request</udata>
-              </qdbapi>`,
+            <qdbapi>
+              <username>${credentials.username}</username>
+              <password>${credentials.password}</password>
+              <hours>${this.ticketLifespanHours}</hours>
+              <udata>auth_request</udata>
+            </qdbapi>`,
           }
         );
 
@@ -164,8 +180,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
           );
         }
         await this.ticketCache.delete("ticket");
-        const credentials = await this.getCredentials();
-        return this.fetchTicket(credentials);
+        return this.fetchTicket();
       }
       if (this.debug) {
         console.log("[TicketTokenStrategy] Using cached ticket");
@@ -174,8 +189,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     }
 
     await this.ticketCache.delete("ticket");
-    const credentials = await this.getCredentials();
-    return this.fetchTicket(credentials);
+    return this.fetchTicket();
   }
 
   private async fetchTempToken(dbid: string): Promise<string> {
@@ -261,9 +275,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     if (cachedEntry) {
       const now = Date.now();
       const timeLeft = cachedEntry.expiresAt - now;
-      const threshold =
-        (this.tokenCache as any).tempTokenLifespan *
-        this.ticketRefreshThreshold;
+      const threshold = this.tempTokenLifespan * this.ticketRefreshThreshold;
       if (timeLeft < threshold) {
         if (this.debug) {
           console.log(
@@ -353,19 +365,27 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
         }
         return newToken;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (debug || this.debug) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.error(
           `[TicketTokenStrategy] Token refresh failed for ${
             methodName || "method"
           }:`,
-          error.message || error
+          errorMessage
         );
       }
-      if (error.status !== 401) {
+      // Check if error is ApiError with status
+      if (
+        error instanceof Error &&
+        "status" in error &&
+        typeof (error as ApiError).status === "number" &&
+        (error as ApiError).status !== 401
+      ) {
         throw error; // Rethrow non-401 errors
       }
-      // 401 error: Proceed to ticket refresh
+      // 401 error or non-ApiError: Proceed to ticket refresh
     }
 
     // Second attempt: Refresh ticket and retry
@@ -378,6 +398,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     }
     await this.ticketCache.delete("ticket");
     try {
+      const credentials = await this.getCredentials(true); // Request refreshed credentials
       const newToken = await this.getToken(dbid);
       if (newToken) {
         if (debug || this.debug) {
@@ -389,13 +410,15 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
         }
         return newToken;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (debug || this.debug) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
         console.error(
           `[TicketTokenStrategy] Failed to obtain new token after ticket refresh for ${
             methodName || "method"
           }:`,
-          error.message || error
+          errorMessage
         );
       }
       throw error; // Rethrow to allow invokeMethod to handle retries

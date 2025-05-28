@@ -2,6 +2,7 @@
 import { vi } from "vitest";
 import { quickbase } from "../src/client/quickbaseClient";
 import type { QuickbaseConfig } from "../src/client/quickbaseClient";
+import { TicketInMemorySessionSource } from "../src/auth/credential-sources/credentialSources";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "./.env" });
@@ -10,11 +11,10 @@ export const mockFetch = vi.fn();
 
 export const QB_REALM = process.env.QB_REALM || "builderprogram-dbradford6815";
 export const QB_USER_TOKEN =
-  process.env.QB_USER_TOKEN || "user-token-1234567890";
-export const QB_APP_ID = process.env.QB_APP_ID || "app-id-1234567890";
-export const QB_TABLE_ID_1 = process.env.QB_TABLE_ID_1 || "bck7x8y9z";
-export const QB_TABLE_ID_2 =
-  process.env.QB_TABLE_ID_2 || "table-id-2-1234567890";
+  process.env.QB_USER_TOKEN || "b9f3pk_q4jd_0_b4qu5eebyvuix3xs57ysd7zn3"; // Updated from env
+export const QB_APP_ID = process.env.QB_APP_ID || "buwai2zpe"; // Updated from tests
+export const QB_TABLE_ID_1 = process.env.QB_TABLE_ID_1 || "buwai2zr4"; // Updated to valid table
+export const QB_TABLE_ID_2 = process.env.QB_TABLE_ID_2 || "buwai2zud"; // Updated to valid table
 export const QB_USERNAME =
   process.env.QB_USERNAME || "drewbradfordxyz@gmail.com";
 export const QB_PASSWORD = process.env.QB_PASSWORD || "builder-account2";
@@ -34,30 +34,44 @@ export const createClient = (
   fetchApi?: any,
   config: Partial<QuickbaseConfig> = {}
 ) => {
-  const client = quickbase({
+  const defaultConfig: Partial<QuickbaseConfig> = {
     realm: QB_REALM,
     userToken: QB_USER_TOKEN,
-    credentials: {
-      username: QB_USERNAME,
-      password: QB_PASSWORD,
-      appToken: QB_APP_TOKEN,
-    },
     debug: true,
     fetchApi,
     throttle: { rate: 10, burst: 10 },
-    ...config,
-  });
+    useTicketAuth: false, // Default to UserTokenStrategy
+  };
+
+  const finalConfig: Partial<QuickbaseConfig> = { ...defaultConfig, ...config };
+
+  // Add default credential source for ticket authentication
+  if (
+    finalConfig.useTicketAuth &&
+    !finalConfig.credentialSource &&
+    !finalConfig.ticketPromptSessionSource &&
+    !finalConfig.ticketLocalStorageSessionSource &&
+    !finalConfig.ticketInMemorySessionSource
+  ) {
+    finalConfig.ticketInMemorySessionSource = {
+      initialCredentials: {
+        username: QB_USERNAME,
+        password: QB_PASSWORD,
+        appToken: QB_APP_TOKEN,
+      },
+      debug: finalConfig.debug,
+    };
+  }
+
+  const client = quickbase(finalConfig);
   console.log("[createClient] Config:", {
-    realm: QB_REALM,
-    userToken: QB_USER_TOKEN,
-    credentials: {
-      username: QB_USERNAME,
-      password: QB_PASSWORD,
-      appToken: QB_APP_TOKEN,
-    },
-    debug: true,
-    throttle: { rate: 10, burst: 10 },
-    ...config,
+    realm: finalConfig.realm,
+    userToken: finalConfig.userToken,
+    useTicketAuth: finalConfig.useTicketAuth,
+    ticketInMemorySessionSource: finalConfig.ticketInMemorySessionSource,
+    debug: finalConfig.debug,
+    throttle: finalConfig.throttle,
+    ...finalConfig,
   });
   console.log("[createClient] Returning:", client);
   return client;

@@ -5,13 +5,13 @@
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "declaration": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmitOnError": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": "."
   },
-  "include": ["dist/temp-src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests/**/*",
-    "src/**/*" // Exclude original src/ to avoid confusion
-  ]
+  "include": ["dist/temp-src/**/*.ts"],
+  "exclude": ["node_modules", "tests/**/*", "src/**/*"]
 }

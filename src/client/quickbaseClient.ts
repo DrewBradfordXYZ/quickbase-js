@@ -1,7 +1,13 @@
+// src/client/quickbaseClient.ts
 import { QuickbaseClient as IQuickbaseClient } from "../generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "../generated/runtime";
 import * as apis from "../generated/apis";
 import { TokenCache } from "../cache/TokenCache";
+import {
+  TicketCache,
+  InMemoryCache,
+  LocalStorageTicketCache,
+} from "../cache/TicketCache";
 import {
   simplifyName,
   getParamNames,
@@ -9,23 +15,27 @@ import {
   extractHttpMethod,
 } from "../utils";
 import { invokeMethod, MethodInfo } from "./invokeMethod";
-import {
-  TempTokenStrategy,
-  UserTokenStrategy,
-  AuthorizationStrategy,
-  SsoTokenStrategy,
-  TicketTokenStrategy,
-  CredentialProvider,
-  Credentials,
-} from "../auth";
 import { FlowThrottleBucket } from "../rate-limiting/FlowThrottleBucket";
 import { BurstAwareThrottleBucket } from "../rate-limiting/BurstAwareThrottleBucket";
 import { RateLimiter } from "../rate-limiting/rateLimiter";
 import {
-  TicketCache,
-  InMemoryCache,
-  LocalStorageTicketCache,
-} from "../cache/TicketCache";
+  CredentialSource,
+  AuthorizationStrategy,
+  TempTokenStrategy,
+  UserTokenStrategy,
+  SsoTokenStrategy,
+  TicketTokenStrategy,
+  Credentials,
+} from "../auth"; // Strategies and types from auth
+import {
+  TicketPromptSessionSource,
+  TicketPromptSessionSourceConfig,
+  TicketLocalStorageSessionSource,
+  LocalStorageSessionSourceConfig,
+  TicketInMemorySessionSource,
+  TicketPromptCallback,
+} from "../auth/credential-sources/credentialSources"; // Credential sources
+
 export * from "../generated/models/index";
 
 export interface QuickbaseClient extends IQuickbaseClient {
@@ -37,8 +47,13 @@ export interface QuickbaseConfig {
   realm: string;
   userToken?: string;
   tempToken?: string;
-  credentials?: Credentials;
-  credentialProvider?: CredentialProvider;
+  credentialSource?: CredentialSource;
+  ticketPromptSessionSource?: TicketPromptSessionSourceConfig;
+  ticketLocalStorageSessionSource?: LocalStorageSessionSourceConfig;
+  ticketInMemorySessionSource?: {
+    initialCredentials?: Credentials;
+    debug?: boolean;
+  };
   useTempTokens?: boolean;
   useSso?: boolean;
   useTicketAuth?: boolean;
@@ -48,7 +63,7 @@ export interface QuickbaseConfig {
   convertDates?: boolean;
   tempTokenLifespan?: number;
   ticketLifespanHours?: number;
-  ticketRefreshThreshold?: number; // Renamed: Threshold for proactive token/ticket refresh (0 to 1)
+  ticketRefreshThreshold?: number;
   throttle?: {
     type?: "flow" | "burst-aware";
     rate?: number;
@@ -75,17 +90,17 @@ interface TicketData {
   cookies: string;
 }
 
-type MethodMap = {
-  [K in keyof QuickbaseClient]: MethodInfo<K>;
-};
+type MethodMap = { [K in keyof QuickbaseClient]: MethodInfo<K> };
 
 export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   const {
     realm,
     userToken,
     tempToken,
-    credentials,
-    credentialProvider,
+    credentialSource,
+    ticketPromptSessionSource,
+    ticketLocalStorageSessionSource,
+    ticketInMemorySessionSource,
     useTempTokens = false,
     useSso = false,
     useTicketAuth = false,
@@ -95,7 +110,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     convertDates = true,
     tempTokenLifespan = 290000,
     ticketLifespanHours = 12,
-    ticketRefreshThreshold = 0.1, // Renamed: Default to 10% of lifespan
+    ticketRefreshThreshold = 0.1,
     throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
@@ -109,9 +124,15 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
   if (!realm) {
     throw new Error("QuickbaseConfig must include a valid 'realm'");
   }
-  if (useTicketAuth && !credentials && !credentialProvider) {
+  if (
+    useTicketAuth &&
+    !credentialSource &&
+    !ticketPromptSessionSource &&
+    !ticketLocalStorageSessionSource &&
+    !ticketInMemorySessionSource
+  ) {
     throw new Error(
-      "Ticket authentication requires 'credentials' or 'credentialProvider'"
+      "Ticket authentication requires a 'credentialSource', 'ticketPromptSessionSource', 'ticketLocalStorageSessionSource', or 'ticketInMemorySessionSource'"
     );
   }
   if (useSso && !samlToken) {
@@ -164,16 +185,37 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       baseUrl
     );
   } else if (useTicketAuth) {
+    let effectiveCredentialSource: CredentialSource;
+    if (credentialSource) {
+      effectiveCredentialSource = credentialSource;
+    } else if (ticketPromptSessionSource) {
+      effectiveCredentialSource = new TicketPromptSessionSource(
+        ticketPromptSessionSource
+      );
+    } else if (ticketLocalStorageSessionSource) {
+      effectiveCredentialSource = new TicketLocalStorageSessionSource({
+        ...ticketLocalStorageSessionSource,
+        debug: ticketLocalStorageSessionSource.debug || debug,
+      });
+    } else if (ticketInMemorySessionSource) {
+      effectiveCredentialSource = new TicketInMemorySessionSource(
+        ticketInMemorySessionSource.initialCredentials,
+        ticketInMemorySessionSource.debug || debug
+      );
+    } else {
+      throw new Error(
+        "No valid credential source provided for ticket authentication"
+      );
+    }
     authStrategy = new TicketTokenStrategy(
-      credentials || { username: "", password: "", appToken: "" },
-      credentialProvider,
+      effectiveCredentialSource,
       realm,
       effectiveFetch,
       tokenCache,
       ticketCache,
       debug,
       ticketLifespanHours,
-      ticketRefreshThreshold, // Renamed: Pass ticketRefreshThreshold
+      ticketRefreshThreshold,
       baseUrl
     );
   } else if (useTempTokens) {
@@ -345,7 +387,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
       debug,
       tempTokenLifespan,
       ticketLifespanHours,
-      ticketRefreshThreshold, // Renamed
+      ticketRefreshThreshold,
       throttle,
       maxRetries,
       retryDelay,
