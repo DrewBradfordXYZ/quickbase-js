@@ -118,7 +118,6 @@ export class TempTokenStrategy implements AuthorizationStrategy {
       return null;
     }
     if (debug) console.log(`Refreshing temp token for dbid: ${dbid}`);
-    // Invalidate the cache for this dbid to force a fresh fetch
     this.tokenCache.delete(dbid);
     try {
       const newToken = await this.getToken(dbid);
@@ -348,7 +347,8 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
   private tokenCache: TokenCache;
   private ticketCache: TicketCache<TicketData>;
   private pendingTicketFetch: Promise<TicketData> | null = null;
-  private ticketLifespan: number;
+  private ticketLifespan: number; // In milliseconds
+  private ticketLifespanHours: number; // In hours
   private debug: boolean;
 
   constructor(
@@ -359,7 +359,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     tokenCache: TokenCache,
     ticketCache: TicketCache<TicketData>,
     debug = false,
-    ticketLifespan = 24 * 60 * 60 * 1000, // 24 hours
+    ticketLifespanHours = 12, // Default to 12 hours
     baseUrl = "https://api.quickbase.com/v1"
   ) {
     this.credentials = credentials;
@@ -369,7 +369,8 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     this.baseUrl = baseUrl;
     this.tokenCache = tokenCache;
     this.ticketCache = ticketCache;
-    this.ticketLifespan = ticketLifespan;
+    this.ticketLifespanHours = ticketLifespanHours;
+    this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000; // Convert hours to milliseconds
     this.debug = debug;
   }
 
@@ -416,7 +417,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
               <qdbapi>
                 <username>${credentials.username}</username>
                 <password>${credentials.password}</password>
-                <hours>24</hours>
+                <hours>${this.ticketLifespanHours}</hours>
                 <udata>auth_request</udata>
               </qdbapi>`,
           }

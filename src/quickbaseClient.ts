@@ -1,4 +1,3 @@
-// src/quickbaseClient.ts
 import { QuickbaseClient as IQuickbaseClient } from "./generated-unified/QuickbaseClient";
 import { Configuration, HTTPHeaders } from "./generated/runtime";
 import * as apis from "./generated/apis";
@@ -48,7 +47,7 @@ export interface QuickbaseConfig {
   fetchApi?: typeof fetch;
   convertDates?: boolean;
   tempTokenLifespan?: number;
-  ticketLifespan?: number;
+  ticketLifespanHours?: number; // Changed from ticketLifespan
   throttle?: {
     type?: "flow" | "burst-aware";
     rate?: number;
@@ -94,7 +93,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
     debug,
     convertDates = true,
     tempTokenLifespan = 290000,
-    ticketLifespan = 24 * 60 * 60 * 1000,
+    ticketLifespanHours = 12, // Default to 12 hours
     throttle = { type: "flow", rate: 5, burst: 50 },
     maxRetries = 3,
     retryDelay = 1000,
@@ -151,7 +150,7 @@ export function quickbase(config: QuickbaseConfig): QuickbaseClient {
         tokenCache,
         ticketCache,
         debug,
-        ticketLifespan,
+        ticketLifespanHours, // Pass hours
         baseUrl
       )
     : useTempTokens

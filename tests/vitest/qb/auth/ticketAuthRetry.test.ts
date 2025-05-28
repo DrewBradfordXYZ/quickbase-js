@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 
 test.skipIf(process.env.CI)(
-  "QuickbaseClient Integration - runQuery with 401 Retry Using Valid Ticket (Mocked)",
+  "QuickbaseClient Integration - runQuery with 401 Retry Using Valid Ticket and Default 12-Hour Lifespan (Mocked)",
   { timeout: 60000 },
   async () => {
     const realm = process.env.QB_REALM || "";
@@ -46,7 +46,7 @@ test.skipIf(process.env.CI)(
       );
     }
 
-    // Mock API_Authenticate (first ticket)
+    // Mock API_Authenticate (first ticket, default 12 hours)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] API_Authenticate (first):", { url, options });
       if (
@@ -54,6 +54,7 @@ test.skipIf(process.env.CI)(
         options.method === "POST" &&
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
+        expect(options.body).toContain("<hours>12</hours>"); // Verify default lifespan
         return new Response(
           `<qdbapi><action>API_Authenticate</action><errcode>0</errcode><errtext>No error</errtext><ticket>integration-ticket-123</ticket></qdbapi>`,
           {
@@ -285,7 +286,7 @@ test.skipIf(process.env.CI)(
 );
 
 test.skipIf(process.env.CI)(
-  "QuickbaseClient Integration - runQuery with 401 Retry Requiring Ticket Refresh (Mocked)",
+  "QuickbaseClient Integration - runQuery with 401 Retry Requiring Ticket Refresh and Custom 24-Hour Lifespan (Mocked)",
   { timeout: 60000 },
   async () => {
     const realm = process.env.QB_REALM || "";
@@ -301,7 +302,7 @@ test.skipIf(process.env.CI)(
       );
     }
 
-    // Mock API_Authenticate (first ticket)
+    // Mock API_Authenticate (first ticket, 24 hours)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] API_Authenticate (first):", { url, options });
       if (
@@ -309,6 +310,7 @@ test.skipIf(process.env.CI)(
         options.method === "POST" &&
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
+        expect(options.body).toContain("<hours>24</hours>"); // Verify custom lifespan
         return new Response(
           `<qdbapi><action>API_Authenticate</action><errcode>0</errcode><errtext>No error</errtext><ticket>integration-ticket-123</ticket></qdbapi>`,
           {
@@ -443,7 +445,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
     });
 
-    // Mock API_Authenticate (refreshed ticket)
+    // Mock API_Authenticate (refreshed ticket, 24 hours)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] API_Authenticate (refresh):", { url, options });
       if (
@@ -451,6 +453,7 @@ test.skipIf(process.env.CI)(
         options.method === "POST" &&
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
+        expect(options.body).toContain("<hours>24</hours>"); // Verify custom lifespan
         return new Response(
           `<qdbapi><action>API_Authenticate</action><errcode>0</errcode><errtext>No error</errtext><ticket>integration-ticket-789</ticket></qdbapi>`,
           {
@@ -519,6 +522,7 @@ test.skipIf(process.env.CI)(
       credentials: { username, password, appToken },
       useTicketAuth: true,
       debug: true,
+      ticketLifespanHours: 24, // Custom lifespan
     });
 
     try {
