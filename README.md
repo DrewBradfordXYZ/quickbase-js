@@ -113,7 +113,7 @@ getAppDetails();
 
 ### Ticket Authentication
 
-Use ticket authentication for secure, session-based authentication in browser or Node.js environments. Tickets are obtained using credentials managed by one of three credential sources: InMemory, LocalStorage, or Prompt.
+Use ticket authentication for secure, session-based authentication in browser or Node.js environments. Tickets are obtained using credentials managed by InMemory, and Prompt sources.
 
 #### InMemorySessionSource
 
@@ -126,7 +126,6 @@ const QB_REALM = "mycompany";
 const QB_APP_ID = "bxyz789";
 const QB_USERNAME = "user@example.com";
 const QB_PASSWORD = "your-password";
-const QB_APP_TOKEN = "******************";
 
 const qb = quickbase({
   realm: QB_REALM,
@@ -135,7 +134,6 @@ const qb = quickbase({
     initialCredentials: {
       username: QB_USERNAME,
       password: QB_PASSWORD,
-      appToken: QB_APP_TOKEN,
     },
     debug: true,
   },
@@ -172,7 +170,6 @@ const qb = quickbase({
       return {
         username: prompt("Enter username") || "",
         password: prompt("Enter password") || "",
-        appToken: prompt("Enter app token") || "",
       };
     },
     localStorageConfig: { storageKey: "quickbase-credentials" },

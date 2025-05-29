@@ -1,13 +1,14 @@
+// tests/vitest/qb/auth/ticketTokenStrategy.test.ts
 import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
 import { createClient, mockFetch, QB_REALM, QB_TABLE_ID_1 } from "@tests/setup";
 import {
   InMemoryCache,
   LocalStorageTicketCache,
-  TicketCache,
   TicketCacheEntry,
+  TicketData,
 } from "../../../../src/cache/TicketCache";
 import { TokenCache } from "../../../../src/cache/TokenCache";
-import { TicketData } from "../../../../src/auth/types";
+import { TicketInMemorySessionSource } from "../../../../src/auth/credential-sources/credentialSources";
 
 describe("TicketTokenStrategy", () => {
   beforeAll(() => {
@@ -15,7 +16,6 @@ describe("TicketTokenStrategy", () => {
       "QB_REALM",
       "QB_USERNAME",
       "QB_PASSWORD",
-      "QB_APP_TOKEN",
       "QB_TABLE_ID_1",
     ];
     for (const envVar of requiredEnvVars) {
@@ -35,6 +35,7 @@ describe("TicketTokenStrategy", () => {
         options.method === "POST" &&
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
+        expect(options.headers["QB-App-Token"]).toBeUndefined();
         return new Response(
           `
             <qdbapi>
@@ -115,10 +116,11 @@ describe("TicketTokenStrategy", () => {
 
       const client = createClient(mockFetch, {
         useTicketAuth: true,
-        credentials: {
-          username: process.env.QB_USERNAME!,
-          password: process.env.QB_PASSWORD!,
-          appToken: process.env.QB_APP_TOKEN!,
+        ticketInMemorySessionSource: {
+          initialCredentials: {
+            username: process.env.QB_USERNAME!,
+            password: process.env.QB_PASSWORD!,
+          },
         },
       });
       const response = await client.runQuery({
@@ -205,10 +207,11 @@ describe("TicketTokenStrategy", () => {
     const spy = vi.spyOn(ticketCache, "set");
     const client = createClient(mockFetch, {
       useTicketAuth: true,
-      credentials: {
-        username: process.env.QB_USERNAME!,
-        password: process.env.QB_PASSWORD!,
-        appToken: process.env.QB_APP_TOKEN!,
+      ticketInMemorySessionSource: {
+        initialCredentials: {
+          username: process.env.QB_USERNAME!,
+          password: process.env.QB_PASSWORD!,
+        },
       },
       ticketCache,
     });
@@ -235,21 +238,17 @@ describe("TicketTokenStrategy", () => {
     "proactively refreshes token when nearing expiration with ticketRefreshThreshold",
     { timeout: 5000 },
     async () => {
-      // Mock TokenCache to return a token nearing expiration
-      const tokenCache = new TokenCache(300000); // 5 min lifespan
+      const tokenCache = new TokenCache(300000);
       const ticketCache = new InMemoryCache<TicketData>();
 
-      // Set up a token with 30s left (threshold: 0.2 * 300000 = 60s)
       vi.spyOn(tokenCache, "get").mockReturnValue({
         token: "mock-temp-token-old",
-        expiresAt: Date.now() + 30000, // 30s left
+        expiresAt: Date.now() + 30000,
       });
 
-      // Spy on TokenCache.delete to confirm old token is removed
       const deleteSpy = vi.spyOn(tokenCache, "delete");
       const setSpy = vi.spyOn(tokenCache, "set");
 
-      // Mock fetchTempToken response for the new token
       mockFetch.mockImplementationOnce(async (url, options) => {
         console.log("[QuickBase]: getTempTokenDBID (refresh):", {
           url,
@@ -271,7 +270,6 @@ describe("TicketTokenStrategy", () => {
         throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
       });
 
-      // Mock runQuery response with the new token
       mockFetch.mockImplementationOnce(async (url, options) => {
         console.log("[QuickBase]: runQuery (new token):", { url, options });
         if (
@@ -297,14 +295,15 @@ describe("TicketTokenStrategy", () => {
 
       const client = createClient(mockFetch, {
         useTicketAuth: true,
-        credentials: {
-          username: process.env.QB_USERNAME!,
-          password: process.env.QB_PASSWORD!,
-          appToken: process.env.QB_APP_TOKEN!,
+        ticketInMemorySessionSource: {
+          initialCredentials: {
+            username: process.env.QB_USERNAME!,
+            password: process.env.QB_PASSWORD!,
+          },
         },
         ticketCache,
         tokenCache,
-        ticketRefreshThreshold: 0.2, // Refresh if <60s left
+        ticketRefreshThreshold: 0.2,
         debug: true,
       });
 

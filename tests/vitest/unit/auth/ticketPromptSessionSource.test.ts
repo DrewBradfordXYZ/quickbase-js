@@ -3,12 +3,12 @@ import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
 import { TicketPromptSessionSource } from "../../../../src/auth/credential-sources/credentialSources";
 
 describe("TicketPromptSessionSource", () => {
-  let credentials: { username: string; password: string; appToken: string };
+  let credentials: { username: string; password: string };
   let localStorageMock: Record<string, string>;
   let promptCallback: () => Promise<typeof credentials>;
 
   beforeAll(() => {
-    const requiredEnvVars = ["QB_USERNAME", "QB_PASSWORD", "QB_APP_TOKEN"];
+    const requiredEnvVars = ["QB_USERNAME", "QB_PASSWORD"];
     for (const envVar of requiredEnvVars) {
       if (!process.env[envVar]) {
         throw new Error(`Missing required env var: ${envVar}`);
@@ -17,7 +17,6 @@ describe("TicketPromptSessionSource", () => {
     credentials = {
       username: process.env.QB_USERNAME!,
       password: process.env.QB_PASSWORD!,
-      appToken: process.env.QB_APP_TOKEN!,
     };
   });
 
@@ -113,14 +112,12 @@ describe("TicketPromptSessionSource", () => {
       debug: true,
     });
 
-    // Test localStorage fetch
     localStorageMock["quickbase-credentials"] = JSON.stringify(credentials);
     await source.getCredentials();
     expect(consoleSpy).toHaveBeenCalledWith(
       "[TicketPromptSessionSource] Fetched credentials from localStorage"
     );
 
-    // Test prompt fallback
     delete localStorageMock["quickbase-credentials"];
     await source.getCredentials();
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -130,7 +127,6 @@ describe("TicketPromptSessionSource", () => {
       "[TicketPromptSessionSource] Stored prompted credentials in localStorage"
     );
 
-    // Test refresh
     await source.refreshCredentials();
     expect(consoleSpy).toHaveBeenCalledWith(
       "[TicketPromptSessionSource] Refreshing credentials"
@@ -139,8 +135,6 @@ describe("TicketPromptSessionSource", () => {
       "[TicketPromptSessionSource] Cleared localStorage for refresh"
     );
 
-    // Test prompt failure
-    delete localStorageMock["quickbase-credentials"];
     const error = new Error("Prompt failed");
     promptCallback = vi.fn().mockRejectedValue(error);
     const sourceWithoutLocalStorage = new TicketPromptSessionSource({

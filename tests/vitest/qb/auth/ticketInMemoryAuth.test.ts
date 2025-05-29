@@ -21,7 +21,6 @@ beforeAll(() => {
     "QB_REALM",
     "QB_USERNAME",
     "QB_PASSWORD",
-    "QB_APP_TOKEN",
     "QB_TABLE_ID_1",
     "QB_APP_ID",
   ];
@@ -49,15 +48,14 @@ test.skipIf(process.env.CI)(
     const appId = process.env.QB_APP_ID || "";
     const username = process.env.QB_USERNAME || "";
     const password = process.env.QB_PASSWORD || "";
-    const appToken = process.env.QB_APP_TOKEN || "";
 
-    if (!realm || !tableId || !appId || !username || !password || !appToken) {
+    if (!realm || !tableId || !appId || !username || !password) {
       throw new Error(
-        "QB_REALM, QB_TABLE_ID_1, QB_APP_ID, QB_USERNAME, QB_PASSWORD, and QB_APP_TOKEN must be set in .env"
+        "QB_REALM, QB_TABLE_ID_1, QB_APP_ID, QB_USERNAME, QB_PASSWORD must be set in .env"
       );
     }
 
-    const tokenCache = new TokenCache(3600000); // 1 hour lifespan to avoid premature refreshes
+    const tokenCache = new TokenCache(3600000);
     const ticketCache = new LocalStorageTicketCache<TicketData>();
 
     // Mock localStorage for tickets
@@ -81,6 +79,7 @@ test.skipIf(process.env.CI)(
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
         expect(options.body).toContain("<hours>24</hours>");
+        expect(options.headers["QB-App-Token"]).toBeUndefined(); // No app token
         return new Response(
           `<qdbapi><action>API_Authenticate</action><errcode>0</errcode><errtext>No error</errtext><ticket>integration-ticket-123</ticket></qdbapi>`,
           {
@@ -131,7 +130,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getApp request: ${url}`);
     });
 
-    // Mock getAppTables (reuses cached token)
+    // Mock getAppTables
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] getAppTables:", { url, options });
       if (
@@ -183,7 +182,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getFields request: ${url}`);
     });
 
-    // Mock runQuery (401 error on first attempt, reuses cached token)
+    // Mock runQuery (401 error on first attempt)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] runQuery (401):", { url, options });
       if (
@@ -221,7 +220,7 @@ test.skipIf(process.env.CI)(
       throw new Error(`Unexpected getTempTokenDBID request: ${url}`);
     });
 
-    // Mock API_Authenticate (refreshed ticket, 24 hours)
+    // Mock API_Authenticate (refreshed ticket)
     mockFetch.mockImplementationOnce(async (url, options) => {
       console.log("[mockFetch] API_Authenticate (refresh):", { url, options });
       if (
@@ -230,6 +229,7 @@ test.skipIf(process.env.CI)(
         options.headers["QUICKBASE-ACTION"] === "API_Authenticate"
       ) {
         expect(options.body).toContain("<hours>24</hours>");
+        expect(options.headers["QB-App-Token"]).toBeUndefined();
         return new Response(
           `<qdbapi><action>API_Authenticate</action><errcode>0</errcode><errtext>No error</errtext><ticket>integration-ticket-789</ticket></qdbapi>`,
           {
@@ -293,7 +293,7 @@ test.skipIf(process.env.CI)(
       ticketCache,
       tokenCache,
       ticketInMemorySessionSource: {
-        initialCredentials: { username, password, appToken },
+        initialCredentials: { username, password },
         debug: true,
       },
     });

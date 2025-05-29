@@ -1,7 +1,7 @@
 // src/auth/credential-sources/credentialSources.ts
 import { CredentialSource, Credentials } from "../types";
 
-// TicketInMemorySessionSource (unchanged)
+// TicketInMemorySessionSource
 export class TicketInMemorySessionSource implements CredentialSource {
   private credentials: Credentials | null = null;
   private debug: boolean;
@@ -71,7 +71,7 @@ export class TicketPromptSessionSource implements CredentialSource {
   constructor(config: TicketPromptSessionSourceConfig) {
     this.promptCallback = config.promptCallback;
     this.debug = config.debug || false;
-    this.storageKey = config.localStorageConfig?.storageKey; // Only set if localStorageConfig is provided
+    this.storageKey = config.localStorageConfig?.storageKey;
   }
 
   private getFromLocalStorage(): Credentials | null {
@@ -88,7 +88,7 @@ export class TicketPromptSessionSource implements CredentialSource {
         return null;
       }
       const creds: Credentials = JSON.parse(stored);
-      if (!creds.username || !creds.password || !creds.appToken) {
+      if (!creds.username || !creds.password) {
         return null;
       }
       return creds;
@@ -141,7 +141,7 @@ export class TicketPromptSessionSource implements CredentialSource {
     // Fall back to client prompt
     try {
       const creds = await this.promptCallback();
-      if (!creds.username || !creds.password || !creds.appToken) {
+      if (!creds.username || !creds.password) {
         throw new Error("Client prompt returned incomplete credentials");
       }
       // Store in localStorage if configured
@@ -176,7 +176,6 @@ export class TicketPromptSessionSource implements CredentialSource {
     if (this.debug) {
       console.log("[TicketPromptSessionSource] Refreshing credentials");
     }
-    // If using localStorage, clear it to force a new prompt
     if (this.storageKey) {
       this.clearLocalStorage();
       if (this.debug) {

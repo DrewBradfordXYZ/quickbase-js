@@ -3,10 +3,10 @@ import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
 import { TicketInMemorySessionSource } from "../../../../src/auth/credential-sources/credentialSources";
 
 describe("TicketInMemorySessionSource", () => {
-  let credentials: { username: string; password: string; appToken: string };
+  let credentials: { username: string; password: string };
 
   beforeAll(() => {
-    const requiredEnvVars = ["QB_USERNAME", "QB_PASSWORD", "QB_APP_TOKEN"];
+    const requiredEnvVars = ["QB_USERNAME", "QB_PASSWORD"];
     for (const envVar of requiredEnvVars) {
       if (!process.env[envVar]) {
         throw new Error(`Missing required env var: ${envVar}`);
@@ -15,7 +15,6 @@ describe("TicketInMemorySessionSource", () => {
     credentials = {
       username: process.env.QB_USERNAME!,
       password: process.env.QB_PASSWORD!,
-      appToken: process.env.QB_APP_TOKEN!,
     };
   });
 
@@ -54,7 +53,6 @@ describe("TicketInMemorySessionSource", () => {
     const newCredentials = {
       username: "new-user@example.com",
       password: "new-password",
-      appToken: "new-app-token",
     };
     source.setCredentials(newCredentials);
     const fetched = await source.getCredentials();

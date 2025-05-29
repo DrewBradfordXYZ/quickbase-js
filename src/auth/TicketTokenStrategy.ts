@@ -29,7 +29,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     private ticketLifespanHours: number = 12,
     private ticketRefreshThreshold: number = 0.1,
     private baseUrl: string = "https://api.quickbase.com/v1",
-    private tempTokenLifespan: number = 3600 * 1000 // Added for type safety
+    private tempTokenLifespan: number = 3600 * 1000
   ) {
     this.ticketLifespan = ticketLifespanHours * 60 * 60 * 1000;
   }
@@ -42,7 +42,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
         refresh && this.credentialSource.refreshCredentials
           ? await this.credentialSource.refreshCredentials()
           : await this.credentialSource.getCredentials();
-      if (!creds.username || !creds.password || !creds.appToken) {
+      if (!creds.username || !creds.password) {
         throw new Error("CredentialSource returned incomplete credentials");
       }
       if (this.debug) {
@@ -85,7 +85,6 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
               "Content-Type": "application/xml",
               Accept: "application/xml",
               "QUICKBASE-ACTION": "API_Authenticate",
-              "QB-App-Token": credentials.appToken,
               "QB-Realm-Hostname": `${this.realm}.quickbase.com`,
               "User-Agent":
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -376,16 +375,14 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
           errorMessage
         );
       }
-      // Check if error is ApiError with status
       if (
         error instanceof Error &&
         "status" in error &&
         typeof (error as ApiError).status === "number" &&
         (error as ApiError).status !== 401
       ) {
-        throw error; // Rethrow non-401 errors
+        throw error;
       }
-      // 401 error or non-ApiError: Proceed to ticket refresh
     }
 
     // Second attempt: Refresh ticket and retry
@@ -398,7 +395,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
     }
     await this.ticketCache.delete("ticket");
     try {
-      const credentials = await this.getCredentials(true); // Request refreshed credentials
+      const credentials = await this.getCredentials(true);
       const newToken = await this.getToken(dbid);
       if (newToken) {
         if (debug || this.debug) {
@@ -421,7 +418,7 @@ export class TicketTokenStrategy implements AuthorizationStrategy {
           errorMessage
         );
       }
-      throw error; // Rethrow to allow invokeMethod to handle retries
+      throw error;
     }
 
     if (debug || this.debug) {

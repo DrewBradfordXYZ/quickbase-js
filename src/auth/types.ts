@@ -15,7 +15,6 @@ export interface AuthorizationStrategy {
 export interface Credentials {
   username: string;
   password: string;
-  appToken: string;
 }
 
 export interface CredentialSource {
