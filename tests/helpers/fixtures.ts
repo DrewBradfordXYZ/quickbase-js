@@ -2,14 +2,20 @@
  * Test fixture loading utilities
  *
  * Provides helpers for loading test fixtures and creating mock responses.
+ *
+ * Fixture locations:
+ * - Generated fixtures: spec/fixtures/{domain}/{operation}/
+ * - Manual fixtures: spec/fixtures/_manual/{domain}/{operation}/
+ * - Common errors: spec/fixtures/_manual/errors/
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = join(__dirname, '..', '..', 'spec', 'fixtures');
+const MANUAL_DIR = join(FIXTURES_DIR, '_manual');
 
 export interface FixtureMeta {
   description?: string;
@@ -23,13 +29,80 @@ export interface Fixture<T = unknown> {
 }
 
 /**
+ * Find a fixture file, checking multiple possible locations
+ */
+function findFixturePath(path: string): string | null {
+  // Try exact path first
+  const exactPath = join(FIXTURES_DIR, path);
+  if (existsSync(exactPath)) {
+    return exactPath;
+  }
+
+  // Try in _manual directory
+  const manualPath = join(MANUAL_DIR, path);
+  if (existsSync(manualPath)) {
+    return manualPath;
+  }
+
+  return null;
+}
+
+/**
+ * Find a response fixture, handling variants and _manual locations
+ */
+function findResponsePath(
+  domain: string,
+  operation: string,
+  status: number,
+  variant?: string
+): string | null {
+  const baseName = `response.${status}`;
+
+  // If variant specified, look for exact match
+  if (variant) {
+    const variantFile = `${baseName}.${variant}.json`;
+    const found = findFixturePath(`${domain}/${operation}/${variantFile}`);
+    if (found) return found;
+  }
+
+  // Try exact path (response.{status}.json)
+  const exactFile = `${baseName}.json`;
+  const exactPath = findFixturePath(`${domain}/${operation}/${exactFile}`);
+  if (exactPath) return exactPath;
+
+  // For error statuses, check _manual/errors/
+  if (status >= 400) {
+    const errorPath = join(MANUAL_DIR, 'errors', exactFile);
+    if (existsSync(errorPath)) return errorPath;
+  }
+
+  // Look for any variant file in the directory
+  const dir = join(FIXTURES_DIR, domain, operation);
+  if (existsSync(dir)) {
+    const files = readdirSync(dir);
+    const match = files.find(f => f.startsWith(baseName) && f.endsWith('.json'));
+    if (match) return join(dir, match);
+  }
+
+  // Check _manual directory for variants
+  const manualDir = join(MANUAL_DIR, domain, operation);
+  if (existsSync(manualDir)) {
+    const files = readdirSync(manualDir);
+    const match = files.find(f => f.startsWith(baseName) && f.endsWith('.json'));
+    if (match) return join(manualDir, match);
+  }
+
+  return null;
+}
+
+/**
  * Load a fixture file
  */
 export function loadFixture<T = unknown>(path: string): Fixture<T> {
-  const fullPath = join(FIXTURES_DIR, path);
+  const fullPath = findFixturePath(path);
 
-  if (!existsSync(fullPath)) {
-    throw new Error(`Fixture not found: ${path} (looked in ${fullPath})`);
+  if (!fullPath) {
+    throw new Error(`Fixture not found: ${path} (looked in ${FIXTURES_DIR} and ${MANUAL_DIR})`);
   }
 
   const content = readFileSync(fullPath, 'utf-8');
@@ -38,13 +111,29 @@ export function loadFixture<T = unknown>(path: string): Fixture<T> {
 
 /**
  * Load a response fixture
+ *
+ * Searches in order:
+ * 1. Exact path: {domain}/{operation}/response.{status}.json
+ * 2. With variant: {domain}/{operation}/response.{status}.{variant}.json
+ * 3. Manual path: _manual/{domain}/{operation}/response.{status}.json
+ * 4. Common errors: _manual/errors/response.{status}.json
  */
 export function loadResponse<T = unknown>(
   domain: string,
   operation: string,
-  status: number
+  status: number,
+  variant?: string
 ): Fixture<T> {
-  return loadFixture<T>(`${domain}/${operation}/response.${status}.json`);
+  const fullPath = findResponsePath(domain, operation, status, variant);
+
+  if (!fullPath) {
+    throw new Error(
+      `Response fixture not found: ${domain}/${operation}/response.${status}${variant ? '.' + variant : ''}.json`
+    );
+  }
+
+  const content = readFileSync(fullPath, 'utf-8');
+  return JSON.parse(content) as Fixture<T>;
 }
 
 /**
@@ -53,6 +142,20 @@ export function loadResponse<T = unknown>(
 export function loadRequest<T = unknown>(domain: string, operation: string): T {
   const fixture = loadFixture<T>(`${domain}/${operation}/request.json`);
   return fixture.body;
+}
+
+/**
+ * Load a common error fixture from _manual/errors/
+ */
+export function loadError<T = unknown>(status: number): Fixture<T> {
+  const path = join(MANUAL_DIR, 'errors', `response.${status}.json`);
+
+  if (!existsSync(path)) {
+    throw new Error(`Error fixture not found: _manual/errors/response.${status}.json`);
+  }
+
+  const content = readFileSync(path, 'utf-8');
+  return JSON.parse(content) as Fixture<T>;
 }
 
 /**
@@ -180,6 +283,8 @@ export function withHeaders<T>(
 
 /**
  * Load a paginated response fixture (for specific page)
+ *
+ * Looks in _manual/{domain}/{operation}/ for pagination fixtures
  */
 export function loadPagedResponse<T = unknown>(
   domain: string,
@@ -187,7 +292,25 @@ export function loadPagedResponse<T = unknown>(
   status: number,
   page: string
 ): Fixture<T> {
-  return loadFixture<T>(`${domain}/${operation}/response.${status}.${page}.json`);
+  const fileName = `response.${status}.${page}.json`;
+
+  // Check _manual first (pagination fixtures are manual)
+  const manualPath = join(MANUAL_DIR, domain, operation, fileName);
+  if (existsSync(manualPath)) {
+    const content = readFileSync(manualPath, 'utf-8');
+    return JSON.parse(content) as Fixture<T>;
+  }
+
+  // Fall back to regular fixtures dir
+  const regularPath = join(FIXTURES_DIR, domain, operation, fileName);
+  if (existsSync(regularPath)) {
+    const content = readFileSync(regularPath, 'utf-8');
+    return JSON.parse(content) as Fixture<T>;
+  }
+
+  throw new Error(
+    `Paged fixture not found: ${domain}/${operation}/${fileName} (checked _manual/ and regular fixtures)`
+  );
 }
 
 /**
