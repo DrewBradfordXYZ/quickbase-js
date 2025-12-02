@@ -14,9 +14,9 @@ A TypeScript/JavaScript client for the QuickBase JSON RESTful API.
 
 ## API Reference
 
-**[View all 59 API methods →](./interfaces/QuickbaseAPI.html)**
+**[View Full API Documentation →](https://drewbradfordxyz.github.io/quickbase-js/)**
 
-The SDK provides typed methods for all QuickBase API endpoints including Apps, Tables, Fields, Records, Reports, Users, and more. Each method includes JSDoc documentation with links to the official QuickBase API docs.
+The SDK provides typed methods for all 59 QuickBase API endpoints including Apps, Tables, Fields, Records, Reports, Users, and more. Each method includes JSDoc documentation with links to the official QuickBase API docs.
 
 ## Installation
 
@@ -461,14 +461,17 @@ npm run spec:generate  # Generate TypeScript types
 
 ### Documentation
 
-Generate API documentation from source code:
+API documentation is auto-generated from source code and hosted at:
+**https://drewbradfordxyz.github.io/quickbase-js/**
+
+To generate docs locally:
 
 ```bash
 npm run docs        # Generate docs to ./docs
 npm run docs:watch  # Watch mode for development
 ```
 
-The documentation is generated using [TypeDoc](https://typedoc.org/) and extracts JSDoc comments from the source code. Open `docs/index.html` to view locally.
+Documentation is built with [TypeDoc](https://typedoc.org/) and auto-deployed to GitHub Pages on every push to main.
 
 ## License
 
