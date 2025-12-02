@@ -374,6 +374,108 @@ try {
 }
 ```
 
+## Rate Limiting
+
+QuickBase enforces a rate limit of **100 requests per 10 seconds** per user token.
+
+### How 429 Errors Are Handled
+
+When the SDK receives a 429 (Too Many Requests) response, it automatically:
+
+1. **Extracts rate limit info** from response headers (`Retry-After`, `cf-ray`, `qb-api-ray`)
+2. **Calls the `onRateLimit` callback** if configured, allowing you to log or monitor
+3. **Waits before retrying** - uses the `Retry-After` header if present, otherwise exponential backoff with jitter
+4. **Retries the request** up to `maxAttempts` times (default: 3)
+5. **Throws a `RateLimitError`** if all retries are exhausted
+
+```
+Request fails with 429
+        ↓
+Extract Retry-After header
+        ↓
+Call onRateLimit callback (if set)
+        ↓
+Wait (Retry-After or exponential backoff)
+        ↓
+Retry request (up to maxAttempts)
+        ↓
+Throw RateLimitError if exhausted
+```
+
+### Retry Configuration
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  rateLimit: {
+    retry: {
+      maxAttempts: 5,        // Default: 3
+      initialDelayMs: 1000,  // Default: 1000ms
+      maxDelayMs: 30000,     // Default: 30000ms
+      multiplier: 2,         // Default: 2
+    },
+  },
+});
+```
+
+The backoff formula with jitter: `delay = initialDelayMs * (multiplier ^ attempt) ± 10%`
+
+### Proactive Throttling
+
+Prevent 429 errors entirely by throttling requests client-side using a sliding window algorithm:
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  rateLimit: {
+    proactiveThrottle: {
+      enabled: true,
+      requestsPer10Seconds: 100,
+    },
+  },
+});
+```
+
+This tracks request timestamps and blocks new requests when the limit would be exceeded, waiting until the oldest request exits the 10-second window.
+
+### Rate Limit Callback
+
+Get notified when rate limited (called before retry):
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  rateLimit: {
+    onRateLimit: (info) => {
+      console.log(`Rate limited on ${info.requestUrl}`);
+      console.log(`Retry after: ${info.retryAfter} seconds`);
+      console.log(`Ray ID: ${info.qbApiRay}`);
+      console.log(`Attempt: ${info.attempt}`);
+    },
+  },
+});
+```
+
+### Handling RateLimitError
+
+If retries are exhausted, a `RateLimitError` is thrown:
+
+```typescript
+import { RateLimitError } from 'quickbase-js';
+
+try {
+  await client.getApp({ appId: 'bpqe82s1' });
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.log(`Rate limited after ${error.rateLimitInfo.attempt} attempts`);
+    console.log(`Retry after: ${error.retryAfter} seconds`);
+  }
+}
+```
+
 ## Migration from v1
 
 ### Authentication
