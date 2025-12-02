@@ -376,7 +376,7 @@ try {
 
 ## Rate Limiting
 
-QuickBase enforces a rate limit of **100 requests per 10 seconds** per user token.
+QuickBase enforces a rate limit of **100 requests per 10 seconds** per user token. This SDK follows [QuickBase's official rate limiting guidance](https://developer.quickbase.com/rateLimit) — relying on server-side `Retry-After` headers by default, with optional client-side throttling.
 
 ### How 429 Errors Are Handled
 
