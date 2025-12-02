@@ -1,30 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
     "strict": true,
-    "lib": ["ES2015", "ESNext", "DOM"],
-    "types": ["node"],
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "outDir": "dist",
-    "rootDir": ".",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@tests/*": ["tests/*"],
-      "openapi-types": ["node_modules/openapi-types/index.d.ts"]
-    }
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "resolveJsonModule": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": true
   },
-  "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
-  "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
-  "ts-node": {
-    "esm": true,
-    "experimentalResolver": true
-  }
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "spec", "tests"]
 }

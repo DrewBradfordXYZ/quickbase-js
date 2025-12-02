@@ -1,330 +1,475 @@
-# quickbase-js
+# QuickBase JS SDK v2
 
-A Typescript API client for the [Quickbase JSON RESTful API](https://developer.quickbase.com/).
+A TypeScript/JavaScript client for the QuickBase JSON RESTful API.
 
-Support for various authentication types (`user token`, `temporary tokens`, `SSO token`), `concurrent rate limiting strategies`, `auto pagination`, `js date conversion`, `429` (rate limit) and `401` (auth) error handling retries. It uses a Proxy to dynamically invoke API methods derived from the OpenAPI specification.
+## Features
 
-Browser and Node.js support. ESM and UMD builds are available.
+- **Typed API Methods** - Full TypeScript support with auto-generated types from OpenAPI spec
+- **Multiple Auth Methods** - User token, temporary token, and SSO authentication
+- **Fluent Pagination** - Chain `.all()`, `.paginate()`, or `.noPaginate()` on paginated endpoints
+- **Date Conversion** - Automatic conversion of ISO date strings to JavaScript Date objects
+- **Rate Limit Handling** - Automatic retry with exponential backoff on 429 errors
+- **Proactive Throttling** - Optional client-side request throttling
+- **Tree-Shakeable** - Static method generation for optimal bundle size
 
-Authentication and throttle methods are opinionated. See configuration options for details and available settings.
+## API Reference
 
-## API Documentation
+**[View all 59 API methods →](./interfaces/QuickbaseAPI.html)**
 
-<a href="https://quickbase-js.netlify.app/" target="_blank"> Documentation</a> for quickbase-js.
+The SDK provides typed methods for all QuickBase API endpoints including Apps, Tables, Fields, Records, Reports, Users, and more. Each method includes JSDoc documentation with links to the official QuickBase API docs.
 
 ## Installation
 
-#### Node.js install
+### npm / Node.js
 
 ```bash
-npm install --save quickbase-js
+npm install quickbase-js
 ```
 
-#### CDN install.
+### Browser / CDN (QuickBase Code Pages)
 
-Find and select the latest version. UMD is recommended for code pages.
-
-<a href="https://www.jsdelivr.com/package/npm/quickbase-js?tab=files" target="_blank">CDN Files</a> for quickbase-js
+For QuickBase Code Pages, use temp-token authentication which automatically leverages the user's browser session:
 
 ```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Quickbase</title>
-    <!-- Replace xx.xx.xx with the latest version from CDN Files-->
-    <script src="https://cdn.jsdelivr.net/npm/quickbase-js@xx.xx.xx/dist/umd/quickbase.umd.min.js"></script>
-  </head>
-  <body>
-    <script>
-      const realm = ""; // Replace with your realm
-      const appId = ""; // Replace with your app ID
+<script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+<script>
+  // Realm can be auto-detected from the current URL
+  const realm = window.location.hostname.split('.')[0];
 
-      const qb = QuickbaseJS.quickbase({
-        realm,
-        useTempTokens: true,
-      });
+  const client = QuickBase.createClient({
+    realm: realm,
+    auth: { type: 'temp-token' },
+  });
 
-      qb.getApp({ appId })
-        .then((app) => console.log(app.name))
-        .catch((err) => console.log(err.message));
-    </script>
-  </body>
-</html>
+  client.getApp({ appId: 'bpqe82s1' }).then(app => {
+    console.log(app.name);
+  });
+</script>
 ```
 
-## Authentication Examples
+Or with ES modules:
 
-### User Token
+```html
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js';
 
-```javascript
-import { quickbase } from "quickbase-js"; // Adjust the import path as needed
+  const client = createClient({
+    realm: 'mycompany',
+    auth: { type: 'temp-token' },
+  });
 
-// QuickBase config variables
-const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
-const QB_USER_TOKEN = ""; // Your QuickBase user token (e.g., 'b12345_abcde...')
-const QB_APP_ID = ""; // Your app ID (e.g., 'bxyz789')
+  const app = await client.getApp({ appId: 'bpqe82s1' });
+  console.log(app.name);
+</script>
+```
 
-const qb = quickbase({
-  realm: QB_REALM,
-  userToken: QB_USER_TOKEN,
+## Quick Start
+
+```typescript
+import { createClient } from 'quickbase-js';
+
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'user-token',
+    userToken: 'your-user-token',
+  },
 });
 
-const getAppDetails = async () => {
-  try {
-    const response = await qb.getApp({
-      appId: QB_APP_ID,
-    });
-    console.log("App Details:", response);
-  } catch (error) {
-    console.error("Error fetching app:", error.message);
-  }
-};
+// Use typed API methods
+const app = await client.getApp({ appId: 'bpqe82s1' });
+console.log(app.name);
 
-getAppDetails();
+// Query records
+const records = await client.runQuery({
+  from: 'bpqe82s1',
+  select: [3, 6, 7],
+  where: "{6.EX.'Active'}",
+});
+console.log(records.data);
 ```
 
-### Temporary Tokens (Code Pages)
+## Authentication
 
-```javascript
-import { quickbase } from "quickbase-js"; // Adjust the import path as needed
+### User Token (Recommended for Server-Side)
 
-// QuickBase config variables
-const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
-const QB_APP_ID = ""; // Your app ID (e.g., 'bxyz789')
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'user-token',
+    userToken: 'your-user-token',
+  },
+});
+```
 
-const qb = quickbase({
-  realm: QB_REALM,
-  useTempTokens: true,
+### Temporary Token (Recommended for Browser/Code Pages)
+
+Temporary tokens are automatically fetched and cached per database. They refresh on 401 errors.
+
+```typescript
+// In QuickBase Code Pages - no user token needed (uses browser session)
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'temp-token',
+  },
 });
 
-const getAppDetails = async () => {
-  try {
-    const response = await qb.getApp({
-      appId: QB_APP_ID,
-    });
-    console.log("App Details:", response);
-  } catch (error) {
-    console.error("Error fetching app:", error.message);
-  }
-};
-
-getAppDetails();
+// Outside Code Pages - user token required to fetch temp tokens
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'temp-token',
+    userToken: 'your-user-token',      // Required outside Code Pages
+    appToken: 'optional-app-token',    // If app requires it
+  },
+});
 ```
+
+**Auto dbid extraction:** The SDK automatically extracts the database ID for temp token authentication from your request parameters:
+
+- `body.from` (runQuery, deleteRecords)
+- `body.to` (upsert)
+- `query.tableId` (getFields, etc.)
+- `query.appId` (getAppTables, etc.)
+- Path segments `/tables/{tableId}` and `/apps/{appId}`
+
+This means you don't need to manually specify the dbid - just make API calls and the SDK handles token management automatically.
 
 ### SSO Token
 
-```javascript
-import { quickbase } from "quickbase-js"; // Adjust the import path as needed
-
-// QuickBase config variables
-const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
-const QB_SAML_TOKEN = ""; // Your SAML token (e.g., 'saml_xyz789...')
-const QB_APP_ID = ""; // Your app ID (e.g., 'bxyz789')
-
-const qb = quickbase({
-  realm: QB_REALM,
-  samlToken: QB_SAML_TOKEN,
-  useSso: true,
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'sso',
+    samlToken: 'your-saml-token',
+  },
 });
-
-const getAppDetails = async () => {
-  try {
-    const response = await qb.getApp({
-      appId: QB_APP_ID,
-    });
-    console.log("App Details:", response);
-  } catch (error) {
-    console.error("Error fetching app:", error.message);
-  }
-};
-
-getAppDetails();
 ```
 
-## Configuration
+## Pagination
 
-The `quickbase` function accepts a `QuickbaseConfig` object with the following options:
+Paginated endpoints (`runQuery`, `runReport`, `getUsers`, etc.) return a `PaginatedRequest` that supports fluent pagination methods.
 
-### User Options
+### Default Behavior (Single Page)
 
-- **`realm`** (`string`): Your QuickBase realm (e.g., "company"). This is required and has no default value.
-
-- **`userToken`** (`string`, optional): A QuickBase user token for authentication. No default is provided.
-
-- **`useTempTokens`** (`boolean`, optional): Enables temporary token authentication. Defaults to `false`.
-
-- **`useSso`** (`boolean`, optional): Enables SSO authentication. Defaults to `false`.
-
-- **`samlToken`** (`string`, optional): A SAML token for SSO authentication. No default is provided.
-
-### Advanced User Options
-
-- **`throttle`** (`{ type?: 'flow' | 'burst-aware';` `rate?: number;` `burst?: number;` `windowSeconds?: number }`, optional): Configures concurrent rate limiting to manage API request throughput. Defaults to `{ type: 'flow', rate: 5, burst: 50 }`.
-
-  - **`type`** (`string`): Throttle strategy. _Setting type without rate or burst enables default settings for that throttle type._
-
-    - `'flow'` (default): Uses `FlowThrottleBucket` for a QuickBase-agnostic burst-then-rate flow. Ideal for steady request pacing.
-
-    - `'burst-aware'`: Uses `BurstAwareThrottleBucket` for QuickBase-specific burst throttling with a sliding window (e.g., 100 requests per 10 seconds). Ideal for when you need to use nearly all your allotted API calls immediately, for example on page load.
-
-  _Set rate and burst if changing defaults._
-
-  - **`rate`** (`number`): Requests per second after the initial burst (for `'flow'` only). Default is `5`. Meaning 5 request tokens get created each second.
-
-  - **`burst`** (`number`): Maximum concurrent requests:
-    - For `'flow'`: Initial concurrent burst size (default: 50), followed by `rate`/sec.
-    - For `'burst-aware'`: Concurrent burst cap per window (default: 100), waits for window reset if exceeded.
-  - **`windowSeconds`** (`number`, `'burst-aware'` only): Sliding window duration in seconds (default: 10). Caps total requests (e.g., 100 requests available every 10s).
-
-  - **Examples**:
-    - `{ type: 'flow', rate: 5, burst: 50 }`: **~10s for 100 requests**, (50 instant, and 1 every 200ms. In other words, 50 at 10/sec).
-    - `{ type: 'burst-aware', burst: 100, windowSeconds: 10 }`: **~10s for 100 requests**, (100 instant, refreshing every 10s for next burst).
-
-- **`maxRetries`** (`number`, optional): Maximum retries for failed requests. Defaults to `3`.
-
-- **`retryDelay`** (`number`, optional): Base delay (in milliseconds) between retries, increases exponentially. Defaults to `1000`.
-
-- **`tempTokenLifespan`** (`number`, optional): Lifespan (in milliseconds) of temporary tokens in the cache. Defaults to 4 minutes 50 seconds (290000 ms).
-
-- **`convertDates`** (`boolean`, optional): Converts ISO date strings to `Date` objects in responses. Defaults to `true`.
-
-- **`autoPaginate`** (`boolean`, optional): Enables automatic pagination of multi-page API responses. Defaults to `true`.
-
-### Overrides and Development Options
-
-- **`fetchApi`** (`typeof fetch`, optional): Defaults to built-in `fetch` in browsers and Node.js >= 18. In older Node.js versions, node-fetch or another compatible library via fetchApi is required.
-
-- **`baseUrl`** (`string`, optional): Base URL for the QuickBase API. Defaults to `"https://api.quickbase.com/v1"`.
-
-- **`debug`** (`boolean`, optional): Enables debug logging to the console. Defaults to `false`.
-
-- **`tempToken`** (`string`, optional): Overrides default tempToken behavior by providing your own token.
-
-- **`tokenCache`** (`TokenCache`, optional): Allows use of a custom token cache instance.
-
----
-
-#### Configuration Notes
-
-- **Authentication**: Three mutually exclusive methods: `userToken`, `useTempTokens`, and `useSso` with `samlToken`. Only one may be active at a time.
-- **`tokenCache`**: Temporary tokens are cached here with their `dbid` and `tempTokenLifespan` when `useTempTokens` is enabled.
-
----
-
-### Pagination Control
-
-The library supports automatic pagination for methods like `runQuery` when `autoPaginate` is enabled (default: `true`). To temporarily disable or constrain pagination for a specific operation without altering the global configuration, use the `withPaginationDisabled()` or `withPaginationLimit()` methods.
-
-#### `withPaginationDisabled(callback)`
-
-- **Description**: Executes an asynchronous callback with pagination temporarily disabled, restoring the original `autoPaginate` setting afterward. Useful for fetching only the initial page of results without modifying method signatures or global settings.
-- **Parameters**:
-  - `callback`: `() => Promise<T>` - An async function containing the API call(s) to execute without pagination.
-- **Returns**: `Promise<T>` - The result of the callback.
-- **Example**:
-
-```javascript
-import { quickbase } from "quickbase-js"; // Adjust the import path as needed
-
-const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
-const QB_USER_TOKEN = ""; // Your QuickBase user token (e.g., 'b12345_abcde...')
-const QB_TABLE_ID = ""; // Your table ID (e.g., 'bxyz789')
-
-const qb = quickbase({
-  realm: QB_REALM,
-  userToken: QB_USER_TOKEN,
-  autoPaginate: true, // Pagination enabled by default
-});
-
-const runLimitedQuery = async () => {
-  try {
-    const result = await qb.withPaginationDisabled(async () => {
-      return qb.runQuery({
-        body: {
-          from: QB_TABLE_ID,
-          select: [3], // Example field ID
-          options: { top: 2 }, // Fetch only 2 records
-        },
-      });
-    });
-    console.log("Fetched records:", result.data.length); // Outputs: 2
-  } catch (error) {
-    console.error("Error running query:", error.message);
-  }
-};
-
-runLimitedQuery();
+```typescript
+// Returns first page only
+const page = await client.runQuery({ from: 'tableId' });
+console.log(page.data.length); // e.g., 100 records
+console.log(page.metadata.totalRecords); // e.g., 5000 total
 ```
 
-#### `withPaginationLimit(limit, callback)`
+### Fetch All Pages
 
-- **Description**: Executes an asynchronous callback with pagination enabled but limited to a specified number of records, restoring the original `autoPaginate` setting afterward. Useful for fetching a precise number of records (e.g., 100) from a larger dataset, stopping pagination once the limit is reached, without modifying method signatures or global settings.
-- **Parameters**:
-  - `limit`: `number` - The maximum number of records to fetch across all pages.
-  - `callback`: `() => Promise<T>` - An async function containing the API call(s) to execute with the pagination limit.
-- **Returns**: `Promise<T>` - The result of the callback, containing up to `limit` records.
-- **Example**:
-
-```javascript
-import { quickbase } from "quickbase-js"; // Adjust the import path as needed
-
-const QB_REALM = ""; // Your QuickBase realm (e.g., 'mycompany')
-const QB_USER_TOKEN = ""; // Your QuickBase user token (e.g., 'b12345_abcde...')
-const QB_TABLE_ID = ""; // Your table ID (e.g., 'bxyz789')
-
-const qb = quickbase({
-  realm: QB_REALM,
-  userToken: QB_USER_TOKEN,
-  autoPaginate: true, // Pagination enabled by default
-});
-
-const runCappedQuery = async () => {
-  try {
-    const result = await qb.withPaginationLimit(100, async () => {
-      return qb.runQuery({
-        body: {
-          from: QB_TABLE_ID,
-          select: [3], // Example field ID
-          options: { top: 25 }, // Fetch 25 records per page
-        },
-      });
-    });
-    console.log("Fetched records:", result.data.length); // Outputs: 100
-  } catch (error) {
-    console.error("Error running query:", error.message);
-  }
-};
-
-runCappedQuery();
+```typescript
+// Automatically fetches all pages and combines results
+const all = await client.runQuery({ from: 'tableId' }).all();
+console.log(all.data.length); // 5000 records
 ```
 
----
+### Fetch with Record Limit
 
-### Development workflow
+```typescript
+// Fetch up to 500 records (may span multiple pages)
+const limited = await client.runQuery({ from: 'tableId' }).paginate({ limit: 500 });
+console.log(limited.data.length); // 500 records
+```
+
+### Explicit Single Page
+
+```typescript
+// Explicitly fetch single page (useful when autoPaginate is enabled globally)
+const single = await client.runQuery({ from: 'tableId' }).noPaginate();
+```
+
+### Global Auto-Pagination
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  autoPaginate: true, // Default await now fetches all pages
+});
+
+// Now direct await fetches all pages
+const all = await client.runQuery({ from: 'tableId' });
+
+// Use .noPaginate() to get single page
+const page = await client.runQuery({ from: 'tableId' }).noPaginate();
+```
+
+## Date Conversion
+
+By default, ISO 8601 date strings in API responses are automatically converted to JavaScript `Date` objects:
+
+```typescript
+const app = await client.getApp({ appId: 'bpqe82s1' });
+
+// Date fields are now Date objects
+console.log(app.created instanceof Date); // true
+console.log(app.created.toISOString());   // "2024-01-15T10:30:00.000Z"
+
+// Works with nested objects and arrays
+const records = await client.runQuery({ from: 'tableId' });
+records.data.forEach(record => {
+  // Date field values are converted
+  console.log(record['7'].value instanceof Date); // true for date/timestamp fields
+});
+```
+
+To disable date conversion and keep dates as strings:
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  convertDates: false, // Keep dates as ISO strings
+});
+```
+
+## Configuration Options
+
+```typescript
+const client = createClient({
+  // Required
+  realm: 'mycompany',
+  auth: { /* see authentication section */ },
+
+  // Optional
+  debug: false,                              // Enable debug logging
+  timeout: 30000,                            // Request timeout in ms
+  baseUrl: 'https://api.quickbase.com/v1',   // API base URL
+  autoPaginate: false,                       // Auto-paginate on direct await
+  convertDates: true,                        // Convert ISO date strings to Date objects
+
+  // Rate limiting
+  rateLimit: {
+    // Optional client-side throttling
+    // QuickBase allows 100 requests per 10 seconds per user token
+    proactiveThrottle: {
+      enabled: false,
+      requestsPer10Seconds: 100,
+    },
+
+    // Retry configuration for 429 and 5xx errors
+    retry: {
+      maxAttempts: 3,
+      initialDelayMs: 1000,
+      maxDelayMs: 30000,
+      multiplier: 2,
+    },
+
+    // Callback when rate limited
+    onRateLimit: (info) => {
+      console.log(`Rate limited! Retry after ${info.retryAfter}s`);
+      console.log(`Request: ${info.requestUrl}`);
+      console.log(`Ray ID: ${info.qbApiRay}`);
+    },
+  },
+});
+```
+
+## API Methods
+
+All QuickBase API endpoints are available as typed methods:
+
+```typescript
+// Apps
+const app = await client.getApp({ appId: 'bpqe82s1' });
+const newApp = await client.createApp({ name: 'My App', description: 'Test' });
+await client.updateApp({ appId: 'bpqe82s1' }, { name: 'Updated Name' });
+await client.deleteApp({ appId: 'bpqe82s1' }, { name: 'My App' });
+
+// Tables
+const tables = await client.getAppTables({ appId: 'bpqe82s1' });
+const table = await client.getTable({ appId: 'bpqe82s1', tableId: 'byyy82s1' });
+
+// Fields
+const fields = await client.getFields({ tableId: 'byyy82s1' });
+
+// Records
+const records = await client.runQuery({
+  from: 'byyy82s1',
+  select: [3, 6, 7],
+  where: "{6.GT.100}",
+  sortBy: [{ fieldId: 3, order: 'ASC' }],
+  options: { top: 100, skip: 0 },
+});
+
+// Insert/Update records
+const result = await client.upsert({
+  to: 'byyy82s1',
+  data: [
+    { '6': { value: 'New Record' }, '7': { value: 42 } },
+  ],
+});
+
+// Delete records
+await client.deleteRecords({
+  from: 'byyy82s1',
+  where: "{3.EX.123}",
+});
+
+// Reports
+const report = await client.runReport(
+  { reportId: 'abc123', tableId: 'byyy82s1' },
+  { skip: 0, top: 100 }
+);
+
+// Users
+const users = await client.getUsers(
+  { accountId: '123456' },
+  { appIds: ['bpqe82s1'] }
+);
+```
+
+### Raw Request
+
+For endpoints not covered by typed methods, use the generic `request` method:
+
+```typescript
+const result = await client.request<MyResponseType>({
+  method: 'POST',
+  path: '/some/endpoint',
+  body: { key: 'value' },
+  query: { param: 'value' },
+});
+```
+
+## Error Handling
+
+```typescript
+import {
+  QuickbaseError,
+  RateLimitError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+  ValidationError,
+  ServerError,
+} from 'quickbase-js';
+
+try {
+  await client.getApp({ appId: 'invalid' });
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.log(`Rate limited. Retry after ${error.retryAfter} seconds`);
+    console.log(`Ray ID: ${error.rayId}`);
+  } else if (error instanceof AuthenticationError) {
+    console.log('Invalid or expired token');
+  } else if (error instanceof AuthorizationError) {
+    console.log('Permission denied');
+  } else if (error instanceof NotFoundError) {
+    console.log('Resource not found');
+  } else if (error instanceof ValidationError) {
+    console.log('Bad request:', error.message);
+  } else if (error instanceof ServerError) {
+    console.log('Server error:', error.statusCode);
+  } else if (error instanceof QuickbaseError) {
+    console.log(`API error ${error.statusCode}: ${error.message}`);
+  }
+}
+```
+
+## Migration from v1
+
+### Authentication
+
+```typescript
+// v1 - user token
+const qb = quickbase({ realm: 'company', userToken: 'token' });
+
+// v2 - user token (explicit type)
+const client = createClient({
+  realm: 'company',
+  auth: { type: 'user-token', userToken: 'token' },
+});
+
+// v1 - temp tokens in Code Pages
+const qb = quickbase({ realm: 'company', useTempTokens: true });
+
+// v2 - temp tokens in Code Pages
+const client = createClient({
+  realm: 'company',
+  auth: { type: 'temp-token' },
+});
+```
+
+### Pagination
+
+```typescript
+// v1 - callback-based
+await qb.withPaginationDisabled(async () => qb.runQuery({ body: { from: tableId } }));
+await qb.withPaginationLimit(100, async () => qb.runQuery({ body: { from: tableId } }));
+
+// v2 - fluent API
+await client.runQuery({ from: tableId }).noPaginate();
+await client.runQuery({ from: tableId }).paginate({ limit: 100 });
+```
+
+### Request Body
+
+```typescript
+// v1 - body wrapper
+await qb.runQuery({ body: { from: tableId, select: [3, 6] } });
+
+// v2 - direct parameters
+await client.runQuery({ from: tableId, select: [3, 6] });
+```
+
+## Development
 
 ```bash
-npm run gen:all
+# Clone with submodules (includes OpenAPI spec)
+git clone --recurse-submodules https://github.com/DrewBradfordXYZ/quickbase-js.git
+
+# Or if already cloned, initialize submodules
+git submodule update --init
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Build
 npm run build
-npm run test:all
+
+# Type check
+npm run typecheck
+
+# Generate types from OpenAPI spec
+npm run spec:generate
 ```
 
----
+### Spec Tools
 
-### Prerequisites
+```bash
+# Full spec processing pipeline
+npm run spec:build
 
-- Node.js version >= 18
-- A Quickbase account. [Free tier available](https://www.quickbase.com/builder-program).
+# Individual steps
+npm run spec:convert   # Swagger 2.0 → OpenAPI 3.0
+npm run spec:patch     # Apply fixes from overrides
+npm run spec:validate  # Validate spec
+npm run spec:split     # Split by tag (for editing)
+npm run spec:generate  # Generate TypeScript types
+```
 
----
+### Documentation
 
-### Contributing
+Generate API documentation from source code:
 
-If you would like to contribute to this project, please fork the repository and submit a pull request.
+```bash
+npm run docs        # Generate docs to ./docs
+npm run docs:watch  # Watch mode for development
+```
 
----
+The documentation is generated using [TypeDoc](https://typedoc.org/) and extracts JSDoc comments from the source code. Open `docs/index.html` to view locally.
 
-### License
+## License
 
-MIT License - see LICENSE for details.
-
----
+MIT

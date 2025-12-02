@@ -1,0 +1,38 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Generated files (optional, depending on versioning preference)
+/src/generated/
+
+# API Documentation website
+docs/.vitepress/dist/
+
+# Environment variables
+.env
+
+# Test artifacts
+test-artifacts/
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+
+# OpenAPI Generator artifacts
+src/openapi-jars/openapi-generator-cli*.jar
+openapitools.json
+
+# Java installation tarball
+OpenJDK17U-jre_x64_linux_hotspot_17.0.11_9.tar.gz
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

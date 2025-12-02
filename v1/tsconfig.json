@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "lib": ["ES2015", "ESNext", "DOM"],
+    "types": ["node"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "declaration": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@tests/*": ["tests/*"],
+      "openapi-types": ["node_modules/openapi-types/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*", "open-api/**/*", "tools/**/*"],
+  "exclude": ["node_modules", "dist/**/*", "generated/**/*", "specs"],
+  "ts-node": {
+    "esm": true,
+    "experimentalResolver": true
+  }
+}

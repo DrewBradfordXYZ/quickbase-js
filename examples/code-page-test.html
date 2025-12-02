@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QuickBase JS v2 Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2.0.0-alpha.8/dist/quickbase.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    pre { background: #f4f4f4; padding: 10px; overflow: auto; max-height: 300px; }
+    button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    select { padding: 8px; margin: 5px; min-width: 200px; }
+    .error { color: red; }
+    .success { color: green; }
+    #status { margin: 10px 0; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>QuickBase JS v2 Test</h1>
+  <div id="status">Loading...</div>
+
+  <div id="controls" style="display:none">
+    <div>
+      <label>Table: <select id="tableSelect" onchange="loadFields()"></select></label>
+      <label>Text Field: <select id="fieldSelect"></select></label>
+    </div>
+    <div>
+      <button onclick="runQuery()">Run Query</button>
+      <button onclick="testUpsert()">Create Record</button>
+      <button onclick="deleteAll()">Delete All</button>
+    </div>
+  </div>
+
+  <h3>Result:</h3>
+  <pre id="output">Initializing...</pre>
+
+  <script>
+    // Auto-detect realm and appId from URL
+    // URL format: https://realm.quickbase.com/db/{appId}?a=dbpage&pageID=X
+    const realm = window.location.hostname.split('.')[0];
+    const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+
+    const client = QuickBase.createClient({
+      realm: realm,
+      auth: { type: 'temp-token' }
+    });
+
+    let tables = [];
+    let fields = [];
+
+    function log(msg, isError) {
+      const el = document.getElementById('output');
+      el.className = isError ? 'error' : 'success';
+      el.textContent = typeof msg === 'string' ? msg : JSON.stringify(msg, null, 2);
+    }
+
+    function status(msg) {
+      document.getElementById('status').textContent = msg;
+    }
+
+    async function init() {
+      if (!appId) {
+        status('Error: Could not detect app ID from URL');
+        log('This page must be accessed from within a QuickBase app', true);
+        return;
+      }
+
+      try {
+        // For temp-token auth, we need a table ID first.
+        // The appId itself can be used as the dbid for the first call.
+        status('Loading tables...');
+        tables = await client.getAppTables({ appId });
+
+        if (tables.length === 0) {
+          status('No tables found');
+          log('This app has no tables', true);
+          return;
+        }
+
+        const tableSelect = document.getElementById('tableSelect');
+        tableSelect.innerHTML = tables.map(t =>
+          `<option value="${t.id}">${t.name}</option>`
+        ).join('');
+
+        await loadFields();
+
+        status(`App: ${appId} (${tables.length} tables)`);
+        document.getElementById('controls').style.display = 'block';
+        log({ appId, tables: tables.map(t => ({ id: t.id, name: t.name })) });
+      } catch (e) {
+        status('Error loading app');
+        log(e.message, true);
+      }
+    }
+
+    async function loadFields() {
+      const tableId = document.getElementById('tableSelect').value;
+      if (!tableId) return;
+
+      try {
+        fields = await client.getFields({ tableId });
+
+        // Find text fields for the dropdown
+        const textFields = fields.filter(f => f.fieldType === 'text');
+        const fieldSelect = document.getElementById('fieldSelect');
+        fieldSelect.innerHTML = textFields.map(f =>
+          `<option value="${f.id}">${f.label} (${f.id})</option>`
+        ).join('');
+
+        log({
+          table: tables.find(t => t.id === tableId)?.name,
+          fieldCount: fields.length,
+          fields: fields.map(f => ({ id: f.id, label: f.label, type: f.fieldType }))
+        });
+      } catch (e) {
+        log(e.message, true);
+      }
+    }
+
+    async function runQuery() {
+      const tableId = document.getElementById('tableSelect').value;
+      try {
+        log('Running query...');
+        const result = await client.runQuery({
+          from: tableId,
+          select: [3, 1, 2],  // Record ID, Date Created, Date Modified
+          sortBy: [{ fieldId: 1, order: 'DESC' }]
+        });
+        log({
+          recordCount: result.data?.length,
+          records: result.data?.slice(0, 10).map(r => ({
+            id: r[3].value,
+            created: r[1].value,
+            modified: r[2].value
+          }))
+        });
+      } catch (e) {
+        log(e.message, true);
+      }
+    }
+
+    async function testUpsert() {
+      const tableId = document.getElementById('tableSelect').value;
+      const fieldId = document.getElementById('fieldSelect').value;
+      if (!fieldId) {
+        log('No text field available in this table', true);
+        return;
+      }
+
+      try {
+        log('Creating record...');
+        const result = await client.upsert({
+          to: tableId,
+          data: [{
+            [fieldId]: { value: 'Test v2 SDK ' + new Date().toISOString() }
+          }]
+        });
+        log({
+          success: true,
+          createdIds: result.metadata?.createdRecordIds
+        });
+      } catch (e) {
+        log(e.message, true);
+      }
+    }
+
+    async function deleteAll() {
+      const tableId = document.getElementById('tableSelect').value;
+      if (!confirm('Delete ALL records from this table?')) return;
+
+      try {
+        log('Deleting all records...');
+        const result = await client.deleteRecords({
+          from: tableId,
+          where: '{3.GT.0}'
+        });
+        log({
+          success: true,
+          deleted: result.numberDeleted
+        });
+      } catch (e) {
+        log(e.message, true);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

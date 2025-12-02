@@ -1,0 +1,19 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "name": "QuickBase JS SDK v2",
+  "readme": "README.md",
+  "customJs": "typedoc-custom.js",
+  "exclude": ["**/*+(test|spec).ts", "**/node_modules/**"],
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "navigationLinks": {
+    "API Methods": "./interfaces/QuickbaseAPI.html",
+    "QuickBase API": "https://developer.quickbase.com/",
+    "GitHub": "https://github.com/DrewBradfordXYZ/quickbase-js"
+  }
+}

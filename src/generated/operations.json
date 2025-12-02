@@ -1,0 +1,592 @@
+[
+  {
+    "operationId": "createApp",
+    "method": "POST",
+    "path": "/apps",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "getApp",
+    "method": "GET",
+    "path": "/apps/{appId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "updateApp",
+    "method": "POST",
+    "path": "/apps/{appId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "deleteApp",
+    "method": "DELETE",
+    "path": "/apps/{appId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "getAppEvents",
+    "method": "GET",
+    "path": "/apps/{appId}/events",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "copyApp",
+    "method": "POST",
+    "path": "/apps/{appId}/copy",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
+    "operationId": "getAppTables",
+    "method": "GET",
+    "path": "/tables",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "createTable",
+    "method": "POST",
+    "path": "/tables",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "getTable",
+    "method": "GET",
+    "path": "/tables/{tableId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "updateTable",
+    "method": "POST",
+    "path": "/tables/{tableId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "deleteTable",
+    "method": "DELETE",
+    "path": "/tables/{tableId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "getRelationships",
+    "method": "GET",
+    "path": "/tables/{tableId}/relationships",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "createRelationship",
+    "method": "POST",
+    "path": "/tables/{tableId}/relationship",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "updateRelationship",
+    "method": "POST",
+    "path": "/tables/{tableId}/relationship/{relationshipId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "deleteRelationship",
+    "method": "DELETE",
+    "path": "/tables/{tableId}/relationship/{relationshipId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Tables"
+    ]
+  },
+  {
+    "operationId": "getTableReports",
+    "method": "GET",
+    "path": "/reports",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Reports"
+    ]
+  },
+  {
+    "operationId": "getReport",
+    "method": "GET",
+    "path": "/reports/{reportId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Reports"
+    ]
+  },
+  {
+    "operationId": "runReport",
+    "method": "POST",
+    "path": "/reports/{reportId}/run",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Reports"
+    ]
+  },
+  {
+    "operationId": "getFields",
+    "method": "GET",
+    "path": "/fields",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "createField",
+    "method": "POST",
+    "path": "/fields",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "deleteFields",
+    "method": "DELETE",
+    "path": "/fields",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "getField",
+    "method": "GET",
+    "path": "/fields/{fieldId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "updateField",
+    "method": "POST",
+    "path": "/fields/{fieldId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "getFieldsUsage",
+    "method": "GET",
+    "path": "/fields/usage",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "getFieldUsage",
+    "method": "GET",
+    "path": "/fields/usage/{fieldId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Fields"
+    ]
+  },
+  {
+    "operationId": "runFormula",
+    "method": "POST",
+    "path": "/formula/run",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Formulas"
+    ]
+  },
+  {
+    "operationId": "upsert",
+    "method": "POST",
+    "path": "/records",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Records"
+    ]
+  },
+  {
+    "operationId": "deleteRecords",
+    "method": "DELETE",
+    "path": "/records",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Records"
+    ]
+  },
+  {
+    "operationId": "runQuery",
+    "method": "POST",
+    "path": "/records/query",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Records"
+    ]
+  },
+  {
+    "operationId": "getTempTokenDBID",
+    "method": "GET",
+    "path": "/auth/temporary/{dbid}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Auth"
+    ]
+  },
+  {
+    "operationId": "exchangeSsoToken",
+    "method": "POST",
+    "path": "/auth/oauth/token",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Auth"
+    ]
+  },
+  {
+    "operationId": "cloneUserToken",
+    "method": "POST",
+    "path": "/usertoken/clone",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "UserToken"
+    ]
+  },
+  {
+    "operationId": "transferUserToken",
+    "method": "POST",
+    "path": "/usertoken/transfer",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "UserToken"
+    ]
+  },
+  {
+    "operationId": "deactivateUserToken",
+    "method": "POST",
+    "path": "/usertoken/deactivate",
+    "hasParams": false,
+    "hasBody": false,
+    "tags": [
+      "UserToken"
+    ]
+  },
+  {
+    "operationId": "deleteUserToken",
+    "method": "DELETE",
+    "path": "/usertoken",
+    "hasParams": false,
+    "hasBody": false,
+    "tags": [
+      "UserToken"
+    ]
+  },
+  {
+    "operationId": "downloadFile",
+    "method": "GET",
+    "path": "/files/{tableId}/{recordId}/{fieldId}/{versionNumber}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Files"
+    ]
+  },
+  {
+    "operationId": "deleteFile",
+    "method": "DELETE",
+    "path": "/files/{tableId}/{recordId}/{fieldId}/{versionNumber}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Files"
+    ]
+  },
+  {
+    "operationId": "getUsers",
+    "method": "POST",
+    "path": "/users",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "denyUsers",
+    "method": "PUT",
+    "path": "/users/deny",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "denyUsersAndGroups",
+    "method": "PUT",
+    "path": "/users/deny/{shouldDeleteFromGroups}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "undenyUsers",
+    "method": "PUT",
+    "path": "/users/undeny",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "addMembersToGroup",
+    "method": "POST",
+    "path": "/groups/{gid}/members",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "removeMembersFromGroup",
+    "method": "DELETE",
+    "path": "/groups/{gid}/members",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "addManagersToGroup",
+    "method": "POST",
+    "path": "/groups/{gid}/managers",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "removeManagersFromGroup",
+    "method": "DELETE",
+    "path": "/groups/{gid}/managers",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "addSubgroupsToGroup",
+    "method": "POST",
+    "path": "/groups/{gid}/subgroups",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "removeSubgroupsFromGroup",
+    "method": "DELETE",
+    "path": "/groups/{gid}/subgroups",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
+    "operationId": "audit",
+    "method": "POST",
+    "path": "/audit",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Audit"
+    ]
+  },
+  {
+    "operationId": "platformAnalyticReads",
+    "method": "GET",
+    "path": "/analytics/reads",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Platform Analytics"
+    ]
+  },
+  {
+    "operationId": "platformAnalyticEventSummaries",
+    "method": "POST",
+    "path": "/analytics/events/summaries",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Platform Analytics"
+    ]
+  },
+  {
+    "operationId": "exportSolution",
+    "method": "GET",
+    "path": "/solutions/{solutionId}",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "updateSolution",
+    "method": "PUT",
+    "path": "/solutions/{solutionId}",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "createSolution",
+    "method": "POST",
+    "path": "/solutions",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "exportSolutionToRecord",
+    "method": "GET",
+    "path": "/solutions/{solutionId}/torecord",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "createSolutionFromRecord",
+    "method": "GET",
+    "path": "/solutions/fromrecord",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "updateSolutionToRecord",
+    "method": "GET",
+    "path": "/solutions/{solutionId}/fromrecord",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "changesetSolution",
+    "method": "PUT",
+    "path": "/solutions/{solutionId}/changeset",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "changesetSolutionFromRecord",
+    "method": "GET",
+    "path": "/solutions/{solutionId}/changeset/fromrecord",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "generateDocument",
+    "method": "GET",
+    "path": "/docTemplates/{templateId}/generate",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Document Templates"
+    ]
+  }
+]

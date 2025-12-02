@@ -1,1 +1,165 @@
-export * from "./quickbaseClient.ts";
+/**
+ * QuickBase SDK v2
+ *
+ * A TypeScript/JavaScript client for the QuickBase JSON RESTful API.
+ *
+ * @example
+ * ```typescript
+ * import { createClient } from 'quickbase-js';
+ *
+ * const client = createClient({
+ *   realm: 'mycompany',
+ *   auth: {
+ *     type: 'user-token',
+ *     userToken: 'your-user-token',
+ *   },
+ * });
+ *
+ * const app = await client.getApp({ appId: 'bpqe82s1' });
+ * console.log(app.name);
+ * ```
+ */
+
+// Core exports
+export type {
+  QuickbaseConfig,
+  AuthConfig,
+  UserTokenAuthConfig,
+  TempTokenAuthConfig,
+  SsoTokenAuthConfig,
+  RateLimitConfig,
+  RetryConfig,
+  RateLimitInfo,
+  PaginationMetadata,
+  PaginatedResponse,
+  FieldInfo,
+} from './core/index.js';
+
+export {
+  QuickbaseError,
+  RateLimitError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+  ValidationError,
+  TimeoutError,
+  ServerError,
+} from './core/index.js';
+
+// Auth exports (for advanced usage)
+export type { AuthStrategy } from './auth/index.js';
+export {
+  UserTokenStrategy,
+  TempTokenStrategy,
+  SsoTokenStrategy,
+  createAuthStrategy,
+} from './auth/index.js';
+
+// Client exports
+export type { RequestOptions } from './client/index.js';
+export { SlidingWindowThrottle, NoOpThrottle } from './client/index.js';
+
+// Generated types and client
+export type { QuickbaseAPI } from './generated/types.js';
+export * from './generated/types.js';
+export { createApiMethods } from './generated/client.js';
+
+// Main client factory
+import type { QuickbaseConfig, ResolvedConfig } from './core/types.js';
+import { resolveConfig } from './core/config.js';
+import { createLogger } from './core/logger.js';
+import { createAuthStrategy } from './auth/index.js';
+import { createThrottle } from './client/throttle.js';
+import { createRequestExecutor } from './client/request.js';
+import type { QuickbaseAPI } from './generated/types.js';
+import { createApiMethods } from './generated/client.js';
+
+/**
+ * QuickBase client with typed API methods
+ */
+export interface QuickbaseClient extends QuickbaseAPI {
+  /** Execute a raw request (for custom API calls) */
+  request: <T = unknown>(options: {
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    path: string;
+    body?: unknown;
+    query?: Record<string, string | number | boolean | undefined>;
+    dbid?: string;
+  }) => Promise<T>;
+
+  /** Get the resolved configuration */
+  getConfig: () => ResolvedConfig;
+}
+
+/**
+ * Create a QuickBase client
+ *
+ * @example User token authentication
+ * ```typescript
+ * const client = createClient({
+ *   realm: 'mycompany',
+ *   auth: {
+ *     type: 'user-token',
+ *     userToken: 'your-user-token',
+ *   },
+ * });
+ * ```
+ *
+ * @example Temporary token authentication
+ * ```typescript
+ * const client = createClient({
+ *   realm: 'mycompany',
+ *   auth: {
+ *     type: 'temp-token',
+ *     userToken: 'your-user-token',
+ *     appToken: 'optional-app-token',
+ *   },
+ * });
+ * ```
+ *
+ * @example With rate limiting callback
+ * ```typescript
+ * const client = createClient({
+ *   realm: 'mycompany',
+ *   auth: { type: 'user-token', userToken: 'token' },
+ *   rateLimit: {
+ *     onRateLimit: (info) => {
+ *       console.log(`Rate limited! Retry after ${info.retryAfter}s`);
+ *     },
+ *   },
+ * });
+ * ```
+ */
+export function createClient(config: QuickbaseConfig): QuickbaseClient {
+  const resolvedConfig = resolveConfig(config);
+  const logger = createLogger(resolvedConfig.debug);
+
+  const authContext = {
+    realm: resolvedConfig.realm,
+    baseUrl: resolvedConfig.baseUrl,
+    fetchApi: resolvedConfig.fetchApi,
+    logger,
+  };
+
+  const auth = createAuthStrategy(resolvedConfig.auth, authContext);
+  const throttle = createThrottle(resolvedConfig.proactiveThrottle);
+
+  const executor = createRequestExecutor({
+    config: resolvedConfig,
+    auth,
+    throttle,
+    logger,
+  });
+
+  // Create typed API methods
+  const apiMethods = createApiMethods(executor.execute, resolvedConfig.autoPaginate);
+
+  return {
+    ...apiMethods,
+    request: executor.execute,
+    getConfig: () => resolvedConfig,
+  };
+}
+
+// Default export
+export default createClient;
