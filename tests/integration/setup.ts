@@ -16,8 +16,11 @@ config({ quiet: true });
 
 export const QB_REALM = process.env.QB_REALM;
 export const QB_USER_TOKEN = process.env.QB_USER_TOKEN;
+export const QB_USERNAME = process.env.QB_USERNAME;
+export const QB_PASSWORD = process.env.QB_PASSWORD;
 
 export const hasCredentials = !!(QB_REALM && QB_USER_TOKEN);
+export const hasTicketCredentials = !!(QB_REALM && QB_USERNAME && QB_PASSWORD);
 
 /**
  * Returns true if credentials are missing (used with describe.skipIf)

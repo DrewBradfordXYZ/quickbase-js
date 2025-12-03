@@ -7,7 +7,16 @@
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { existsSync, readFileSync } from 'fs';
 import { createClient } from '../../src/index.js';
-import { skipIfNoCredentials, TEST_CONTEXT_PATH, TestContext, QB_REALM, QB_USER_TOKEN } from './setup.js';
+import {
+  skipIfNoCredentials,
+  TEST_CONTEXT_PATH,
+  TestContext,
+  QB_REALM,
+  QB_USER_TOKEN,
+  QB_USERNAME,
+  QB_PASSWORD,
+  hasTicketCredentials,
+} from './setup.js';
 
 describe.skipIf(skipIfNoCredentials())('Authentication Integration', () => {
   let appId: string;
@@ -44,6 +53,52 @@ describe.skipIf(skipIfNoCredentials())('Authentication Integration', () => {
         auth: {
           type: 'user-token',
           userToken: 'invalid_token_12345',
+        },
+      });
+
+      await expect(client.getApp({ appId })).rejects.toThrow();
+    });
+  });
+
+  // XML-API-TICKET: Remove this describe block if XML API is discontinued
+  describe.skipIf(!hasTicketCredentials)('Ticket Auth (Username/Password)', () => {
+    it('should authenticate with username and password', async () => {
+      const client = createClient({
+        realm: QB_REALM!,
+        auth: {
+          type: 'ticket',
+          username: QB_USERNAME!,
+          password: QB_PASSWORD!,
+        },
+      });
+
+      // First request triggers authentication
+      const result = await client.getApp({ appId });
+      expect(result.id).toBe(appId);
+    });
+
+    it('should work with custom ticket hours', async () => {
+      const client = createClient({
+        realm: QB_REALM!,
+        auth: {
+          type: 'ticket',
+          username: QB_USERNAME!,
+          password: QB_PASSWORD!,
+          hours: 24,
+        },
+      });
+
+      const result = await client.getApp({ appId });
+      expect(result.id).toBe(appId);
+    });
+
+    it('should fail with invalid credentials', async () => {
+      const client = createClient({
+        realm: QB_REALM!,
+        auth: {
+          type: 'ticket',
+          username: 'invalid@example.com',
+          password: 'wrongpassword',
         },
       });
 
