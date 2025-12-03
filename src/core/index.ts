@@ -8,6 +8,7 @@ export type {
   UserTokenAuthConfig,
   TempTokenAuthConfig,
   SsoTokenAuthConfig,
+  TicketAuthConfig, // XML-API-TICKET: Remove if XML API discontinued
   RateLimitConfig,
   RetryConfig,
   RequestContext,

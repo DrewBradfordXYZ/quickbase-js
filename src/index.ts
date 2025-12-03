@@ -27,6 +27,7 @@ export type {
   UserTokenAuthConfig,
   TempTokenAuthConfig,
   SsoTokenAuthConfig,
+  TicketAuthConfig, // XML-API-TICKET: Remove if XML API discontinued
   RateLimitConfig,
   RetryConfig,
   RateLimitInfo,
@@ -52,6 +53,7 @@ export {
   UserTokenStrategy,
   TempTokenStrategy,
   SsoTokenStrategy,
+  TicketStrategy, // XML-API-TICKET: Remove if XML API discontinued
   createAuthStrategy,
 } from './auth/index.js';
 

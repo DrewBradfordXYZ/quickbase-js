@@ -99,6 +99,16 @@ function validateAuthConfig(auth: QuickbaseConfig['auth']): void {
       }
       break;
 
+    // XML-API-TICKET: Remove this case if XML API is discontinued
+    case 'ticket':
+      if (!auth.username) {
+        throw new Error('Username is required for ticket auth');
+      }
+      if (!auth.password) {
+        throw new Error('Password is required for ticket auth');
+      }
+      break;
+
     default:
       throw new Error(`Unknown auth type: ${(auth as { type: string }).type}`);
   }

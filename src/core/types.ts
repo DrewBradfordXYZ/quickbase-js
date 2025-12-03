@@ -38,7 +38,8 @@ export interface QuickbaseConfig {
 export type AuthConfig =
   | UserTokenAuthConfig
   | TempTokenAuthConfig
-  | SsoTokenAuthConfig;
+  | SsoTokenAuthConfig
+  | TicketAuthConfig;
 
 export interface UserTokenAuthConfig {
   type: 'user-token';
@@ -63,6 +64,23 @@ export interface SsoTokenAuthConfig {
   type: 'sso';
   /** SAML token for SSO authentication */
   samlToken: string;
+}
+
+/**
+ * Ticket authentication using username/password via XML API_Authenticate.
+ * Unlike user tokens, tickets properly attribute record changes (createdBy/modifiedBy)
+ * to the authenticated user.
+ *
+ * XML-API-TICKET: Remove this interface if XML API is discontinued.
+ */
+export interface TicketAuthConfig {
+  type: 'ticket';
+  /** QuickBase username (email address) */
+  username: string;
+  /** QuickBase password */
+  password: string;
+  /** Ticket validity in hours (default: 12, max: 4380 ~6 months) */
+  hours?: number;
 }
 
 export interface RateLimitConfig {

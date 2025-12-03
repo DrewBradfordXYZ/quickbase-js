@@ -149,6 +149,46 @@ const client = createClient({
 });
 ```
 
+### Ticket Auth (Username/Password)
+
+Ticket authentication lets users log in with their QuickBase email and password. Unlike user tokens, tickets properly attribute record changes (`createdBy`/`modifiedBy`) to the authenticated user.
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'ticket',
+    username: 'user@example.com',
+    password: 'password',
+  },
+});
+```
+
+**Key behaviors:**
+- Authentication happens lazily on the first API call
+- Password is discarded from memory after authentication
+- Tickets are valid for 12 hours by default (configurable up to ~6 months)
+- When the ticket expires, an error is thrown — create a new client with fresh credentials
+
+**With custom ticket validity:**
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'ticket',
+    username: 'user@example.com',
+    password: 'password',
+    hours: 24 * 7, // 1 week
+  },
+});
+```
+
+**When to use ticket auth:**
+- Third-party services where users shouldn't share user tokens
+- Proper audit trails with correct `createdBy`/`modifiedBy` attribution
+- Session-based authentication flows
+
 ## Pagination
 
 Paginated endpoints (`runQuery`, `runReport`, `getUsers`, etc.) return a `PaginatedRequest` that supports fluent pagination methods.
