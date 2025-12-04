@@ -109,21 +109,11 @@ const client = createClient({
 Temporary tokens are automatically fetched and cached per database. Tokens are refreshed proactively before expiration (default: 4m 50s TTL for 5-minute tokens). The SDK also handles unexpected 401 errors as a fallback.
 
 ```typescript
-// In QuickBase Code Pages - no user token needed (uses browser session)
+// In QuickBase Code Pages - uses browser session for authentication
 const client = createClient({
   realm: 'mycompany',
   auth: {
     type: 'temp-token',
-  },
-});
-
-// Outside Code Pages - user token required to fetch temp tokens
-const client = createClient({
-  realm: 'mycompany',
-  auth: {
-    type: 'temp-token',
-    userToken: 'your-user-token',      // Required outside Code Pages
-    appToken: 'optional-app-token',    // If app requires it
   },
 });
 ```
