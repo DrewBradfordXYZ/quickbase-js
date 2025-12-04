@@ -37,12 +37,12 @@ For QuickBase Code Pages, use temp-token authentication which automatically leve
   // Realm can be auto-detected from the current URL
   const realm = window.location.hostname.split('.')[0];
 
-  const client = QuickBase.createClient({
+  const qb = QuickBase.createClient({
     realm: realm,
     auth: { type: 'temp-token' },
   });
 
-  client.getApp({ appId: 'bpqe82s1' }).then(app => {
+  qb.getApp({ appId: 'bpqe82s1' }).then(app => {
     console.log(app.name);
   });
 </script>
@@ -54,12 +54,12 @@ Or with ES modules:
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js';
 
-  const client = createClient({
+  const qb = createClient({
     realm: 'mycompany',
     auth: { type: 'temp-token' },
   });
 
-  const app = await client.getApp({ appId: 'bpqe82s1' });
+  const app = await qb.getApp({ appId: 'bpqe82s1' });
   console.log(app.name);
 </script>
 ```
@@ -69,7 +69,7 @@ Or with ES modules:
 ```typescript
 import { createClient } from 'quickbase-js';
 
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: {
     type: 'user-token',
@@ -78,11 +78,11 @@ const client = createClient({
 });
 
 // Use typed API methods
-const app = await client.getApp({ appId: 'bpqe82s1' });
+const app = await qb.getApp({ appId: 'bpqe82s1' });
 console.log(app.name);
 
 // Query records
-const records = await client.runQuery({
+const records = await qb.runQuery({
   from: 'bpqe82s1',
   select: [3, 6, 7],
   where: "{6.EX.'Active'}",
@@ -95,7 +95,7 @@ console.log(records.data);
 ### User Token (Recommended for Server-Side)
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: {
     type: 'user-token',
@@ -110,7 +110,7 @@ Temporary tokens are automatically fetched and cached per database. Tokens are r
 
 ```typescript
 // In QuickBase Code Pages - uses browser session for authentication
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: {
     type: 'temp-token',
@@ -131,7 +131,7 @@ This means you don't need to manually specify the dbid - just make API calls and
 ### SSO Token
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: {
     type: 'sso',
@@ -147,7 +147,7 @@ Ticket authentication lets users log in with their QuickBase email and password.
 ```typescript
 // Create client after user submits login form
 function handleLogin(formData: { username: string; password: string }) {
-  const client = createClient({
+  const qb = createClient({
     realm: 'mycompany',
     auth: {
       type: 'ticket',
@@ -160,7 +160,7 @@ function handleLogin(formData: { username: string; password: string }) {
       },
     },
   });
-  return client;
+  return qb;
 }
 ```
 
@@ -178,7 +178,7 @@ Paginated endpoints (`runQuery`, `runReport`, `getUsers`, etc.) return a `Pagina
 
 ```typescript
 // Returns first page only
-const page = await client.runQuery({ from: 'tableId' });
+const page = await qb.runQuery({ from: 'tableId' });
 console.log(page.data.length); // e.g., 100 records
 console.log(page.metadata.totalRecords); // e.g., 5000 total
 ```
@@ -187,7 +187,7 @@ console.log(page.metadata.totalRecords); // e.g., 5000 total
 
 ```typescript
 // Automatically fetches all pages and combines results
-const all = await client.runQuery({ from: 'tableId' }).all();
+const all = await qb.runQuery({ from: 'tableId' }).all();
 console.log(all.data.length); // 5000 records
 ```
 
@@ -195,7 +195,7 @@ console.log(all.data.length); // 5000 records
 
 ```typescript
 // Fetch up to 500 records (may span multiple pages)
-const limited = await client.runQuery({ from: 'tableId' }).paginate({ limit: 500 });
+const limited = await qb.runQuery({ from: 'tableId' }).paginate({ limit: 500 });
 console.log(limited.data.length); // 500 records
 ```
 
@@ -203,23 +203,23 @@ console.log(limited.data.length); // 500 records
 
 ```typescript
 // Explicitly fetch single page (useful when autoPaginate is enabled globally)
-const single = await client.runQuery({ from: 'tableId' }).noPaginate();
+const single = await qb.runQuery({ from: 'tableId' }).noPaginate();
 ```
 
 ### Global Auto-Pagination
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   autoPaginate: true, // Default await now fetches all pages
 });
 
 // Now direct await fetches all pages
-const all = await client.runQuery({ from: 'tableId' });
+const all = await qb.runQuery({ from: 'tableId' });
 
 // Use .noPaginate() to get single page
-const page = await client.runQuery({ from: 'tableId' }).noPaginate();
+const page = await qb.runQuery({ from: 'tableId' }).noPaginate();
 ```
 
 ## Date Conversion
@@ -227,14 +227,14 @@ const page = await client.runQuery({ from: 'tableId' }).noPaginate();
 By default, ISO 8601 date strings in API responses are automatically converted to JavaScript `Date` objects:
 
 ```typescript
-const app = await client.getApp({ appId: 'bpqe82s1' });
+const app = await qb.getApp({ appId: 'bpqe82s1' });
 
 // Date fields are now Date objects
 console.log(app.created instanceof Date); // true
 console.log(app.created.toISOString());   // "2024-01-15T10:30:00.000Z"
 
 // Works with nested objects and arrays
-const records = await client.runQuery({ from: 'tableId' });
+const records = await qb.runQuery({ from: 'tableId' });
 records.data.forEach(record => {
   // Date field values are converted
   console.log(record['7'].value instanceof Date); // true for date/timestamp fields
@@ -244,7 +244,7 @@ records.data.forEach(record => {
 To disable date conversion and keep dates as strings:
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   convertDates: false, // Keep dates as ISO strings
@@ -258,7 +258,7 @@ Use readable names for tables and fields instead of cryptic IDs. The SDK transfo
 ### Defining a Schema
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   schema: {
@@ -291,7 +291,7 @@ const client = createClient({
 
 ```typescript
 // Use table and field aliases instead of IDs
-const result = await client.runQuery({
+const result = await qb.runQuery({
   from: 'projects',                          // Instead of 'bqw3ryzab'
   select: ['name', 'status', 'dueDate'],     // Instead of [6, 7, 12]
   where: "{'status'.EX.'Active'}",           // Field aliases in where clauses
@@ -307,7 +307,7 @@ console.log(result.data[0].dueDate);  // Date object (if convertDates is enabled
 ### Upserting with Aliases
 
 ```typescript
-await client.upsert({
+await qb.upsert({
   to: 'projects',
   data: [
     { name: { value: 'New Project' }, status: { value: 'Planning' } },
@@ -336,7 +336,7 @@ Typos in aliases throw errors with suggestions:
 
 ```typescript
 // Throws: Unknown field alias 'stauts' in table 'projects'. Did you mean 'status'?
-await client.runQuery({
+await qb.runQuery({
   from: 'projects',
   select: ['stauts'],  // Typo!
 });
@@ -409,7 +409,7 @@ export const schema: Schema = {
 import { createClient } from 'quickbase-js';
 import { schema } from './schema.js';
 
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   schema,
@@ -434,7 +434,7 @@ Or use a JSON file:
 import { createClient } from 'quickbase-js';
 import schema from './schema.json' assert { type: 'json' };
 
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   schema,
@@ -444,7 +444,7 @@ const client = createClient({
 ## Configuration Options
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   // Required
   realm: 'mycompany',
   auth: { /* see authentication section */ },
@@ -490,20 +490,20 @@ All QuickBase API endpoints are available as typed methods:
 
 ```typescript
 // Apps
-const app = await client.getApp({ appId: 'bpqe82s1' });
-const newApp = await client.createApp({ name: 'My App', description: 'Test' });
-await client.updateApp({ appId: 'bpqe82s1' }, { name: 'Updated Name' });
-await client.deleteApp({ appId: 'bpqe82s1' }, { name: 'My App' });
+const app = await qb.getApp({ appId: 'bpqe82s1' });
+const newApp = await qb.createApp({ name: 'My App', description: 'Test' });
+await qb.updateApp({ appId: 'bpqe82s1' }, { name: 'Updated Name' });
+await qb.deleteApp({ appId: 'bpqe82s1' }, { name: 'My App' });
 
 // Tables
-const tables = await client.getAppTables({ appId: 'bpqe82s1' });
-const table = await client.getTable({ appId: 'bpqe82s1', tableId: 'byyy82s1' });
+const tables = await qb.getAppTables({ appId: 'bpqe82s1' });
+const table = await qb.getTable({ appId: 'bpqe82s1', tableId: 'byyy82s1' });
 
 // Fields
-const fields = await client.getFields({ tableId: 'byyy82s1' });
+const fields = await qb.getFields({ tableId: 'byyy82s1' });
 
 // Records
-const records = await client.runQuery({
+const records = await qb.runQuery({
   from: 'byyy82s1',
   select: [3, 6, 7],
   where: "{6.GT.100}",
@@ -512,7 +512,7 @@ const records = await client.runQuery({
 });
 
 // Insert/Update records
-const result = await client.upsert({
+const result = await qb.upsert({
   to: 'byyy82s1',
   data: [
     { '6': { value: 'New Record' }, '7': { value: 42 } },
@@ -520,19 +520,19 @@ const result = await client.upsert({
 });
 
 // Delete records
-await client.deleteRecords({
+await qb.deleteRecords({
   from: 'byyy82s1',
   where: "{3.EX.123}",
 });
 
 // Reports
-const report = await client.runReport(
+const report = await qb.runReport(
   { reportId: 'abc123', tableId: 'byyy82s1' },
   { skip: 0, top: 100 }
 );
 
 // Users
-const users = await client.getUsers(
+const users = await qb.getUsers(
   { accountId: '123456' },
   { appIds: ['bpqe82s1'] }
 );
@@ -543,7 +543,7 @@ const users = await client.getUsers(
 For endpoints not covered by typed methods, use the generic `request` method:
 
 ```typescript
-const result = await client.request<MyResponseType>({
+const result = await qb.request<MyResponseType>({
   method: 'POST',
   path: '/some/endpoint',
   body: { key: 'value' },
@@ -565,7 +565,7 @@ import {
 } from 'quickbase-js';
 
 try {
-  await client.getApp({ appId: 'invalid' });
+  await qb.getApp({ appId: 'invalid' });
 } catch (error) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry after ${error.retryAfter} seconds`);
@@ -617,7 +617,7 @@ Throw RateLimitError if exhausted
 ### Retry Configuration
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   rateLimit: {
@@ -638,7 +638,7 @@ The backoff formula with jitter: `delay = initialDelayMs * (multiplier ^ attempt
 Prevent 429 errors entirely by throttling requests client-side using a sliding window algorithm:
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   rateLimit: {
@@ -657,7 +657,7 @@ This tracks request timestamps and blocks new requests when the limit would be e
 Get notified when rate limited (called before retry):
 
 ```typescript
-const client = createClient({
+const qb = createClient({
   realm: 'mycompany',
   auth: { type: 'user-token', userToken: 'token' },
   rateLimit: {
@@ -679,7 +679,7 @@ If retries are exhausted, a `RateLimitError` is thrown:
 import { RateLimitError } from 'quickbase-js';
 
 try {
-  await client.getApp({ appId: 'bpqe82s1' });
+  await qb.getApp({ appId: 'bpqe82s1' });
 } catch (error) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited after ${error.rateLimitInfo.attempt} attempts`);
@@ -697,7 +697,7 @@ try {
 const qb = quickbase({ realm: 'company', userToken: 'token' });
 
 // v2 - user token (explicit type)
-const client = createClient({
+const qb = createClient({
   realm: 'company',
   auth: { type: 'user-token', userToken: 'token' },
 });
@@ -706,7 +706,7 @@ const client = createClient({
 const qb = quickbase({ realm: 'company', useTempTokens: true });
 
 // v2 - temp tokens in Code Pages
-const client = createClient({
+const qb = createClient({
   realm: 'company',
   auth: { type: 'temp-token' },
 });
@@ -720,8 +720,8 @@ await qb.withPaginationDisabled(async () => qb.runQuery({ body: { from: tableId 
 await qb.withPaginationLimit(100, async () => qb.runQuery({ body: { from: tableId } }));
 
 // v2 - fluent API
-await client.runQuery({ from: tableId }).noPaginate();
-await client.runQuery({ from: tableId }).paginate({ limit: 100 });
+await qb.runQuery({ from: tableId }).noPaginate();
+await qb.runQuery({ from: tableId }).paginate({ limit: 100 });
 ```
 
 ### Request Body
@@ -731,7 +731,7 @@ await client.runQuery({ from: tableId }).paginate({ limit: 100 });
 await qb.runQuery({ body: { from: tableId, select: [3, 6] } });
 
 // v2 - direct parameters
-await client.runQuery({ from: tableId, select: [3, 6] });
+await qb.runQuery({ from: tableId, select: [3, 6] });
 ```
 
 ## Development
