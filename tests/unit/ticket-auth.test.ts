@@ -303,6 +303,80 @@ describe('TicketStrategy', () => {
   });
 });
 
+describe('onExpired callback', () => {
+  it('should call onExpired when ticket expires after auth', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'test_ticket',
+      userid: '12345',
+    });
+
+    const onExpired = vi.fn();
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { onExpired },
+      createAuthContext(mockFetch)
+    );
+
+    // First auth succeeds
+    await strategy.getToken();
+    expect(onExpired).not.toHaveBeenCalled();
+
+    // Simulate ticket expiration
+    strategy.invalidate();
+    await strategy.handleAuthError();
+
+    // Now getToken should fail and call onExpired
+    await expect(strategy.getToken()).rejects.toThrow('Ticket expired');
+    expect(onExpired).toHaveBeenCalledTimes(2); // Once in handleAuthError, once in getToken
+  });
+
+  it('should call onExpired in handleAuthError', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'test_ticket',
+      userid: '12345',
+    });
+
+    const onExpired = vi.fn();
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { onExpired },
+      createAuthContext(mockFetch)
+    );
+
+    await strategy.getToken();
+    const canRetry = await strategy.handleAuthError();
+
+    expect(canRetry).toBe(false);
+    expect(onExpired).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not throw if onExpired is not provided', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'test_ticket',
+      userid: '12345',
+    });
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      undefined,
+      createAuthContext(mockFetch)
+    );
+
+    await strategy.getToken();
+    strategy.invalidate();
+
+    // Should not throw due to missing onExpired
+    await strategy.handleAuthError();
+    await expect(strategy.getToken()).rejects.toThrow('Ticket expired');
+  });
+});
+
 describe('createClient with ticket auth', () => {
   it('should create client with ticket auth config', () => {
     const client = createClient({
@@ -326,6 +400,21 @@ describe('createClient with ticket auth', () => {
         username: 'user@example.com',
         password: 'password123',
         hours: 48,
+      },
+    });
+
+    expect(client).toBeDefined();
+  });
+
+  it('should create client with onExpired callback', () => {
+    const onExpired = vi.fn();
+    const client = createClient({
+      realm: 'testcompany',
+      auth: {
+        type: 'ticket',
+        username: 'user@example.com',
+        password: 'password123',
+        onExpired,
       },
     });
 

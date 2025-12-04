@@ -37,6 +37,8 @@ interface AuthenticateResponse {
 export interface TicketAuthOptions {
   /** Ticket validity in hours (default: 12, max: 4380 ~6 months) */
   hours?: number;
+  /** Callback invoked when ticket expires - use to show login UI */
+  onExpired?: () => void;
 }
 
 /**
@@ -63,6 +65,7 @@ export class TicketStrategy implements AuthStrategy {
   private readonly realm: string;
   private readonly fetchApi: typeof fetch;
   private readonly logger: Logger;
+  private readonly onExpired?: () => void;
 
   private ticket: string | null = null;
   private userId: string | null = null;
@@ -78,6 +81,7 @@ export class TicketStrategy implements AuthStrategy {
     this.username = username;
     this.password = password;
     this.hours = Math.min(Math.max(options?.hours ?? 12, 1), 4380);
+    this.onExpired = options?.onExpired;
     this.realm = context.realm;
     this.fetchApi = context.fetchApi;
     this.logger = context.logger;
@@ -91,6 +95,7 @@ export class TicketStrategy implements AuthStrategy {
 
     // If already authenticated but no ticket, it expired
     if (this.authenticated) {
+      this.onExpired?.();
       throw new Error('Ticket expired; create a new client with fresh credentials');
     }
 
@@ -118,6 +123,7 @@ export class TicketStrategy implements AuthStrategy {
 
     // Can't refresh - password was cleared after initial auth
     this.logger.debug('Ticket auth error - cannot refresh (password was cleared)');
+    this.onExpired?.();
     return false;
   }
 
@@ -134,6 +140,7 @@ export class TicketStrategy implements AuthStrategy {
 
   private async authenticate(): Promise<string> {
     if (!this.password) {
+      this.onExpired?.();
       throw new Error('Ticket expired; create a new client with fresh credentials');
     }
 

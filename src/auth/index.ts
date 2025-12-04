@@ -41,7 +41,7 @@ export function createAuthStrategy(
       return new TicketStrategy(
         authConfig.username,
         authConfig.password,
-        { hours: authConfig.hours },
+        { hours: authConfig.hours, onExpired: authConfig.onExpired },
         context
       );
 

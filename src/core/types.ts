@@ -155,6 +155,8 @@ export interface TicketAuthConfig {
   password: string;
   /** Ticket validity in hours (default: 12, max: 4380 ~6 months) */
   hours?: number;
+  /** Callback invoked when ticket expires - use to show login UI */
+  onExpired?: () => void;
 }
 
 export interface RateLimitConfig {

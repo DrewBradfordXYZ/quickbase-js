@@ -180,19 +180,24 @@ function handleLogin(formData: { username: string; password: string }) {
 
 **Handling expired tickets:**
 
-When a ticket expires, the SDK throws an error. Your app should catch this and prompt the user to log in again:
+Use the `onExpired` callback to automatically handle ticket expiration. This is called whenever the ticket expires, so you can redirect users to log in again:
 
 ```typescript
-try {
-  const result = await client.runQuery({ from: 'bck5pia2n', select: [3, 6] });
-} catch (error) {
-  if (error.message.includes('Ticket expired')) {
-    // Redirect user to login form or show login modal
-    showLoginForm();
-  } else {
-    throw error;
-  }
-}
+const client = createClient({
+  realm: 'mycompany',
+  auth: {
+    type: 'ticket',
+    username: formData.username,
+    password: formData.password,
+    onExpired: () => {
+      // Redirect to login page or show login modal
+      window.location.href = '/login';
+    },
+  },
+});
+
+// No try/catch needed - onExpired handles it
+const result = await client.runQuery({ from: 'bck5pia2n', select: [3, 6] });
 ```
 
 **With custom ticket validity:**
