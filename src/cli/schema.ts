@@ -13,11 +13,12 @@
  *   --token    User token for authentication (or set QB_USER_TOKEN env var)
  *   --output   Output file path (default: stdout)
  *   --format   Output format: "ts" or "json" (default: "ts")
+ *   --merge    Merge with existing schema file, preserving custom aliases
  *   --help     Show help
  */
 
 import { createClient } from '../index.js';
-import type { Schema } from '../core/types.js';
+import type { Schema, TableSchema } from '../core/types.js';
 
 interface CliOptions {
   realm?: string;
@@ -25,6 +26,7 @@ interface CliOptions {
   token?: string;
   output?: string;
   format?: 'ts' | 'json';
+  merge?: boolean;
   help?: boolean;
 }
 
@@ -68,6 +70,10 @@ function parseArgs(args: string[]): CliOptions {
       case '-h':
         options.help = true;
         break;
+      case '--merge':
+      case '-m':
+        options.merge = true;
+        break;
     }
   }
 
@@ -90,6 +96,7 @@ Options:
   -t, --token <token>   User token (or set QB_USER_TOKEN env var)
   -o, --output <file>   Output file path (default: stdout)
   -f, --format <type>   Output format: "ts" or "json" (default: "ts")
+  -m, --merge           Merge with existing schema, preserving custom aliases
   -h, --help            Show this help message
 
 Examples:
@@ -101,6 +108,9 @@ Examples:
 
   # Generate JSON format
   npx quickbase-js schema -r mycompany -a bqw123abc -f json -o schema.json
+
+  # Update existing schema with new fields (preserves custom aliases)
+  npx quickbase-js schema -r mycompany -a bqw123abc -o schema.ts --merge
 
   # Using environment variable for token
   QB_USER_TOKEN=your-token npx quickbase-js schema -r mycompany -a bqw123abc
@@ -252,6 +262,162 @@ function formatAsJson(schema: Schema): string {
 }
 
 /**
+ * Load existing schema from a file
+ */
+async function loadExistingSchema(filePath: string, format: 'ts' | 'json'): Promise<Schema | null> {
+  const fs = await import('fs');
+
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  const content = fs.readFileSync(filePath, 'utf-8');
+
+  if (format === 'json') {
+    try {
+      return JSON.parse(content) as Schema;
+    } catch {
+      console.error(`Warning: Could not parse existing JSON schema at ${filePath}`);
+      return null;
+    }
+  }
+
+  // Parse TypeScript format - extract the schema object
+  // Look for pattern: export const schema: Schema = { ... }
+  const schemaMatch = content.match(/export\s+const\s+schema[^=]*=\s*(\{[\s\S]*\});?\s*$/m);
+  if (!schemaMatch) {
+    console.error(`Warning: Could not parse existing TypeScript schema at ${filePath}`);
+    return null;
+  }
+
+  try {
+    // Use Function constructor to safely evaluate the object literal
+    // This handles the JS object syntax in the TS file
+    const schemaStr = schemaMatch[1]!;
+    const fn = new Function(`return ${schemaStr}`);
+    return fn() as Schema;
+  } catch (e) {
+    console.error(`Warning: Could not evaluate existing schema: ${e}`);
+    return null;
+  }
+}
+
+/**
+ * Build reverse lookup: field ID -> alias for a table
+ */
+function buildFieldIdToAlias(table: TableSchema): Map<number, string> {
+  const map = new Map<number, string>();
+  for (const [alias, id] of Object.entries(table.fields)) {
+    map.set(id, alias);
+  }
+  return map;
+}
+
+/**
+ * Build reverse lookup: table ID -> alias
+ */
+function buildTableIdToAlias(schema: Schema): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const [alias, table] of Object.entries(schema.tables)) {
+    map.set(table.id, alias);
+  }
+  return map;
+}
+
+/**
+ * Merge new schema with existing schema, preserving custom aliases
+ */
+function mergeSchemas(existing: Schema, fresh: Schema): { merged: Schema; stats: MergeStats } {
+  const stats: MergeStats = {
+    tablesAdded: 0,
+    tablesRemoved: 0,
+    tablesPreserved: 0,
+    fieldsAdded: 0,
+    fieldsRemoved: 0,
+    fieldsPreserved: 0,
+  };
+
+  const merged: Schema = { tables: {} };
+
+  // Build reverse lookup for existing schema (ID -> alias)
+  const existingTableIdToAlias = buildTableIdToAlias(existing);
+  const existingFieldIdToAlias = new Map<string, Map<number, string>>();
+  for (const [, table] of Object.entries(existing.tables)) {
+    existingFieldIdToAlias.set(table.id, buildFieldIdToAlias(table));
+  }
+
+  // Track which existing tables we've seen (by ID)
+  const seenTableIds = new Set<string>();
+
+  // Process each table from fresh schema
+  for (const [freshTableAlias, freshTable] of Object.entries(fresh.tables)) {
+    const tableId = freshTable.id;
+    seenTableIds.add(tableId);
+
+    // Use existing alias if available, otherwise use fresh alias
+    const tableAlias = existingTableIdToAlias.get(tableId) ?? freshTableAlias;
+    const existingFieldMap = existingFieldIdToAlias.get(tableId);
+
+    // Track which existing fields we've seen (by ID)
+    const seenFieldIds = new Set<number>();
+    const mergedFields: Record<string, number> = {};
+
+    // Process each field from fresh schema
+    for (const [freshFieldAlias, fieldId] of Object.entries(freshTable.fields)) {
+      seenFieldIds.add(fieldId);
+
+      // Use existing alias if available, otherwise use fresh alias
+      const fieldAlias = existingFieldMap?.get(fieldId) ?? freshFieldAlias;
+      mergedFields[fieldAlias] = fieldId;
+
+      if (existingFieldMap?.has(fieldId)) {
+        stats.fieldsPreserved++;
+      } else {
+        stats.fieldsAdded++;
+      }
+    }
+
+    // Check for removed fields (in existing but not in fresh)
+    if (existingFieldMap) {
+      for (const [fieldId] of existingFieldMap) {
+        if (!seenFieldIds.has(fieldId)) {
+          stats.fieldsRemoved++;
+        }
+      }
+    }
+
+    merged.tables[tableAlias] = {
+      id: tableId,
+      fields: mergedFields,
+    };
+
+    if (existingTableIdToAlias.has(tableId)) {
+      stats.tablesPreserved++;
+    } else {
+      stats.tablesAdded++;
+    }
+  }
+
+  // Check for removed tables (in existing but not in fresh)
+  for (const [, table] of Object.entries(existing.tables)) {
+    if (!seenTableIds.has(table.id)) {
+      stats.tablesRemoved++;
+    }
+  }
+
+  return { merged, stats };
+}
+
+interface MergeStats {
+  tablesAdded: number;
+  tablesRemoved: number;
+  tablesPreserved: number;
+  fieldsAdded: number;
+  fieldsRemoved: number;
+  fieldsPreserved: number;
+}
+
+/**
  * Main CLI entry point
  */
 export async function main(args: string[]): Promise<void> {
@@ -284,10 +450,16 @@ export async function main(args: string[]): Promise<void> {
 
   const format = options.format || 'ts';
 
+  // Merge requires an output file
+  if (options.merge && !options.output) {
+    console.error('Error: --merge requires --output to specify the file to merge with');
+    process.exit(1);
+  }
+
   try {
     console.error(`Fetching schema from ${realm}/${app}...`);
 
-    const schema = await fetchSchema(realm, app, token);
+    let schema = await fetchSchema(realm, app, token);
     const tableCount = Object.keys(schema.tables).length;
     const fieldCount = Object.values(schema.tables).reduce(
       (sum, t) => sum + Object.keys(t.fields).length,
@@ -295,6 +467,21 @@ export async function main(args: string[]): Promise<void> {
     );
 
     console.error(`Found ${tableCount} tables with ${fieldCount} fields`);
+
+    // Merge with existing schema if requested
+    if (options.merge && options.output) {
+      const existing = await loadExistingSchema(options.output, format);
+      if (existing) {
+        const { merged, stats } = mergeSchemas(existing, schema);
+        schema = merged;
+
+        console.error(`Merge complete:`);
+        console.error(`  Tables: ${stats.tablesPreserved} preserved, ${stats.tablesAdded} added, ${stats.tablesRemoved} removed`);
+        console.error(`  Fields: ${stats.fieldsPreserved} preserved, ${stats.fieldsAdded} added, ${stats.fieldsRemoved} removed`);
+      } else {
+        console.error(`No existing schema found at ${options.output}, creating new file`);
+      }
+    }
 
     // Format output
     const output = format === 'json'
