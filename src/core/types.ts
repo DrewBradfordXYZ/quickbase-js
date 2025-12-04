@@ -33,6 +33,80 @@ export interface QuickbaseConfig {
 
   /** Convert ISO date strings in responses to JavaScript Date objects (default: true) */
   convertDates?: boolean;
+
+  /**
+   * Schema aliases for tables and fields.
+   * Allows using readable names instead of QuickBase IDs in queries.
+   *
+   * @example
+   * ```typescript
+   * schema: {
+   *   tables: {
+   *     projects: {
+   *       id: 'bqw3ryzab',
+   *       fields: {
+   *         name: 6,
+   *         status: 7,
+   *         dueDate: 12,
+   *       }
+   *     }
+   *   }
+   * }
+   * ```
+   */
+  schema?: Schema;
+}
+
+// =============================================================================
+// Schema Types
+// =============================================================================
+
+/**
+ * Field alias mapping: alias name -> field ID
+ * @example { name: 6, status: 7, dueDate: 12 }
+ */
+export interface FieldSchema {
+  [alias: string]: number;
+}
+
+/**
+ * Table schema with ID and field mappings
+ * @example { id: 'bqw3ryzab', fields: { name: 6, status: 7 } }
+ */
+export interface TableSchema {
+  /** QuickBase table ID (dbid) */
+  id: string;
+  /** Field alias mappings */
+  fields: FieldSchema;
+}
+
+/**
+ * Complete schema definition with table aliases
+ */
+export interface Schema {
+  tables: {
+    [alias: string]: TableSchema;
+  };
+}
+
+/**
+ * Resolved schema with bidirectional lookup maps for efficient alias resolution
+ */
+export interface ResolvedSchema {
+  /** Original schema definition */
+  original: Schema;
+
+  /** Table alias -> table ID */
+  tableAliasToId: Map<string, string>;
+
+  /** Table ID -> table alias */
+  tableIdToAlias: Map<string, string>;
+
+  /** Table ID -> (field alias -> field ID) */
+  fieldAliasToId: Map<string, Map<string, number>>;
+
+  /** Table ID -> (field ID -> field alias) */
+  fieldIdToAlias: Map<string, Map<number, string>>;
 }
 
 export type AuthConfig =
@@ -191,6 +265,8 @@ export interface ResolvedConfig {
   onRateLimit?: (info: RateLimitInfo) => void;
   autoPaginate: boolean;
   convertDates: boolean;
+  /** Resolved schema with lookup maps (undefined if no schema provided) */
+  schema?: ResolvedSchema;
 }
 
 /** Default configuration values */

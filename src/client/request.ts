@@ -22,6 +22,12 @@ import {
 import { extractRateLimitInfo, sleep } from './retry.js';
 import { getRealmHostname } from '../core/config.js';
 import { transformDates } from '../core/dates.js';
+import {
+  transformRequest,
+  transformResponse,
+  extractTableIdFromRequest,
+} from '../core/transform.js';
+import { resolveTableAlias } from '../core/schema.js';
 
 export interface RequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -44,16 +50,23 @@ export interface RequestExecutorOptions {
 /**
  * Extract dbid from request options for temp-token auth.
  * Checks multiple locations where table/app ID may appear.
+ * Resolves aliases to IDs if schema is provided.
  */
-export function extractDbid(options: RequestOptions): string | undefined {
+export function extractDbid(
+  options: RequestOptions,
+  config?: ResolvedConfig
+): string | undefined {
   // 1. Explicit dbid takes priority
   if (options.dbid) {
-    return options.dbid;
+    return config?.schema
+      ? resolveTableAlias(config.schema, options.dbid)
+      : options.dbid;
   }
 
   // 2. Check query params for tableId
   if (options.query?.tableId) {
-    return String(options.query.tableId);
+    const tableId = String(options.query.tableId);
+    return config?.schema ? resolveTableAlias(config.schema, tableId) : tableId;
   }
 
   // 3. Check query params for appId (for app-level operations)
@@ -73,16 +86,13 @@ export function extractDbid(options: RequestOptions): string | undefined {
     return appIdMatch[1];
   }
 
-  // 6. Check request body for 'from' field (runQuery, deleteRecords)
+  // 6. Check request body for 'from' or 'to' fields
   if (options.body && typeof options.body === 'object') {
-    const body = options.body as Record<string, unknown>;
-    if (typeof body.from === 'string') {
-      return body.from;
-    }
-    // 7. Check request body for 'to' field (upsert)
-    if (typeof body.to === 'string') {
-      return body.to;
-    }
+    const tableId = extractTableIdFromRequest(
+      options.body as Record<string, unknown>,
+      config?.schema
+    );
+    if (tableId) return tableId;
   }
 
   return undefined;
@@ -237,8 +247,18 @@ export async function executeRequest<T = unknown>(
   const { config, auth, logger } = executor;
   const maxAttempts = config.retry.maxAttempts;
 
-  // Extract dbid for temp-token auth
-  const dbid = extractDbid(options);
+  // Extract dbid for temp-token auth (resolves aliases if schema provided)
+  const dbid = extractDbid(options, config);
+
+  // Transform request body if schema is configured
+  let transformedOptions = options;
+  if (config.schema && options.body && typeof options.body === 'object') {
+    const transformedBody = transformRequest(
+      options.body as Record<string, unknown>,
+      { schema: config.schema, tableId: dbid }
+    );
+    transformedOptions = { ...options, body: transformedBody };
+  }
 
   const context: RequestContext = {
     methodName: `${options.method} ${options.path}`,
@@ -254,13 +274,20 @@ export async function executeRequest<T = unknown>(
     context.attempt = attempt;
 
     try {
-      const response = await executeSingleRequest(options, executor, context);
+      const response = await executeSingleRequest(transformedOptions, executor, context);
       const url = buildUrl(config.baseUrl, options.path, options.query);
 
       await handleResponse(response, url, context, executor);
 
-      // Parse JSON response and optionally transform dates
-      const data = await response.json();
+      // Parse JSON response
+      let data = await response.json();
+
+      // Transform response if schema is configured
+      if (config.schema && dbid) {
+        data = transformResponse(data, { schema: config.schema, tableId: dbid });
+      }
+
+      // Optionally transform dates
       return transformDates(data, config.convertDates) as T;
     } catch (error) {
       lastError = error as Error;

@@ -5,7 +5,8 @@ A TypeScript/JavaScript client for the QuickBase JSON RESTful API.
 ## Features
 
 - **Typed API Methods** - Full TypeScript support with auto-generated types from OpenAPI spec
-- **Multiple Auth Methods** - User token, temporary token, and SSO authentication
+- **Multiple Auth Methods** - User token, temporary token, SSO, and ticket authentication
+- **Schema Aliases** - Use readable names for tables and fields instead of IDs
 - **Fluent Pagination** - Chain `.all()`, `.paginate()`, or `.noPaginate()` on paginated endpoints
 - **Date Conversion** - Automatic conversion of ISO date strings to JavaScript Date objects
 - **Rate Limit Handling** - Automatic retry with exponential backoff on 429 errors
@@ -270,6 +271,174 @@ const client = createClient({
 });
 ```
 
+## Schema Aliases
+
+Use readable names for tables and fields instead of cryptic IDs. The SDK transforms aliases to IDs in requests and IDs back to aliases in responses.
+
+### Defining a Schema
+
+```typescript
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  schema: {
+    tables: {
+      projects: {
+        id: 'bqw3ryzab',
+        fields: {
+          id: 3,
+          name: 6,
+          status: 7,
+          dueDate: 12,
+          assignee: 15,
+        },
+      },
+      tasks: {
+        id: 'bqw4xyzcd',
+        fields: {
+          id: 3,
+          title: 6,
+          projectId: 8,
+          completed: 10,
+        },
+      },
+    },
+  },
+});
+```
+
+### Using Aliases in Queries
+
+```typescript
+// Use table and field aliases instead of IDs
+const result = await client.runQuery({
+  from: 'projects',                          // Instead of 'bqw3ryzab'
+  select: ['name', 'status', 'dueDate'],     // Instead of [6, 7, 12]
+  where: "{'status'.EX.'Active'}",           // Field aliases in where clauses
+  sortBy: [{ fieldId: 'dueDate', order: 'ASC' }],
+});
+
+// Response uses aliases and values are automatically unwrapped
+console.log(result.data[0].name);     // "Project Alpha" (not { value: "Project Alpha" })
+console.log(result.data[0].status);   // "Active"
+console.log(result.data[0].dueDate);  // Date object (if convertDates is enabled)
+```
+
+### Upserting with Aliases
+
+```typescript
+await client.upsert({
+  to: 'projects',
+  data: [
+    { name: { value: 'New Project' }, status: { value: 'Planning' } },
+  ],
+});
+```
+
+### Response Transformation
+
+Responses are automatically transformed:
+- Field ID keys (`'6'`) become aliases (`name`)
+- Values are unwrapped from `{ value: X }` to just `X`
+- Unknown fields (not in schema) keep their numeric key but are still unwrapped
+
+```typescript
+// Raw API response:
+{ data: [{ '6': { value: 'Alpha' }, '99': { value: 'Custom' } }] }
+
+// Transformed response (with schema):
+{ data: [{ name: 'Alpha', '99': 'Custom' }] }
+```
+
+### Helpful Error Messages
+
+Typos in aliases throw errors with suggestions:
+
+```typescript
+// Throws: Unknown field alias 'stauts' in table 'projects'. Did you mean 'status'?
+await client.runQuery({
+  from: 'projects',
+  select: ['stauts'],  // Typo!
+});
+```
+
+### Generating Schema from QuickBase
+
+Use the CLI to generate a schema from an existing app:
+
+```bash
+# Generate TypeScript schema file
+npx quickbase-js schema -r "$QB_REALM" -a "$QB_APP_ID" -t "$QB_USER_TOKEN" -o schema.ts
+
+# Generate JSON format
+npx quickbase-js schema -r "$QB_REALM" -a "$QB_APP_ID" -t "$QB_USER_TOKEN" -f json -o schema.json
+
+# Output to stdout
+npx quickbase-js schema -r "$QB_REALM" -a "$QB_APP_ID" -t "$QB_USER_TOKEN"
+```
+
+The generator creates aliases from field labels using camelCase (e.g., "Due Date" → `dueDate`).
+
+### Using a Separate Schema File
+
+You can define your schema in a separate file and import it:
+
+**schema.ts**
+```typescript
+import type { Schema } from 'quickbase-js';
+
+export const schema: Schema = {
+  tables: {
+    projects: {
+      id: 'bqw3ryzab',
+      fields: {
+        id: 3,
+        name: 6,
+        status: 7,
+        dueDate: 12,
+      },
+    },
+  },
+};
+```
+
+**client.ts**
+```typescript
+import { createClient } from 'quickbase-js';
+import { schema } from './schema.js';
+
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  schema,
+});
+```
+
+Or use a JSON file:
+
+**schema.json**
+```json
+{
+  "tables": {
+    "projects": {
+      "id": "bqw3ryzab",
+      "fields": { "id": 3, "name": 6, "status": 7 }
+    }
+  }
+}
+```
+
+```typescript
+import { createClient } from 'quickbase-js';
+import schema from './schema.json' assert { type: 'json' };
+
+const client = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  schema,
+});
+```
+
 ## Configuration Options
 
 ```typescript
@@ -284,6 +453,7 @@ const client = createClient({
   baseUrl: 'https://api.quickbase.com/v1',   // API base URL
   autoPaginate: false,                       // Auto-paginate on direct await
   convertDates: true,                        // Convert ISO date strings to Date objects
+  schema: { /* see schema aliases section */ }, // Table and field aliases
 
   // Rate limiting
   rateLimit: {

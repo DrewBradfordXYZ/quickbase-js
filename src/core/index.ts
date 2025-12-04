@@ -17,6 +17,11 @@ export type {
   PaginatedResponse,
   FieldInfo,
   ResolvedConfig,
+  // Schema types
+  Schema,
+  TableSchema,
+  FieldSchema,
+  ResolvedSchema,
 } from './types.js';
 
 export { DEFAULT_CONFIG } from './types.js';

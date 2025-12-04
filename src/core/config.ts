@@ -4,6 +4,7 @@
 
 import type { QuickbaseConfig, ResolvedConfig, RetryConfig } from './types.js';
 import { DEFAULT_CONFIG } from './types.js';
+import { resolveSchema } from './schema.js';
 
 /**
  * Resolve user configuration with defaults
@@ -37,6 +38,7 @@ export function resolveConfig(config: QuickbaseConfig): ResolvedConfig {
     onRateLimit: config.rateLimit?.onRateLimit,
     autoPaginate: config.autoPaginate ?? DEFAULT_CONFIG.autoPaginate,
     convertDates: config.convertDates ?? DEFAULT_CONFIG.convertDates,
+    schema: resolveSchema(config.schema),
   };
 }
 

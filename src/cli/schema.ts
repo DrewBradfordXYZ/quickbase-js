@@ -1,0 +1,325 @@
+#!/usr/bin/env node
+/**
+ * CLI Schema Generator
+ *
+ * Generates a schema definition from a QuickBase application.
+ *
+ * Usage:
+ *   npx quickbase-js schema --realm <realm> --app <appId> --token <token>
+ *
+ * Options:
+ *   --realm    QuickBase realm (e.g., "mycompany")
+ *   --app      Application ID (e.g., "bqw123abc")
+ *   --token    User token for authentication (or set QB_USER_TOKEN env var)
+ *   --output   Output file path (default: stdout)
+ *   --format   Output format: "ts" or "json" (default: "ts")
+ *   --help     Show help
+ */
+
+import { createClient } from '../index.js';
+import type { Schema } from '../core/types.js';
+
+interface CliOptions {
+  realm?: string;
+  app?: string;
+  token?: string;
+  output?: string;
+  format?: 'ts' | 'json';
+  help?: boolean;
+}
+
+/**
+ * Parse command line arguments
+ */
+function parseArgs(args: string[]): CliOptions {
+  const options: CliOptions = {};
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    const next = args[i + 1];
+
+    switch (arg) {
+      case '--realm':
+      case '-r':
+        options.realm = next;
+        i++;
+        break;
+      case '--app':
+      case '-a':
+        options.app = next;
+        i++;
+        break;
+      case '--token':
+      case '-t':
+        options.token = next;
+        i++;
+        break;
+      case '--output':
+      case '-o':
+        options.output = next;
+        i++;
+        break;
+      case '--format':
+      case '-f':
+        options.format = next as 'ts' | 'json';
+        i++;
+        break;
+      case '--help':
+      case '-h':
+        options.help = true;
+        break;
+    }
+  }
+
+  return options;
+}
+
+/**
+ * Show help message
+ */
+function showHelp(): void {
+  console.log(`
+quickbase-js schema - Generate schema from QuickBase application
+
+Usage:
+  npx quickbase-js schema [options]
+
+Options:
+  -r, --realm <realm>   QuickBase realm (required, e.g., "mycompany")
+  -a, --app <appId>     Application ID (required, e.g., "bqw123abc")
+  -t, --token <token>   User token (or set QB_USER_TOKEN env var)
+  -o, --output <file>   Output file path (default: stdout)
+  -f, --format <type>   Output format: "ts" or "json" (default: "ts")
+  -h, --help            Show this help message
+
+Examples:
+  # Generate TypeScript schema to stdout
+  npx quickbase-js schema -r mycompany -a bqw123abc -t your-token
+
+  # Generate and save to file
+  npx quickbase-js schema -r mycompany -a bqw123abc --output schema.ts
+
+  # Generate JSON format
+  npx quickbase-js schema -r mycompany -a bqw123abc -f json -o schema.json
+
+  # Using environment variable for token
+  QB_USER_TOKEN=your-token npx quickbase-js schema -r mycompany -a bqw123abc
+`);
+}
+
+/**
+ * Convert a label to a camelCase alias
+ */
+function labelToAlias(label: string): string {
+  // Remove non-alphanumeric chars except spaces
+  const cleaned = label
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .trim();
+
+  // Handle empty string
+  if (!cleaned) return 'field';
+
+  // Split by spaces and convert to camelCase
+  const words = cleaned.split(/\s+/);
+  return words
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      if (i === 0) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join('');
+}
+
+/**
+ * Make alias unique by appending number if needed
+ */
+function makeUnique(alias: string, existing: Set<string>): string {
+  if (!existing.has(alias)) {
+    existing.add(alias);
+    return alias;
+  }
+
+  let counter = 2;
+  while (existing.has(`${alias}${counter}`)) {
+    counter++;
+  }
+  const unique = `${alias}${counter}`;
+  existing.add(unique);
+  return unique;
+}
+
+/**
+ * Fetch schema from QuickBase application
+ */
+async function fetchSchema(
+  realm: string,
+  appId: string,
+  token: string
+): Promise<Schema> {
+  const client = createClient({
+    realm,
+    auth: { type: 'user-token', userToken: token },
+  });
+
+  // Fetch all tables
+  const tables = await client.getAppTables({ appId });
+
+  const schema: Schema = { tables: {} };
+
+  for (const table of tables) {
+    if (!table.id || !table.name) continue;
+
+    // Generate table alias from name
+    const tableAlias = labelToAlias(table.name);
+
+    // Fetch fields for this table
+    const fields = await client.getFields({ tableId: table.id });
+
+    const fieldAliases = new Set<string>();
+    const fieldMap: Record<string, number> = {};
+
+    for (const field of fields) {
+      if (!field.label) continue;
+
+      // Generate field alias from label
+      let alias = labelToAlias(field.label);
+      alias = makeUnique(alias, fieldAliases);
+
+      fieldMap[alias] = field.id;
+    }
+
+    schema.tables[tableAlias] = {
+      id: table.id,
+      fields: fieldMap,
+    };
+  }
+
+  return schema;
+}
+
+/**
+ * Format schema as TypeScript
+ */
+function formatAsTypeScript(schema: Schema): string {
+  const lines: string[] = [
+    '/**',
+    ' * QuickBase Schema Definition',
+    ' * Generated by: npx quickbase-js schema',
+    ` * Generated at: ${new Date().toISOString()}`,
+    ' */',
+    '',
+    "import type { Schema } from 'quickbase-js';",
+    '',
+    'export const schema: Schema = {',
+    '  tables: {',
+  ];
+
+  const tableAliases = Object.keys(schema.tables);
+  for (let t = 0; t < tableAliases.length; t++) {
+    const tableAlias = tableAliases[t]!;
+    const table = schema.tables[tableAlias]!;
+    const isLastTable = t === tableAliases.length - 1;
+
+    lines.push(`    ${tableAlias}: {`);
+    lines.push(`      id: '${table.id}',`);
+    lines.push('      fields: {');
+
+    const fieldAliases = Object.keys(table.fields);
+    for (let f = 0; f < fieldAliases.length; f++) {
+      const fieldAlias = fieldAliases[f]!;
+      const fieldId = table.fields[fieldAlias]!;
+      const isLastField = f === fieldAliases.length - 1;
+      const comma = isLastField ? '' : ',';
+      lines.push(`        ${fieldAlias}: ${fieldId}${comma}`);
+    }
+
+    lines.push('      },');
+    lines.push(`    }${isLastTable ? '' : ','}`);
+  }
+
+  lines.push('  },');
+  lines.push('};');
+  lines.push('');
+
+  return lines.join('\n');
+}
+
+/**
+ * Format schema as JSON
+ */
+function formatAsJson(schema: Schema): string {
+  return JSON.stringify(schema, null, 2) + '\n';
+}
+
+/**
+ * Main CLI entry point
+ */
+export async function main(args: string[]): Promise<void> {
+  const options = parseArgs(args);
+
+  if (options.help) {
+    showHelp();
+    return;
+  }
+
+  // Validate required options
+  const realm = options.realm;
+  const app = options.app;
+  const token = options.token || process.env.QB_USER_TOKEN;
+
+  if (!realm) {
+    console.error('Error: --realm is required');
+    process.exit(1);
+  }
+
+  if (!app) {
+    console.error('Error: --app is required');
+    process.exit(1);
+  }
+
+  if (!token) {
+    console.error('Error: --token is required (or set QB_USER_TOKEN env var)');
+    process.exit(1);
+  }
+
+  const format = options.format || 'ts';
+
+  try {
+    console.error(`Fetching schema from ${realm}/${app}...`);
+
+    const schema = await fetchSchema(realm, app, token);
+    const tableCount = Object.keys(schema.tables).length;
+    const fieldCount = Object.values(schema.tables).reduce(
+      (sum, t) => sum + Object.keys(t.fields).length,
+      0
+    );
+
+    console.error(`Found ${tableCount} tables with ${fieldCount} fields`);
+
+    // Format output
+    const output = format === 'json'
+      ? formatAsJson(schema)
+      : formatAsTypeScript(schema);
+
+    // Write output
+    if (options.output) {
+      const fs = await import('fs');
+      fs.writeFileSync(options.output, output, 'utf-8');
+      console.error(`Schema written to ${options.output}`);
+    } else {
+      console.log(output);
+    }
+  } catch (error) {
+    console.error('Error:', error instanceof Error ? error.message : error);
+    process.exit(1);
+  }
+}
+
+// Run if executed directly
+const isDirectExecution =
+  typeof process !== 'undefined' &&
+  process.argv[1]?.endsWith('schema.js');
+
+if (isDirectExecution) {
+  main(process.argv.slice(2));
+}

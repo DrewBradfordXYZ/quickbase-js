@@ -34,7 +34,15 @@ export type {
   PaginationMetadata,
   PaginatedResponse,
   FieldInfo,
+  // Schema types
+  Schema,
+  TableSchema,
+  FieldSchema,
+  ResolvedSchema,
 } from './core/index.js';
+
+// Schema utilities
+export { SchemaError } from './core/schema.js';
 
 export {
   QuickbaseError,
