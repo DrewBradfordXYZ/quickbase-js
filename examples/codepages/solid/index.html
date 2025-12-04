@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBase App Explorer - Solid</title>
+  <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+  <!-- Solid + Babel with solid preset -->
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+  <script type="module">
+    // Pre-load Solid modules and expose them globally for Babel-transformed code
+    import { createSignal, createResource, createContext, useContext, Show, For, onMount } from 'https://esm.sh/solid-js@1';
+    import { render } from 'https://esm.sh/solid-js@1/web';
+
+    window.SolidJS = { createSignal, createResource, createContext, useContext, Show, For, onMount };
+    window.SolidWeb = { render };
+
+    // Register Solid JSX pragma with Babel
+    Babel.registerPreset('solid', {
+      presets: [
+        [Babel.availablePresets['react'], {
+          pragma: 'SolidJS.createComponent',
+          pragmaFrag: 'SolidJS.Fragment',
+          throwIfNamespace: false,
+        }]
+      ]
+    });
+
+    // Signal that Solid is ready
+    window.dispatchEvent(new Event('solid-ready'));
+  </script>
+  <style>
+    :root {
+      --qb-primary: #2196f3;
+      --qb-primary-dark: #1976d2;
+      --qb-error: #f44336;
+      --qb-bg: #f5f5f5;
+      --qb-card-bg: #ffffff;
+      --qb-text: #333333;
+      --qb-text-muted: #666666;
+      --qb-border: #e0e0e0;
+      --qb-radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--qb-bg);
+      color: var(--qb-text);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--qb-border);
+    }
+    .header h1 { margin: 0; font-size: 24px; }
+    .meta { color: var(--qb-text-muted); font-size: 14px; }
+    .card {
+      background: var(--qb-card-bg);
+      border-radius: var(--qb-radius);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--qb-bg);
+      border-bottom: 1px solid var(--qb-border);
+      cursor: pointer;
+    }
+    .card-header:hover { background: #eeeeee; }
+    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .card-body { padding: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #e3f2fd;
+      color: var(--qb-primary-dark);
+      margin-left: 4px;
+    }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th, .data-table td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--qb-border);
+    }
+    .data-table th {
+      background: var(--qb-bg);
+      font-weight: 600;
+      color: var(--qb-text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--qb-text-muted);
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--qb-border);
+      border-top-color: var(--qb-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error {
+      background: #ffebee;
+      color: var(--qb-error);
+      padding: 16px;
+      border-radius: var(--qb-radius);
+      margin: 16px 0;
+    }
+    .field-type {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #eeeeee;
+      color: var(--qb-text-muted);
+    }
+    .stats { display: flex; gap: 32px; }
+    .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
+    .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
+    .expand-icon {
+      display: inline-block;
+      transition: transform 0.2s;
+      margin-right: 8px;
+    }
+    .expand-icon.expanded { transform: rotate(90deg); }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
+    .tab {
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      color: var(--qb-text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab:hover { color: var(--qb-text); }
+    .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
+  </style>
+</head>
+<body>
+  <div id="app" class="container"></div>
+
+  <script type="module">
+    import { createSignal, createResource, createContext, useContext, Show, For } from 'https://esm.sh/solid-js@1';
+    import { render } from 'https://esm.sh/solid-js@1/web';
+    import html from 'https://esm.sh/solid-js@1/html';
+
+    // ============================================
+    // QuickBase Context
+    // ============================================
+    const QBContext = createContext();
+
+    function createQBClient() {
+      const realm = window.location.hostname.split('.')[0];
+      const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+
+      if (!realm || !appId) {
+        throw new Error('Could not detect realm/appId from URL');
+      }
+
+      const client = QuickBase.createClient({
+        realm,
+        auth: { type: 'temp-token' }
+      });
+
+      return { client, realm, appId };
+    }
+
+    function useQB() {
+      return useContext(QBContext);
+    }
+
+    // ============================================
+    // Utility Functions
+    // ============================================
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = now - date;
+
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+      if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+
+      return date.toLocaleDateString();
+    }
+
+    // ============================================
+    // Components (using html tagged templates)
+    // ============================================
+    // Note: Solid's html template literal provides JSX-like syntax without build step
+    // Syntax: html`<${Component} prop=${value}>children<//>`
+
+    function Loading(props) {
+      return html`
+        <div class="loading">
+          <div class="spinner"></div>
+          ${() => props.message || 'Loading...'}
+        </div>
+      `;
+    }
+
+    function ErrorMsg(props) {
+      return html`<div class="error">${() => props.message}</div>`;
+    }
+
+    function FieldsTable(props) {
+      // props.fields is a signal getter passed from parent
+      return html`
+        <${Show} when=${() => props.fields?.length} fallback=${() => html`<p class="meta">No fields found</p>`}>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Type</th>
+                <th>Properties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <${For} each=${() => props.fields}>
+                ${(f) => html`
+                  <tr>
+                    <td>${f.id}</td>
+                    <td>${f.label}</td>
+                    <td><span class="field-type">${f.fieldType}</span></td>
+                    <td>
+                      ${f.required ? html`<span class="badge">required</span>` : ''}
+                      ${f.unique ? html`<span class="badge">unique</span>` : ''}
+                      ${f.properties?.formula ? html`<span class="badge">formula</span>` : ''}
+                    </td>
+                  </tr>
+                `}
+              <//>
+            </tbody>
+          </table>
+        <//>
+      `;
+    }
+
+    function RecordsTable(props) {
+      // props.records is a signal getter passed from parent
+      return html`
+        <${Show} when=${() => props.records?.length} fallback=${() => html`<p class="meta">No records found</p>`}>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Record ID</th>
+                <th>Created</th>
+                <th>Modified</th>
+              </tr>
+            </thead>
+            <tbody>
+              <${For} each=${() => props.records}>
+                ${(r) => html`
+                  <tr>
+                    <td>${r['3']?.value || '-'}</td>
+                    <td>${formatDate(r['1']?.value)}</td>
+                    <td>${formatDate(r['2']?.value)}</td>
+                  </tr>
+                `}
+              <//>
+            </tbody>
+          </table>
+        <//>
+      `;
+    }
+
+    function TableCard(props) {
+      const ctx = useQB();
+      const [expanded, setExpanded] = createSignal(false);
+      const [activeTab, setActiveTab] = createSignal('fields');
+      const [fields, setFields] = createSignal(null);
+      const [records, setRecords] = createSignal(null);
+      const [loading, setLoading] = createSignal(false);
+      const [error, setError] = createSignal(null);
+
+      async function loadDetails() {
+        if (fields()) return; // Already loaded
+
+        setLoading(true);
+        try {
+          const [fieldsData, queryResult] = await Promise.all([
+            ctx.client.getFields({ tableId: props.table.id }),
+            ctx.client.runQuery({
+              from: props.table.id,
+              select: [3, 1, 2],
+              sortBy: [{ fieldId: 2, order: 'DESC' }],
+              options: { top: 5 }
+            })
+          ]);
+          setFields(fieldsData);
+          setRecords(queryResult.data || []);
+        } catch (e) {
+          setError(e.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function toggle() {
+        const newExpanded = !expanded();
+        setExpanded(newExpanded);
+        if (newExpanded) loadDetails();
+      }
+
+      return html`
+        <div class="card">
+          <div class="card-header" onClick=${toggle}>
+            <h2>
+              <span class=${() => 'expand-icon' + (expanded() ? ' expanded' : '')}>▶</span>
+              ${props.table.name}
+            </h2>
+            <span class="badge">${() => fields()?.length ?? '...'} fields</span>
+          </div>
+
+          <${Show} when=${expanded}>
+            <div class="card-body">
+              <${Show} when=${loading}>
+                <${Loading} message="Loading table details..." />
+              <//>
+
+              <${Show} when=${error}>
+                <${ErrorMsg} message=${error} />
+              <//>
+
+              <${Show} when=${() => fields() && !loading()}>
+                <div class="tabs">
+                  <button
+                    class=${() => 'tab' + (activeTab() === 'fields' ? ' active' : '')}
+                    onClick=${() => setActiveTab('fields')}
+                  >
+                    Fields (${() => fields()?.length || 0})
+                  </button>
+                  <button
+                    class=${() => 'tab' + (activeTab() === 'records' ? ' active' : '')}
+                    onClick=${() => setActiveTab('records')}
+                  >
+                    Recent Records (${() => records()?.length || 0})
+                  </button>
+                </div>
+
+                <${Show} when=${() => activeTab() === 'fields'}>
+                  <${FieldsTable} fields=${() => fields()} />
+                <//>
+                <${Show} when=${() => activeTab() === 'records'}>
+                  <${RecordsTable} records=${() => records()} />
+                <//>
+              <//>
+            </div>
+          <//>
+        </div>
+      `;
+    }
+
+    function AppExplorer() {
+      const ctx = useQB();
+      const [app, setApp] = createSignal(null);
+      const [tables, setTables] = createSignal([]);
+      const [loading, setLoading] = createSignal(true);
+      const [error, setError] = createSignal(null);
+
+      // Load on mount
+      (async () => {
+        try {
+          const [appData, tablesData] = await Promise.all([
+            ctx.client.getApp({ appId: ctx.appId }),
+            ctx.client.getAppTables({ appId: ctx.appId })
+          ]);
+          setApp(appData);
+          setTables(tablesData);
+        } catch (e) {
+          setError(e.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+
+      return html`
+        <${Show} when=${loading}>
+          <${Loading} message="Loading app..." />
+        <//>
+
+        <${Show} when=${error}>
+          <${ErrorMsg} message=${error} />
+        <//>
+
+        <${Show} when=${() => app() && !loading()}>
+          <div class="header">
+            <div>
+              <h1>${() => app()?.name}</h1>
+              <div class="meta">${ctx.realm}.quickbase.com</div>
+              <div class="meta">Solid</div>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-value">${() => tables().length}</div>
+                <div class="stat-label">Tables</div>
+              </div>
+            </div>
+          </div>
+
+          <${For} each=${tables}>
+            ${(table) => html`<${TableCard} table=${table} />`}
+          <//>
+        <//>
+      `;
+    }
+
+    function App() {
+      let ctx;
+      let error;
+
+      try {
+        ctx = createQBClient();
+      } catch (e) {
+        error = e.message;
+      }
+
+      if (error) {
+        return html`<${ErrorMsg} message=${error} />`;
+      }
+
+      return html`
+        <${QBContext.Provider} value=${ctx}>
+          <${AppExplorer} />
+        <//>
+      `;
+    }
+
+    render(App, document.getElementById('app'));
+  </script>
+</body>
+</html>

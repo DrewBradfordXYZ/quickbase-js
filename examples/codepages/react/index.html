@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBase App Explorer - React</title>
+  <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+  <style>
+    :root {
+      --qb-primary: #2196f3;
+      --qb-primary-dark: #1976d2;
+      --qb-error: #f44336;
+      --qb-bg: #f5f5f5;
+      --qb-card-bg: #ffffff;
+      --qb-text: #333333;
+      --qb-text-muted: #666666;
+      --qb-border: #e0e0e0;
+      --qb-radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--qb-bg);
+      color: var(--qb-text);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--qb-border);
+    }
+    .header h1 { margin: 0; font-size: 24px; }
+    .meta { color: var(--qb-text-muted); font-size: 14px; }
+    .card {
+      background: var(--qb-card-bg);
+      border-radius: var(--qb-radius);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--qb-bg);
+      border-bottom: 1px solid var(--qb-border);
+      cursor: pointer;
+    }
+    .card-header:hover { background: #eeeeee; }
+    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .card-body { padding: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #e3f2fd;
+      color: var(--qb-primary-dark);
+      margin-left: 4px;
+    }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .data-table th, .data-table td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--qb-border);
+    }
+    .data-table th {
+      background: var(--qb-bg);
+      font-weight: 600;
+      color: var(--qb-text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--qb-text-muted);
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--qb-border);
+      border-top-color: var(--qb-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error {
+      background: #ffebee;
+      color: var(--qb-error);
+      padding: 16px;
+      border-radius: var(--qb-radius);
+      margin: 16px 0;
+    }
+    .field-type {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #eeeeee;
+      color: var(--qb-text-muted);
+    }
+    .stats { display: flex; gap: 32px; }
+    .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
+    .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
+    .expand-icon {
+      display: inline-block;
+      transition: transform 0.2s;
+      margin-right: 8px;
+    }
+    .expand-icon.expanded { transform: rotate(90deg); }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
+    .tab {
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      color: var(--qb-text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab:hover { color: var(--qb-text); }
+    .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
+  </style>
+</head>
+<body>
+  <div id="root" class="container"></div>
+
+  <script type="text/babel">
+    const { createContext, useContext, useState, useEffect, useMemo } = React;
+
+    // ============================================
+    // QuickBase Context
+    // ============================================
+    const QBContext = createContext(null);
+
+    function QBProvider({ children }) {
+      const [error, setError] = useState(null);
+
+      const ctx = useMemo(() => {
+        const realm = window.location.hostname.split('.')[0];
+        const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+
+        if (!realm || !appId) {
+          setError('Could not detect realm/appId from URL');
+          return null;
+        }
+
+        const client = QuickBase.createClient({
+          realm,
+          auth: { type: 'temp-token' }
+        });
+
+        return { client, realm, appId };
+      }, []);
+
+      if (error) {
+        return <div className="error">{error}</div>;
+      }
+
+      return (
+        <QBContext.Provider value={ctx}>
+          {children}
+        </QBContext.Provider>
+      );
+    }
+
+    function useQB() {
+      return useContext(QBContext);
+    }
+
+    // ============================================
+    // Custom Hooks
+    // ============================================
+    function useApp() {
+      const { client, appId } = useQB();
+      const [app, setApp] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        client.getApp({ appId })
+          .then(setApp)
+          .catch(e => setError(e.message))
+          .finally(() => setLoading(false));
+      }, [client, appId]);
+
+      return { app, loading, error };
+    }
+
+    function useTables() {
+      const { client, appId } = useQB();
+      const [tables, setTables] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        client.getAppTables({ appId })
+          .then(setTables)
+          .catch(e => setError(e.message))
+          .finally(() => setLoading(false));
+      }, [client, appId]);
+
+      return { tables, loading, error };
+    }
+
+    function useTableDetails(tableId, enabled) {
+      const { client } = useQB();
+      const [fields, setFields] = useState(null);
+      const [records, setRecords] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        if (!enabled || fields) return;
+
+        setLoading(true);
+        Promise.all([
+          client.getFields({ tableId }),
+          client.runQuery({
+            from: tableId,
+            select: [3, 1, 2],
+            sortBy: [{ fieldId: 2, order: 'DESC' }],
+            options: { top: 5 }
+          })
+        ])
+          .then(([fieldsData, queryResult]) => {
+            setFields(fieldsData);
+            setRecords(queryResult.data || []);
+          })
+          .catch(e => setError(e.message))
+          .finally(() => setLoading(false));
+      }, [client, tableId, enabled, fields]);
+
+      return { fields, records, loading, error };
+    }
+
+    // ============================================
+    // Utility Functions
+    // ============================================
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = now - date;
+
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+      if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+
+      return date.toLocaleDateString();
+    }
+
+    // ============================================
+    // Components
+    // ============================================
+    function Loading({ message = 'Loading...' }) {
+      return (
+        <div className="loading">
+          <div className="spinner"></div>
+          {message}
+        </div>
+      );
+    }
+
+    function Error({ message }) {
+      return <div className="error">{message}</div>;
+    }
+
+    function FieldsTable({ fields }) {
+      if (!fields?.length) {
+        return <p className="meta">No fields found</p>;
+      }
+
+      return (
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Label</th>
+              <th>Type</th>
+              <th>Properties</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fields.map(f => (
+              <tr key={f.id}>
+                <td>{f.id}</td>
+                <td>{f.label}</td>
+                <td><span className="field-type">{f.fieldType}</span></td>
+                <td>
+                  {f.required && <span className="badge">required</span>}
+                  {f.unique && <span className="badge">unique</span>}
+                  {f.properties?.formula && <span className="badge">formula</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+
+    function RecordsTable({ records }) {
+      if (!records?.length) {
+        return <p className="meta">No records found</p>;
+      }
+
+      return (
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Record ID</th>
+              <th>Created</th>
+              <th>Modified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {records.map(r => (
+              <tr key={r['3']?.value}>
+                <td>{r['3']?.value || '-'}</td>
+                <td>{formatDate(r['1']?.value)}</td>
+                <td>{formatDate(r['2']?.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+
+    function TableCard({ table }) {
+      const [expanded, setExpanded] = useState(false);
+      const [activeTab, setActiveTab] = useState('fields');
+      const { fields, records, loading, error } = useTableDetails(table.id, expanded);
+
+      const fieldCount = fields?.length || '...';
+
+      return (
+        <div className="card">
+          <div className="card-header" onClick={() => setExpanded(!expanded)}>
+            <h2>
+              <span className={`expand-icon ${expanded ? 'expanded' : ''}`}>▶</span>
+              {table.name}
+            </h2>
+            <span className="badge">{fieldCount} fields</span>
+          </div>
+
+          {expanded && (
+            <div className="card-body">
+              {loading ? (
+                <Loading message="Loading table details..." />
+              ) : error ? (
+                <Error message={error} />
+              ) : (
+                <>
+                  <div className="tabs">
+                    <button
+                      className={`tab ${activeTab === 'fields' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('fields')}
+                    >
+                      Fields ({fields?.length || 0})
+                    </button>
+                    <button
+                      className={`tab ${activeTab === 'records' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('records')}
+                    >
+                      Recent Records ({records?.length || 0})
+                    </button>
+                  </div>
+                  {activeTab === 'fields' ? (
+                    <FieldsTable fields={fields} />
+                  ) : (
+                    <RecordsTable records={records} />
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function AppExplorer() {
+      const { realm } = useQB();
+      const { app, loading: appLoading, error: appError } = useApp();
+      const { tables, loading: tablesLoading, error: tablesError } = useTables();
+
+      const loading = appLoading || tablesLoading;
+      const error = appError || tablesError;
+
+      if (loading) {
+        return <Loading message="Loading app..." />;
+      }
+
+      if (error) {
+        return <Error message={error} />;
+      }
+
+      return (
+        <>
+          <div className="header">
+            <div>
+              <h1>{app.name}</h1>
+              <div className="meta">{realm}.quickbase.com</div>
+              <div className="meta">React</div>
+            </div>
+            <div className="stats">
+              <div className="stat">
+                <div className="stat-value">{tables.length}</div>
+                <div className="stat-label">Tables</div>
+              </div>
+            </div>
+          </div>
+
+          {tables.map(table => (
+            <TableCard key={table.id} table={table} />
+          ))}
+        </>
+      );
+    }
+
+    function App() {
+      return (
+        <QBProvider>
+          <AppExplorer />
+        </QBProvider>
+      );
+    }
+
+    // Render
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

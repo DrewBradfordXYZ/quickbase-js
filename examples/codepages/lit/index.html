@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBase App Explorer - Lit</title>
+  <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+  <script type="module">
+    import { LitElement, html, css } from 'https://cdn.jsdelivr.net/npm/lit@3/+esm';
+    import { ContextProvider, ContextConsumer, createContext } from 'https://cdn.jsdelivr.net/npm/@lit/context@1/+esm';
+
+    // ============================================
+    // QuickBase Context (Lit Context Protocol)
+    // ============================================
+    const qbContext = createContext('qb-client');
+
+    // ============================================
+    // Shared Styles
+    // ============================================
+    const sharedStyles = css`
+      :host {
+        --qb-primary: #2196f3;
+        --qb-primary-dark: #1976d2;
+        --qb-error: #f44336;
+        --qb-bg: #f5f5f5;
+        --qb-card-bg: #ffffff;
+        --qb-text: #333333;
+        --qb-text-muted: #666666;
+        --qb-border: #e0e0e0;
+        --qb-radius: 8px;
+      }
+      * { box-sizing: border-box; }
+      .card {
+        background: var(--qb-card-bg);
+        border-radius: var(--qb-radius);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: var(--qb-bg);
+        border-bottom: 1px solid var(--qb-border);
+        cursor: pointer;
+      }
+      .card-header:hover { background: #eeeeee; }
+      .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
+      .card-body { padding: 16px; }
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        background: #e3f2fd;
+        color: var(--qb-primary-dark);
+      }
+      .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      .data-table th, .data-table td {
+        text-align: left;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--qb-border);
+      }
+      .data-table th {
+        background: var(--qb-bg);
+        font-weight: 600;
+        color: var(--qb-text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        color: var(--qb-text-muted);
+      }
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--qb-border);
+        border-top-color: var(--qb-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 12px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .error {
+        background: #ffebee;
+        color: var(--qb-error);
+        padding: 16px;
+        border-radius: var(--qb-radius);
+      }
+      .field-type {
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #eeeeee;
+        color: var(--qb-text-muted);
+      }
+      .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
+      .tab {
+        padding: 8px 16px;
+        border: none;
+        background: none;
+        font-size: 14px;
+        color: var(--qb-text-muted);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+      }
+      .tab:hover { color: var(--qb-text); }
+      .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
+      .expand-icon { transition: transform 0.2s; display: inline-block; }
+      .expand-icon.expanded { transform: rotate(90deg); }
+    `;
+
+    // ============================================
+    // <qb-provider> - Context Provider
+    // ============================================
+    class QBProvider extends LitElement {
+      static properties = {
+        _ready: { state: true },
+        _error: { state: true }
+      };
+
+      constructor() {
+        super();
+        this._ready = false;
+        this._error = null;
+
+        const realm = window.location.hostname.split('.')[0];
+        const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+
+        if (!realm || !appId) {
+          this._error = 'Could not detect realm/appId from URL';
+          return;
+        }
+
+        const client = QuickBase.createClient({
+          realm,
+          auth: { type: 'temp-token' }
+        });
+
+        this._provider = new ContextProvider(this, {
+          context: qbContext,
+          initialValue: { client, realm, appId }
+        });
+
+        this._ready = true;
+      }
+
+      render() {
+        if (this._error) {
+          return html`<div class="error">${this._error}</div>`;
+        }
+        return html`<slot></slot>`;
+      }
+    }
+
+    // ============================================
+    // <qb-app-explorer> - Main App Component
+    // ============================================
+    class QBAppExplorer extends LitElement {
+      static styles = [sharedStyles, css`
+        :host { display: block; }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid var(--qb-border);
+        }
+        .header h1 { margin: 0; font-size: 24px; }
+        .meta { color: var(--qb-text-muted); font-size: 14px; }
+        .stats { display: flex; gap: 32px; }
+        .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
+        .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
+      `];
+
+      static properties = {
+        _app: { state: true },
+        _tables: { state: true },
+        _loading: { state: true },
+        _error: { state: true }
+      };
+
+      constructor() {
+        super();
+        this._loading = true;
+        this._consumer = new ContextConsumer(this, { context: qbContext });
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._loadApp();
+      }
+
+      async _loadApp() {
+        await this.updateComplete;
+        const ctx = this._consumer.value;
+        if (!ctx) return;
+
+        try {
+          const [app, tables] = await Promise.all([
+            ctx.client.getApp({ appId: ctx.appId }),
+            ctx.client.getAppTables({ appId: ctx.appId })
+          ]);
+
+          this._app = app;
+          this._tables = tables;
+          this._loading = false;
+        } catch (e) {
+          this._error = e.message;
+          this._loading = false;
+        }
+      }
+
+      render() {
+        const ctx = this._consumer.value;
+
+        if (this._loading) {
+          return html`<div class="loading"><div class="spinner"></div>Loading app...</div>`;
+        }
+
+        if (this._error) {
+          return html`<div class="error">${this._error}</div>`;
+        }
+
+        return html`
+          <div class="header">
+            <div>
+              <h1>${this._app.name}</h1>
+              <div class="meta">${ctx?.realm}.quickbase.com</div>
+              <div class="meta">Lit</div>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-value">${this._tables.length}</div>
+                <div class="stat-label">Tables</div>
+              </div>
+            </div>
+          </div>
+
+          ${this._tables.map(table => html`
+            <qb-table-card .tableId=${table.id} .tableName=${table.name}></qb-table-card>
+          `)}
+        `;
+      }
+    }
+
+    // ============================================
+    // <qb-table-card> - Expandable Table Card
+    // ============================================
+    class QBTableCard extends LitElement {
+      static styles = [sharedStyles];
+
+      static properties = {
+        tableId: { type: String },
+        tableName: { type: String },
+        _expanded: { state: true },
+        _fields: { state: true },
+        _records: { state: true },
+        _loading: { state: true },
+        _error: { state: true },
+        _activeTab: { state: true }
+      };
+
+      constructor() {
+        super();
+        this._expanded = false;
+        this._loading = false;
+        this._activeTab = 'fields';
+        this._consumer = new ContextConsumer(this, { context: qbContext });
+      }
+
+      async _toggle() {
+        this._expanded = !this._expanded;
+
+        if (this._expanded && !this._fields) {
+          this._loading = true;
+          const ctx = this._consumer.value;
+
+          try {
+            const [fields, queryResult] = await Promise.all([
+              ctx.client.getFields({ tableId: this.tableId }),
+              ctx.client.runQuery({
+                from: this.tableId,
+                select: [3, 1, 2],
+                sortBy: [{ fieldId: 2, order: 'DESC' }],
+                options: { top: 5 }
+              })
+            ]);
+
+            this._fields = fields;
+            this._records = queryResult.data || [];
+            this._loading = false;
+          } catch (e) {
+            this._error = e.message;
+            this._loading = false;
+          }
+        }
+      }
+
+      _formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = now - date;
+
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+
+        return date.toLocaleDateString();
+      }
+
+      render() {
+        const fieldCount = this._fields?.length || '...';
+
+        return html`
+          <div class="card">
+            <div class="card-header" @click=${this._toggle}>
+              <h2>
+                <span class="expand-icon ${this._expanded ? 'expanded' : ''}">▶</span>
+                ${this.tableName}
+              </h2>
+              <span class="badge">${fieldCount} fields</span>
+            </div>
+            ${this._expanded ? html`
+              <div class="card-body">
+                ${this._loading ? html`
+                  <div class="loading"><div class="spinner"></div>Loading...</div>
+                ` : this._error ? html`
+                  <div class="error">${this._error}</div>
+                ` : html`
+                  <div class="tabs">
+                    <button class="tab ${this._activeTab === 'fields' ? 'active' : ''}"
+                            @click=${() => this._activeTab = 'fields'}>
+                      Fields (${this._fields?.length || 0})
+                    </button>
+                    <button class="tab ${this._activeTab === 'records' ? 'active' : ''}"
+                            @click=${() => this._activeTab = 'records'}>
+                      Recent Records (${this._records?.length || 0})
+                    </button>
+                  </div>
+                  ${this._activeTab === 'fields' ? this._renderFields() : this._renderRecords()}
+                `}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      _renderFields() {
+        if (!this._fields?.length) {
+          return html`<p class="meta">No fields found</p>`;
+        }
+
+        return html`
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Type</th>
+                <th>Properties</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this._fields.map(f => html`
+                <tr>
+                  <td>${f.id}</td>
+                  <td>${f.label}</td>
+                  <td><span class="field-type">${f.fieldType}</span></td>
+                  <td>
+                    ${f.required ? html`<span class="badge">required</span>` : ''}
+                    ${f.unique ? html`<span class="badge">unique</span>` : ''}
+                    ${f.properties?.formula ? html`<span class="badge">formula</span>` : ''}
+                  </td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
+        `;
+      }
+
+      _renderRecords() {
+        if (!this._records?.length) {
+          return html`<p class="meta">No records found</p>`;
+        }
+
+        return html`
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Record ID</th>
+                <th>Created</th>
+                <th>Modified</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this._records.map(r => html`
+                <tr>
+                  <td>${r['3']?.value || '-'}</td>
+                  <td>${this._formatDate(r['1']?.value)}</td>
+                  <td>${this._formatDate(r['2']?.value)}</td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    // Register components
+    customElements.define('qb-provider', QBProvider);
+    customElements.define('qb-app-explorer', QBAppExplorer);
+    customElements.define('qb-table-card', QBTableCard);
+  </script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 16px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <qb-provider>
+      <qb-app-explorer></qb-app-explorer>
+    </qb-provider>
+  </div>
+</body>
+</html>
