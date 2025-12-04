@@ -142,12 +142,10 @@ const client = createClient({
 
 ### Ticket Auth (Username/Password)
 
-Ticket authentication lets users log in with their QuickBase email and password. Unlike user tokens, tickets properly attribute record changes (`createdBy`/`modifiedBy`) to the authenticated user.
-
-Credentials should come from user input (e.g., a login form), not hardcoded:
+Ticket authentication lets users log in with their QuickBase email and password. Unlike user tokens, tickets properly attribute record changes (`createdBy`/`modifiedBy`) to the authenticated user. Credentials should come from user input (e.g., a login form), not hardcoded.
 
 ```typescript
-// Example: Create client after user submits login form
+// Create client after user submits login form
 function handleLogin(formData: { username: string; password: string }) {
   const client = createClient({
     realm: 'mycompany',
@@ -155,10 +153,12 @@ function handleLogin(formData: { username: string; password: string }) {
       type: 'ticket',
       username: formData.username,
       password: formData.password,
+      hours: 24,              // Optional: ticket validity (default: 12h, max: ~6 months)
+      onExpired: () => {      // Optional: called when ticket expires
+        window.location.href = '/login';
+      },
     },
   });
-
-  // Store client instance for subsequent API calls
   return client;
 }
 ```
@@ -166,48 +166,7 @@ function handleLogin(formData: { username: string; password: string }) {
 **Key behaviors:**
 - Authentication happens lazily on the first API call
 - Password is discarded from memory immediately after authentication
-- Tickets are valid for 12 hours by default (configurable up to ~6 months)
-
-**Handling expired tickets:**
-
-Use the `onExpired` callback to automatically handle ticket expiration. This is called whenever the ticket expires, so you can redirect users to log in again:
-
-```typescript
-const client = createClient({
-  realm: 'mycompany',
-  auth: {
-    type: 'ticket',
-    username: formData.username,
-    password: formData.password,
-    onExpired: () => {
-      // Redirect to login page or show login modal
-      window.location.href = '/login';
-    },
-  },
-});
-
-// No try/catch needed - onExpired handles it
-const result = await client.runQuery({ from: 'bck5pia2n', select: [3, 6] });
-```
-
-**With custom ticket validity:**
-
-```typescript
-const client = createClient({
-  realm: 'mycompany',
-  auth: {
-    type: 'ticket',
-    username: formData.username,
-    password: formData.password,
-    hours: 24 * 7, // 1 week
-  },
-});
-```
-
-**When to use ticket auth:**
-- Web apps with login forms where users authenticate with their QuickBase credentials
-- Proper audit trails with correct `createdBy`/`modifiedBy` attribution
-- Session-based authentication flows
+- Use `onExpired` to handle session expiration (e.g., redirect to login)
 
 ## Pagination
 
