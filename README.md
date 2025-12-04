@@ -154,22 +154,46 @@ const client = createClient({
 
 Ticket authentication lets users log in with their QuickBase email and password. Unlike user tokens, tickets properly attribute record changes (`createdBy`/`modifiedBy`) to the authenticated user.
 
+Credentials should come from user input (e.g., a login form), not hardcoded:
+
 ```typescript
-const client = createClient({
-  realm: 'mycompany',
-  auth: {
-    type: 'ticket',
-    username: 'user@example.com',
-    password: 'password',
-  },
-});
+// Example: Create client after user submits login form
+function handleLogin(formData: { username: string; password: string }) {
+  const client = createClient({
+    realm: 'mycompany',
+    auth: {
+      type: 'ticket',
+      username: formData.username,
+      password: formData.password,
+    },
+  });
+
+  // Store client instance for subsequent API calls
+  return client;
+}
 ```
 
 **Key behaviors:**
 - Authentication happens lazily on the first API call
-- Password is discarded from memory after authentication
+- Password is discarded from memory immediately after authentication
 - Tickets are valid for 12 hours by default (configurable up to ~6 months)
-- When the ticket expires, an error is thrown — create a new client with fresh credentials
+
+**Handling expired tickets:**
+
+When a ticket expires, the SDK throws an error. Your app should catch this and prompt the user to log in again:
+
+```typescript
+try {
+  const result = await client.runQuery({ from: 'bck5pia2n', select: [3, 6] });
+} catch (error) {
+  if (error.message.includes('Ticket expired')) {
+    // Redirect user to login form or show login modal
+    showLoginForm();
+  } else {
+    throw error;
+  }
+}
+```
 
 **With custom ticket validity:**
 
@@ -178,15 +202,15 @@ const client = createClient({
   realm: 'mycompany',
   auth: {
     type: 'ticket',
-    username: 'user@example.com',
-    password: 'password',
+    username: formData.username,
+    password: formData.password,
     hours: 24 * 7, // 1 week
   },
 });
 ```
 
 **When to use ticket auth:**
-- Third-party services where users shouldn't share user tokens
+- Web apps with login forms where users authenticate with their QuickBase credentials
 - Proper audit trails with correct `createdBy`/`modifiedBy` attribution
 - Session-based authentication flows
 
