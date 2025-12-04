@@ -39,6 +39,15 @@ export interface TicketAuthOptions {
   hours?: number;
   /** Callback invoked when ticket expires - use to show login UI */
   onExpired?: () => void;
+  /** Persist ticket to storage for session survival (default: none) */
+  persist?: 'sessionStorage' | 'localStorage';
+}
+
+/** Data structure stored in persistent storage */
+interface PersistedTicketData {
+  ticket: string;
+  userId: string;
+  expiresAt: number;
 }
 
 /**
@@ -66,9 +75,12 @@ export class TicketStrategy implements AuthStrategy {
   private readonly fetchApi: typeof fetch;
   private readonly logger: Logger;
   private readonly onExpired?: () => void;
+  private readonly persist?: 'sessionStorage' | 'localStorage';
+  private readonly storageKey: string;
 
   private ticket: string | null = null;
   private userId: string | null = null;
+  private expiresAt: number | null = null;
   private authenticated = false;
   private pendingAuth: Promise<string> | null = null;
 
@@ -82,15 +94,27 @@ export class TicketStrategy implements AuthStrategy {
     this.password = password;
     this.hours = Math.min(Math.max(options?.hours ?? 12, 1), 4380);
     this.onExpired = options?.onExpired;
+    this.persist = options?.persist;
     this.realm = context.realm;
     this.fetchApi = context.fetchApi;
     this.logger = context.logger;
+    this.storageKey = `qb_ticket_${this.realm}`;
+
+    // Try to restore ticket from storage
+    this.restoreFromStorage();
   }
 
   async getToken(_dbid?: string): Promise<string> {
-    // Return cached ticket if available
-    if (this.ticket) {
+    // Return cached ticket if available and not expired
+    if (this.ticket && this.expiresAt && Date.now() < this.expiresAt) {
       return this.ticket;
+    }
+
+    // If ticket existed but expired, clear it
+    if (this.ticket && this.expiresAt && Date.now() >= this.expiresAt) {
+      this.clearTicket();
+      this.onExpired?.();
+      throw new Error('Ticket expired; create a new client with fresh credentials');
     }
 
     // If already authenticated but no ticket, it expired
@@ -119,7 +143,7 @@ export class TicketStrategy implements AuthStrategy {
 
   async handleAuthError(_dbid?: string): Promise<boolean> {
     // Clear expired ticket
-    this.ticket = null;
+    this.clearTicket();
 
     // Can't refresh - password was cleared after initial auth
     this.logger.debug('Ticket auth error - cannot refresh (password was cleared)');
@@ -128,7 +152,13 @@ export class TicketStrategy implements AuthStrategy {
   }
 
   invalidate(_dbid?: string): void {
+    this.clearTicket();
+  }
+
+  private clearTicket(): void {
     this.ticket = null;
+    this.expiresAt = null;
+    this.clearFromStorage();
   }
 
   /**
@@ -179,7 +209,11 @@ export class TicketStrategy implements AuthStrategy {
     // Store ticket and user ID
     this.ticket = result.ticket;
     this.userId = result.userid;
+    this.expiresAt = Date.now() + this.hours * 60 * 60 * 1000;
     this.authenticated = true;
+
+    // Save to storage if persistence is enabled
+    this.saveToStorage();
 
     // Clear password from memory
     this.password = null;
@@ -212,5 +246,81 @@ export class TicketStrategy implements AuthStrategy {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&apos;');
+  }
+
+  private getStorage(): { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void } | null {
+    if (!this.persist) return null;
+    try {
+      // Check if we're in a browser environment
+      if (typeof globalThis === 'undefined') return null;
+      type StorageLike = { getItem(key: string): string | null; setItem(key: string, value: string): void; removeItem(key: string): void };
+      const win = globalThis as { localStorage?: StorageLike; sessionStorage?: StorageLike };
+      const storage = this.persist === 'localStorage' ? win.localStorage : win.sessionStorage;
+      return storage ?? null;
+    } catch {
+      // Storage may be disabled (e.g., private browsing)
+      return null;
+    }
+  }
+
+  private saveToStorage(): void {
+    const storage = this.getStorage();
+    if (!storage || !this.ticket || !this.userId || !this.expiresAt) return;
+
+    try {
+      const data: PersistedTicketData = {
+        ticket: this.ticket,
+        userId: this.userId,
+        expiresAt: this.expiresAt,
+      };
+      storage.setItem(this.storageKey, JSON.stringify(data));
+      this.logger.debug(`Ticket saved to ${this.persist}`);
+    } catch {
+      // Storage quota exceeded or other error - ignore
+      this.logger.debug(`Failed to save ticket to ${this.persist}`);
+    }
+  }
+
+  private restoreFromStorage(): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    try {
+      const json = storage.getItem(this.storageKey);
+      if (!json) return;
+
+      const data: PersistedTicketData = JSON.parse(json);
+
+      // Check if ticket is still valid (with 1 minute buffer)
+      if (Date.now() >= data.expiresAt - 60000) {
+        storage.removeItem(this.storageKey);
+        this.logger.debug('Stored ticket expired, removed from storage');
+        return;
+      }
+
+      this.ticket = data.ticket;
+      this.userId = data.userId;
+      this.expiresAt = data.expiresAt;
+      this.authenticated = true;
+      // Password stays null since we have a valid ticket
+      this.password = null;
+
+      this.logger.debug(`Ticket restored from ${this.persist}`);
+    } catch {
+      // Invalid JSON or other error - clear storage
+      storage.removeItem(this.storageKey);
+    }
+  }
+
+  private clearFromStorage(): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    try {
+      storage.removeItem(this.storageKey);
+      this.logger.debug(`Ticket cleared from ${this.persist}`);
+    } catch {
+      // Ignore errors
+    }
   }
 }

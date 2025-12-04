@@ -157,6 +157,8 @@ export interface TicketAuthConfig {
   hours?: number;
   /** Callback invoked when ticket expires - use to show login UI */
   onExpired?: () => void;
+  /** Persist ticket to storage for session survival (default: none) */
+  persist?: 'sessionStorage' | 'localStorage';
 }
 
 export interface RateLimitConfig {

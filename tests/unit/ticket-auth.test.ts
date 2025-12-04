@@ -420,4 +420,167 @@ describe('createClient with ticket auth', () => {
 
     expect(client).toBeDefined();
   });
+
+  it('should create client with persist option', () => {
+    const client = createClient({
+      realm: 'testcompany',
+      auth: {
+        type: 'ticket',
+        username: 'user@example.com',
+        password: 'password123',
+        persist: 'sessionStorage',
+      },
+    });
+
+    expect(client).toBeDefined();
+  });
+});
+
+describe('ticket persistence', () => {
+  // Mock storage
+  let mockStorage: Map<string, string>;
+  let mockStorageObject: {
+    getItem: (key: string) => string | null;
+    setItem: (key: string, value: string) => void;
+    removeItem: (key: string) => void;
+  };
+
+  beforeEach(() => {
+    mockStorage = new Map();
+    mockStorageObject = {
+      getItem: (key: string) => mockStorage.get(key) ?? null,
+      setItem: (key: string, value: string) => mockStorage.set(key, value),
+      removeItem: (key: string) => mockStorage.delete(key),
+    };
+
+    // Mock globalThis.sessionStorage
+    vi.stubGlobal('sessionStorage', mockStorageObject);
+    vi.stubGlobal('localStorage', mockStorageObject);
+  });
+
+  it('should save ticket to storage after authentication', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'persisted_ticket',
+      userid: '12345',
+    });
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { persist: 'sessionStorage' },
+      createAuthContext(mockFetch)
+    );
+
+    await strategy.getToken();
+
+    const stored = mockStorage.get('qb_ticket_testrealm');
+    expect(stored).toBeDefined();
+
+    const data = JSON.parse(stored!);
+    expect(data.ticket).toBe('persisted_ticket');
+    expect(data.userId).toBe('12345');
+    expect(data.expiresAt).toBeGreaterThan(Date.now());
+  });
+
+  it('should restore ticket from storage on construction', async () => {
+    // Pre-populate storage with a valid ticket
+    const futureExpiry = Date.now() + 60 * 60 * 1000; // 1 hour from now
+    mockStorage.set(
+      'qb_ticket_testrealm',
+      JSON.stringify({
+        ticket: 'restored_ticket',
+        userId: '99999',
+        expiresAt: futureExpiry,
+      })
+    );
+
+    const mockFetch = vi.fn(); // Should not be called
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { persist: 'sessionStorage' },
+      createAuthContext(mockFetch)
+    );
+
+    const token = await strategy.getToken();
+
+    expect(token).toBe('restored_ticket');
+    expect(strategy.getUserId()).toBe('99999');
+    expect(mockFetch).not.toHaveBeenCalled(); // No auth request made
+  });
+
+  it('should not restore expired ticket from storage', async () => {
+    // Pre-populate storage with an expired ticket
+    const pastExpiry = Date.now() - 1000; // Already expired
+    mockStorage.set(
+      'qb_ticket_testrealm',
+      JSON.stringify({
+        ticket: 'expired_ticket',
+        userId: '99999',
+        expiresAt: pastExpiry,
+      })
+    );
+
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'new_ticket',
+      userid: '12345',
+    });
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { persist: 'sessionStorage' },
+      createAuthContext(mockFetch)
+    );
+
+    const token = await strategy.getToken();
+
+    expect(token).toBe('new_ticket'); // Fresh auth was performed
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear ticket from storage on invalidate', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'test_ticket',
+      userid: '12345',
+    });
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { persist: 'sessionStorage' },
+      createAuthContext(mockFetch)
+    );
+
+    await strategy.getToken();
+    expect(mockStorage.has('qb_ticket_testrealm')).toBe(true);
+
+    strategy.invalidate();
+    expect(mockStorage.has('qb_ticket_testrealm')).toBe(false);
+  });
+
+  it('should clear ticket from storage on handleAuthError', async () => {
+    const mockFetch = createMockAuthFetch({
+      errcode: 0,
+      ticket: 'test_ticket',
+      userid: '12345',
+    });
+
+    const strategy = new TicketStrategy(
+      'user@example.com',
+      'password',
+      { persist: 'sessionStorage' },
+      createAuthContext(mockFetch)
+    );
+
+    await strategy.getToken();
+    expect(mockStorage.has('qb_ticket_testrealm')).toBe(true);
+
+    await strategy.handleAuthError();
+    expect(mockStorage.has('qb_ticket_testrealm')).toBe(false);
+  });
 });

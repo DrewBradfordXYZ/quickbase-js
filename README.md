@@ -153,8 +153,9 @@ function handleLogin(formData: { username: string; password: string }) {
       type: 'ticket',
       username: formData.username,
       password: formData.password,
-      hours: 24,              // Optional: ticket validity (default: 12h, max: ~6 months)
-      onExpired: () => {      // Optional: called when ticket expires
+      hours: 24,                      // Optional: validity (default: 12h, max: ~6 months)
+      persist: 'sessionStorage',      // Optional: survive page refresh
+      onExpired: () => {              // Optional: called when ticket expires
         window.location.href = '/login';
       },
     },
@@ -166,6 +167,7 @@ function handleLogin(formData: { username: string; password: string }) {
 **Key behaviors:**
 - Authentication happens lazily on the first API call
 - Password is discarded from memory immediately after authentication
+- Use `persist` to survive page refreshes (`'sessionStorage'` or `'localStorage'`)
 - Use `onExpired` to handle session expiration (e.g., redirect to login)
 
 ## Pagination
