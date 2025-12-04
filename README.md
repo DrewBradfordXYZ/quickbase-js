@@ -106,7 +106,7 @@ const client = createClient({
 
 ### Temporary Token (Recommended for Browser/Code Pages)
 
-Temporary tokens are automatically fetched and cached per database. They refresh on 401 errors.
+Temporary tokens are automatically fetched and cached per database. Tokens are refreshed proactively before expiration (default: 4m 50s TTL for 5-minute tokens). The SDK also handles unexpected 401 errors as a fallback.
 
 ```typescript
 // In QuickBase Code Pages - no user token needed (uses browser session)
