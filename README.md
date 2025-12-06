@@ -306,13 +306,27 @@ console.log(result.data[0].dueDate);  // Date object (if convertDates is enabled
 
 ### Upserting with Aliases
 
+With schema, use field aliases as keys:
+
 ```typescript
 await qb.upsert({
   to: 'projects',
   data: [
-    { name: { value: 'New Project' }, status: { value: 'Planning' } },
+    { name: 'New Project', status: 'Planning' },
   ],
 });
+```
+
+## Auto-Wrapping
+
+Values are automatically wrapped in `{ value: X }` format for upserts. This works with or without a schema:
+
+```typescript
+// Clean syntax - values are auto-wrapped
+{ '6': 'New Record', '7': 42 }
+
+// Explicit wrapping also works (backwards compatible)
+{ '6': { value: 'New Record' }, '7': { value: 42 } }
 ```
 
 ### Response Transformation
@@ -511,11 +525,11 @@ const records = await qb.runQuery({
   options: { top: 100, skip: 0 },
 });
 
-// Insert/Update records
+// Insert/Update records (values are auto-wrapped)
 const result = await qb.upsert({
   to: 'byyy82s1',
   data: [
-    { '6': { value: 'New Record' }, '7': { value: 42 } },
+    { '6': 'New Record', '7': 42 },
   ],
 });
 

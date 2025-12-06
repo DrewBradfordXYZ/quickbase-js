@@ -30,61 +30,93 @@ export function transformRequest<T extends Record<string, unknown>>(
   body: T,
   ctx: RequestTransformContext
 ): T {
-  if (!ctx.schema) return body;
-
   // Work with a plain object to avoid TypeScript index signature issues
   const result: Record<string, unknown> = { ...body };
   let tableId = ctx.tableId;
 
-  // Resolve table references (from, to)
-  if ('from' in result && typeof result.from === 'string') {
-    tableId = resolveTableAlias(ctx.schema, result.from);
-    result.from = tableId;
-  }
-  if ('to' in result && typeof result.to === 'string') {
-    tableId = resolveTableAlias(ctx.schema, result.to);
-    result.to = tableId;
+  // Schema-dependent transforms (alias resolution)
+  if (ctx.schema) {
+    // Resolve table references (from, to)
+    if ('from' in result && typeof result.from === 'string') {
+      tableId = resolveTableAlias(ctx.schema, result.from);
+      result.from = tableId;
+    }
+    if ('to' in result && typeof result.to === 'string') {
+      tableId = resolveTableAlias(ctx.schema, result.to);
+      result.to = tableId;
+    }
+
+    // Resolve field aliases (requires tableId)
+    if (tableId) {
+      // Resolve select array
+      if ('select' in result && Array.isArray(result.select)) {
+        result.select = (result.select as (string | number)[]).map((field) =>
+          resolveFieldAlias(ctx.schema!, tableId!, field)
+        );
+      }
+
+      // Resolve sortBy array
+      if ('sortBy' in result && Array.isArray(result.sortBy)) {
+        result.sortBy = (result.sortBy as Record<string, unknown>[]).map((sort) => ({
+          ...sort,
+          fieldId: resolveFieldAlias(ctx.schema!, tableId!, sort.fieldId as string | number),
+        }));
+      }
+
+      // Resolve groupBy array
+      if ('groupBy' in result && Array.isArray(result.groupBy)) {
+        result.groupBy = (result.groupBy as Record<string, unknown>[]).map((group) => ({
+          ...group,
+          fieldId: resolveFieldAlias(ctx.schema!, tableId!, group.fieldId as string | number),
+        }));
+      }
+
+      // Resolve where clause (string replacement)
+      if ('where' in result && typeof result.where === 'string') {
+        result.where = transformWhereClause(result.where, ctx.schema, tableId);
+      }
+    }
   }
 
-  // Need tableId to resolve field aliases
-  if (!tableId) return result as T;
-
-  // Resolve select array
-  if ('select' in result && Array.isArray(result.select)) {
-    result.select = (result.select as (string | number)[]).map((field) =>
-      resolveFieldAlias(ctx.schema, tableId!, field)
-    );
-  }
-
-  // Resolve sortBy array
-  if ('sortBy' in result && Array.isArray(result.sortBy)) {
-    result.sortBy = (result.sortBy as Record<string, unknown>[]).map((sort) => ({
-      ...sort,
-      fieldId: resolveFieldAlias(ctx.schema, tableId!, sort.fieldId as string | number),
-    }));
-  }
-
-  // Resolve groupBy array
-  if ('groupBy' in result && Array.isArray(result.groupBy)) {
-    result.groupBy = (result.groupBy as Record<string, unknown>[]).map((group) => ({
-      ...group,
-      fieldId: resolveFieldAlias(ctx.schema, tableId!, group.fieldId as string | number),
-    }));
-  }
-
-  // Resolve where clause (string replacement)
-  if ('where' in result && typeof result.where === 'string') {
-    result.where = transformWhereClause(result.where, ctx.schema, tableId);
-  }
-
-  // Resolve data array (for upsert)
+  // Auto-wrap data values (always runs, no schema required)
   if ('data' in result && Array.isArray(result.data)) {
     result.data = (result.data as Record<string, unknown>[]).map((record) =>
-      transformRecordForRequest(record, ctx.schema!, tableId!)
+      wrapRecordValues(record, ctx.schema, tableId)
     );
   }
 
   return result as T;
+}
+
+/**
+ * Wrap record values and optionally resolve field aliases.
+ * Always wraps plain values in { value: X } format.
+ * Resolves field aliases to IDs if schema is provided.
+ */
+function wrapRecordValues(
+  record: Record<string, unknown>,
+  schema: ResolvedSchema | undefined,
+  tableId: string | undefined
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(record)) {
+    // Resolve field alias if schema is available
+    let outputKey = key;
+    if (schema && tableId) {
+      try {
+        const fieldId = resolveFieldAlias(schema, tableId, key);
+        outputKey = String(fieldId);
+      } catch {
+        // Not an alias, keep original key
+      }
+    }
+
+    // Always auto-wrap values
+    result[outputKey] = wrapFieldValue(value);
+  }
+
+  return result;
 }
 
 /**
@@ -111,29 +143,28 @@ function transformWhereClause(
 }
 
 /**
- * Transform a record object for upsert, converting field alias keys to IDs.
- * Input: { name: { value: 'X' } }
- * Output: { 6: { value: 'X' } }
+ * Wrap a value in QuickBase's { value: X } format if not already wrapped.
+ * Handles plain values, arrays, and already-wrapped values.
  */
-function transformRecordForRequest(
-  record: Record<string, unknown>,
-  schema: ResolvedSchema,
-  tableId: string
-): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-
-  for (const [key, value] of Object.entries(record)) {
-    // Try to resolve the key as a field alias
-    try {
-      const fieldId = resolveFieldAlias(schema, tableId, key);
-      result[fieldId] = value;
-    } catch {
-      // If not an alias, keep the original key (might already be an ID)
-      result[key] = value;
-    }
+function wrapFieldValue(value: unknown): { value: unknown } {
+  // Already wrapped - return as-is
+  if (isWrappedValue(value)) {
+    return value as { value: unknown };
   }
 
-  return result;
+  // Wrap plain value
+  return { value };
+}
+
+/**
+ * Check if a value is already wrapped in { value: X } format.
+ */
+function isWrappedValue(value: unknown): boolean {
+  if (value === null || value === undefined) return false;
+  if (typeof value !== 'object' || Array.isArray(value)) return false;
+
+  const obj = value as Record<string, unknown>;
+  return 'value' in obj;
 }
 
 // =============================================================================
