@@ -413,12 +413,66 @@ export enum PageType {
 // ============================================================================
 
 /**
- * Webhook trigger type
+ * Webhook trigger type.
+ * Can be combined, e.g., 'adm' for all triggers.
  */
-export type WebhookTrigger = 'add' | 'update' | 'delete' | 'any';
+export type WebhookTrigger = 'a' | 'd' | 'm' | 'ad' | 'am' | 'dm' | 'adm';
 
 /**
- * Options for creating/editing a webhook
+ * Webhook message format
+ */
+export type WebhookMessageFormat = 'XML' | 'JSON' | 'RAW';
+
+/**
+ * Webhook HTTP verb
+ */
+export type WebhookHTTPVerb = 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE';
+
+/**
+ * Webhook header key-value pair
+ */
+export interface WebhookHeader {
+  key: string;
+  value: string;
+}
+
+/**
+ * Options for creating a webhook
+ */
+export interface WebhooksCreateOptions {
+  /** A unique name for the webhook (required) */
+  label: string;
+  /** Endpoint URL - must start with https:// (required) */
+  webhookUrl: string;
+  /** Description of the webhook */
+  description?: string;
+  /** Filter criteria to trigger the webhook */
+  query?: string;
+  /** When to trigger: 'a' (add), 'd' (delete), 'm' (modify), or combinations like 'adm' */
+  workflowWhen?: WebhookTrigger;
+  /** HTTP headers for the webhook request */
+  headers?: WebhookHeader[];
+  /** Payload of the webhook (empty by default) */
+  message?: string;
+  /** Format of the payload: XML (default), JSON, or RAW */
+  messageFormat?: WebhookMessageFormat;
+  /** HTTP method: POST (default), GET, PUT, PATCH, DELETE */
+  httpVerb?: WebhookHTTPVerb;
+  /** Field IDs - webhook fires only when these fields change. If empty, fires on any change. */
+  triggerFields?: number[];
+}
+
+/**
+ * Options for editing a webhook
+ */
+export interface WebhooksEditOptions extends WebhooksCreateOptions {
+  /** When true, clears the field trigger criteria (fires on any field) */
+  clearTriggerFields?: boolean;
+}
+
+/**
+ * Legacy webhook options (deprecated - use WebhooksCreateOptions)
+ * @deprecated Use WebhooksCreateOptions instead
  */
 export interface WebhookOptions {
   /** Webhook name */
@@ -426,11 +480,7 @@ export interface WebhookOptions {
   /** URL to call */
   url?: string;
   /** Trigger type */
-  trigger?: WebhookTrigger;
-  /** Fields to include in payload */
-  fields?: number[];
-  /** Whether to include old values on update */
-  includeOldValues?: boolean;
+  trigger?: string;
 }
 
 // ============================================================================

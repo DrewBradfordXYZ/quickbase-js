@@ -38,6 +38,9 @@ export async function fieldAddChoices(
   fieldId: number,
   choices: string[]
 ): Promise<FieldAddChoicesResult> {
+  if (choices.length === 0) {
+    throw new Error('choices array cannot be empty');
+  }
   let inner = `<fid>${fieldId}</fid>`;
   for (const choice of choices) {
     inner += `<choice>${escapeXml(choice)}</choice>`;
@@ -73,6 +76,9 @@ export async function fieldRemoveChoices(
   fieldId: number,
   choices: string[]
 ): Promise<FieldRemoveChoicesResult> {
+  if (choices.length === 0) {
+    throw new Error('choices array cannot be empty');
+  }
   let inner = `<fid>${fieldId}</fid>`;
   for (const choice of choices) {
     inner += `<choice>${escapeXml(choice)}</choice>`;

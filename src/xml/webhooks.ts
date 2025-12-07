@@ -9,7 +9,8 @@
 
 import type {
   XmlCaller,
-  WebhookOptions,
+  WebhooksCreateOptions,
+  WebhooksEditOptions,
   WebhookResult,
 } from './types.js';
 import { checkError } from './errors.js';
@@ -22,19 +23,60 @@ import {
 } from './request.js';
 
 /**
- * Build webhook XML options
+ * Build webhook XML from create options
  */
-function buildWebhookOptions(options: WebhookOptions): string {
-  let inner = '';
+function buildWebhookCreateXml(options: WebhooksCreateOptions): string {
+  let inner = `<label>${escapeXml(options.label)}</label>`;
+  inner += `<WebhookURL>${escapeXml(options.webhookUrl)}</WebhookURL>`;
 
-  if (options.name) {
-    inner += `<name>${escapeXml(options.name)}</name>`;
+  if (options.description) {
+    inner += `<Description>${escapeXml(options.description)}</Description>`;
   }
-  if (options.url) {
-    inner += `<url>${escapeXml(options.url)}</url>`;
+  if (options.query) {
+    inner += `<Query>${escapeXml(options.query)}</Query>`;
   }
-  if (options.trigger) {
-    inner += `<trigger>${escapeXml(options.trigger)}</trigger>`;
+  if (options.workflowWhen) {
+    inner += `<WorkflowWhen>${escapeXml(options.workflowWhen)}</WorkflowWhen>`;
+  }
+  if (options.headers && options.headers.length > 0) {
+    inner += `<WebhookHeaderCount>${options.headers.length}</WebhookHeaderCount>`;
+    options.headers.forEach((h, i) => {
+      inner += `<WebhookHeaderKey${i + 1}>${escapeXml(h.key)}</WebhookHeaderKey${i + 1}>`;
+      inner += `<WebhookHeaderValue${i + 1}>${escapeXml(h.value)}</WebhookHeaderValue${i + 1}>`;
+    });
+  }
+  if (options.message) {
+    inner += `<WebhookMessage>${escapeXml(options.message)}</WebhookMessage>`;
+  }
+  if (options.messageFormat) {
+    inner += `<WebhookMessageFormat>${options.messageFormat}</WebhookMessageFormat>`;
+  }
+  if (options.httpVerb) {
+    inner += `<WebhookHTTPVerb>${options.httpVerb}</WebhookHTTPVerb>`;
+  }
+  if (options.triggerFields && options.triggerFields.length > 0) {
+    inner += '<tfidsWhich>TRUE</tfidsWhich>';
+    for (const fid of options.triggerFields) {
+      inner += `<tfids>${fid}</tfids>`;
+    }
+  }
+
+  return inner;
+}
+
+/**
+ * Build webhook XML from edit options
+ */
+function buildWebhookEditXml(actionId: string, options: WebhooksEditOptions): string {
+  let inner = `<actionId>${escapeXml(actionId)}</actionId>`;
+  inner += buildWebhookCreateXml(options);
+
+  // Handle clearing trigger fields
+  if (options.clearTriggerFields) {
+    // Remove any tfidsWhich/tfids we just added and replace with clear
+    inner = inner.replace(/<tfidsWhich>TRUE<\/tfidsWhich>/, '');
+    inner = inner.replace(/<tfids>\d+<\/tfids>/g, '');
+    inner += '<tfidsWhich>tfidsAny</tfidsWhich>';
   }
 
   return inner;
@@ -47,29 +89,26 @@ function buildWebhookOptions(options: WebhookOptions): string {
  *
  * @example
  * ```typescript
- * const result = await webhooksCreate(caller, 'bqtable123', {
- *   name: 'My Webhook',
- *   url: 'https://example.com/webhook',
- *   trigger: 'onInsert',
+ * await webhooksCreate(caller, 'bqtable123', {
+ *   label: 'Notify on new records',
+ *   webhookUrl: 'https://example.com/webhook',
+ *   workflowWhen: 'a',
+ *   messageFormat: 'JSON',
+ *   headers: [{ key: 'Content-Type', value: 'application/json' }],
  * });
- * console.log(`Created webhook: ${result.webhookId}`);
  * ```
  */
 export async function webhooksCreate(
   caller: XmlCaller,
   tableId: string,
-  options: WebhookOptions
-): Promise<WebhookResult> {
-  const inner = buildWebhookOptions(options);
+  options: WebhooksCreateOptions
+): Promise<void> {
+  const inner = buildWebhookCreateXml(options);
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Create', body);
 
   const base = parseBaseResponse(xml);
   checkError(base);
-
-  return {
-    webhookId: parseXmlNumber(getTagContent(xml, 'webhookid')),
-  };
 }
 
 /**
@@ -79,20 +118,20 @@ export async function webhooksCreate(
  *
  * @example
  * ```typescript
- * await webhooksEdit(caller, 'bqtable123', 5, {
- *   name: 'Updated Name',
- *   url: 'https://example.com/new-webhook',
+ * await webhooksEdit(caller, 'bqtable123', '15', {
+ *   label: 'Updated webhook name',
+ *   webhookUrl: 'https://example.com/new-endpoint',
+ *   messageFormat: 'JSON',
  * });
  * ```
  */
 export async function webhooksEdit(
   caller: XmlCaller,
   tableId: string,
-  webhookId: number,
-  options: WebhookOptions
+  actionId: string,
+  options: WebhooksEditOptions
 ): Promise<void> {
-  let inner = `<webhookid>${webhookId}</webhookid>`;
-  inner += buildWebhookOptions(options);
+  const inner = buildWebhookEditXml(actionId, options);
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Edit', body);
 
@@ -101,72 +140,96 @@ export async function webhooksEdit(
 }
 
 /**
- * Delete a webhook.
+ * Delete webhooks.
  *
  * @see https://help.quickbase.com/docs/api-webhooks-delete
  *
  * @example
  * ```typescript
- * await webhooksDelete(caller, 'bqtable123', 5);
+ * const result = await webhooksDelete(caller, 'bqtable123', ['15', '16']);
+ * console.log(`Deleted ${result.numChanged} webhooks`);
  * ```
  */
 export async function webhooksDelete(
   caller: XmlCaller,
   tableId: string,
-  webhookId: number
-): Promise<void> {
-  const inner = `<webhookid>${webhookId}</webhookid>`;
+  actionIds: string[]
+): Promise<{ numChanged: number }> {
+  if (actionIds.length === 0) {
+    throw new Error('actionIds array cannot be empty');
+  }
+  const inner = `<actionIDList>${actionIds.join(',')}</actionIDList>`;
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Delete', body);
 
   const base = parseBaseResponse(xml);
   checkError(base);
+
+  return {
+    numChanged: parseXmlNumber(getTagContent(xml, 'numChanged')),
+  };
 }
 
 /**
- * Activate a webhook.
+ * Activate webhooks.
  *
  * @see https://help.quickbase.com/docs/api-webhooks-activate
  *
  * @example
  * ```typescript
- * await webhooksActivate(caller, 'bqtable123', 5);
+ * const result = await webhooksActivate(caller, 'bqtable123', ['15']);
+ * console.log(`Activated ${result.numChanged} webhooks`);
  * ```
  */
 export async function webhooksActivate(
   caller: XmlCaller,
   tableId: string,
-  webhookId: number
-): Promise<void> {
-  const inner = `<webhookid>${webhookId}</webhookid>`;
+  actionIds: string[]
+): Promise<{ numChanged: number }> {
+  if (actionIds.length === 0) {
+    throw new Error('actionIds array cannot be empty');
+  }
+  const inner = `<actionIDList>${actionIds.join(',')}</actionIDList>`;
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Activate', body);
 
   const base = parseBaseResponse(xml);
   checkError(base);
+
+  return {
+    numChanged: parseXmlNumber(getTagContent(xml, 'numChanged')),
+  };
 }
 
 /**
- * Deactivate a webhook.
+ * Deactivate webhooks.
  *
  * @see https://help.quickbase.com/docs/api-webhooks-deactivate
  *
  * @example
  * ```typescript
- * await webhooksDeactivate(caller, 'bqtable123', 5);
+ * const result = await webhooksDeactivate(caller, 'bqtable123', ['15']);
+ * console.log(`Deactivated ${result.numChanged} webhooks`);
  * ```
  */
 export async function webhooksDeactivate(
   caller: XmlCaller,
   tableId: string,
-  webhookId: number
-): Promise<void> {
-  const inner = `<webhookid>${webhookId}</webhookid>`;
+  actionIds: string[]
+): Promise<{ numChanged: number }> {
+  if (actionIds.length === 0) {
+    throw new Error('actionIds array cannot be empty');
+  }
+  const inner = `<actionIDList>${actionIds.join(',')}</actionIDList>`;
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Deactivate', body);
 
   const base = parseBaseResponse(xml);
   checkError(base);
+
+  return {
+    numChanged: parseXmlNumber(getTagContent(xml, 'numChanged')),
+  };
 }
 
 /**
@@ -176,20 +239,16 @@ export async function webhooksDeactivate(
  *
  * @example
  * ```typescript
- * const result = await webhooksCopy(caller, 'bqtable123', 5, 'Copied Webhook');
- * console.log(`Copied to: ${result.webhookId}`);
+ * const result = await webhooksCopy(caller, 'bqtable123', '15');
+ * console.log(`Created webhook copy with ID: ${result.actionId}`);
  * ```
  */
 export async function webhooksCopy(
   caller: XmlCaller,
   tableId: string,
-  webhookId: number,
-  name?: string
-): Promise<WebhookResult> {
-  let inner = `<webhookid>${webhookId}</webhookid>`;
-  if (name) {
-    inner += `<name>${escapeXml(name)}</name>`;
-  }
+  actionId: string
+): Promise<{ actionId: string }> {
+  const inner = `<actionId>${escapeXml(actionId)}</actionId>`;
   const body = buildRequest(inner);
   const xml = await caller.doXml(tableId, 'API_Webhooks_Copy', body);
 
@@ -197,6 +256,6 @@ export async function webhooksCopy(
   checkError(base);
 
   return {
-    webhookId: parseXmlNumber(getTagContent(xml, 'webhookid')),
+    actionId: getTagContent(xml, 'actionId'),
   };
 }

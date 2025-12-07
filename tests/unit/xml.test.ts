@@ -834,3 +834,50 @@ describe('Error helpers', () => {
     expect(isInvalidTicket(err)).toBe(false);
   });
 });
+
+describe('Empty array validation', () => {
+  it('should throw error for empty choices array in fieldAddChoices', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock);
+
+    await expect(client.fieldAddChoices('bqtable123', 6, [])).rejects.toThrow(
+      'choices array cannot be empty'
+    );
+  });
+
+  it('should throw error for empty choices array in fieldRemoveChoices', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock);
+
+    await expect(client.fieldRemoveChoices('bqtable123', 6, [])).rejects.toThrow(
+      'choices array cannot be empty'
+    );
+  });
+
+  it('should throw error for empty actionIds array in webhooksDelete', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock);
+
+    await expect(client.webhooksDelete('bqtable123', [])).rejects.toThrow(
+      'actionIds array cannot be empty'
+    );
+  });
+
+  it('should throw error for empty actionIds array in webhooksActivate', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock);
+
+    await expect(client.webhooksActivate('bqtable123', [])).rejects.toThrow(
+      'actionIds array cannot be empty'
+    );
+  });
+
+  it('should throw error for empty actionIds array in webhooksDeactivate', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock);
+
+    await expect(client.webhooksDeactivate('bqtable123', [])).rejects.toThrow(
+      'actionIds array cannot be empty'
+    );
+  });
+});

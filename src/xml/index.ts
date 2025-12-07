@@ -55,8 +55,8 @@ import type {
   GetAncestorInfoResult,
   ImportFromCSVResult,
   CopyMasterDetailResult,
-  WebhookOptions,
-  WebhookResult,
+  WebhooksCreateOptions,
+  WebhooksEditOptions,
 } from './types.js';
 
 // Import endpoint implementations
@@ -756,7 +756,7 @@ export class XmlClient {
    * Create a webhook.
    * @see https://help.quickbase.com/docs/api-webhooks-create
    */
-  async webhooksCreate(tableId: string, options: WebhookOptions): Promise<WebhookResult> {
+  async webhooksCreate(tableId: string, options: WebhooksCreateOptions): Promise<void> {
     this.checkWriteAllowed('API_Webhooks_Create');
     return webhooksCreateImpl(this.caller, tableId, options);
   }
@@ -767,47 +767,47 @@ export class XmlClient {
    */
   async webhooksEdit(
     tableId: string,
-    webhookId: number,
-    options: WebhookOptions
+    actionId: string,
+    options: WebhooksEditOptions
   ): Promise<void> {
     this.checkWriteAllowed('API_Webhooks_Edit');
-    return webhooksEditImpl(this.caller, tableId, webhookId, options);
+    return webhooksEditImpl(this.caller, tableId, actionId, options);
   }
 
   /**
-   * Delete a webhook.
+   * Delete webhooks.
    * @see https://help.quickbase.com/docs/api-webhooks-delete
    */
-  async webhooksDelete(tableId: string, webhookId: number): Promise<void> {
+  async webhooksDelete(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Delete');
-    return webhooksDeleteImpl(this.caller, tableId, webhookId);
+    return webhooksDeleteImpl(this.caller, tableId, actionIds);
   }
 
   /**
-   * Activate a webhook.
+   * Activate webhooks.
    * @see https://help.quickbase.com/docs/api-webhooks-activate
    */
-  async webhooksActivate(tableId: string, webhookId: number): Promise<void> {
+  async webhooksActivate(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Activate');
-    return webhooksActivateImpl(this.caller, tableId, webhookId);
+    return webhooksActivateImpl(this.caller, tableId, actionIds);
   }
 
   /**
-   * Deactivate a webhook.
+   * Deactivate webhooks.
    * @see https://help.quickbase.com/docs/api-webhooks-deactivate
    */
-  async webhooksDeactivate(tableId: string, webhookId: number): Promise<void> {
+  async webhooksDeactivate(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Deactivate');
-    return webhooksDeactivateImpl(this.caller, tableId, webhookId);
+    return webhooksDeactivateImpl(this.caller, tableId, actionIds);
   }
 
   /**
    * Copy a webhook.
    * @see https://help.quickbase.com/docs/api-webhooks-copy
    */
-  async webhooksCopy(tableId: string, webhookId: number, name?: string): Promise<WebhookResult> {
+  async webhooksCopy(tableId: string, actionId: string): Promise<{ actionId: string }> {
     this.checkWriteAllowed('API_Webhooks_Copy');
-    return webhooksCopyImpl(this.caller, tableId, webhookId, name);
+    return webhooksCopyImpl(this.caller, tableId, actionId);
   }
 
   // ============================================================================
@@ -942,7 +942,7 @@ export function createXmlClient(
   const caller: XmlCaller = {
     realm: () => config.realm,
     doXml: async (dbid: string, action: string, body: string): Promise<string> => {
-      const url = `https://${config.realm}.quickbase.com/db/${dbid}`;
+      const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
 
       // Get auth token for this dbid
       const token = await auth.getToken(dbid);
