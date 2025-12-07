@@ -30,6 +30,44 @@ export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, is
 
 // Import ReadOnlyError for consistent error handling
 import { ReadOnlyError } from '../core/errors.js';
+import type { ResolvedSchema } from '../core/types.js';
+import { resolveTableAlias, resolveFieldAlias } from '../core/schema.js';
+
+// Import response transformation functions and types
+import {
+  transformGetRecordInfoResult,
+  transformGetSchemaResult,
+  transformFieldAddChoicesResult,
+  transformFieldRemoveChoicesResult,
+  transformGrantedDBsResult,
+  transformGrantedDBsForGroupResult,
+  transformGetAppDTMInfoResult,
+  transformFindDBByNameResult,
+  type GetRecordInfoResultWithAlias,
+  type GetSchemaResultWithAlias,
+  type FieldAddChoicesResultWithAlias,
+  type FieldRemoveChoicesResultWithAlias,
+  type GrantedDBsResultWithAlias,
+  type GrantedDBsForGroupResultWithAlias,
+  type GetAppDTMInfoResultWithAlias,
+  type FindDBByNameResultWithAlias,
+} from './transform.js';
+
+// Re-export transformation types for consumers
+export type {
+  RecordFieldWithAlias,
+  SchemaFieldWithAlias,
+  DatabaseInfoWithAlias,
+  SchemaChildTableWithAlias,
+  GetRecordInfoResultWithAlias,
+  GetSchemaResultWithAlias,
+  FieldAddChoicesResultWithAlias,
+  FieldRemoveChoicesResultWithAlias,
+  GrantedDBsResultWithAlias,
+  GrantedDBsForGroupResultWithAlias,
+  GetAppDTMInfoResultWithAlias,
+  FindDBByNameResultWithAlias,
+} from './transform.js';
 
 // Import types for XmlClient
 import type { XmlCaller } from './types.js';
@@ -37,9 +75,6 @@ import type {
   GetRoleInfoResult,
   UserRolesResult,
   GetUserRoleResult,
-  GetSchemaResult,
-  GrantedDBsResult,
-  FindDBByNameResult,
   GetUsersInGroupResult,
   CreateGroupResult,
   GetGroupRoleResult,
@@ -48,13 +83,8 @@ import type {
   DBInfo,
   AddReplaceDBPageResult,
   PageType,
-  FieldAddChoicesResult,
-  FieldRemoveChoicesResult,
   DoQueryCountResult,
-  GetRecordInfoResult,
   GrantedGroupsResult,
-  GrantedDBsForGroupResult,
-  GetAppDTMInfoResult,
   GetAncestorInfoResult,
   ImportFromCSVResult,
   CopyMasterDetailResult,
@@ -222,6 +252,8 @@ export function isXmlWriteAction(action: string): boolean {
 export interface XmlClientOptions {
   /** Block all write operations (read-only mode) */
   readOnly?: boolean;
+  /** Schema for table/field alias resolution (typically inherited from main client) */
+  schema?: ResolvedSchema;
 }
 
 /**
@@ -233,10 +265,28 @@ export interface XmlClientOptions {
 export class XmlClient {
   private readonly caller: XmlCaller;
   private readonly readOnly: boolean;
+  private readonly schema?: ResolvedSchema;
 
   constructor(caller: XmlCaller, options?: XmlClientOptions) {
     this.caller = caller;
     this.readOnly = options?.readOnly ?? false;
+    this.schema = options?.schema;
+  }
+
+  /**
+   * Resolve a table alias to its ID using the configured schema.
+   * If no schema is configured or the input is already a table ID, returns unchanged.
+   */
+  private resolveTable(tableRef: string): string {
+    return resolveTableAlias(this.schema, tableRef);
+  }
+
+  /**
+   * Resolve a field alias to its ID using the configured schema.
+   * If no schema is configured or the input is already a field ID, returns unchanged.
+   */
+  private resolveField(tableId: string, fieldRef: string | number): number {
+    return resolveFieldAlias(this.schema, tableId, fieldRef);
   }
 
   /**
@@ -275,7 +325,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getroleinfo
    */
   async getRoleInfo(appId: string): Promise<GetRoleInfoResult> {
-    return getRoleInfoImpl(this.caller, appId);
+    return getRoleInfoImpl(this.caller, this.resolveTable(appId));
   }
 
   /**
@@ -283,7 +333,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-userroles
    */
   async userRoles(appId: string): Promise<UserRolesResult> {
-    return userRolesImpl(this.caller, appId);
+    return userRolesImpl(this.caller, this.resolveTable(appId));
   }
 
   /**
@@ -295,7 +345,7 @@ export class XmlClient {
     userId?: string,
     includeGroups?: boolean
   ): Promise<GetUserRoleResult> {
-    return getUserRoleImpl(this.caller, appId, userId, includeGroups);
+    return getUserRoleImpl(this.caller, this.resolveTable(appId), userId, includeGroups);
   }
 
   /**
@@ -304,7 +354,7 @@ export class XmlClient {
    */
   async addUserToRole(appId: string, userId: string, roleId: number): Promise<void> {
     this.checkWriteAllowed('API_AddUserToRole');
-    return addUserToRoleImpl(this.caller, appId, userId, roleId);
+    return addUserToRoleImpl(this.caller, this.resolveTable(appId), userId, roleId);
   }
 
   /**
@@ -313,7 +363,7 @@ export class XmlClient {
    */
   async removeUserFromRole(appId: string, userId: string, roleId: number): Promise<void> {
     this.checkWriteAllowed('API_RemoveUserFromRole');
-    return removeUserFromRoleImpl(this.caller, appId, userId, roleId);
+    return removeUserFromRoleImpl(this.caller, this.resolveTable(appId), userId, roleId);
   }
 
   /**
@@ -327,7 +377,7 @@ export class XmlClient {
     newRoleId?: number
   ): Promise<void> {
     this.checkWriteAllowed('API_ChangeUserRole');
-    return changeUserRoleImpl(this.caller, appId, userId, currentRoleId, newRoleId);
+    return changeUserRoleImpl(this.caller, this.resolveTable(appId), userId, currentRoleId, newRoleId);
   }
 
   // ============================================================================
@@ -419,7 +469,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getgrouprole
    */
   async getGroupRole(appId: string, groupId: string): Promise<GetGroupRoleResult> {
-    return getGroupRoleImpl(this.caller, appId, groupId);
+    return getGroupRoleImpl(this.caller, this.resolveTable(appId), groupId);
   }
 
   /**
@@ -428,7 +478,7 @@ export class XmlClient {
    */
   async addGroupToRole(appId: string, groupId: string, roleId: number): Promise<void> {
     this.checkWriteAllowed('API_AddGroupToRole');
-    return addGroupToRoleImpl(this.caller, appId, groupId, roleId);
+    return addGroupToRoleImpl(this.caller, this.resolveTable(appId), groupId, roleId);
   }
 
   /**
@@ -442,7 +492,7 @@ export class XmlClient {
     allRoles?: boolean
   ): Promise<void> {
     this.checkWriteAllowed('API_RemoveGroupFromRole');
-    return removeGroupFromRoleImpl(this.caller, appId, groupId, roleId, allRoles);
+    return removeGroupFromRoleImpl(this.caller, this.resolveTable(appId), groupId, roleId, allRoles);
   }
 
   /**
@@ -457,8 +507,9 @@ export class XmlClient {
    * Get apps a group can access.
    * @see https://help.quickbase.com/docs/api-granteddbsforgroup
    */
-  async grantedDBsForGroup(groupId: string): Promise<GrantedDBsForGroupResult> {
-    return grantedDBsForGroupImpl(this.caller, groupId);
+  async grantedDBsForGroup(groupId: string): Promise<GrantedDBsForGroupResultWithAlias> {
+    const result = await grantedDBsForGroupImpl(this.caller, groupId);
+    return transformGrantedDBsForGroupResult(result, this.schema);
   }
 
   /**
@@ -503,7 +554,7 @@ export class XmlClient {
     roleId?: number
   ): Promise<ProvisionUserResult> {
     this.checkWriteAllowed('API_ProvisionUser');
-    return provisionUserImpl(this.caller, appId, email, firstName, lastName, roleId);
+    return provisionUserImpl(this.caller, this.resolveTable(appId), email, firstName, lastName, roleId);
   }
 
   /**
@@ -512,7 +563,7 @@ export class XmlClient {
    */
   async sendInvitation(appId: string, userId: string, userText?: string): Promise<void> {
     this.checkWriteAllowed('API_SendInvitation');
-    return sendInvitationImpl(this.caller, appId, userId, userText);
+    return sendInvitationImpl(this.caller, this.resolveTable(appId), userId, userText);
   }
 
   /**
@@ -521,7 +572,7 @@ export class XmlClient {
    */
   async changeManager(appId: string, newManagerEmail: string): Promise<void> {
     this.checkWriteAllowed('API_ChangeManager');
-    return changeManagerImpl(this.caller, appId, newManagerEmail);
+    return changeManagerImpl(this.caller, this.resolveTable(appId), newManagerEmail);
   }
 
   /**
@@ -534,7 +585,7 @@ export class XmlClient {
     newOwner: string
   ): Promise<void> {
     this.checkWriteAllowed('API_ChangeRecordOwner');
-    return changeRecordOwnerImpl(this.caller, tableId, recordId, newOwner);
+    return changeRecordOwnerImpl(this.caller, this.resolveTable(tableId), recordId, newOwner);
   }
 
   // ============================================================================
@@ -552,16 +603,18 @@ export class XmlClient {
     includeAncestors?: boolean;
     withEmbeddedTables?: boolean;
     realmAppsOnly?: boolean;
-  }): Promise<GrantedDBsResult> {
-    return grantedDBsImpl(this.caller, options);
+  }): Promise<GrantedDBsResultWithAlias> {
+    const result = await grantedDBsImpl(this.caller, options);
+    return transformGrantedDBsResult(result, this.schema);
   }
 
   /**
    * Find an app by name.
    * @see https://help.quickbase.com/docs/api-finddbbyname
    */
-  async findDBByName(name: string, parentsOnly?: boolean): Promise<FindDBByNameResult> {
-    return findDBByNameImpl(this.caller, name, parentsOnly);
+  async findDBByName(name: string, parentsOnly?: boolean): Promise<FindDBByNameResultWithAlias> {
+    const result = await findDBByNameImpl(this.caller, name, parentsOnly);
+    return transformFindDBByNameResult(result, this.schema);
   }
 
   /**
@@ -569,7 +622,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getdbinfo
    */
   async getDBInfo(dbid: string): Promise<DBInfo> {
-    return getDBInfoImpl(this.caller, dbid);
+    return getDBInfoImpl(this.caller, this.resolveTable(dbid));
   }
 
   /**
@@ -577,7 +630,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getnumrecords
    */
   async getNumRecords(tableId: string): Promise<number> {
-    return getNumRecordsImpl(this.caller, tableId);
+    return getNumRecordsImpl(this.caller, this.resolveTable(tableId));
   }
 
   // ============================================================================
@@ -588,8 +641,10 @@ export class XmlClient {
    * Get comprehensive app/table metadata.
    * @see https://help.quickbase.com/docs/api-getschema
    */
-  async getSchema(dbid: string): Promise<GetSchemaResult> {
-    return getSchemaImpl(this.caller, dbid);
+  async getSchema(dbid: string): Promise<GetSchemaResultWithAlias> {
+    const resolvedDbid = this.resolveTable(dbid);
+    const result = await getSchemaImpl(this.caller, resolvedDbid);
+    return transformGetSchemaResult(result, this.schema, resolvedDbid);
   }
 
   // ============================================================================
@@ -601,7 +656,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getdbvar
    */
   async getDBVar(appId: string, varName: string): Promise<string> {
-    return getDBVarImpl(this.caller, appId, varName);
+    return getDBVarImpl(this.caller, this.resolveTable(appId), varName);
   }
 
   /**
@@ -610,7 +665,7 @@ export class XmlClient {
    */
   async setDBVar(appId: string, varName: string, value: string): Promise<void> {
     this.checkWriteAllowed('API_SetDBVar');
-    return setDBVarImpl(this.caller, appId, varName, value);
+    return setDBVarImpl(this.caller, this.resolveTable(appId), varName, value);
   }
 
   // ============================================================================
@@ -622,7 +677,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getdbpage
    */
   async getDBPage(appId: string, pageIdOrName: string | number): Promise<string> {
-    return getDBPageImpl(this.caller, appId, pageIdOrName);
+    return getDBPageImpl(this.caller, this.resolveTable(appId), pageIdOrName);
   }
 
   /**
@@ -637,7 +692,7 @@ export class XmlClient {
     pageBody: string
   ): Promise<AddReplaceDBPageResult> {
     this.checkWriteAllowed('API_AddReplaceDBPage');
-    return addReplaceDBPageImpl(this.caller, appId, pageName, pageId, pageType, pageBody);
+    return addReplaceDBPageImpl(this.caller, this.resolveTable(appId), pageName, pageId, pageType, pageBody);
   }
 
   // ============================================================================
@@ -650,11 +705,14 @@ export class XmlClient {
    */
   async fieldAddChoices(
     tableId: string,
-    fieldId: number,
+    fieldId: number | string,
     choices: string[]
-  ): Promise<FieldAddChoicesResult> {
+  ): Promise<FieldAddChoicesResultWithAlias> {
     this.checkWriteAllowed('API_FieldAddChoices');
-    return fieldAddChoicesImpl(this.caller, tableId, fieldId, choices);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedFieldId = this.resolveField(resolvedTableId, fieldId);
+    const result = await fieldAddChoicesImpl(this.caller, resolvedTableId, resolvedFieldId, choices);
+    return transformFieldAddChoicesResult(result, this.schema, resolvedTableId);
   }
 
   /**
@@ -663,20 +721,25 @@ export class XmlClient {
    */
   async fieldRemoveChoices(
     tableId: string,
-    fieldId: number,
+    fieldId: number | string,
     choices: string[]
-  ): Promise<FieldRemoveChoicesResult> {
+  ): Promise<FieldRemoveChoicesResultWithAlias> {
     this.checkWriteAllowed('API_FieldRemoveChoices');
-    return fieldRemoveChoicesImpl(this.caller, tableId, fieldId, choices);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedFieldId = this.resolveField(resolvedTableId, fieldId);
+    const result = await fieldRemoveChoicesImpl(this.caller, resolvedTableId, resolvedFieldId, choices);
+    return transformFieldRemoveChoicesResult(result, this.schema, resolvedTableId);
   }
 
   /**
    * Set the key field for a table.
    * @see https://help.quickbase.com/docs/api-setkeyfield
    */
-  async setKeyField(tableId: string, fieldId: number): Promise<void> {
+  async setKeyField(tableId: string, fieldId: number | string): Promise<void> {
     this.checkWriteAllowed('API_SetKeyField');
-    return setKeyFieldImpl(this.caller, tableId, fieldId);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedFieldId = this.resolveField(resolvedTableId, fieldId);
+    return setKeyFieldImpl(this.caller, resolvedTableId, resolvedFieldId);
   }
 
   // ============================================================================
@@ -688,23 +751,27 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-doquerycount
    */
   async doQueryCount(tableId: string, query?: string): Promise<DoQueryCountResult> {
-    return doQueryCountImpl(this.caller, tableId, query);
+    return doQueryCountImpl(this.caller, this.resolveTable(tableId), query);
   }
 
   /**
    * Get a record with field metadata.
    * @see https://help.quickbase.com/docs/api-getrecordinfo
    */
-  async getRecordInfo(tableId: string, recordId: number): Promise<GetRecordInfoResult> {
-    return getRecordInfoImpl(this.caller, tableId, recordId);
+  async getRecordInfo(tableId: string, recordId: number): Promise<GetRecordInfoResultWithAlias> {
+    const resolvedTableId = this.resolveTable(tableId);
+    const result = await getRecordInfoImpl(this.caller, resolvedTableId, recordId);
+    return transformGetRecordInfoResult(result, this.schema, resolvedTableId);
   }
 
   /**
    * Get a record by key field value.
    * @see https://help.quickbase.com/docs/api-getrecordinfo
    */
-  async getRecordInfoByKey(tableId: string, keyValue: string): Promise<GetRecordInfoResult> {
-    return getRecordInfoByKeyImpl(this.caller, tableId, keyValue);
+  async getRecordInfoByKey(tableId: string, keyValue: string): Promise<GetRecordInfoResultWithAlias> {
+    const resolvedTableId = this.resolveTable(tableId);
+    const result = await getRecordInfoByKeyImpl(this.caller, resolvedTableId, keyValue);
+    return transformGetRecordInfoResult(result, this.schema, resolvedTableId);
   }
 
   /**
@@ -715,14 +782,23 @@ export class XmlClient {
     tableId: string,
     options: {
       recordsCsv: string;
-      clist?: number[];
+      clist?: (number | string)[];
       skipFirst?: boolean;
-      mergeFieldId?: number;
+      mergeFieldId?: number | string;
       decimalPercent?: boolean;
     }
   ): Promise<ImportFromCSVResult> {
     this.checkWriteAllowed('API_ImportFromCSV');
-    return importFromCSVImpl(this.caller, tableId, options);
+    const resolvedTableId = this.resolveTable(tableId);
+    // Resolve field aliases in clist and mergeFieldId
+    const resolvedOptions = {
+      ...options,
+      clist: options.clist?.map(f => this.resolveField(resolvedTableId, f)),
+      mergeFieldId: options.mergeFieldId !== undefined
+        ? this.resolveField(resolvedTableId, options.mergeFieldId)
+        : undefined,
+    };
+    return importFromCSVImpl(this.caller, resolvedTableId, resolvedOptions);
   }
 
   /**
@@ -731,7 +807,7 @@ export class XmlClient {
    */
   async runImport(tableId: string, importId: number): Promise<ImportFromCSVResult> {
     this.checkWriteAllowed('API_RunImport');
-    return runImportImpl(this.caller, tableId, importId);
+    return runImportImpl(this.caller, this.resolveTable(tableId), importId);
   }
 
   /**
@@ -742,13 +818,22 @@ export class XmlClient {
     tableId: string,
     options: {
       rid: number;
-      copyfid?: number;
+      copyfid?: number | string;
       recurse?: boolean;
-      relfids?: number[];
+      relfids?: (number | string)[];
     }
   ): Promise<CopyMasterDetailResult> {
     this.checkWriteAllowed('API_CopyMasterDetail');
-    return copyMasterDetailImpl(this.caller, tableId, options);
+    const resolvedTableId = this.resolveTable(tableId);
+    // Resolve field aliases in copyfid and relfids
+    const resolvedOptions = {
+      ...options,
+      copyfid: options.copyfid !== undefined
+        ? this.resolveField(resolvedTableId, options.copyfid)
+        : undefined,
+      relfids: options.relfids?.map(f => this.resolveField(resolvedTableId, f)),
+    };
+    return copyMasterDetailImpl(this.caller, resolvedTableId, resolvedOptions);
   }
 
   // ============================================================================
@@ -759,8 +844,9 @@ export class XmlClient {
    * Get modification timestamps (fast, no auth required).
    * @see https://help.quickbase.com/docs/api-getappdtminfo
    */
-  async getAppDTMInfo(appId: string): Promise<GetAppDTMInfoResult> {
-    return getAppDTMInfoImpl(this.caller, appId);
+  async getAppDTMInfo(appId: string): Promise<GetAppDTMInfoResultWithAlias> {
+    const result = await getAppDTMInfoImpl(this.caller, this.resolveTable(appId));
+    return transformGetAppDTMInfoResult(result, this.schema);
   }
 
   /**
@@ -768,7 +854,7 @@ export class XmlClient {
    * @see https://help.quickbase.com/docs/api-getancestorinfo
    */
   async getAncestorInfo(appId: string): Promise<GetAncestorInfoResult> {
-    return getAncestorInfoImpl(this.caller, appId);
+    return getAncestorInfoImpl(this.caller, this.resolveTable(appId));
   }
 
   // ============================================================================
@@ -781,7 +867,7 @@ export class XmlClient {
    */
   async webhooksCreate(tableId: string, options: WebhooksCreateOptions): Promise<void> {
     this.checkWriteAllowed('API_Webhooks_Create');
-    return webhooksCreateImpl(this.caller, tableId, options);
+    return webhooksCreateImpl(this.caller, this.resolveTable(tableId), options);
   }
 
   /**
@@ -794,7 +880,7 @@ export class XmlClient {
     options: WebhooksEditOptions
   ): Promise<void> {
     this.checkWriteAllowed('API_Webhooks_Edit');
-    return webhooksEditImpl(this.caller, tableId, actionId, options);
+    return webhooksEditImpl(this.caller, this.resolveTable(tableId), actionId, options);
   }
 
   /**
@@ -803,7 +889,7 @@ export class XmlClient {
    */
   async webhooksDelete(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Delete');
-    return webhooksDeleteImpl(this.caller, tableId, actionIds);
+    return webhooksDeleteImpl(this.caller, this.resolveTable(tableId), actionIds);
   }
 
   /**
@@ -812,7 +898,7 @@ export class XmlClient {
    */
   async webhooksActivate(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Activate');
-    return webhooksActivateImpl(this.caller, tableId, actionIds);
+    return webhooksActivateImpl(this.caller, this.resolveTable(tableId), actionIds);
   }
 
   /**
@@ -821,7 +907,7 @@ export class XmlClient {
    */
   async webhooksDeactivate(tableId: string, actionIds: string[]): Promise<{ numChanged: number }> {
     this.checkWriteAllowed('API_Webhooks_Deactivate');
-    return webhooksDeactivateImpl(this.caller, tableId, actionIds);
+    return webhooksDeactivateImpl(this.caller, this.resolveTable(tableId), actionIds);
   }
 
   /**
@@ -830,7 +916,7 @@ export class XmlClient {
    */
   async webhooksCopy(tableId: string, actionId: string): Promise<{ actionId: string }> {
     this.checkWriteAllowed('API_Webhooks_Copy');
-    return webhooksCopyImpl(this.caller, tableId, actionId);
+    return webhooksCopyImpl(this.caller, this.resolveTable(tableId), actionId);
   }
 
   // ============================================================================
@@ -843,9 +929,14 @@ export class XmlClient {
    */
   async genAddRecordForm(
     tableId: string,
-    fields?: Array<{ id: number; value: string }>
+    fields?: Array<{ id: number | string; value: string }>
   ): Promise<string> {
-    return genAddRecordFormImpl(this.caller, tableId, fields);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedFields = fields?.map(f => ({
+      id: this.resolveField(resolvedTableId, f.id),
+      value: f.value,
+    }));
+    return genAddRecordFormImpl(this.caller, resolvedTableId, resolvedFields);
   }
 
   /**
@@ -856,13 +947,19 @@ export class XmlClient {
     tableId: string,
     options?: {
       query?: string;
-      clist?: number[];
-      slist?: number[];
+      clist?: (number | string)[];
+      slist?: (number | string)[];
       options?: string;
       format?: 'structured' | 'csv';
     }
   ): Promise<string> {
-    return genResultsTableImpl(this.caller, tableId, options);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedOptions = options ? {
+      ...options,
+      clist: options.clist?.map(f => this.resolveField(resolvedTableId, f)),
+      slist: options.slist?.map(f => this.resolveField(resolvedTableId, f)),
+    } : undefined;
+    return genResultsTableImpl(this.caller, resolvedTableId, resolvedOptions);
   }
 
   /**
@@ -875,10 +972,17 @@ export class XmlClient {
       rid?: number;
       key?: string;
       jht?: boolean;
-      dfid?: number;
+      dfid?: number | string;
     }
   ): Promise<string> {
-    return getRecordAsHTMLImpl(this.caller, tableId, options);
+    const resolvedTableId = this.resolveTable(tableId);
+    const resolvedOptions = {
+      ...options,
+      dfid: options.dfid !== undefined
+        ? this.resolveField(resolvedTableId, options.dfid)
+        : undefined,
+    };
+    return getRecordAsHTMLImpl(this.caller, resolvedTableId, resolvedOptions);
   }
 
   // ============================================================================
@@ -919,7 +1023,13 @@ export interface XmlExecutor {
  * This bridges the main client to the XML API client.
  */
 interface QuickbaseClientLike {
-  getConfig(): { realm: string; fetchApi: typeof fetch; timeout: number; readOnly?: boolean };
+  getConfig(): {
+    realm: string;
+    fetchApi: typeof fetch;
+    timeout: number;
+    readOnly?: boolean;
+    schema?: ResolvedSchema;
+  };
   /**
    * Get the auth strategy for XML requests.
    * This is exposed via getAuthStrategy() method added to the client.
@@ -1014,9 +1124,10 @@ export function createXmlClient(
     },
   };
 
-  // Inherit readOnly from main client if not explicitly set in options
+  // Inherit readOnly and schema from main client if not explicitly set in options
   const resolvedOptions: XmlClientOptions = {
     readOnly: options?.readOnly ?? config.readOnly ?? false,
+    schema: options?.schema ?? config.schema,
   };
 
   return new XmlClient(caller, resolvedOptions);

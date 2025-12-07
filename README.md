@@ -716,6 +716,92 @@ You can also override read-only mode for just the XML client:
 const xml = createXmlClient(qb, { readOnly: true });
 ```
 
+### Schema Aliases
+
+The XML client inherits the schema from the main client and supports table and field aliases:
+
+```typescript
+const qb = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  schema: {
+    tables: {
+      projects: {
+        id: 'bqprojects123',
+        fields: {
+          id: 3,
+          name: 6,
+          status: 7,
+        },
+      },
+    },
+  },
+});
+
+const xml = createXmlClient(qb);
+
+// Use table aliases
+const count = await xml.getNumRecords('projects');  // Resolves to 'bqprojects123'
+const roles = await xml.getRoleInfo('projects');
+
+// Use field aliases
+await xml.fieldAddChoices('projects', 'status', ['Active', 'Inactive']);
+await xml.setKeyField('projects', 'name');
+
+// Field aliases in importFromCSV
+await xml.importFromCSV('projects', {
+  recordsCsv: 'Project A,Active',
+  clist: ['name', 'status'],
+  mergeFieldId: 'id',
+});
+```
+
+**Response Transformation:**
+
+The XML client transforms responses to use field and table aliases as keys when a schema is configured, similar to the JSON API:
+
+```typescript
+// getRecordInfo - access fields by alias
+const record = await xml.getRecordInfo('projects', 123);
+console.log(record.fields.name.value);    // "Project Alpha"
+console.log(record.fields.status.value);  // "Active"
+
+// Without schema, fields are keyed by ID
+const record2 = await xmlNoSchema.getRecordInfo('bqprojects123', 123);
+console.log(record2.fields['6'].value);   // "Project Alpha"
+
+// getSchema - access fields by alias
+const schema = await xml.getSchema('projects');
+console.log(schema.table.fields?.name.label);    // "Project Name"
+console.log(schema.table.fields?.status.label);  // "Status"
+console.log(schema.table.childTables?.tasks.dbid);  // "bqtasks123"
+
+// grantedDBs - access databases by alias
+const dbs = await xml.grantedDBs();
+console.log(dbs.databases.projects.dbname);  // "My Projects App"
+console.log(dbs.databases.tasks.dbname);     // "Tasks Table"
+
+// Unknown tables/fields are keyed by their ID
+console.log(dbs.databases['bqunknown123'].dbname);  // "Unknown Table"
+
+// getAppDTMInfo - access tables by alias
+const dtm = await xml.getAppDTMInfo('projects');
+console.log(dtm.appAlias);                           // "projects"
+console.log(dtm.tables.projects.lastModifiedTime);   // "1234567890"
+console.log(dtm.tables.tasks.lastModifiedTime);      // "1234567891"
+```
+
+**Responses transformed to keyed objects:**
+
+| Method | Keyed Properties |
+|--------|-----------------|
+| `getRecordInfo` / `getRecordInfoByKey` | `fields.{alias}` |
+| `getSchema` | `table.fields.{alias}`, `table.childTables.{alias}` |
+| `grantedDBs` / `grantedDBsForGroup` | `databases.{alias}` |
+| `getAppDTMInfo` | `tables.{alias}` |
+| `fieldAddChoices` / `fieldRemoveChoices` | `fieldAlias` property |
+| `findDBByName` | `alias` property |
+
 ## API Methods
 
 All QuickBase API endpoints are available as typed methods:

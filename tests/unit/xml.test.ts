@@ -15,6 +15,7 @@ import {
   type XmlCaller,
 } from '../../src/xml/index.js';
 import { ReadOnlyError } from '../../src/core/errors.js';
+import { resolveSchema } from '../../src/core/schema.js';
 
 /**
  * Mock XmlCaller for testing
@@ -318,14 +319,15 @@ describe('XmlClient.getRecordInfo', () => {
     expect(result.recordId).toBe(20);
     expect(result.numFields).toBe(3);
     expect(result.updateId).toBe('1205780029699');
-    expect(result.fields).toHaveLength(3);
+    expect(Object.keys(result.fields)).toHaveLength(3);
 
-    expect(result.fields[0].id).toBe(3);
-    expect(result.fields[0].name).toBe('Record ID#');
-    expect(result.fields[0].value).toBe('20');
+    // Fields are keyed by ID (no schema provided)
+    expect(result.fields['3'].id).toBe(3);
+    expect(result.fields['3'].name).toBe('Record ID#');
+    expect(result.fields['3'].value).toBe('20');
 
-    expect(result.fields[1].printable).toBe('07-23-2015');
-    expect(result.fields[2].value).toBe('Active');
+    expect(result.fields['6'].printable).toBe('07-23-2015');
+    expect(result.fields['7'].value).toBe('Active');
   });
 
   it('should handle not found error', async () => {
@@ -430,8 +432,9 @@ describe('XmlClient.getSchema', () => {
     expect(result.table.variables).toHaveLength(2);
     expect(result.table.variables?.[0].name).toBe('Blue');
     expect(result.table.variables?.[0].value).toBe('14');
-    expect(result.table.childTables).toHaveLength(1);
-    expect(result.table.childTables?.[0].dbid).toBe('bddrydqhg');
+    // Child tables are keyed by dbid (no schema)
+    expect(Object.keys(result.table.childTables ?? {})).toHaveLength(1);
+    expect(result.table.childTables?.['bddrydqhg']?.dbid).toBe('bddrydqhg');
   });
 
   it('should parse table-level schema with fields', async () => {
@@ -473,16 +476,17 @@ describe('XmlClient.getSchema', () => {
     expect(result.table.name).toBe('Contacts');
     expect(result.table.queries).toHaveLength(1);
     expect(result.table.queries?.[0].name).toBe('List All');
-    expect(result.table.fields).toHaveLength(2);
+    // Fields are keyed by ID (no schema)
+    expect(Object.keys(result.table.fields ?? {})).toHaveLength(2);
 
-    const field1 = result.table.fields?.[0];
+    const field1 = result.table.fields?.['6'];
     expect(field1?.id).toBe(6);
     expect(field1?.label).toBe('Name');
     expect(field1?.fieldType).toBe('text');
     expect(field1?.required).toBe(true);
     expect(field1?.fieldHelp).toBe('Enter the contact name');
 
-    const field2 = result.table.fields?.[1];
+    const field2 = result.table.fields?.['7'];
     expect(field2?.fieldType).toBe('email');
     expect(field2?.unique).toBe(true);
   });
@@ -534,11 +538,12 @@ describe('XmlClient.grantedDBs', () => {
     const result = await client.grantedDBs({ realmAppsOnly: true, includeAncestors: true });
 
     expect(mock.lastAction).toBe('API_GrantedDBs');
-    expect(result.databases).toHaveLength(2);
-    expect(result.databases[0].dbid).toBe('bdzk2ecg5');
-    expect(result.databases[0].name).toBe('MyApp');
-    expect(result.databases[0].ancestorAppId).toBe('beaa6db7t');
-    expect(result.databases[1].name).toBe('MyApp:Table1');
+    // Databases are keyed by dbid (no schema)
+    expect(Object.keys(result.databases)).toHaveLength(2);
+    expect(result.databases['bdzk2ecg5'].dbid).toBe('bdzk2ecg5');
+    expect(result.databases['bdzk2ecg5'].name).toBe('MyApp');
+    expect(result.databases['bdzk2ecg5'].ancestorAppId).toBe('beaa6db7t');
+    expect(result.databases['bdzuh4nj5'].name).toBe('MyApp:Table1');
   });
 });
 
@@ -934,5 +939,438 @@ describe('Empty array validation', () => {
     await expect(client.webhooksDeactivate('bqtable123', [])).rejects.toThrow(
       'actionIds array cannot be empty'
     );
+  });
+});
+
+describe('XmlClient schema alias support', () => {
+  const testSchema = resolveSchema({
+    tables: {
+      projects: {
+        id: 'bqprojects',
+        fields: {
+          id: 3,
+          name: 6,
+          status: 7,
+          dueDate: 12,
+        },
+      },
+      tasks: {
+        id: 'bqtasks',
+        fields: {
+          id: 3,
+          title: 6,
+          priority: 8,
+        },
+      },
+    },
+  });
+
+  it('should resolve table aliases in getRoleInfo', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetRoleInfo</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <roles></roles>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    await client.getRoleInfo('projects');
+
+    // Should resolve 'projects' to 'bqprojects'
+    expect(mock.lastDbid).toBe('bqprojects');
+  });
+
+  it('should resolve table aliases in getNumRecords', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetNumRecords</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <num_records>42</num_records>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    await client.getNumRecords('tasks');
+
+    expect(mock.lastDbid).toBe('bqtasks');
+  });
+
+  it('should resolve field aliases in fieldAddChoices', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_FieldAddChoices</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <fid>7</fid>
+   <fname>Status</fname>
+   <numadded>2</numadded>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    await client.fieldAddChoices('projects', 'status', ['Active', 'Inactive']);
+
+    // Should resolve both table and field aliases
+    expect(mock.lastDbid).toBe('bqprojects');
+    expect(mock.lastBody).toContain('<fid>7</fid>');
+  });
+
+  it('should resolve field aliases in setKeyField', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_SetKeyField</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema, readOnly: false });
+    await client.setKeyField('projects', 'name');
+
+    expect(mock.lastDbid).toBe('bqprojects');
+    expect(mock.lastBody).toContain('<fid>6</fid>');
+  });
+
+  it('should resolve field aliases in importFromCSV clist', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_ImportFromCSV</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <num_recs_input>1</num_recs_input>
+   <num_recs_added>1</num_recs_added>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema, readOnly: false });
+    await client.importFromCSV('projects', {
+      recordsCsv: 'Test Project,Active',
+      clist: ['name', 'status'],
+      mergeFieldId: 'id',
+    });
+
+    expect(mock.lastDbid).toBe('bqprojects');
+    // clist should have resolved field IDs
+    expect(mock.lastBody).toContain('<clist>6.7</clist>');
+    // mergeFieldId should be resolved
+    expect(mock.lastBody).toContain('<mergeFieldId>3</mergeFieldId>');
+  });
+
+  it('should resolve field aliases in genResultsTable', async () => {
+    const mock = createMockCaller({
+      response: `<table><tr><td>Test</td></tr></table>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    await client.genResultsTable('projects', {
+      clist: ['name', 'status', 'dueDate'],
+      slist: ['dueDate'],
+    });
+
+    expect(mock.lastDbid).toBe('bqprojects');
+    expect(mock.lastBody).toContain('<clist>6.7.12</clist>');
+    expect(mock.lastBody).toContain('<slist>12</slist>');
+  });
+
+  it('should pass through raw IDs when no schema is provided', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetNumRecords</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <num_records>42</num_records>
+</qdbapi>`,
+    });
+
+    // No schema provided
+    const client = new XmlClient(mock);
+    await client.getNumRecords('bqrawid123');
+
+    // Should pass through unchanged
+    expect(mock.lastDbid).toBe('bqrawid123');
+  });
+
+  it('should pass through raw field IDs when using numbers', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_FieldAddChoices</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <fid>99</fid>
+   <fname>Custom</fname>
+   <numadded>1</numadded>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    // Using raw field ID 99 which isn't in schema
+    await client.fieldAddChoices('projects', 99, ['Option']);
+
+    expect(mock.lastDbid).toBe('bqprojects');
+    expect(mock.lastBody).toContain('<fid>99</fid>');
+  });
+
+  it('should throw SchemaError for unknown table alias', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock, { schema: testSchema });
+
+    await expect(client.getNumRecords('unknownTable')).rejects.toThrow(
+      /Unknown table alias 'unknownTable'/
+    );
+  });
+
+  it('should throw SchemaError for unknown field alias', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock, { schema: testSchema });
+
+    await expect(client.fieldAddChoices('projects', 'unknownField', ['test'])).rejects.toThrow(
+      /Unknown field alias 'unknownField'/
+    );
+  });
+});
+
+describe('XmlClient response transformation', () => {
+  const testSchema = resolveSchema({
+    tables: {
+      projects: {
+        id: 'bqprojects',
+        fields: {
+          id: 3,
+          name: 6,
+          status: 7,
+          dueDate: 12,
+        },
+      },
+      tasks: {
+        id: 'bqtasks',
+        fields: {
+          id: 3,
+          title: 6,
+        },
+      },
+    },
+  });
+
+  it('should add field aliases to getRecordInfo response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetRecordInfo</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <rid>123</rid>
+   <num_fields>3</num_fields>
+   <field>
+      <fid>3</fid>
+      <name>Record ID#</name>
+      <type>recordid</type>
+      <value>123</value>
+   </field>
+   <field>
+      <fid>6</fid>
+      <name>Project Name</name>
+      <type>text</type>
+      <value>Alpha</value>
+   </field>
+   <field>
+      <fid>7</fid>
+      <name>Status</name>
+      <type>text</type>
+      <value>Active</value>
+   </field>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.getRecordInfo('projects', 123);
+
+    // Fields should be keyed by alias
+    expect(result.fields.id.id).toBe(3);
+    expect(result.fields.id.value).toBe('123');
+    expect(result.fields.name.id).toBe(6);
+    expect(result.fields.name.value).toBe('Alpha');
+    expect(result.fields.status.id).toBe(7);
+    expect(result.fields.status.value).toBe('Active');
+  });
+
+  it('should add field aliases to getSchema response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetSchema</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <table>
+      <name>Projects</name>
+      <fields>
+         <field id="3" field_type="recordid" base_type="int32">
+            <label>Record ID#</label>
+         </field>
+         <field id="6" field_type="text" base_type="text">
+            <label>Project Name</label>
+         </field>
+         <field id="7" field_type="text" base_type="text">
+            <label>Status</label>
+         </field>
+      </fields>
+   </table>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.getSchema('projects');
+
+    // Fields should be keyed by alias
+    expect(result.table.fields?.id.id).toBe(3);
+    expect(result.table.fields?.id.label).toBe('Record ID#');
+    expect(result.table.fields?.name.id).toBe(6);
+    expect(result.table.fields?.name.label).toBe('Project Name');
+    expect(result.table.fields?.status.id).toBe(7);
+    expect(result.table.fields?.status.label).toBe('Status');
+  });
+
+  it('should add field alias to fieldAddChoices response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_FieldAddChoices</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <fid>7</fid>
+   <fname>Status</fname>
+   <numadded>2</numadded>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.fieldAddChoices('projects', 'status', ['Active', 'Inactive']);
+
+    expect(result.fieldId).toBe(7);
+    expect(result.fieldAlias).toBe('status');
+  });
+
+  it('should add table aliases to grantedDBs response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GrantedDBs</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <databases>
+      <dbinfo>
+         <dbname>Projects</dbname>
+         <dbid>bqprojects</dbid>
+      </dbinfo>
+      <dbinfo>
+         <dbname>Tasks</dbname>
+         <dbid>bqtasks</dbid>
+      </dbinfo>
+      <dbinfo>
+         <dbname>Unknown</dbname>
+         <dbid>bqunknown</dbid>
+      </dbinfo>
+   </databases>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.grantedDBs();
+
+    // Databases should be keyed by alias for known tables
+    expect(result.databases.projects.dbid).toBe('bqprojects');
+    expect(result.databases.projects.name).toBe('Projects');
+    expect(result.databases.tasks.dbid).toBe('bqtasks');
+    expect(result.databases.tasks.name).toBe('Tasks');
+    // Unknown table keyed by dbid
+    expect(result.databases['bqunknown'].dbid).toBe('bqunknown');
+    expect(result.databases['bqunknown'].name).toBe('Unknown');
+  });
+
+  it('should add table alias to findDBByName response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_FindDBByName</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <dbid>bqprojects</dbid>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.findDBByName('Projects');
+
+    expect(result.dbid).toBe('bqprojects');
+    expect(result.alias).toBe('projects');
+  });
+
+  it('should not add aliases when no schema is provided', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetRecordInfo</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <rid>123</rid>
+   <num_fields>1</num_fields>
+   <field>
+      <fid>6</fid>
+      <name>Project Name</name>
+      <type>text</type>
+      <value>Alpha</value>
+   </field>
+</qdbapi>`,
+    });
+
+    // No schema
+    const client = new XmlClient(mock);
+    const result = await client.getRecordInfo('bqprojects', 123);
+
+    // Fields keyed by ID (no schema)
+    expect(result.fields['6'].id).toBe(6);
+    expect(result.fields['6'].value).toBe('Alpha');
+    expect(result.fields['6'].alias).toBeUndefined();
+  });
+
+  it('should add table aliases to getAppDTMInfo response', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_GetAppDTMInfo</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+   <app id="bqprojects">
+      <lastModifiedTime>1234567890</lastModifiedTime>
+   </app>
+   <tables>
+      <table id="bqprojects">
+         <lastModifiedTime>1234567890</lastModifiedTime>
+      </table>
+      <table id="bqtasks">
+         <lastModifiedTime>1234567891</lastModifiedTime>
+      </table>
+   </tables>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { schema: testSchema });
+    const result = await client.getAppDTMInfo('projects');
+
+    expect(result.appAlias).toBe('projects');
+    // Tables keyed by alias
+    expect(result.tables.projects.id).toBe('bqprojects');
+    expect(result.tables.projects.lastModifiedTime).toBe('1234567890');
+    expect(result.tables.tasks.id).toBe('bqtasks');
+    expect(result.tables.tasks.lastModifiedTime).toBe('1234567891');
   });
 });
