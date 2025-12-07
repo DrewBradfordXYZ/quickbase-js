@@ -14,6 +14,7 @@ import {
   isInvalidTicket,
   type XmlCaller,
 } from '../../src/xml/index.js';
+import { ReadOnlyError } from '../../src/core/errors.js';
 
 /**
  * Mock XmlCaller for testing
@@ -771,7 +772,7 @@ describe('XmlClient code pages', () => {
 });
 
 describe('XmlClient read-only mode', () => {
-  it('should block write operations in read-only mode', async () => {
+  it('should throw ReadOnlyError for write operations', async () => {
     const mock = createMockCaller({
       response: `<?xml version="1.0" ?>
 <qdbapi>
@@ -783,9 +784,38 @@ describe('XmlClient read-only mode', () => {
 
     const client = new XmlClient(mock, { readOnly: true });
 
-    await expect(client.setDBVar('bqxyz123', 'myVar', 'value')).rejects.toThrow(
-      'Read-only mode: API_SetDBVar is blocked'
-    );
+    try {
+      await client.setDBVar('bqxyz123', 'myVar', 'value');
+      expect.fail('Should have thrown ReadOnlyError');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ReadOnlyError);
+      const roErr = err as ReadOnlyError;
+      expect(roErr.method).toBe('POST');
+      expect(roErr.path).toBe('/db/testrealm');
+      expect(roErr.action).toBe('API_SetDBVar');
+      expect(roErr.message).toContain('Read-only mode');
+      expect(roErr.message).toContain('API_SetDBVar');
+    }
+  });
+
+  it('should block all XML write actions', async () => {
+    const mock = createMockCaller({});
+    const client = new XmlClient(mock, { readOnly: true });
+
+    // Test a sample of write actions
+    const writeActions = [
+      () => client.addUserToRole('app', 'user', 10),
+      () => client.provisionUser('app', 'email', 'first', 'last'),
+      () => client.createGroup('name'),
+      () => client.setDBVar('app', 'var', 'value'),
+      () => client.fieldAddChoices('table', 6, ['choice']),
+      () => client.webhooksCreate('table', { label: 'test', webhookUrl: 'https://example.com' }),
+      () => client.importFromCSV('table', { recordsCsv: 'data' }),
+    ];
+
+    for (const action of writeActions) {
+      await expect(action()).rejects.toThrow(ReadOnlyError);
+    }
   });
 
   it('should allow read operations in read-only mode', async () => {
@@ -803,6 +833,31 @@ describe('XmlClient read-only mode', () => {
     const result = await client.getDBVar('bqxyz123', 'myVar');
 
     expect(result).toBe('42');
+  });
+
+  it('should allow read operations when readOnly is false', async () => {
+    const mock = createMockCaller({
+      response: `<?xml version="1.0" ?>
+<qdbapi>
+   <action>API_SetDBVar</action>
+   <errcode>0</errcode>
+   <errtext>No error</errtext>
+</qdbapi>`,
+    });
+
+    const client = new XmlClient(mock, { readOnly: false });
+    await expect(client.setDBVar('bqxyz123', 'myVar', 'value')).resolves.not.toThrow();
+  });
+
+  it('ReadOnlyError should serialize to JSON properly', () => {
+    const err = new ReadOnlyError('POST', '/v1/records', 'API_SetDBVar');
+    const json = err.toJSON();
+
+    expect(json.name).toBe('ReadOnlyError');
+    expect(json.method).toBe('POST');
+    expect(json.path).toBe('/v1/records');
+    expect(json.action).toBe('API_SetDBVar');
+    expect(json.message).toContain('Read-only mode');
   });
 });
 

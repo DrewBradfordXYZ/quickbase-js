@@ -16,6 +16,7 @@ import {
   QuickbaseError,
   RateLimitError,
   TimeoutError,
+  ReadOnlyError,
   parseErrorResponse,
   isRetryableError,
 } from '../core/errors.js';
@@ -28,6 +29,167 @@ import {
   extractTableIdFromRequest,
 } from '../core/transform.js';
 import { resolveTableAlias } from '../core/schema.js';
+
+// =============================================================================
+// Read-Only Mode - Defense-in-Depth
+// =============================================================================
+
+/**
+ * JSON API endpoints that modify data.
+ * Layer 1 of defense-in-depth - explicit blocklist.
+ * Uses "METHOD /path" for exact match, "METHOD /path/" for prefix match.
+ * Note: Paths do not include /v1 prefix as the SDK uses relative paths.
+ */
+const jsonWriteEndpoints: Record<string, boolean> = {
+  // Records
+  'POST /records': true, // Upsert
+  'DELETE /records': true, // DeleteRecords
+
+  // Apps
+  'POST /apps': true, // CreateApp
+  'DELETE /apps': true, // DeleteApp (prefix)
+  'POST /apps/': true, // UpdateApp, CopyApp (prefix)
+  'DELETE /apps/': true, // DeleteApp (prefix)
+
+  // Tables
+  'POST /tables': true, // CreateTable
+  'DELETE /tables': true, // DeleteTable (prefix)
+  'POST /tables/': true, // UpdateTable, relationships (prefix)
+  'DELETE /tables/': true, // DeleteRelationship (prefix)
+
+  // Fields
+  'POST /fields': true, // CreateField
+  'DELETE /fields': true, // DeleteFields
+  'POST /fields/': true, // UpdateField (prefix)
+
+  // Files
+  'DELETE /files/': true, // DeleteFile (prefix)
+
+  // User tokens
+  'POST /usertoken': true, // Clone, Transfer, Deactivate
+  'DELETE /usertoken': true, // Delete
+
+  // Users and groups
+  'PUT /users': true, // DenyUsers, UndenyUsers
+  'PUT /users/': true, // DenyUsersAndGroups (prefix)
+  'POST /groups/': true, // AddMembers, AddManagers, AddSubgroups (prefix)
+  'DELETE /groups/': true, // RemoveMembers, RemoveManagers, RemoveSubgroups (prefix)
+
+  // Solutions
+  'POST /solutions': true, // CreateSolution
+  'PUT /solutions/': true, // UpdateSolution, ChangesetSolution (prefix)
+
+  // Document generation (GET but writes)
+  'GET /docTemplates/': true, // GenerateDocument (prefix)
+
+  // Solution from record (GET but writes)
+  'GET /solutions/fromrecord': true, // CreateSolutionFromRecord
+};
+
+/**
+ * POST endpoints that are actually read-only (allowlist).
+ * These are exceptions to the "POST = write" rule.
+ * Note: Paths do not include /v1 prefix as the SDK uses relative paths.
+ */
+const jsonReadOnlyPOSTEndpoints: Record<string, boolean> = {
+  'POST /records/query': true, // RunQuery - read-only
+  'POST /reports/': true, // RunReport - read-only (prefix)
+  'POST /formula/run': true, // RunFormula - read-only
+  'POST /audit': true, // Audit logs - read-only
+  'POST /users': true, // GetUsers - read-only despite POST
+  'POST /analytics/': true, // Analytics - read-only (prefix)
+};
+
+/**
+ * Check if HTTP method is a write operation.
+ */
+function isWriteMethod(method: string): boolean {
+  const upper = method.toUpperCase();
+  return upper === 'POST' || upper === 'PUT' || upper === 'DELETE' || upper === 'PATCH';
+}
+
+/**
+ * Check if request matches a known write endpoint.
+ * Uses both exact matching and prefix matching for paths with IDs.
+ */
+function isJSONWriteEndpoint(method: string, path: string): boolean {
+  const key = `${method} ${path}`;
+
+  // Exact match
+  if (jsonWriteEndpoints[key]) {
+    return true;
+  }
+
+  // Prefix match for paths with IDs (e.g., "POST /v1/apps/" matches "POST /v1/apps/abc123")
+  for (let i = path.length - 1; i >= 0; i--) {
+    if (path[i] === '/') {
+      const prefixKey = `${method} ${path.slice(0, i + 1)}`;
+      if (jsonWriteEndpoints[prefixKey]) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if a POST request is actually read-only (allowlist).
+ */
+function isJSONReadOnlyPOSTEndpoint(path: string): boolean {
+  const key = `POST ${path}`;
+
+  // Exact match
+  if (jsonReadOnlyPOSTEndpoints[key]) {
+    return true;
+  }
+
+  // Prefix match
+  for (let i = path.length - 1; i >= 0; i--) {
+    if (path[i] === '/') {
+      const prefixKey = `POST ${path.slice(0, i + 1)}`;
+      if (jsonReadOnlyPOSTEndpoints[prefixKey]) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if request is blocked by read-only mode.
+ * Uses two layers of defense:
+ * 1. Explicit blocklist of known write endpoints
+ * 2. HTTP method check (catch-all for POST/PUT/DELETE/PATCH)
+ */
+function checkReadOnly(config: ResolvedConfig, method: string, path: string): void {
+  if (!config.readOnly) {
+    return;
+  }
+
+  // Layer 1: Explicit blocklist check (defense-in-depth)
+  if (isJSONWriteEndpoint(method, path)) {
+    // Exception: Some POST endpoints are read-only (RunQuery, RunReport, etc.)
+    if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
+      return;
+    }
+    throw new ReadOnlyError(method, path);
+  }
+
+  // Layer 2: HTTP method check (catch-all for any endpoints not in blocklist)
+  if (isWriteMethod(method)) {
+    // Exception: Some POST endpoints are read-only
+    if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
+      return;
+    }
+    throw new ReadOnlyError(method, path);
+  }
+}
+
+// =============================================================================
+// Request Types
+// =============================================================================
 
 export interface RequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -246,6 +408,9 @@ export async function executeRequest<T = unknown>(
 ): Promise<T> {
   const { config, auth, logger } = executor;
   const maxAttempts = config.retry.maxAttempts;
+
+  // Check read-only mode before making any request
+  checkReadOnly(config, options.method, options.path);
 
   // Extract dbid for temp-token auth (resolves aliases if schema provided)
   const dbid = extractDbid(options, config);

@@ -11,7 +11,6 @@ import type {
   XmlCaller,
   WebhooksCreateOptions,
   WebhooksEditOptions,
-  WebhookResult,
 } from './types.js';
 import { checkError } from './errors.js';
 import {

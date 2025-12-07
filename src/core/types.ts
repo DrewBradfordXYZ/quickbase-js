@@ -55,6 +55,25 @@ export interface QuickbaseConfig {
    * ```
    */
   schema?: Schema;
+
+  /**
+   * Read-only mode prevents any write operations.
+   * Uses defense-in-depth with two layers:
+   * 1. Explicit blocklist of known write endpoints
+   * 2. HTTP method check (blocks POST/PUT/DELETE/PATCH unless allowlisted)
+   *
+   * @example
+   * ```typescript
+   * const qb = createClient({
+   *   realm: 'myrealm',
+   *   auth: { type: 'user-token', userToken: '...' },
+   *   readOnly: true,
+   * });
+   * // qb.runQuery() works
+   * // qb.upsert() throws ReadOnlyError
+   * ```
+   */
+  readOnly?: boolean;
 }
 
 // =============================================================================
@@ -271,6 +290,8 @@ export interface ResolvedConfig {
   convertDates: boolean;
   /** Resolved schema with lookup maps (undefined if no schema provided) */
   schema?: ResolvedSchema;
+  /** Read-only mode - blocks all write operations */
+  readOnly: boolean;
 }
 
 /** Default configuration values */

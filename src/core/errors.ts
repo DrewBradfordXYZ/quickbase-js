@@ -237,3 +237,39 @@ export function isRetryableError(error: unknown): boolean {
   }
   return false;
 }
+
+/**
+ * Error thrown when a write operation is attempted in read-only mode.
+ * Provides defense-in-depth for both JSON API and XML API requests.
+ */
+export class ReadOnlyError extends Error {
+  readonly method: string;
+  readonly path: string;
+  readonly action?: string; // For XML API actions
+
+  constructor(method: string, path: string, action?: string) {
+    const msg = action
+      ? `Read-only mode: write operation blocked (XML action: ${action})`
+      : `Read-only mode: write operation blocked (${method} ${path})`;
+    super(msg);
+    this.name = 'ReadOnlyError';
+    this.method = method;
+    this.path = path;
+    this.action = action;
+
+    // Maintains proper stack trace in V8 environments
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ReadOnlyError);
+    }
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      method: this.method,
+      path: this.path,
+      action: this.action,
+    };
+  }
+}

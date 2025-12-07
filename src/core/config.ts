@@ -39,6 +39,7 @@ export function resolveConfig(config: QuickbaseConfig): ResolvedConfig {
     autoPaginate: config.autoPaginate ?? DEFAULT_CONFIG.autoPaginate,
     convertDates: config.convertDates ?? DEFAULT_CONFIG.convertDates,
     schema: resolveSchema(config.schema),
+    readOnly: config.readOnly ?? false,
   };
 }
 

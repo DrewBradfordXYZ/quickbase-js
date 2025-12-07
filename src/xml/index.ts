@@ -28,6 +28,9 @@
 export * from './types.js';
 export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, isInvalidInput } from './errors.js';
 
+// Import ReadOnlyError for consistent error handling
+import { ReadOnlyError } from '../core/errors.js';
+
 // Import types for XmlClient
 import type { XmlCaller } from './types.js';
 import type {
@@ -153,37 +156,57 @@ import {
  * Used to enforce read-only mode.
  */
 const xmlWriteActions = new Set([
+  // User/Role management
   'API_AddUserToRole',
   'API_RemoveUserFromRole',
   'API_ChangeUserRole',
   'API_ProvisionUser',
   'API_SendInvitation',
+  'API_ChangeManager',
+  'API_ChangeRecordOwner',
+
+  // Group management
+  'API_CreateGroup',
+  'API_DeleteGroup',
+  'API_AddUserToGroup',
+  'API_RemoveUserFromGroup',
+  'API_AddGroupToRole',
+  'API_RemoveGroupFromRole',
+  'API_CopyGroup',
+  'API_ChangeGroupInfo',
+  'API_AddSubgroup',
+  'API_RemoveSubgroup',
+
+  // Variables
   'API_SetDBVar',
+
+  // Code pages
   'API_AddReplaceDBPage',
+
+  // Fields
   'API_FieldAddChoices',
   'API_FieldRemoveChoices',
   'API_SetKeyField',
-  'API_CreateGroup',
-  'API_DeleteGroup',
-  'API_CopyGroup',
-  'API_ChangeGroupInfo',
-  'API_AddUserToGroup',
-  'API_RemoveUserFromGroup',
-  'API_AddSubgroup',
-  'API_RemoveSubgroup',
-  'API_AddGroupToRole',
-  'API_RemoveGroupFromRole',
-  'API_ChangeManager',
-  'API_ChangeRecordOwner',
-  'API_ImportFromCSV',
-  'API_RunImport',
-  'API_CopyMasterDetail',
+
+  // Webhooks
   'API_Webhooks_Create',
   'API_Webhooks_Edit',
   'API_Webhooks_Delete',
   'API_Webhooks_Activate',
   'API_Webhooks_Deactivate',
   'API_Webhooks_Copy',
+
+  // Records/Import
+  'API_ImportFromCSV',
+  'API_RunImport',
+  'API_CopyMasterDetail',
+  'API_PurgeRecords',
+  'API_AddRecord',
+  'API_EditRecord',
+  'API_DeleteRecord',
+
+  // Auth (clears session state)
+  'API_SignOut',
 ]);
 
 /**
@@ -218,11 +241,11 @@ export class XmlClient {
 
   /**
    * Check if an action is allowed (not blocked by read-only mode).
-   * Throws if the action is blocked.
+   * Throws ReadOnlyError if the action is blocked.
    */
   private checkWriteAllowed(action: string): void {
     if (this.readOnly && isXmlWriteAction(action)) {
-      throw new Error(`Read-only mode: ${action} is blocked`);
+      throw new ReadOnlyError('POST', `/db/${this.caller.realm()}`, action);
     }
   }
 
@@ -896,7 +919,7 @@ export interface XmlExecutor {
  * This bridges the main client to the XML API client.
  */
 interface QuickbaseClientLike {
-  getConfig(): { realm: string; fetchApi: typeof fetch; timeout: number };
+  getConfig(): { realm: string; fetchApi: typeof fetch; timeout: number; readOnly?: boolean };
   /**
    * Get the auth strategy for XML requests.
    * This is exposed via getAuthStrategy() method added to the client.
@@ -991,5 +1014,10 @@ export function createXmlClient(
     },
   };
 
-  return new XmlClient(caller, options);
+  // Inherit readOnly from main client if not explicitly set in options
+  const resolvedOptions: XmlClientOptions = {
+    readOnly: options?.readOnly ?? config.readOnly ?? false,
+  };
+
+  return new XmlClient(caller, resolvedOptions);
 }

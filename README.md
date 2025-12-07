@@ -13,6 +13,7 @@ A TypeScript/JavaScript client for the QuickBase JSON RESTful API.
 - **Proactive Throttling** - Optional client-side request throttling
 - **Tree-Shakeable** - Static method generation for optimal bundle size
 - **XML API Support** - Access legacy XML-only endpoints (roles, groups, DBVars, code pages, etc.)
+- **Read-Only Mode** - Defense-in-depth protection against accidental writes
 
 ## API Reference
 
@@ -470,6 +471,7 @@ const qb = createClient({
   baseUrl: 'https://api.quickbase.com/v1',   // API base URL
   autoPaginate: false,                       // Auto-paginate on direct await
   convertDates: true,                        // Convert ISO date strings to Date objects
+  readOnly: false,                           // Block all write operations
   schema: { /* see schema aliases section */ }, // Table and field aliases
 
   // Rate limiting
@@ -690,16 +692,28 @@ try {
 
 ### Read-Only Mode
 
-The XML client supports read-only mode to prevent accidental writes:
+The XML client inherits read-only mode from the main client (see [Read-Only Mode](#read-only-mode-1)):
 
 ```typescript
-const xml = createXmlClient(qb, { readOnly: true });
+const qb = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  readOnly: true,
+});
+
+const xml = createXmlClient(qb); // Inherits readOnly: true
 
 // Read operations work
 const roles = await xml.getRoleInfo(appId);
 
-// Write operations throw an error
+// Write operations throw ReadOnlyError
 await xml.addUserToRole(appId, userId, roleId); // Throws!
+```
+
+You can also override read-only mode for just the XML client:
+
+```typescript
+const xml = createXmlClient(qb, { readOnly: true });
 ```
 
 ## API Methods
@@ -769,6 +783,99 @@ const result = await qb.request<MyResponseType>({
 });
 ```
 
+## Read-Only Mode
+
+Enable read-only mode to prevent accidental writes during development, testing, or when building read-only dashboards. This feature uses defense-in-depth with two layers of protection.
+
+```typescript
+import { createClient, createXmlClient, ReadOnlyError } from 'quickbase-js';
+
+const qb = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  readOnly: true,
+});
+
+// Read operations work normally
+const app = await qb.getApp({ appId: 'bpqe82s1' });
+const records = await qb.runQuery({ from: 'byyy82s1' });
+
+// Write operations throw ReadOnlyError
+try {
+  await qb.upsert({ to: 'byyy82s1', data: [{ '6': 'test' }] });
+} catch (error) {
+  if (error instanceof ReadOnlyError) {
+    console.log(`Blocked: ${error.method} ${error.path}`);
+    // "Blocked: POST /records"
+  }
+}
+```
+
+### What Gets Blocked
+
+| Operation Type | Examples | Blocked? |
+|----------------|----------|----------|
+| **GET requests** | getApp, getFields, getTables | ✅ Allowed |
+| **Query POSTs** | runQuery, runReport, getUsers | ✅ Allowed |
+| **Create/Update** | upsert, createApp, createTable | ❌ Blocked |
+| **Delete** | deleteRecords, deleteApp | ❌ Blocked |
+| **XML writes** | addUserToRole, setDBVar | ❌ Blocked |
+
+### Defense-in-Depth
+
+The read-only check uses two layers:
+
+1. **Explicit blocklist** - Known write endpoints are blocked by path matching
+2. **HTTP method check** - Any POST/PUT/DELETE/PATCH not in the allowlist is blocked
+
+This ensures new API endpoints are blocked by default until explicitly allowlisted.
+
+### XML API
+
+The XML client automatically inherits read-only mode from the main client:
+
+```typescript
+const qb = createClient({
+  realm: 'mycompany',
+  auth: { type: 'user-token', userToken: 'token' },
+  readOnly: true,
+});
+
+const xml = createXmlClient(qb); // Inherits readOnly: true
+
+// Read operations work
+const roles = await xml.getRoleInfo(appId);
+
+// Write operations throw ReadOnlyError with action info
+try {
+  await xml.setDBVar(appId, 'myVar', 'value');
+} catch (error) {
+  if (error instanceof ReadOnlyError) {
+    console.log(`Blocked XML action: ${error.action}`);
+    // "Blocked XML action: API_SetDBVar"
+  }
+}
+```
+
+### ReadOnlyError
+
+The `ReadOnlyError` class provides details about the blocked operation:
+
+```typescript
+import { ReadOnlyError } from 'quickbase-js';
+
+try {
+  await qb.deleteRecords({ from: 'byyy82s1', where: '{3.GT.0}' });
+} catch (error) {
+  if (error instanceof ReadOnlyError) {
+    error.method;  // "DELETE"
+    error.path;    // "/records"
+    error.action;  // undefined (only set for XML API)
+    error.message; // "Read-only mode: write operation blocked (DELETE /records)"
+  }
+}
+```
+
 ## Error Handling
 
 ```typescript
@@ -780,6 +887,7 @@ import {
   NotFoundError,
   ValidationError,
   ServerError,
+  ReadOnlyError,
 } from 'quickbase-js';
 
 try {

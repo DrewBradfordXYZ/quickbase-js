@@ -53,6 +53,7 @@ export {
   ValidationError,
   TimeoutError,
   ServerError,
+  ReadOnlyError,
 } from './core/index.js';
 
 // Auth exports (for advanced usage)

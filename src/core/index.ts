@@ -35,6 +35,7 @@ export {
   ValidationError,
   TimeoutError,
   ServerError,
+  ReadOnlyError,
   parseErrorResponse,
   isRetryableError,
 } from './errors.js';
