@@ -74,6 +74,26 @@ export interface QuickbaseConfig {
    * ```
    */
   readOnly?: boolean;
+
+  /**
+   * Application token for XML API calls.
+   *
+   * App tokens are only needed for the XML API when:
+   * - The app has "Require Application Tokens" enabled, AND
+   * - You're NOT using user token authentication (which bypasses app token checks)
+   *
+   * The JSON API does not use app tokens.
+   *
+   * @example
+   * ```typescript
+   * const qb = createClient({
+   *   realm: 'myrealm',
+   *   auth: { type: 'ticket', username: 'user@example.com', password: 'pass' },
+   *   appToken: 'your-app-token',
+   * });
+   * ```
+   */
+  appToken?: string;
 }
 
 // =============================================================================
@@ -292,6 +312,8 @@ export interface ResolvedConfig {
   schema?: ResolvedSchema;
   /** Read-only mode - blocks all write operations */
   readOnly: boolean;
+  /** App token for XML API calls (optional) */
+  appToken?: string;
 }
 
 /** Default configuration values */

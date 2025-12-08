@@ -32,6 +32,7 @@ export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, is
 import { ReadOnlyError } from '../core/errors.js';
 import type { ResolvedSchema } from '../core/types.js';
 import { resolveTableAlias, resolveFieldAlias } from '../core/schema.js';
+import { injectAppToken } from './request.js';
 
 // Import response transformation functions and types
 import {
@@ -254,6 +255,8 @@ export interface XmlClientOptions {
   readOnly?: boolean;
   /** Schema for table/field alias resolution (typically inherited from main client) */
   schema?: ResolvedSchema;
+  /** App token for apps that require application tokens (XML API only) */
+  appToken?: string;
 }
 
 /**
@@ -271,6 +274,7 @@ export class XmlClient {
     this.caller = caller;
     this.readOnly = options?.readOnly ?? false;
     this.schema = options?.schema;
+    // Note: appToken is handled by the caller closure, not stored here
   }
 
   /**
@@ -1029,6 +1033,7 @@ interface QuickbaseClientLike {
     timeout: number;
     readOnly?: boolean;
     schema?: ResolvedSchema;
+    appToken?: string;
   };
   /**
    * Get the auth strategy for XML requests.
@@ -1071,11 +1076,17 @@ export function createXmlClient(
   }
   const auth = getAuth();
 
+  // Resolve app token: explicit option > config
+  const appToken = options?.appToken ?? config.appToken;
+
   // Create an XmlCaller adapter that makes XML requests
   const caller: XmlCaller = {
     realm: () => config.realm,
     doXml: async (dbid: string, action: string, body: string): Promise<string> => {
       const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
+
+      // Inject app token if configured
+      const finalBody = appToken ? injectAppToken(body, appToken) : body;
 
       // Get auth token for this dbid
       const token = await auth.getToken(dbid);
@@ -1093,7 +1104,7 @@ export function createXmlClient(
             'QUICKBASE-ACTION': action,
             'Authorization': authHeader,
           },
-          body,
+          body: finalBody,
           signal: controller.signal,
           credentials: 'omit',
         });

@@ -540,6 +540,32 @@ for (const field of schema.table.fields ?? []) {
 }
 ```
 
+### Application Tokens
+
+Application tokens are an additional security layer for QuickBase apps. If an app has "Require Application Tokens" enabled, XML API calls must include a valid app token.
+
+**Important:** User tokens bypass app token checks entirely. You only need app tokens when:
+- Using ticket auth (`type: 'ticket'`) with the XML API
+- Using temp tokens (`type: 'temp-token'`) with the XML API
+- The target app has "Require Application Tokens" enabled
+
+The JSON API does not use app tokens.
+
+```typescript
+// Set app token at client level
+const qb = createClient({
+  realm: 'mycompany',
+  auth: { type: 'ticket', username: 'user@example.com', password: 'pass' },
+  appToken: 'your-app-token',  // Used by XML API only
+});
+
+const xml = createXmlClient(qb);
+const roles = await xml.getRoleInfo(appId);  // Includes app token
+
+// Or set it on the XML client directly
+const xmlWithToken = createXmlClient(qb, { appToken: 'your-app-token' });
+```
+
 ### Available Methods
 
 **App Discovery:**

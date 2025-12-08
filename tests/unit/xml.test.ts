@@ -14,6 +14,7 @@ import {
   isInvalidTicket,
   type XmlCaller,
 } from '../../src/xml/index.js';
+import { injectAppToken } from '../../src/xml/request.js';
 import { ReadOnlyError } from '../../src/core/errors.js';
 import { resolveSchema } from '../../src/core/schema.js';
 
@@ -1372,5 +1373,37 @@ describe('XmlClient response transformation', () => {
     expect(result.tables.projects.lastModifiedTime).toBe('1234567890');
     expect(result.tables.tasks.id).toBe('bqtasks');
     expect(result.tables.tasks.lastModifiedTime).toBe('1234567891');
+  });
+});
+
+describe('injectAppToken', () => {
+  it('should inject token after opening qdbapi tag', () => {
+    const body = '<qdbapi><query>{}</query></qdbapi>';
+    const result = injectAppToken(body, 'abc123');
+    expect(result).toBe('<qdbapi><apptoken>abc123</apptoken><query>{}</query></qdbapi>');
+  });
+
+  it('should handle empty body', () => {
+    const body = '<qdbapi></qdbapi>';
+    const result = injectAppToken(body, 'token');
+    expect(result).toBe('<qdbapi><apptoken>token</apptoken></qdbapi>');
+  });
+
+  it('should return unchanged if no qdbapi tag', () => {
+    const body = '<other>content</other>';
+    const result = injectAppToken(body, 'token');
+    expect(result).toBe('<other>content</other>');
+  });
+
+  it('should handle complex body with multiple elements', () => {
+    const body = '<qdbapi><udata>test</udata><rid>123</rid></qdbapi>';
+    const result = injectAppToken(body, 'mytoken');
+    expect(result).toBe('<qdbapi><apptoken>mytoken</apptoken><udata>test</udata><rid>123</rid></qdbapi>');
+  });
+
+  it('should escape special characters in token', () => {
+    const body = '<qdbapi></qdbapi>';
+    const result = injectAppToken(body, 'token<>&"\'');
+    expect(result).toBe('<qdbapi><apptoken>token&lt;&gt;&amp;&quot;&apos;</apptoken></qdbapi>');
   });
 });

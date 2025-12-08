@@ -26,6 +26,30 @@ export function buildRequest(inner: string): string {
 }
 
 /**
+ * Inject an app token into an XML request body.
+ * The body is expected to have the format <qdbapi>...</qdbapi>.
+ * The apptoken is inserted right after the opening <qdbapi> tag.
+ *
+ * @param body - The XML request body
+ * @param appToken - The app token to inject
+ * @returns Body with apptoken element inserted
+ *
+ * @example
+ * injectAppToken('<qdbapi><query>{}</query></qdbapi>', 'abc123')
+ * // Returns: '<qdbapi><apptoken>abc123</apptoken><query>{}</query></qdbapi>'
+ */
+export function injectAppToken(body: string, appToken: string): string {
+  const openTag = '<qdbapi>';
+  const idx = body.indexOf(openTag);
+  if (idx === -1) {
+    return body; // Can't find tag, return unchanged
+  }
+  const insertPos = idx + openTag.length;
+  const appTokenElem = `<apptoken>${escapeXml(appToken)}</apptoken>`;
+  return body.slice(0, insertPos) + appTokenElem + body.slice(insertPos);
+}
+
+/**
  * Escape special characters for safe inclusion in XML.
  *
  * @param str - The string to escape
