@@ -32,7 +32,7 @@ export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, is
 import { ReadOnlyError } from '../core/errors.js';
 import type { ResolvedSchema } from '../core/types.js';
 import { resolveTableAlias, resolveFieldAlias } from '../core/schema.js';
-import { injectAppToken } from './request.js';
+import { injectAppToken, injectUserToken } from './request.js';
 
 // Import response transformation functions and types
 import {
@@ -1086,11 +1086,29 @@ export function createXmlClient(
       const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
 
       // Inject app token if configured
-      const finalBody = appToken ? injectAppToken(body, appToken) : body;
+      let finalBody = appToken ? injectAppToken(body, appToken) : body;
 
       // Get auth token for this dbid
       const token = await auth.getToken(dbid);
       const authHeader = auth.getAuthorizationHeader(token);
+
+      // Build headers - XML API requires tokens in body, not Authorization header
+      // Check if using user token auth (QB-USER-TOKEN prefix)
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/xml',
+        'QUICKBASE-ACTION': action,
+      };
+
+      if (authHeader.startsWith('QB-USER-TOKEN ')) {
+        // User token auth: inject token into XML body instead of header
+        // The XML API requires <usertoken> element, not Authorization header
+        // See: https://help.quickbase.com/docs/api-getdbpage
+        finalBody = injectUserToken(finalBody, token);
+      } else {
+        // Other auth types (temp token, SSO): fall back to header auth
+        // Note: These may not work with XML API endpoints that require body auth
+        headers['Authorization'] = authHeader;
+      }
 
       // Create abort controller for timeout
       const controller = new AbortController();
@@ -1099,11 +1117,7 @@ export function createXmlClient(
       try {
         const response = await config.fetchApi(url, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/xml',
-            'QUICKBASE-ACTION': action,
-            'Authorization': authHeader,
-          },
+          headers,
           body: finalBody,
           signal: controller.signal,
           credentials: 'omit',

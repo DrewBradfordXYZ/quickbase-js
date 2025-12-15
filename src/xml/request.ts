@@ -50,6 +50,33 @@ export function injectAppToken(body: string, appToken: string): string {
 }
 
 /**
+ * Inject a user token into an XML request body.
+ * The body is expected to have the format <qdbapi>...</qdbapi>.
+ * The usertoken is inserted right after the opening <qdbapi> tag.
+ *
+ * The XML API requires authentication tokens as body elements, not headers.
+ * See: https://help.quickbase.com/docs/api-getdbpage
+ *
+ * @param body - The XML request body
+ * @param userToken - The user token to inject
+ * @returns Body with usertoken element inserted
+ *
+ * @example
+ * injectUserToken('<qdbapi><query>{}</query></qdbapi>', 'b5d4r...')
+ * // Returns: '<qdbapi><usertoken>b5d4r...</usertoken><query>{}</query></qdbapi>'
+ */
+export function injectUserToken(body: string, userToken: string): string {
+  const openTag = '<qdbapi>';
+  const idx = body.indexOf(openTag);
+  if (idx === -1) {
+    return body; // Can't find tag, return unchanged
+  }
+  const insertPos = idx + openTag.length;
+  const userTokenElem = `<usertoken>${escapeXml(userToken)}</usertoken>`;
+  return body.slice(0, insertPos) + userTokenElem + body.slice(insertPos);
+}
+
+/**
  * Escape special characters for safe inclusion in XML.
  *
  * @param str - The string to escape
