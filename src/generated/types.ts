@@ -37,6 +37,18 @@ export interface SortField {
   order: 'ASC' | 'DESC' | 'equal-values';
 }
 
+/**
+ * Sort configuration for queries.
+ * Can be an array of sort fields, or false to disable sorting for better performance.
+ */
+export type SortByUnion = SortField[] | false;
+
+/**
+ * The user ID of the owner.
+ * May be returned as integer or string depending on context.
+ */
+export type OwnerId = string | number;
+
 // createApp
 /** Create an app */
 export interface CreateAppRequest {
@@ -79,9 +91,9 @@ export interface CreateAppResponse {
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/docs/how-to-localize-dates) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/docs/set-the-time-zone-for-both-the-application-and-the-account) to set the application's time zone. */
   timeZone?: string;
   /** Application memory info */
   memoryInfo?: {
@@ -92,7 +104,7 @@ export interface CreateAppResponse {
   };
   /** The unique identifier for this application. */
   id?: string;
-  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
+  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/docs/sharing-apps-publicly) */
   hasEveryoneOnTheInternet?: boolean;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
   variables?: {
@@ -141,9 +153,9 @@ export interface GetAppResponse {
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
   /** Application memory info */
   memoryInfo?: {
@@ -156,7 +168,7 @@ export interface GetAppResponse {
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
   hasEveryoneOnTheInternet?: boolean;
-  /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
+  /** The app variables. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
   variables?: {
     /** Variable name. */
     name?: string;
@@ -232,9 +244,9 @@ export interface UpdateAppResponse {
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
   /** Application memory info */
   memoryInfo?: {
@@ -361,9 +373,9 @@ export interface CopyAppResponse {
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app’s date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application’s time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
   /** The unique identifier for this application. */
   id?: string;
@@ -383,6 +395,29 @@ export interface CopyAppResponse {
   dataClassification?: string;
   [key: string]: unknown;
 }
+
+// getRoles
+/** Get app roles */
+export interface GetRolesParams {
+  /** The unique identifier of an app */
+  appId: string;
+}
+
+export type GetRolesResponse = ({
+  /** The role id. */
+  id?: number;
+  /** The role name. */
+  name?: string;
+  /** The role access properties. */
+  access?: {
+    /** The ID of the access type the role is given. (0 = None, 1 = Administrator, 2 = Basic Access with Share, 3 = Basic Access, 4 = Partial Administrator). */
+    id?: number;
+    /** The type of access the role is given. */
+    type?: 'None' | 'Administrator' | 'Basic Access with Share' | 'Basic Access' | 'Partial Administrator';
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+})[];
 
 // getAppTables
 /** Get tables for an app */
@@ -684,11 +719,11 @@ export interface CreateRelationshipRequest {
     where?: string;
     [key: string]: unknown;
   })[];
-  /** Array of field ids in the parent table that will become lookup fields in the child table. */
+  /** Array of field IDs in the parent table that will become lookup fields in the child table. */
   lookupFieldIds?: number[];
   /** The parent table id for the relationship. */
   parentTableId: string;
-  /** This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>’, where <record> is the name of a record in the parent table. */
+  /** This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>', where <record> is the name of a record in the parent table. */
   foreignKeyField?: {
     /** The label for the foreign key field. */
     label?: string;
@@ -760,7 +795,7 @@ export interface UpdateRelationshipRequest {
     where?: string;
     [key: string]: unknown;
   })[];
-  /** An array of field ids on the parent table that will become lookup fields on the child table. */
+  /** An array of field IDs on the parent table that will become lookup fields on the child table. */
   lookupFieldIds?: number[];
 }
 
@@ -837,8 +872,7 @@ export type GetTableReportsResponse = ({
   type?: string;
   /** The configured description of a report. */
   description?: string;
-  /** Optional, showed only for personal reports. The user ID of report owner. */
-  ownerId?: number;
+  ownerId?: OwnerId;
   /** The query definition as configured in Quickbase that gets executed when the report is run. */
   query?: {
     /** The table identifier for the report. */
@@ -888,8 +922,7 @@ export interface GetReportResponse {
   type?: string;
   /** The configured description of a report. */
   description?: string;
-  /** Optional, showed only for personal reports. The user ID of report owner. */
-  ownerId?: number;
+  ownerId?: OwnerId;
   /** The query definition as configured in Quickbase that gets executed when the report is run. */
   query?: {
     /** The table identifier for the report. */
@@ -1032,7 +1065,7 @@ export type GetFieldsResponse = ({
     parentFieldId?: number;
     /** Indicates whether to display the timezone within the product. */
     displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count). */
+    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
     summaryTargetFieldId?: number;
     /** Indicates if users can add new choices to a selection list. */
     allowNewChoices?: boolean;
@@ -1142,6 +1175,8 @@ export type GetFieldsResponse = ({
     workWeek?: number;
     /** Indicates if the URL should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -1172,7 +1207,7 @@ export interface CreateFieldParams {
 }
 
 export interface CreateFieldRequest {
-  /** Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html). Defaults to false. */
+  /** Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/docs/audit-logs). Defaults to false. */
   audited?: boolean;
   /** The configured help text shown to users within the product. */
   fieldHelp?: string;
@@ -1292,6 +1327,8 @@ export interface CreateFieldRequest {
     hasExtension?: boolean;
     /** Indicates if the file should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -1299,7 +1336,7 @@ export interface CreateFieldRequest {
   };
   /** Indicates if the field is marked as a default in reports. Defaults to true. */
   appearsByDefault?: boolean;
-  /** The [field types](https://help.quickbase.com/user-assistance/field_types.html), click on any of the field type links for more info. */
+  /** The [field types](https://help.quickbase.com/docs/field-types), click on any of the field type links for more info. */
   fieldType: 'text' | 'text-multiple-choice' | 'text-multi-line' | 'rich-text' | 'numeric' | 'currency' | 'rating' | 'percent' | 'multitext' | 'email' | 'url' | 'duration' | 'date' | 'datetime' | 'timestamp' | 'timeofday' | 'checkbox' | 'user' | 'multiuser' | 'address' | 'phone' | 'file';
   /** Field Permissions for different roles. */
   permissions?: {
@@ -1375,7 +1412,7 @@ export interface CreateFieldResponse {
     parentFieldId?: number;
     /** Indicates whether to display the timezone within the product. */
     displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count). */
+    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
     summaryTargetFieldId?: number;
     /** Indicates if users can add new choices to a selection list. */
     allowNewChoices?: boolean;
@@ -1485,6 +1522,8 @@ export interface CreateFieldResponse {
     workWeek?: number;
     /** Indicates if the URL should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -1515,13 +1554,13 @@ export interface DeleteFieldsParams {
 }
 
 export interface DeleteFieldsRequest {
-  /** List of field ids to be deleted. */
+  /** List of field IDs to be deleted. */
   fieldIds: number[];
   [key: string]: unknown;
 }
 
 export interface DeleteFieldsResponse {
-  /** List of field ids to were deleted. */
+  /** List of field IDs to were deleted. */
   deletedFieldIds: number[];
   /** List of errors found. */
   errors: string[];
@@ -1594,7 +1633,7 @@ export interface GetFieldResponse {
     parentFieldId?: number;
     /** Indicates whether to display the timezone within the product. */
     displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count). */
+    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
     summaryTargetFieldId?: number;
     /** Indicates if users can add new choices to a selection list. */
     allowNewChoices?: boolean;
@@ -1704,6 +1743,8 @@ export interface GetFieldResponse {
     workWeek?: number;
     /** Indicates if the URL should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -1772,7 +1813,7 @@ export interface UpdateFieldRequest {
     parentFieldId?: number;
     /** Indicates whether to display the timezone within the product. */
     displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count). */
+    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
     summaryTargetFieldId?: number;
     /** Indicates if users can add new choices to a selection list. */
     allowNewChoices?: boolean;
@@ -1870,6 +1911,8 @@ export interface UpdateFieldRequest {
     hasExtension?: boolean;
     /** Indicates if the file should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -1955,7 +1998,7 @@ export interface UpdateFieldResponse {
     parentFieldId?: number;
     /** Indicates whether to display the timezone within the product. */
     displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn’t require a field selection (like count). */
+    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
     summaryTargetFieldId?: number;
     /** Indicates if users can add new choices to a selection list. */
     allowNewChoices?: boolean;
@@ -2065,6 +2108,8 @@ export interface UpdateFieldResponse {
     workWeek?: number;
     /** Indicates if the URL should open a new window when a user clicks it within the product. */
     useNewWindow?: boolean;
+    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+    postTempToken?: boolean;
     /** Whether this field is append only. */
     appendOnly?: boolean;
     /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
@@ -2367,7 +2412,7 @@ export interface UpsertRequest {
   data?: QuickbaseRecord[];
   /** The merge field id. */
   mergeFieldId?: number;
-  /** Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. */
+  /** Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. */
   fieldsToReturn?: number[];
   [key: string]: unknown;
 }
@@ -2397,8 +2442,8 @@ export interface UpsertResponse {
 export interface DeleteRecordsRequest {
   /** The unique identifier of the table. */
   from: string;
-  /** The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. */
-  where: string;
+  /** The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. Or supply a JSON array of Record IDs. */
+  where: string | number[];
   [key: string]: unknown;
 }
 
@@ -2421,8 +2466,8 @@ export interface RunQueryRequest {
     top?: number;
     [key: string]: unknown;
   };
-  /** The filter, using the Quickbase query language, which determines the records to return. If this parameter is omitted, the query will return all records. */
-  where?: string;
+  /** The filter, using the Quickbase query language, which determines the records to return. Or supply a JSON array of Record IDs. If this parameter is omitted, the query will return all records. */
+  where?: string | number[];
   /** An array that contains the fields to group the records by. */
   groupBy?: {
     /** The unique identifier of a field in a table. */
@@ -2431,9 +2476,8 @@ export interface RunQueryRequest {
     grouping?: 'equal-values';
     [key: string]: unknown;
   }[];
-  /** An array of field IDs and sort directions. If this attribute is not set or set to false, queries will be unsorted to improve performance. */
-  sortBy?: SortField[] | false;
-  /** An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned. */
+  sortBy?: SortByUnion;
+  /** An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. */
   select?: number[];
   /** The table identifier. */
   from: string;
@@ -2467,6 +2511,37 @@ export interface RunQueryResponse {
     numRecords: number;
     [key: string]: unknown;
   };
+  [key: string]: unknown;
+}
+
+// recordsModifiedSince
+/** Get records modified since */
+export interface RecordsModifiedSinceRequest {
+  /** A timestamp, formatted in ISO-8601 UTC, representing the date and time to search. */
+  after: string;
+  /** List of field IDs. Each field is crawled across the entire record dependency graph to find its source record's date modified. If one is not provided, only the current table will be referenced. */
+  fieldList?: number[];
+  /** When true, the individual record IDs and timestamps will be returned. If false, only the count of changes will be returned. */
+  includeDetails?: boolean;
+  /** The table identifier. */
+  from: string;
+}
+
+export interface RecordsModifiedSinceResponse {
+  /** The count of changes found. */
+  count: number;
+  /** When includeDetails is true, this array contains the individual record changes. If includeDetails is false, this array will not be returned. */
+  changes?: ({
+    /** A record whose dependencies were found to have been updated after the time provided. */
+    recordId?: number;
+    /** The timestamp that Quickbase found that exceeded the after time. This does not represent the latest date modified in the record graph. */
+    timestamp?: string;
+    /** The type of change that was detected. */
+    changeType?: 'CREATE' | 'MODIFY' | 'DELETE';
+    [key: string]: unknown;
+  })[];
+  /** When true, this indicates that the number of deletes detected exceeded the limit and details could not be returned. */
+  deletesTruncated?: boolean;
   [key: string]: unknown;
 }
 
@@ -2736,7 +2811,7 @@ export interface AddMembersToGroupParams {
 export type AddMembersToGroupRequest = string[];
 
 export interface AddMembersToGroupResponse {
-  /** A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group. */
+  /** A list of users that couldn't be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group. */
   failure: string[];
   /** A list of users that have been added to the group successfully. */
   success: string[];
@@ -2753,7 +2828,7 @@ export interface RemoveMembersFromGroupParams {
 export type RemoveMembersFromGroupRequest = string[];
 
 export interface RemoveMembersFromGroupResponse {
-  /** A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users. */
+  /** A list of users that couldn't be removed from the group. This includes a list of IDs that represent invalid users. */
   failure: string[];
   /** A list of users that have been removed from the group successfully. */
   success: string[];
@@ -2770,7 +2845,7 @@ export interface AddManagersToGroupParams {
 export type AddManagersToGroupRequest = string[];
 
 export interface AddManagersToGroupResponse {
-  /** A list of users that couldn’t be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group. */
+  /** A list of users that couldn't be added to the group. This includes a list of IDs that represent invalid users and users who have already been added to the group. */
   failure: string[];
   /** A list of users that have been added to the group successfully. */
   success: string[];
@@ -2787,7 +2862,7 @@ export interface RemoveManagersFromGroupParams {
 export type RemoveManagersFromGroupRequest = string[];
 
 export interface RemoveManagersFromGroupResponse {
-  /** A list of users that couldn’t be removed from the group. This includes a list of IDs that represent invalid users. */
+  /** A list of users that couldn't be removed from the group. This includes a list of IDs that represent invalid users. */
   failure: string[];
   /** A list of users that have been removed from the group successfully. */
   success: string[];
@@ -2804,7 +2879,7 @@ export interface AddSubgroupsToGroupParams {
 export type AddSubgroupsToGroupRequest = string[];
 
 export interface AddSubgroupsToGroupResponse {
-  /** A list of child groups that couldn’t be added to the group. This includes a list of IDs that represent invalid groups and groups that have already been added to the group. */
+  /** A list of child groups that couldn't be added to the group. This includes a list of IDs that represent invalid groups and groups that have already been added to the group. */
   failure: string[];
   /** A list of child groups that have been added to the group successfully. */
   success: string[];
@@ -2821,7 +2896,7 @@ export interface RemoveSubgroupsFromGroupParams {
 export type RemoveSubgroupsFromGroupRequest = string[];
 
 export interface RemoveSubgroupsFromGroupResponse {
-  /** A list of child groups that couldn’t be removed from the group. This includes a list of IDs that represent invalid groups. */
+  /** A list of child groups that couldn't be removed from the group. This includes a list of IDs that represent invalid groups. */
   failure: string[];
   /** A list of child groups that have been removed from the group successfully. */
   success: string[];
@@ -2903,20 +2978,28 @@ export interface PlatformAnalyticReadsParams {
 }
 
 export interface PlatformAnalyticReadsResponse {
-  /** The date of the requested summary. */
-  date: string;
-  /** Total reads for the specified date. */
-  reads: {
-    /** Total user reads for the realm on the specified date. */
-    user: number;
-    /** Total integration reads for the realm on the specified date. */
-    integrations: {
-      /** Total reads by anonymous users for the realm on the specified date. */
-      eoti: number;
-      /** Total API reads for the realm on the specified date. */
-      api: number;
-      /** Total pipeline reads for the realm on the specified date. */
-      pipelines: number;
+  /** The data object containing the read summaries. */
+  data: {
+    /** Detailed read summaries for a specific date. */
+    dailyDetailedReads: {
+      /** The date of the requested summary. */
+      date: string;
+      /** Total reads for the specified date. */
+      reads: {
+        /** Total user reads for the realm on the specified date. */
+        user: number;
+        /** Total integration reads for the realm on the specified date. */
+        integrations: {
+          /** Total reads by anonymous users for the realm on the specified date. */
+          eoti: number;
+          /** Total API reads for the realm on the specified date. */
+          api: number;
+          /** Total pipeline reads for the realm on the specified date. */
+          pipelines: number;
+          [key: string]: unknown;
+        };
+        [key: string]: unknown;
+      };
       [key: string]: unknown;
     };
     [key: string]: unknown;
@@ -2936,10 +3019,10 @@ export interface PlatformAnalyticEventSummariesRequest {
   start: string;
   /** The end date and time of the requested summaries in ISO 8601 time format. */
   end: string;
+  /** A pagination token from a previous response made using the same parameters. Used to fetch the next page. */
+  nextToken?: string;
   /** How the events should be grouped. */
   groupBy: 'app' | 'user';
-  /** A pagination token from a previous response. Used to fetch the next page. */
-  nextToken?: string;
   /** A list of items to filter events by. Only events which match ALL criteria will be included in the results. */
   where?: ({
     /** Id of the item to filter by - the hash uid if filtering a user, or the app id if filtering an app. */
@@ -2950,59 +3033,63 @@ export interface PlatformAnalyticEventSummariesRequest {
 }
 
 export interface PlatformAnalyticEventSummariesResponse {
-  /** The ID of the account the events are associated with. */
-  accountId: string;
-  /** The start date and time of the requested summaries in ISO 8601 time format. */
-  start: string;
-  /** The end date and time of the requested summaries in ISO 8601 time format. */
-  end: string;
-  /** How the events should be grouped. */
-  groupBy: 'app' | 'user';
-  where: ({
-    /** Id of the item to filter by. */
-    id: string;
-    /** The type of item to filter by. */
-    type: 'app' | 'user';
-  })[];
-  /** An array of objects that contains Application/User information and an events object with summaries by event type. */
-  results: ({
-    /** An array of events that contains specific information associated with an Application/User broken down by event type. */
-    eventTypes: ({
-      /** Billing category of the event type. */
-      billingCategory?: 'user' | 'integration';
-      /** Count of events associated with that event type and Application/User. */
-      count?: number;
-      /** Event type */
-      eventType?: string;
-    })[];
-    /** Id of the Application/User. */
-    id: string;
-    /** Name of the Application/User. */
-    name: string;
-    /** Totals by billing category for the event grouping. */
-    totals: {
-      all?: number;
-      integration?: number;
-      user?: number;
+  data: {
+    eventsSummaries: {
+      /** The ID of the account the events are associated with. */
+      accountId: string;
+      /** The start date and time of the requested summaries in ISO 8601 time format. */
+      start: string;
+      /** The end date and time of the requested summaries in ISO 8601 time format. */
+      end: string;
+      /** How the events should be grouped. */
+      groupBy: 'app' | 'user';
+      where: ({
+        /** Id of the item to filter by. */
+        id: string;
+        /** The type of item to filter by. */
+        type: 'app' | 'user';
+      })[];
+      /** An array of objects that contains Application/User information and an events object with summaries by event type. */
+      results: ({
+        /** Id of the Application/User. */
+        id: string;
+        /** Name of the Application/User. */
+        name: string;
+        /** Totals by billing category for the event grouping. */
+        totals: {
+          integration?: number;
+          user?: number;
+          all?: number;
+        };
+        /** An array of events that contains specific information associated with an Application/User broken down by event type. */
+        eventTypes: ({
+          /** Event type */
+          eventType?: string;
+          /** Count of events associated with that event type and Application/User. */
+          count?: number;
+          /** Billing category of the event type. */
+          billingCategory?: 'user' | 'integration';
+        })[];
+      })[];
+      /** Additional information about the results that may be helpful. */
+      metadata: {
+        /** Supply this token in a subsequent request to fetch the next page of results. */
+        nextToken: string;
+      };
+      /** Totals by billing category for all queried events. */
+      totals: {
+        integration?: number;
+        user?: number;
+        all?: number;
+      };
     };
-  })[];
-  /** Additional information about the results that may be helpful. */
-  metadata?: {
-    /** Supply this token in a subsequent request to fetch the next page of results. */
-    nextToken: string;
-  };
-  /** Totals by billing category for all queried events. */
-  totals?: {
-    all?: number;
-    integration?: number;
-    user?: number;
   };
 }
 
 // exportSolution
 /** Export a solution */
 export interface ExportSolutionParams {
-  /** The unique identifier of a solution */
+  /** The unique identifier (UUID) or the alias of the solution. */
   solutionId: string;
 }
 
@@ -3011,7 +3098,7 @@ export type ExportSolutionResponse = unknown;
 // updateSolution
 /** Update a solution */
 export interface UpdateSolutionParams {
-  /** The unique identifier of a solution */
+  /** The unique identifier (UUID) or the alias of the solution. */
   solutionId: string;
 }
 
@@ -3127,6 +3214,163 @@ export interface GenerateDocumentResponse {
   [key: string]: unknown;
 }
 
+// getSolutionPublic
+/** Get solution information */
+export interface GetSolutionPublicParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+}
+
+export type GetSolutionPublicResponse = unknown;
+
+// getTrustees
+/** Get trustees for an app */
+export interface GetTrusteesParams {
+  /** The unique identifier of an app */
+  appId: string;
+}
+
+export type GetTrusteesResponse = ({
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+})[];
+
+// addTrustees
+/** Add trustees to an app */
+export interface AddTrusteesParams {
+  /** The unique identifier of an app */
+  appId: string;
+}
+
+export type AddTrusteesRequest = ({
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+})[];
+
+export interface AddTrusteesResponse {
+  /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
+  failure: ({
+    /** The error message associated with the trustee that could not be updated. */
+    error?: string;
+    /** Object used for operations to read, create, or update trustees in an app. */
+    trustee?: {
+      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+      id: string;
+      /** The ID of the role to be assigned or currently assigned to the trustee. */
+      roleId: number;
+      /** The type of trustee being added. This can be a user, group, or email domain group. */
+      type: 'user' | 'group' | 'dom-group';
+    };
+  })[];
+  /** A list of trustees that have been successfully updated. */
+  success: ({
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  })[];
+}
+
+// removeTrustees
+/** Remove trustees from an app */
+export interface RemoveTrusteesParams {
+  /** The unique identifier of an app */
+  appId: string;
+}
+
+export type RemoveTrusteesRequest = ({
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+})[];
+
+export interface RemoveTrusteesResponse {
+  /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
+  failure: ({
+    /** The error message associated with the trustee that could not be updated. */
+    error?: string;
+    /** Object used for operations to read, create, or update trustees in an app. */
+    trustee?: {
+      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+      id: string;
+      /** The ID of the role to be assigned or currently assigned to the trustee. */
+      roleId: number;
+      /** The type of trustee being added. This can be a user, group, or email domain group. */
+      type: 'user' | 'group' | 'dom-group';
+    };
+  })[];
+  /** A list of trustees that have been successfully updated. */
+  success: ({
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  })[];
+}
+
+// updateTrustees
+/** Update trustees of an app */
+export interface UpdateTrusteesParams {
+  /** The unique identifier of an app */
+  appId: string;
+}
+
+export type UpdateTrusteesRequest = ({
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
+  oldRoleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+})[];
+
+export interface UpdateTrusteesResponse {
+  /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
+  failure: ({
+    /** The error message associated with the trustee that could not be updated. */
+    error?: string;
+    /** Object used for operations to read, create, or update trustees in an app. */
+    trustee?: {
+      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+      id: string;
+      /** The ID of the role to be assigned or currently assigned to the trustee. */
+      roleId: number;
+      /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
+      oldRoleId: number;
+      /** The type of trustee being added. This can be a user, group, or email domain group. */
+      type: 'user' | 'group' | 'dom-group';
+    };
+  })[];
+  /** A list of trustees that have been successfully updated. */
+  success: ({
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
+    oldRoleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  })[];
+}
+
 /**
  * QuickBase API client interface
  */
@@ -3222,6 +3466,18 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/copyApp
    */
   copyApp(params: CopyAppParams, body: CopyAppRequest): Promise<CopyAppResponse>;
+  /**
+   * Get app roles
+   *
+   * Retrieves all of the roles for an application. Requires admin access to an app.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getRoles
+   */
+  getRoles(params: GetRolesParams): Promise<GetRolesResponse>;
   /**
    * Get tables for an app
    *
@@ -3319,9 +3575,9 @@ export interface QuickbaseAPI {
    *
    * @param body - Request body
    * @param body.summaryFields - Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - Array of field ids in the parent table that will become lookup fields in the child table. (optional)
+   * @param body.lookupFieldIds - Array of field IDs in the parent table that will become lookup fields in the child table. (optional)
    * @param body.parentTableId - The parent table id for the relationship.
-   * @param body.foreignKeyField - This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>’, where <record> is the name of a record in the parent table. (optional)
+   * @param body.foreignKeyField - This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>', where <record> is the name of a record in the parent table. (optional)
    *
    * @returns Success
    *
@@ -3338,7 +3594,7 @@ export interface QuickbaseAPI {
    *
    * @param body - Request body (optional)
    * @param body.summaryFields - An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - An array of field ids on the parent table that will become lookup fields on the child table. (optional)
+   * @param body.lookupFieldIds - An array of field IDs on the parent table that will become lookup fields on the child table. (optional)
    *
    * @returns Success
    *
@@ -3421,12 +3677,12 @@ export interface QuickbaseAPI {
    * @param params.tableId - The unique identifier of the table.
    *
    * @param body - Request body
-   * @param body.audited - Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html). Defaults to false. (optional)
+   * @param body.audited - Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/docs/audit-logs). Defaults to false. (optional)
    * @param body.fieldHelp - The configured help text shown to users within the product. (optional)
    * @param body.bold - Indicates if the field is configured to display in bold in the product. Defaults to false. (optional)
    * @param body.properties - Specific field properties. (optional)
    * @param body.appearsByDefault - Indicates if the field is marked as a default in reports. Defaults to true. (optional)
-   * @param body.fieldType - The [field types](https://help.quickbase.com/user-assistance/field_types.html), click on any of the field type links for more info.
+   * @param body.fieldType - The [field types](https://help.quickbase.com/docs/field-types), click on any of the field type links for more info.
    * @param body.permissions - Field Permissions for different roles. (optional)
    * @param body.addToForms - Whether the field you are adding should appear on forms. Defaults to false. (optional)
    * @param body.label - The label (name) of the field.
@@ -3446,7 +3702,7 @@ export interface QuickbaseAPI {
    * @param params.tableId - The unique identifier of the table.
    *
    * @param body - Request body
-   * @param body.fieldIds - List of field ids to be deleted.
+   * @param body.fieldIds - List of field IDs to be deleted.
    *
    * @returns Success
    *
@@ -3471,7 +3727,7 @@ export interface QuickbaseAPI {
   /**
    * Update a field
    *
-   * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+   * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field's new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
    *
    * @param params.tableId - The unique identifier of the table.
    * @param params.fieldId - The unique identifier (fid) of the field.
@@ -3547,7 +3803,7 @@ export interface QuickbaseAPI {
    * @param body.to - The table identifier.
    * @param body.data - Record data array, where each record contains key-value mappings of fields to be defined/updated and their values. (optional)
    * @param body.mergeFieldId - The merge field id. (optional)
-   * @param body.fieldsToReturn - Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. (optional)
+   * @param body.fieldsToReturn - Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. (optional)
    *
    * @returns Response
    *
@@ -3561,7 +3817,7 @@ export interface QuickbaseAPI {
    *
    * @param body - Request body
    * @param body.from - The unique identifier of the table.
-   * @param body.where - The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.
+   * @param body.where - The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. Or supply a JSON array of Record IDs.
    *
    * @returns Successful delete records response.
    *
@@ -3575,10 +3831,10 @@ export interface QuickbaseAPI {
    *
    * @param body - Request body
    * @param body.options - Additional query options. (optional)
-   * @param body.where - The filter, using the Quickbase query language, which determines the records to return. If this parameter is omitted, the query will return all records. (optional)
+   * @param body.where - The filter, using the Quickbase query language, which determines the records to return. Or supply a JSON array of Record IDs. If this parameter is omitted, the query will return all records. (optional)
    * @param body.groupBy - An array that contains the fields to group the records by. (optional)
-   * @param body.sortBy - An array of field IDs and sort directions. If this attribute is not set or set to false, queries will be unsorted to improve performance. (optional)
-   * @param body.select - An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned. (optional)
+   * @param body.sortBy - The sortBy (optional)
+   * @param body.select - An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. (optional)
    * @param body.from - The table identifier.
    *
    * @returns Success
@@ -3586,6 +3842,24 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/runQuery
    */
   runQuery(body: RunQueryRequest): PaginatedRequest<RunQueryResponse>;
+  /**
+   * Get records modified since
+   *
+   * Checks for record changes on the current table and crawls the record dependency graph based on a provided field list. This determines if records on the table changed after the provided timestamp, when factoring in their dependencies. This API requires app admin permissions and only reviews lookup and summary fields in supported relationships.
+  To return deleted records for the current table, 'Index record changes' must be enabled.
+  Dependent tables only evaluate current records, and deleted records are not supported.
+   *
+   * @param body - Request body (optional)
+   * @param body.after - A timestamp, formatted in ISO-8601 UTC, representing the date and time to search.
+   * @param body.fieldList - List of field IDs. Each field is crawled across the entire record dependency graph to find its source record's date modified. If one is not provided, only the current table will be referenced. (optional)
+   * @param body.includeDetails - When true, the individual record IDs and timestamps will be returned. If false, only the count of changes will be returned. (optional)
+   * @param body.from - The table identifier.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/recordsModifiedSince
+   */
+  recordsModifiedSince(body?: RecordsModifiedSinceRequest): Promise<RecordsModifiedSinceResponse>;
   /**
    * Get a temporary token for a dbid
    *
@@ -3871,30 +4145,30 @@ export interface QuickbaseAPI {
   /**
    * Get event summaries
    *
-   * Get event summaries for any span of days up to one year and excluding future dates.  
+   * Get event summaries for any span of days up to one year and excluding future dates.
   **Note:** This API is available for enterprise users only. Data is updated hourly; to ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
    *
    * @param params.accountId - The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen. (optional)
    *
-   * @param body - Request body (optional)
+   * @param body - Request body
    * @param body.start - The start date and time of the requested summaries in ISO 8601 time format.
    * @param body.end - The end date and time of the requested summaries in ISO 8601 time format.
+   * @param body.nextToken - A pagination token from a previous response made using the same parameters. Used to fetch the next page. (optional)
    * @param body.groupBy - How the events should be grouped.
-   * @param body.nextToken - A pagination token from a previous response. Used to fetch the next page. (optional)
    * @param body.where - A list of items to filter events by. Only events which match ALL criteria will be included in the results. (optional)
    *
    * @returns Event summaries returned succesfully
    *
    * @see https://developer.quickbase.com/operation/platformAnalyticEventSummaries
    */
-  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body?: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse>;
+  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse>;
   /**
    * Export a solution
    *
-   * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/docs/qbl-definition-structure-and-syntax).  
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://help.quickbase.com/docs/qbl-versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of a solution
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
    * @returns Success
    *
@@ -3905,9 +4179,9 @@ export interface QuickbaseAPI {
    * Update a solution
    *
    * Updates the solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of a solution
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
    * @param body - The QBL to be used for the update. (optional)
    *
@@ -3920,7 +4194,7 @@ export interface QuickbaseAPI {
    * Create a solution
    *
    * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param body - The QBL to be used for the create.
    *
@@ -3933,7 +4207,7 @@ export interface QuickbaseAPI {
    * Export solution to record
    *
    * Exports the solution and outputs the resulting QBL in a new record in the specified table. The QBL will be saved to a file in the file attachment field that is specified. The table cannot have any required fields besides the file attachment field.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -3948,7 +4222,7 @@ export interface QuickbaseAPI {
    * Create solution from record
    *
    * Creates a solution using the QBL from the specified record.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
@@ -3963,7 +4237,7 @@ export interface QuickbaseAPI {
    * Update solution from record
    *
    * Updates a solution using the QBL from the specified record.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -3979,7 +4253,7 @@ export interface QuickbaseAPI {
    * List solution changes
    *
    * Returns a list of changes that would occur if the provided QBL were to be applied. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    *
@@ -3994,7 +4268,7 @@ export interface QuickbaseAPI {
    * List solution changes from record
    *
    * Returns a list of changes that would occur if the QBL from the provided record were to be applied.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -4009,7 +4283,7 @@ export interface QuickbaseAPI {
   /**
    * Generate a document
    *
-   * Generates a document from a template. This feature is only available on business or enterprise plans.
+   * Generates a document from a template. After changing a template, allow up to 15 minutes for documents generated via the API to reflect the changes. This feature is only available on business or enterprise plans.
    *
    * @param params.templateId - This is the ID of document template.
    * @param params.tableId - The unique identifier of the table.
@@ -4027,4 +4301,70 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/generateDocument
    */
   generateDocument(params: GenerateDocumentParams): Promise<GenerateDocumentResponse>;
+  /**
+   * Get solution information
+   *
+   * Returns the metadata and resource information for a solution, including both real and logical IDs of apps and pipelines contained within the solution. This endpoint provides programmatic access to solution structure information.
+   *
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getSolutionPublic
+   */
+  getSolutionPublic(params: GetSolutionPublicParams): Promise<GetSolutionPublicResponse>;
+  /**
+   * Get trustees for an app
+   *
+   * Returns the list of trustees for a specific application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getTrustees
+   */
+  getTrustees(params: GetTrusteesParams): Promise<GetTrusteesResponse>;
+  /**
+   * Add trustees to an app
+   *
+   * Add trustees to the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/addTrustees
+   */
+  addTrustees(params: AddTrusteesParams, body?: AddTrusteesRequest): Promise<AddTrusteesResponse>;
+  /**
+   * Remove trustees from an app
+   *
+   * Remove trustees from the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/removeTrustees
+   */
+  removeTrustees(params: RemoveTrusteesParams, body?: RemoveTrusteesRequest): Promise<RemoveTrusteesResponse>;
+  /**
+   * Update trustees of an app
+   *
+   * Update trustees for the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/updateTrustees
+   */
+  updateTrustees(params: UpdateTrusteesParams, body?: UpdateTrusteesRequest): Promise<UpdateTrusteesResponse>;
 }

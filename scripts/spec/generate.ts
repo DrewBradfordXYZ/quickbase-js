@@ -298,7 +298,7 @@ function generateOperationTypes(
 /**
  * Shared schema names that should be generated as standalone types
  */
-const SHARED_SCHEMAS = ['FieldValue', 'QuickbaseRecord', 'SortField'];
+const SHARED_SCHEMAS = ['FieldValue', 'QuickbaseRecord', 'SortField', 'SortByUnion', 'OwnerId'];
 
 /**
  * Add shared schema types to the types file
@@ -345,6 +345,20 @@ function addSharedSchemaTypes(spec: OpenAPISpec, typeDefs: string[]): void {
       typeDefs.push("  /** Sort direction: 'ASC' (ascending), 'DESC' (descending), or 'equal-values'. */");
       typeDefs.push("  order: 'ASC' | 'DESC' | 'equal-values';");
       typeDefs.push('}');
+      typeDefs.push('');
+    } else if (schemaName === 'SortByUnion') {
+      typeDefs.push('/**');
+      typeDefs.push(' * Sort configuration for queries.');
+      typeDefs.push(' * Can be an array of sort fields, or false to disable sorting for better performance.');
+      typeDefs.push(' */');
+      typeDefs.push('export type SortByUnion = SortField[] | false;');
+      typeDefs.push('');
+    } else if (schemaName === 'OwnerId') {
+      typeDefs.push('/**');
+      typeDefs.push(' * The user ID of the owner.');
+      typeDefs.push(' * May be returned as integer or string depending on context.');
+      typeDefs.push(' */');
+      typeDefs.push('export type OwnerId = string | number;');
       typeDefs.push('');
     }
   }

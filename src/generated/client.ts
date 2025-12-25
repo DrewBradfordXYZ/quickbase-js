@@ -22,6 +22,8 @@ import type {
   CopyAppParams,
   CopyAppRequest,
   CopyAppResponse,
+  GetRolesParams,
+  GetRolesResponse,
   GetAppTablesParams,
   GetAppTablesResponse,
   CreateTableParams,
@@ -76,6 +78,8 @@ import type {
   DeleteRecordsResponse,
   RunQueryRequest,
   RunQueryResponse,
+  RecordsModifiedSinceRequest,
+  RecordsModifiedSinceResponse,
   GetTempTokenDBIDParams,
   GetTempTokenDBIDResponse,
   ExchangeSsoTokenRequest,
@@ -147,6 +151,19 @@ import type {
   ChangesetSolutionFromRecordResponse,
   GenerateDocumentParams,
   GenerateDocumentResponse,
+  GetSolutionPublicParams,
+  GetSolutionPublicResponse,
+  GetTrusteesParams,
+  GetTrusteesResponse,
+  AddTrusteesParams,
+  AddTrusteesRequest,
+  AddTrusteesResponse,
+  RemoveTrusteesParams,
+  RemoveTrusteesRequest,
+  RemoveTrusteesResponse,
+  UpdateTrusteesParams,
+  UpdateTrusteesRequest,
+  UpdateTrusteesResponse,
 } from './types.js';
 
 export type RequestFn = <T>(options: {
@@ -291,6 +308,24 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
       method: 'POST',
       path: `/apps/${params.appId}/copy`,
       body,
+    });
+  },
+
+  /**
+   * Get app roles
+   *
+   * Retrieves all of the roles for an application. Requires admin access to an app.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getRoles
+   */
+  getRoles(params: GetRolesParams): Promise<GetRolesResponse> {
+    return request<GetRolesResponse>({
+      method: 'GET',
+      path: `/apps/${params.appId}/roles`,
     });
   },
 
@@ -445,9 +480,9 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @param body - Request body
    * @param body.summaryFields - Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - Array of field ids in the parent table that will become lookup fields in the child table. (optional)
+   * @param body.lookupFieldIds - Array of field IDs in the parent table that will become lookup fields in the child table. (optional)
    * @param body.parentTableId - The parent table id for the relationship.
-   * @param body.foreignKeyField - This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>’, where <record> is the name of a record in the parent table. (optional)
+   * @param body.foreignKeyField - This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>', where <record> is the name of a record in the parent table. (optional)
    *
    * @returns Success
    *
@@ -471,7 +506,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @param body - Request body (optional)
    * @param body.summaryFields - An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - An array of field ids on the parent table that will become lookup fields on the child table. (optional)
+   * @param body.lookupFieldIds - An array of field IDs on the parent table that will become lookup fields on the child table. (optional)
    *
    * @returns Success
    *
@@ -619,12 +654,12 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * @param params.tableId - The unique identifier of the table.
    *
    * @param body - Request body
-   * @param body.audited - Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/user-assistance/audit_logs.html). Defaults to false. (optional)
+   * @param body.audited - Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/docs/audit-logs). Defaults to false. (optional)
    * @param body.fieldHelp - The configured help text shown to users within the product. (optional)
    * @param body.bold - Indicates if the field is configured to display in bold in the product. Defaults to false. (optional)
    * @param body.properties - Specific field properties. (optional)
    * @param body.appearsByDefault - Indicates if the field is marked as a default in reports. Defaults to true. (optional)
-   * @param body.fieldType - The [field types](https://help.quickbase.com/user-assistance/field_types.html), click on any of the field type links for more info.
+   * @param body.fieldType - The [field types](https://help.quickbase.com/docs/field-types), click on any of the field type links for more info.
    * @param body.permissions - Field Permissions for different roles. (optional)
    * @param body.addToForms - Whether the field you are adding should appear on forms. Defaults to false. (optional)
    * @param body.label - The label (name) of the field.
@@ -652,7 +687,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * @param params.tableId - The unique identifier of the table.
    *
    * @param body - Request body
-   * @param body.fieldIds - List of field ids to be deleted.
+   * @param body.fieldIds - List of field IDs to be deleted.
    *
    * @returns Success
    *
@@ -692,7 +727,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   /**
    * Update a field
    *
-   * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field’s new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
+   * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field's new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
    *
    * @param params.tableId - The unique identifier of the table.
    * @param params.fieldId - The unique identifier (fid) of the field.
@@ -797,7 +832,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * @param body.to - The table identifier.
    * @param body.data - Record data array, where each record contains key-value mappings of fields to be defined/updated and their values. (optional)
    * @param body.mergeFieldId - The merge field id. (optional)
-   * @param body.fieldsToReturn - Specify an array of field ids that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. (optional)
+   * @param body.fieldsToReturn - Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. (optional)
    *
    * @returns Response
    *
@@ -840,7 +875,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @param body - Request body
    * @param body.from - The unique identifier of the table.
-   * @param body.where - The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field.
+   * @param body.where - The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. Or supply a JSON array of Record IDs.
    *
    * @returns Successful delete records response.
    *
@@ -861,10 +896,10 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @param body - Request body
    * @param body.options - Additional query options. (optional)
-   * @param body.where - The filter, using the Quickbase query language, which determines the records to return. If this parameter is omitted, the query will return all records. (optional)
+   * @param body.where - The filter, using the Quickbase query language, which determines the records to return. Or supply a JSON array of Record IDs. If this parameter is omitted, the query will return all records. (optional)
    * @param body.groupBy - An array that contains the fields to group the records by. (optional)
-   * @param body.sortBy - An array of field IDs and sort directions. If this attribute is not set or set to false, queries will be unsorted to improve performance. (optional)
-   * @param body.select - An array of field ids for the fields that should be returned in the response. If empty, the default columns on the table will be returned. (optional)
+   * @param body.sortBy - The sortBy (optional)
+   * @param body.select - An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. (optional)
    * @param body.from - The table identifier.
    *
    * @returns Success
@@ -899,6 +934,31 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
       });
     };
     return createPaginatedRequest(executor, { paginatedExecutor, autoPaginate });
+  },
+
+  /**
+   * Get records modified since
+   *
+   * Checks for record changes on the current table and crawls the record dependency graph based on a provided field list. This determines if records on the table changed after the provided timestamp, when factoring in their dependencies. This API requires app admin permissions and only reviews lookup and summary fields in supported relationships.
+  To return deleted records for the current table, 'Index record changes' must be enabled.
+  Dependent tables only evaluate current records, and deleted records are not supported.
+   *
+   * @param body - Request body (optional)
+   * @param body.after - A timestamp, formatted in ISO-8601 UTC, representing the date and time to search.
+   * @param body.fieldList - List of field IDs. Each field is crawled across the entire record dependency graph to find its source record's date modified. If one is not provided, only the current table will be referenced. (optional)
+   * @param body.includeDetails - When true, the individual record IDs and timestamps will be returned. If false, only the count of changes will be returned. (optional)
+   * @param body.from - The table identifier.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/recordsModifiedSince
+   */
+  recordsModifiedSince(body?: RecordsModifiedSinceRequest): Promise<RecordsModifiedSinceResponse> {
+    return request<RecordsModifiedSinceResponse>({
+      method: 'POST',
+      path: '/records/modifiedSince',
+      body,
+    });
   },
 
   /**
@@ -1348,23 +1408,23 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   /**
    * Get event summaries
    *
-   * Get event summaries for any span of days up to one year and excluding future dates.  
+   * Get event summaries for any span of days up to one year and excluding future dates.
   **Note:** This API is available for enterprise users only. Data is updated hourly; to ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
    *
    * @param params.accountId - The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen. (optional)
    *
-   * @param body - Request body (optional)
+   * @param body - Request body
    * @param body.start - The start date and time of the requested summaries in ISO 8601 time format.
    * @param body.end - The end date and time of the requested summaries in ISO 8601 time format.
+   * @param body.nextToken - A pagination token from a previous response made using the same parameters. Used to fetch the next page. (optional)
    * @param body.groupBy - How the events should be grouped.
-   * @param body.nextToken - A pagination token from a previous response. Used to fetch the next page. (optional)
    * @param body.where - A list of items to filter events by. Only events which match ALL criteria will be included in the results. (optional)
    *
    * @returns Event summaries returned succesfully
    *
    * @see https://developer.quickbase.com/operation/platformAnalyticEventSummaries
    */
-  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body?: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse> {
+  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse> {
     const executor = () => {
       return request<PlatformAnalyticEventSummariesResponse>({
         method: 'POST',
@@ -1399,10 +1459,10 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   /**
    * Export a solution
    *
-   * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/docs/qbl-definition-structure-and-syntax).  
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://help.quickbase.com/docs/qbl-versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of a solution
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
    * @returns Success
    *
@@ -1419,9 +1479,9 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Update a solution
    *
    * Updates the solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of a solution
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
    * @param body - The QBL to be used for the update. (optional)
    *
@@ -1441,7 +1501,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Create a solution
    *
    * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param body - The QBL to be used for the create.
    *
@@ -1461,7 +1521,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Export solution to record
    *
    * Exports the solution and outputs the resulting QBL in a new record in the specified table. The QBL will be saved to a file in the file attachment field that is specified. The table cannot have any required fields besides the file attachment field.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -1483,7 +1543,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Create solution from record
    *
    * Creates a solution using the QBL from the specified record.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
@@ -1505,7 +1565,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Update solution from record
    *
    * Updates a solution using the QBL from the specified record.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -1528,7 +1588,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * List solution changes
    *
    * Returns a list of changes that would occur if the provided QBL were to be applied. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    *
@@ -1550,7 +1610,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * List solution changes from record
    *
    * Returns a list of changes that would occur if the QBL from the provided record were to be applied.  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/articles/30119680754068-QBL-version-0-4-overview) in our QBL documentation.
+   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
@@ -1572,7 +1632,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   /**
    * Generate a document
    *
-   * Generates a document from a template. This feature is only available on business or enterprise plans.
+   * Generates a document from a template. After changing a template, allow up to 15 minutes for documents generated via the API to reflect the changes. This feature is only available on business or enterprise plans.
    *
    * @param params.templateId - This is the ID of document template.
    * @param params.tableId - The unique identifier of the table.
@@ -1594,6 +1654,105 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
       method: 'GET',
       path: `/docTemplates/${params.templateId}/generate`,
       query: { tableId: params.tableId, recordId: params.recordId, filename: params.filename, format: params.format, margin: params.margin, unit: params.unit, pageSize: params.pageSize, orientation: params.orientation, realm: params.realm },
+    });
+  },
+
+  /**
+   * Get solution information
+   *
+   * Returns the metadata and resource information for a solution, including both real and logical IDs of apps and pipelines contained within the solution. This endpoint provides programmatic access to solution structure information.
+   *
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getSolutionPublic
+   */
+  getSolutionPublic(params: GetSolutionPublicParams): Promise<GetSolutionPublicResponse> {
+    return request<GetSolutionPublicResponse>({
+      method: 'GET',
+      path: `/solutions/${params.solutionId}/resources`,
+    });
+  },
+
+  /**
+   * Get trustees for an app
+   *
+   * Returns the list of trustees for a specific application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getTrustees
+   */
+  getTrustees(params: GetTrusteesParams): Promise<GetTrusteesResponse> {
+    return request<GetTrusteesResponse>({
+      method: 'GET',
+      path: `/app/${params.appId}/trustees`,
+    });
+  },
+
+  /**
+   * Add trustees to an app
+   *
+   * Add trustees to the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/addTrustees
+   */
+  addTrustees(params: AddTrusteesParams, body?: AddTrusteesRequest): Promise<AddTrusteesResponse> {
+    return request<AddTrusteesResponse>({
+      method: 'POST',
+      path: `/app/${params.appId}/trustees`,
+      body,
+    });
+  },
+
+  /**
+   * Remove trustees from an app
+   *
+   * Remove trustees from the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/removeTrustees
+   */
+  removeTrustees(params: RemoveTrusteesParams, body?: RemoveTrusteesRequest): Promise<RemoveTrusteesResponse> {
+    return request<RemoveTrusteesResponse>({
+      method: 'DELETE',
+      path: `/app/${params.appId}/trustees`,
+      body,
+    });
+  },
+
+  /**
+   * Update trustees of an app
+   *
+   * Update trustees for the specified application. Trustees include users, groups and email domain groups.
+   *
+   * @param params.appId - The unique identifier of an app
+   *
+   * @param body - Request body (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/updateTrustees
+   */
+  updateTrustees(params: UpdateTrusteesParams, body?: UpdateTrusteesRequest): Promise<UpdateTrusteesResponse> {
+    return request<UpdateTrusteesResponse>({
+      method: 'PATCH',
+      path: `/app/${params.appId}/trustees`,
+      body,
     });
   },
   };

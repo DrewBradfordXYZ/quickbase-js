@@ -60,6 +60,16 @@
     ]
   },
   {
+    "operationId": "getRoles",
+    "method": "GET",
+    "path": "/apps/{appId}/roles",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Apps"
+    ]
+  },
+  {
     "operationId": "getAppTables",
     "method": "GET",
     "path": "/tables",
@@ -290,6 +300,16 @@
     ]
   },
   {
+    "operationId": "recordsModifiedSince",
+    "method": "POST",
+    "path": "/records/modifiedSince",
+    "hasParams": false,
+    "hasBody": true,
+    "tags": [
+      "Records"
+    ]
+  },
+  {
     "operationId": "getTempTokenDBID",
     "method": "GET",
     "path": "/auth/temporary/{dbid}",
@@ -416,7 +436,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -426,7 +446,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -436,7 +456,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -446,7 +466,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -456,7 +476,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -466,7 +486,7 @@
     "hasParams": true,
     "hasBody": true,
     "tags": [
-      "Users"
+      "Groups"
     ]
   },
   {
@@ -587,6 +607,56 @@
     "hasBody": false,
     "tags": [
       "Document Templates"
+    ]
+  },
+  {
+    "operationId": "getSolutionPublic",
+    "method": "GET",
+    "path": "/solutions/{solutionId}/resources",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Solutions"
+    ]
+  },
+  {
+    "operationId": "getTrustees",
+    "method": "GET",
+    "path": "/app/{appId}/trustees",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Trustees"
+    ]
+  },
+  {
+    "operationId": "addTrustees",
+    "method": "POST",
+    "path": "/app/{appId}/trustees",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Trustees"
+    ]
+  },
+  {
+    "operationId": "removeTrustees",
+    "method": "DELETE",
+    "path": "/app/{appId}/trustees",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Trustees"
+    ]
+  },
+  {
+    "operationId": "updateTrustees",
+    "method": "PATCH",
+    "path": "/app/{appId}/trustees",
+    "hasParams": true,
+    "hasBody": true,
+    "tags": [
+      "Trustees"
     ]
   }
 ]
