@@ -1344,8 +1344,7 @@ describe('XmlClient response transformation', () => {
   });
 
   it('should add table aliases to getAppDTMInfo response', async () => {
-    const mock = createMockCaller({
-      response: `<?xml version="1.0" ?>
+    const dtmResponse = `<?xml version="1.0" ?>
 <qdbapi>
    <action>API_GetAppDTMInfo</action>
    <errcode>0</errcode>
@@ -1361,10 +1360,21 @@ describe('XmlClient response transformation', () => {
          <lastModifiedTime>1234567891</lastModifiedTime>
       </table>
    </tables>
-</qdbapi>`,
-    });
+</qdbapi>`;
 
-    const client = new XmlClient(mock, { schema: testSchema });
+    // GetAppDTMInfo bypasses doXml and makes a direct unauthenticated fetch,
+    // so we need a mock fetchApi instead of a mock Caller response.
+    const mock = createMockCaller();
+    const mockFetch = (async (url: string, init?: RequestInit) => {
+      // Verify no auth headers are sent
+      const headers = init?.headers as Record<string, string> | undefined;
+      if (headers?.['Authorization']) {
+        throw new Error('GetAppDTMInfo should not send Authorization header');
+      }
+      return new Response(dtmResponse, { status: 200 });
+    }) as typeof globalThis.fetch;
+
+    const client = new XmlClient(mock, { schema: testSchema, fetchApi: mockFetch });
     const result = await client.getAppDTMInfo('projects');
 
     expect(result.appAlias).toBe('projects');

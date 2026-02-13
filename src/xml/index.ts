@@ -32,7 +32,7 @@ export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, is
 import { ReadOnlyError } from '../core/errors.js';
 import type { ResolvedSchema } from '../core/types.js';
 import { resolveTableAlias, resolveFieldAlias } from '../core/schema.js';
-import { injectAppToken, injectUserToken } from './request.js';
+import { buildRequest, escapeXml, injectAppToken, injectUserToken } from './request.js';
 
 // Import response transformation functions and types
 import {
@@ -257,6 +257,11 @@ export interface XmlClientOptions {
   schema?: ResolvedSchema;
   /** App token for apps that require application tokens (XML API only) */
   appToken?: string;
+  /**
+   * Custom fetch function for direct HTTP requests (e.g., GetAppDTMInfo which
+   * bypasses doXml to avoid sending auth tokens). Defaults to globalThis.fetch.
+   */
+  fetchApi?: typeof globalThis.fetch;
 }
 
 /**
@@ -269,11 +274,13 @@ export class XmlClient {
   private readonly caller: XmlCaller;
   private readonly readOnly: boolean;
   private readonly schema?: ResolvedSchema;
+  private readonly fetchApi: typeof globalThis.fetch;
 
   constructor(caller: XmlCaller, options?: XmlClientOptions) {
     this.caller = caller;
     this.readOnly = options?.readOnly ?? false;
     this.schema = options?.schema;
+    this.fetchApi = options?.fetchApi ?? globalThis.fetch;
     // Note: appToken is handled by the caller closure, not stored here
   }
 
@@ -846,10 +853,39 @@ export class XmlClient {
 
   /**
    * Get modification timestamps (fast, no auth required).
+   *
+   * This method bypasses the normal doXml transport and makes a direct
+   * unauthenticated HTTP request. The QuickBase docs state "No ticket or
+   * app token is required" for this call, and sending a user token causes
+   * rejection ("User Tokens cannot be used to call this API").
+   *
    * @see https://help.quickbase.com/docs/api-getappdtminfo
    */
   async getAppDTMInfo(appId: string): Promise<GetAppDTMInfoResultWithAlias> {
-    const result = await getAppDTMInfoImpl(this.caller, this.resolveTable(appId));
+    const resolvedId = this.resolveTable(appId);
+    const inner = `<dbid>${escapeXml(resolvedId)}</dbid>`;
+    const body = buildRequest(inner);
+    const url = `https://${this.caller.realm()}.quickbase.com/db/main`;
+
+    // Direct unauthenticated fetch — no user token, no app token
+    const response = await this.fetchApi(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/xml',
+        'QUICKBASE-ACTION': 'API_GetAppDTMInfo',
+      },
+      body,
+      credentials: 'omit',
+    });
+
+    const xml = await response.text();
+
+    // Reuse getAppDTMInfoImpl with a passthrough caller that returns pre-fetched XML
+    const result = await getAppDTMInfoImpl(
+      { realm: this.caller.realm, doXml: async () => xml },
+      resolvedId
+    );
+
     return transformGetAppDTMInfoResult(result, this.schema);
   }
 
@@ -1153,6 +1189,7 @@ export function createXmlClient(
   const resolvedOptions: XmlClientOptions = {
     readOnly: options?.readOnly ?? config.readOnly ?? false,
     schema: options?.schema ?? config.schema,
+    fetchApi: options?.fetchApi ?? config.fetchApi,
   };
 
   return new XmlClient(caller, resolvedOptions);
