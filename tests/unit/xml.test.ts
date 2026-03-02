@@ -91,7 +91,7 @@ describe('XmlClient.getRoleInfo', () => {
       response: `<?xml version="1.0" ?>
 <qdbapi>
    <action>API_GetRoleInfo</action>
-   <errcode>4</errcode>
+   <errcode>3</errcode>
    <errtext>User not authorized</errtext>
 </qdbapi>`,
     });
@@ -869,21 +869,23 @@ describe('XmlClient read-only mode', () => {
 
 describe('Error helpers', () => {
   it('should identify unauthorized errors', () => {
-    const err = new XmlError(4, 'User not authorized');
+    // XmlErrorCode.Unauthorized = 3
+    const err = new XmlError(3, 'User not authorized');
     expect(isUnauthorized(err)).toBe(true);
     expect(isNotFound(err)).toBe(false);
     expect(isInvalidTicket(err)).toBe(false);
   });
 
   it('should identify not found errors', () => {
+    // XmlErrorCode.NoSuchDatabase = 6
     const err = new XmlError(6, 'No such database');
     expect(isNotFound(err)).toBe(true);
     expect(isUnauthorized(err)).toBe(false);
   });
 
   it('should identify invalid ticket errors', () => {
-    // XmlErrorCode.InvalidTicket = 8
-    const err = new XmlError(8, 'Invalid ticket');
+    // XmlErrorCode.InvalidTicket = 4
+    const err = new XmlError(4, 'Invalid ticket');
     expect(isInvalidTicket(err)).toBe(true);
     expect(isUnauthorized(err)).toBe(false);
   });

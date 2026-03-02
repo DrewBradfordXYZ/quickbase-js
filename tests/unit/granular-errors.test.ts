@@ -10,10 +10,10 @@ import {
 
 describe('Granular Error Handling', () => {
   describe('checkError mapping', () => {
-    it('should throw QuickbaseTicketError for invalid ticket (code 8)', () => {
+    it('should throw QuickbaseTicketError for invalid ticket (code 4)', () => {
       const resp = {
         action: 'API_DoQuery',
-        errcode: XmlErrorCode.InvalidTicket,
+        errcode: XmlErrorCode.InvalidTicket, // 4
         errtext: 'Invalid ticket',
         errdetail: 'Your ticket has expired'
       };
@@ -24,18 +24,18 @@ describe('Granular Error Handling', () => {
       } catch (err) {
         expect(err).toBeInstanceOf(QuickbaseTicketError);
         const ticketErr = err as QuickbaseTicketError;
-        expect(ticketErr.code).toBe(8);
+        expect(ticketErr.code).toBe(4);
         expect(ticketErr.message).toBe('Invalid ticket');
         expect(ticketErr.description).toBe('Your ticket has expired');
         expect(ticketErr.statusCode).toBe(401);
       }
     });
 
-    it('should throw QuickbaseAppTokenError for app token required (code 22)', () => {
+    it('should throw QuickbaseAppTokenError for invalid app token (code 24)', () => {
       const resp = {
         action: 'API_DoQuery',
-        errcode: XmlErrorCode.AppTokenRequired,
-        errtext: 'App token required',
+        errcode: XmlErrorCode.InvalidAppToken, // 24
+        errtext: 'Invalid app token',
       };
 
       try {
@@ -44,45 +44,15 @@ describe('Granular Error Handling', () => {
       } catch (err) {
         expect(err).toBeInstanceOf(QuickbaseAppTokenError);
         const appTokenErr = err as QuickbaseAppTokenError;
-        expect(appTokenErr.code).toBe(22);
+        expect(appTokenErr.code).toBe(24);
         expect(appTokenErr.statusCode).toBe(403);
-      }
-    });
-
-    it('should throw QuickbaseAppTokenError for invalid app token (code 23)', () => {
-      const resp = {
-        action: 'API_DoQuery',
-        errcode: XmlErrorCode.InvalidAppToken,
-        errtext: 'Invalid app token',
-      };
-
-      try {
-        checkError(resp);
-      } catch (err) {
-        expect(err).toBeInstanceOf(QuickbaseAppTokenError);
-        expect((err as QuickbaseAppTokenError).code).toBe(23);
-      }
-    });
-
-    it('should throw QuickbaseAppTokenError for expired app token (code 24)', () => {
-      const resp = {
-        action: 'API_DoQuery',
-        errcode: XmlErrorCode.ExpiredAppToken,
-        errtext: 'Expired app token',
-      };
-
-      try {
-        checkError(resp);
-      } catch (err) {
-        expect(err).toBeInstanceOf(QuickbaseAppTokenError);
-        expect((err as QuickbaseAppTokenError).code).toBe(24);
       }
     });
 
     it('should throw XmlError (QuickbaseXmlError) for other codes', () => {
       const resp = {
         action: 'API_DoQuery',
-        errcode: XmlErrorCode.NoSuchDatabase,
+        errcode: XmlErrorCode.NoSuchDatabase, // 6
         errtext: 'No such database',
       };
 
@@ -100,7 +70,7 @@ describe('Granular Error Handling', () => {
 
   describe('Error serialization', () => {
     it('should serialize to JSON correctly', () => {
-      const err = new QuickbaseTicketError('Session expired', 8, { 
+      const err = new QuickbaseTicketError('Session expired', 4, { 
         description: 'Detail',
         action: 'API_Authenticate' 
       });
@@ -108,7 +78,7 @@ describe('Granular Error Handling', () => {
       const json = err.toJSON();
       expect(json.name).toBe('QuickbaseTicketError');
       expect(json.message).toBe('Session expired');
-      expect(json.code).toBe(8);
+      expect(json.code).toBe(4);
       expect(json.statusCode).toBe(401);
       expect(json.description).toBe('Detail');
     });

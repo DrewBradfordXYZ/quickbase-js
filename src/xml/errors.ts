@@ -16,28 +16,30 @@ import { QuickbaseTicketError, QuickbaseAppTokenError, QuickbaseXmlError } from 
 export const XmlErrorCode = {
   /** No error (success) */
   Success: 0,
-  /** User is not authorized for this action */
-  Unauthorized: 4,
   /** Invalid input parameters */
-  InvalidInput: 5,
+  InvalidInput: 2,
+  /** User is not authorized for this action */
+  Unauthorized: 3,
+  /** Authentication ticket is invalid or expired (Bad Ticket) */
+  InvalidTicket: 4,
   /** Database/table does not exist */
   NoSuchDatabase: 6,
-  /** Access to the resource is denied */
-  AccessDenied: 7,
-  /** Authentication ticket is invalid or expired */
-  InvalidTicket: 8,
-  /** Application token is required but was not provided */
-  AppTokenRequired: 22,
-  /** Application token is invalid */
-  InvalidAppToken: 23,
-  /** Application token has expired */
-  ExpiredAppToken: 24,
+  /** SSL is required for this application/table */
+  SSLRequired: 8,
+  /** Realm IP filtering is in place */
+  UnauthorizedIP: 19,
+  /** Application token provided is invalid or not assigned */
+  InvalidAppToken: 24,
   /** Record does not exist */
   NoSuchRecord: 30,
   /** Field does not exist */
   NoSuchField: 31,
+  /** Application does not exist or was deleted */
+  NoSuchApp: 32,
   /** User does not exist */
   NoSuchUser: 33,
+  /** Access denied */
+  AccessDenied: 83,
 } as const;
 
 /**
@@ -70,9 +72,7 @@ export function checkError(resp: BaseResponse): void {
   }
 
   if (
-    resp.errcode === XmlErrorCode.AppTokenRequired ||
-    resp.errcode === XmlErrorCode.InvalidAppToken ||
-    resp.errcode === XmlErrorCode.ExpiredAppToken
+    resp.errcode === XmlErrorCode.InvalidAppToken
   ) {
     throw new QuickbaseAppTokenError(resp.errtext, resp.errcode, {
       description: resp.errdetail,
@@ -84,7 +84,7 @@ export function checkError(resp: BaseResponse): void {
 }
 
 /**
- * Check if the error is an authorization error (code 4 or 7)
+ * Check if the error is an authorization error (code 3 or 83)
  */
 export function isUnauthorized(err: unknown): boolean {
   if (err instanceof XmlError) {
@@ -103,6 +103,7 @@ export function isNotFound(err: unknown): boolean {
   if (err instanceof XmlError) {
     return (
       err.code === XmlErrorCode.NoSuchDatabase ||
+      err.code === XmlErrorCode.NoSuchApp ||
       err.code === XmlErrorCode.NoSuchRecord ||
       err.code === XmlErrorCode.NoSuchField ||
       err.code === XmlErrorCode.NoSuchUser
