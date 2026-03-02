@@ -164,6 +164,80 @@ export class ServerError extends QuickbaseError {
 }
 
 /**
+ * Error thrown when an authentication ticket is invalid or expired.
+ * Specifically for ticket-based authentication (XML API).
+ */
+export class QuickbaseTicketError extends QuickbaseError {
+  readonly code: number;
+
+  constructor(message: string, code: number, options?: { description?: string; action?: string; cause?: Error }) {
+    super(message, 401, options);
+    this.name = 'QuickbaseTicketError';
+    this.code = code;
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      code: this.code,
+    };
+  }
+}
+
+/**
+ * Error thrown when an application token is missing or invalid.
+ * Specifically for apps that require app tokens (XML API).
+ */
+export class QuickbaseAppTokenError extends QuickbaseError {
+  readonly code: number;
+
+  constructor(message: string, code: number, options?: { description?: string; action?: string; cause?: Error }) {
+    super(message, 403, options);
+    this.name = 'QuickbaseAppTokenError';
+    this.code = code;
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      code: this.code,
+    };
+  }
+}
+
+/**
+ * Error thrown by the legacy QuickBase XML API.
+ * Wraps XML-specific error codes and messages.
+ */
+export class QuickbaseXmlError extends QuickbaseError {
+  readonly code: number;
+  readonly text: string;
+  readonly action?: string;
+
+  constructor(code: number, text: string, options?: { description?: string; action?: string; cause?: Error }) {
+    const message = options?.description
+      ? `XML API error ${code}: ${text} (${options.description})`
+      : `XML API error ${code}: ${text}`;
+    
+    // Most XML errors return HTTP 200, so we use 0 or a mapped status if known
+    super(message, 0, { rayId: undefined, description: options?.description, cause: options?.cause });
+    this.name = 'QuickbaseXmlError';
+    this.code = code;
+    this.text = text;
+    this.action = options?.action;
+  }
+
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      code: this.code,
+      text: this.text,
+      action: this.action,
+    };
+  }
+}
+
+/**
  * Parse an error response from the QuickBase API
  */
 export async function parseErrorResponse(

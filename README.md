@@ -999,6 +999,9 @@ import {
   NotFoundError,
   ValidationError,
   ServerError,
+  QuickbaseTicketError,
+  QuickbaseAppTokenError,
+  QuickbaseXmlError,
   ReadOnlyError,
 } from 'quickbase-js';
 
@@ -1007,9 +1010,14 @@ try {
 } catch (error) {
   if (error instanceof RateLimitError) {
     console.log(`Rate limited. Retry after ${error.retryAfter} seconds`);
-    console.log(`Ray ID: ${error.rayId}`);
   } else if (error instanceof AuthenticationError) {
     console.log('Invalid or expired token');
+  } else if (error instanceof QuickbaseTicketError) {
+    console.log('XML Ticket expired or invalid');
+  } else if (error instanceof QuickbaseAppTokenError) {
+    console.log('Missing or invalid App Token');
+  } else if (error instanceof QuickbaseXmlError) {
+    console.log(`XML API error ${error.code}: ${error.text}`);
   } else if (error instanceof AuthorizationError) {
     console.log('Permission denied');
   } else if (error instanceof NotFoundError) {

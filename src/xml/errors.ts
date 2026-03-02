@@ -8,6 +8,7 @@
  */
 
 import type { BaseResponse } from './types.js';
+import { QuickbaseTicketError, QuickbaseAppTokenError, QuickbaseXmlError } from '../core/errors.js';
 
 /**
  * Common QuickBase XML API error codes
@@ -25,6 +26,12 @@ export const XmlErrorCode = {
   AccessDenied: 7,
   /** Authentication ticket is invalid or expired */
   InvalidTicket: 8,
+  /** Application token is required but was not provided */
+  AppTokenRequired: 22,
+  /** Application token is invalid */
+  InvalidAppToken: 23,
+  /** Application token has expired */
+  ExpiredAppToken: 24,
   /** Record does not exist */
   NoSuchRecord: 30,
   /** Field does not exist */
@@ -34,24 +41,14 @@ export const XmlErrorCode = {
 } as const;
 
 /**
- * Error returned by the QuickBase XML API
+ * Error returned by the QuickBase XML API.
+ * 
+ * XML-API: This class is a legacy alias for QuickbaseXmlError.
  */
-export class XmlError extends Error {
-  readonly code: number;
-  readonly text: string;
-  readonly detail?: string;
-  readonly action?: string;
-
+export class XmlError extends QuickbaseXmlError {
   constructor(code: number, text: string, detail?: string, action?: string) {
-    const msg = detail
-      ? `XML API error ${code}: ${text} (${detail})`
-      : `XML API error ${code}: ${text}`;
-    super(msg);
+    super(code, text, { description: detail, action });
     this.name = 'XmlError';
-    this.code = code;
-    this.text = text;
-    this.detail = detail;
-    this.action = action;
   }
 }
 
@@ -63,6 +60,26 @@ export function checkError(resp: BaseResponse): void {
   if (resp.errcode === 0) {
     return;
   }
+
+  // Map to specialized error types
+  if (resp.errcode === XmlErrorCode.InvalidTicket) {
+    throw new QuickbaseTicketError(resp.errtext, resp.errcode, {
+      description: resp.errdetail,
+      action: resp.action,
+    });
+  }
+
+  if (
+    resp.errcode === XmlErrorCode.AppTokenRequired ||
+    resp.errcode === XmlErrorCode.InvalidAppToken ||
+    resp.errcode === XmlErrorCode.ExpiredAppToken
+  ) {
+    throw new QuickbaseAppTokenError(resp.errtext, resp.errcode, {
+      description: resp.errdetail,
+      action: resp.action,
+    });
+  }
+
   throw new XmlError(resp.errcode, resp.errtext, resp.errdetail, resp.action);
 }
 

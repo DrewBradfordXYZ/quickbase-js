@@ -53,6 +53,9 @@ export {
   ValidationError,
   TimeoutError,
   ServerError,
+  QuickbaseTicketError,
+  QuickbaseAppTokenError,
+  QuickbaseXmlError,
   ReadOnlyError,
 } from './core/index.js';
 
@@ -187,6 +190,7 @@ export {
   XmlClient,
   XmlError,
   XmlErrorCode,
+  checkError,
   isUnauthorized as isXmlUnauthorized,
   isNotFound as isXmlNotFound,
   isInvalidTicket as isXmlInvalidTicket,

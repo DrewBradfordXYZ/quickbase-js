@@ -766,7 +766,7 @@ describe('XmlClient code pages', () => {
       response: `<?xml version="1.0" ?>
 <qdbapi>
    <action>API_GetDBPage</action>
-   <errcode>24</errcode>
+   <errcode>32</errcode>
    <errtext>No such page</errtext>
 </qdbapi>`,
     });

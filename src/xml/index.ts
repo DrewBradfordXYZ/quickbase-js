@@ -26,7 +26,7 @@
 
 // Re-export types
 export * from './types.js';
-export { XmlError, XmlErrorCode, isUnauthorized, isNotFound, isInvalidTicket, isInvalidInput } from './errors.js';
+export { XmlError, XmlErrorCode, checkError, isUnauthorized, isNotFound, isInvalidTicket, isInvalidInput } from './errors.js';
 
 // Import ReadOnlyError for consistent error handling
 import { ReadOnlyError } from '../core/errors.js';
