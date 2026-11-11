@@ -364,12 +364,13 @@ export type GetTableReportsItem = {
   description?: string;
   ownerId?: OwnerId;
   query?: GetTableReportsItemQuery;
-  /** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
-  properties?: Record<string, unknown>;
+  properties?: GetTableReportsItemProperties;
   /** The instant at which a report was last used. */
   usedLast?: string;
   /** The number of times a report has been used. */
   usedCount?: number;
+  /** Whether the report definition could not be fully returned. */
+  incomplete?: boolean;
   [key: string]: unknown;
 };
 
@@ -393,6 +394,81 @@ export type GetTableReportsItemQuery = {
     decimalPrecision?: number;
     [key: string]: unknown;
   })[];
+  /** The report's columns, as field ids in display order. */
+  fields?: number[];
+  /** Fields the report sorts by. */
+  sortBy?: {
+    fieldId?: number;
+    order?: string;
+    [key: string]: unknown;
+  }[];
+  /** Fields the report groups by. */
+  groupBy?: {
+    fieldId?: number;
+    grouping?: string;
+    [key: string]: unknown;
+  }[];
+  [key: string]: unknown;
+};
+
+/** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
+export type GetTableReportsItemProperties = {
+  displayOnlyNewOrChangedRecords?: boolean;
+  showRowNumbers?: boolean;
+  /** Table reports: per-column settings. */
+  columnProperties?: {
+    fieldId?: number;
+    labelOverride?: string;
+    required?: boolean;
+    justification?: number;
+    [key: string]: unknown;
+  }[];
+  /** Chart reports: the chart type. */
+  chartType?: string;
+  /** Chart reports: the category axis. */
+  categories?: {
+    fieldId?: number;
+    grouping?: string;
+    label?: string;
+    order?: string;
+    [key: string]: unknown;
+  };
+  /** Chart reports: the plotted values. */
+  dataSources?: {
+    type?: string;
+    fieldId?: number;
+    aggregation?: string;
+    [key: string]: unknown;
+  }[];
+  dataLabel?: string;
+  dataSourceLabel?: string;
+  goal?: {
+    label?: string;
+    value?: number;
+    [key: string]: unknown;
+  };
+  /** Chart reports: how categories are ordered. */
+  sortBy?: {
+    by?: string;
+    order?: string;
+    [key: string]: unknown;
+  }[];
+  /** Summary reports: the summarized columns. */
+  summarize?: {
+    type?: string;
+    fieldId?: number;
+    aggregation?: string;
+    showAs?: number;
+    [key: string]: unknown;
+  }[];
+  /** Summary reports: summary formula columns. */
+  summaryFormulas?: unknown[];
+  /** Summary reports: summary variables. */
+  summaryVariables?: unknown[];
+  /** Map reports: the address field. */
+  addressFieldId?: number;
+  /** Map reports: the map view. */
+  mapViewType?: string;
   [key: string]: unknown;
 };
 
@@ -416,6 +492,81 @@ export type GetReportQuery = {
     decimalPrecision?: number;
     [key: string]: unknown;
   })[];
+  /** The report's columns, as field ids in display order. */
+  fields?: number[];
+  /** Fields the report sorts by. */
+  sortBy?: {
+    fieldId?: number;
+    order?: string;
+    [key: string]: unknown;
+  }[];
+  /** Fields the report groups by. */
+  groupBy?: {
+    fieldId?: number;
+    grouping?: string;
+    [key: string]: unknown;
+  }[];
+  [key: string]: unknown;
+};
+
+/** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
+export type GetReportProperties = {
+  displayOnlyNewOrChangedRecords?: boolean;
+  showRowNumbers?: boolean;
+  /** Table reports: per-column settings. */
+  columnProperties?: {
+    fieldId?: number;
+    labelOverride?: string;
+    required?: boolean;
+    justification?: number;
+    [key: string]: unknown;
+  }[];
+  /** Chart reports: the chart type. */
+  chartType?: string;
+  /** Chart reports: the category axis. */
+  categories?: {
+    fieldId?: number;
+    grouping?: string;
+    label?: string;
+    order?: string;
+    [key: string]: unknown;
+  };
+  /** Chart reports: the plotted values. */
+  dataSources?: {
+    type?: string;
+    fieldId?: number;
+    aggregation?: string;
+    [key: string]: unknown;
+  }[];
+  dataLabel?: string;
+  dataSourceLabel?: string;
+  goal?: {
+    label?: string;
+    value?: number;
+    [key: string]: unknown;
+  };
+  /** Chart reports: how categories are ordered. */
+  sortBy?: {
+    by?: string;
+    order?: string;
+    [key: string]: unknown;
+  }[];
+  /** Summary reports: the summarized columns. */
+  summarize?: {
+    type?: string;
+    fieldId?: number;
+    aggregation?: string;
+    showAs?: number;
+    [key: string]: unknown;
+  }[];
+  /** Summary reports: summary formula columns. */
+  summaryFormulas?: unknown[];
+  /** Summary reports: summary variables. */
+  summaryVariables?: unknown[];
+  /** Map reports: the address field. */
+  addressFieldId?: number;
+  /** Map reports: the map view. */
+  mapViewType?: string;
   [key: string]: unknown;
 };
 
@@ -627,8 +778,18 @@ export type GetFieldsItemProperties = {
   allowHTML?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
+  /** Whether the field is the table's key field. */
+  primaryKey?: boolean;
   /** The summary field's filter (matching criteria) in Quickbase query language, when it has one. */
   summaryQuery?: string;
+  /** For a reference field: the id of the parent table in its relationship. */
+  masterTableId?: string;
+  /** For a reference field: the parent table's key field id. */
+  masterTableKeyFid?: number;
+  /** For a reference field: whether lookup values through it are cached. */
+  fieldCaching?: boolean;
+  /** For a reference field: where the parent record opens when the link is followed. */
+  openTargetIn?: string;
   [key: string]: unknown;
 };
 
@@ -949,8 +1110,18 @@ export type GetFieldProperties = {
   allowHTML?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
+  /** Whether the field is the table's key field. */
+  primaryKey?: boolean;
   /** The summary field's filter (matching criteria) in Quickbase query language, when it has one. */
   summaryQuery?: string;
+  /** For a reference field: the id of the parent table in its relationship. */
+  masterTableId?: string;
+  /** For a reference field: the parent table's key field id. */
+  masterTableKeyFid?: number;
+  /** For a reference field: whether lookup values through it are cached. */
+  fieldCaching?: boolean;
+  /** For a reference field: where the parent record opens when the link is followed. */
+  openTargetIn?: string;
   [key: string]: unknown;
 };
 
@@ -1241,6 +1412,16 @@ export type GetFieldsUsageItemUsage = {
     count: number;
     [key: string]: unknown;
   };
+  /** Custom emails that use the field. */
+  customEmails?: {
+    count?: number;
+    [key: string]: unknown;
+  };
+  /** Document templates that use the field. */
+  documentTemplates?: {
+    count?: number;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 };
 
@@ -1360,6 +1541,16 @@ export type GetFieldUsageItemUsage = {
   webhooks: {
     /** the number of times a field has been used for the given item. */
     count: number;
+    [key: string]: unknown;
+  };
+  /** Custom emails that use the field. */
+  customEmails?: {
+    count?: number;
+    [key: string]: unknown;
+  };
+  /** Document templates that use the field. */
+  documentTemplates?: {
+    count?: number;
     [key: string]: unknown;
   };
   [key: string]: unknown;
@@ -2246,12 +2437,13 @@ export interface GetReportResponse {
   description?: string;
   ownerId?: OwnerId;
   query?: GetReportQuery;
-  /** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
-  properties?: Record<string, unknown>;
+  properties?: GetReportProperties;
   /** The instant at which a report was last used. */
   usedLast?: string;
   /** The number of times a report has been used. */
   usedCount?: number;
+  /** Whether the report definition could not be fully returned. */
+  incomplete?: boolean;
   [key: string]: unknown;
 }
 
