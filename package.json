@@ -35,7 +35,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src tests",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.examples.json",
     "spec:normalize": "tsx spec/tools/cli.ts normalize",
     "spec:patch": "tsx spec/tools/cli.ts patch",
     "spec:validate": "tsx spec/tools/cli.ts validate",
