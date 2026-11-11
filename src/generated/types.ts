@@ -49,6 +49,1625 @@ export type SortByUnion = SortField[] | false;
  */
 export type OwnerId = string | number;
 
+/** Application memory info */
+export type CreateAppMemoryInfo = {
+  /** The estimated memory of this application in gigabytes */
+  estMemory?: number;
+  /** The estimated memory of this application and all dependent applications in gigabytes */
+  estMemoryInclDependentApps?: number;
+};
+
+export type CreateAppVariablesItem = {
+  /** Variable name. */
+  name?: string;
+  /** Variable value. */
+  value?: string;
+  [key: string]: unknown;
+};
+
+/** Security properties of the application */
+export type CreateAppSecurityProperties = {
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Hide from public application searches */
+  hideFromPublic?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Only "approved" users may access this application */
+  mustBeRealmApproved?: boolean;
+  [key: string]: unknown;
+};
+
+/** Application memory info */
+export type GetAppMemoryInfo = {
+  /** The estimated memory of this application in gigabytes */
+  estMemory?: number;
+  /** The estimated memory of this application and all dependent applications in gigabytes */
+  estMemoryInclDependentApps?: number;
+};
+
+export type GetAppVariablesItem = {
+  /** Variable name. */
+  name?: string;
+  /** Variable value. */
+  value?: string;
+  [key: string]: unknown;
+};
+
+/** Security properties of the application */
+export type GetAppSecurityProperties = {
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Hide from public application searches */
+  hideFromPublic?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Only "approved" users may access this application */
+  mustBeRealmApproved?: boolean;
+  [key: string]: unknown;
+};
+
+/** Application memory info */
+export type UpdateAppMemoryInfo = {
+  /** The estimated memory of this application in gigabytes */
+  estMemory?: number;
+  /** The estimated memory of this application and all dependent applications in gigabytes */
+  estMemoryInclDependentApps?: number;
+};
+
+export type UpdateAppVariablesItem = {
+  /** Variable name. */
+  name?: string;
+  /** Variable value. */
+  value?: string;
+  [key: string]: unknown;
+};
+
+/** Security properties of the application */
+export type UpdateAppSecurityProperties = {
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Hide from public application searches */
+  hideFromPublic?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Only "approved" users may access this application */
+  mustBeRealmApproved?: boolean;
+  [key: string]: unknown;
+};
+
+export type GetAppEventsItem = {
+  /** Indication of whether current event is active. */
+  isActive?: boolean;
+  /** Type of an event. */
+  type?: 'webhook' | 'qb-action' | 'email-notification' | 'subscription' | 'reminder' | 'automation';
+  /** The name of the event. This property is not returned for automations. */
+  name?: string;
+  /** The url to automation that can be accessed from the browser. Only returned for automations. */
+  url?: string;
+  owner?: GetAppEventsItemOwner;
+  /** The unique identifier of the table to which event belongs to. */
+  tableId?: string;
+  [key: string]: unknown;
+};
+
+/** The user that owns the event. */
+export type GetAppEventsItemOwner = {
+  /** User full name. */
+  name?: string;
+  /** User Id. */
+  id?: string;
+  /** User email. */
+  email?: string;
+  /** User Name as updated in user properties. Optional, appears if not the same as user email. */
+  userName?: string;
+  [key: string]: unknown;
+};
+
+export type CopyAppVariablesItem = {
+  /** Variable name. */
+  name?: string;
+  /** Variable value. */
+  value?: string;
+  [key: string]: unknown;
+};
+
+export type GetRolesItem = {
+  /** The role id. */
+  id?: number;
+  /** The role name. */
+  name?: string;
+  access?: GetRolesItemAccess;
+  [key: string]: unknown;
+};
+
+/** The role access properties. */
+export type GetRolesItemAccess = {
+  /** The ID of the access type the role is given. (0 = None, 1 = Administrator, 2 = Basic Access with Share, 3 = Basic Access, 4 = Partial Administrator). */
+  id?: number;
+  /** The type of access the role is given. */
+  type?: 'None' | 'Administrator' | 'Basic Access with Share' | 'Basic Access' | 'Partial Administrator';
+  [key: string]: unknown;
+};
+
+export type GetAppTablesItem = {
+  /** The name of the table. */
+  name?: string;
+  /** The unique identifier (dbid) of the table. */
+  id?: string;
+  /** The automatically-created table alias for the table. */
+  alias?: string;
+  /** The description of the table, as configured by an application administrator. */
+  description?: string;
+  /** The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
+  created?: string;
+  /** The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
+  updated?: string;
+  /** The incremental Record ID that will be used when the next record is created, as determined when the API call was ran. */
+  nextRecordId?: number;
+  /** The incremental Field ID that will be used when the next field is created, as determined when the API call was ran. */
+  nextFieldId?: number;
+  /** The id of the field that is configured for default sorting. */
+  defaultSortFieldId?: number;
+  /** The configuration of the default sort order on the table. */
+  defaultSortOrder?: 'ASC' | 'DESC';
+  /** The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID. */
+  keyFieldId?: number;
+  /** The builder-configured singular noun of the table. */
+  singleRecordName?: string;
+  /** The builder-configured plural noun of the table. */
+  pluralRecordName?: string;
+  /** The size limit for the table. */
+  sizeLimit?: string;
+  /** The amount of space currently being used by the table. */
+  spaceUsed?: string;
+  /** The amount of space remaining for use by the table. */
+  spaceRemaining?: string;
+  [key: string]: unknown;
+};
+
+export type GetRelationshipsRelationshipsItem = {
+  /** The relationship id (foreign key field id). */
+  id: number;
+  /** The parent table id of the relationship. */
+  parentTableId: string;
+  /** The child table id of the relationship. */
+  childTableId: string;
+  /** The foreign key field information. */
+  foreignKeyField?: {
+    /** Field id. */
+    id?: number;
+    /** Field label. */
+    label?: string;
+    /** Field type. */
+    type?: string;
+    [key: string]: unknown;
+  };
+  /** Whether this is a cross-app relationship. */
+  isCrossApp: boolean;
+  /** The lookup fields array. */
+  lookupFields?: {
+    /** Field id. */
+    id?: number;
+    /** Field label. */
+    label?: string;
+    /** Field type. */
+    type?: string;
+    [key: string]: unknown;
+  }[];
+  /** The summary fields array. */
+  summaryFields?: {
+    /** Field id. */
+    id?: number;
+    /** Field label. */
+    label?: string;
+    /** Field type. */
+    type?: string;
+    [key: string]: unknown;
+  }[];
+  [key: string]: unknown;
+};
+
+/** Additional information about the results that may be helpful. */
+export type GetRelationshipsMetadata = {
+  /** The number of relationships to skip. */
+  skip?: number;
+  /** The total number of relationships. */
+  totalRelationships?: number;
+  /** The number of relationships in the current response object. */
+  numRelationships?: number;
+  [key: string]: unknown;
+};
+
+/** The foreign key field information. */
+export type CreateRelationshipForeignKeyField = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+export type CreateRelationshipLookupFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+export type CreateRelationshipSummaryFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+/** The foreign key field information. */
+export type UpdateRelationshipForeignKeyField = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+export type UpdateRelationshipLookupFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+export type UpdateRelationshipSummaryFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+export type GetTableReportsItem = {
+  /** The identifier of the report, unique to the table. */
+  id?: string;
+  /** The configured name of the report. */
+  name?: string;
+  /** The type of report in Quickbase (e.g., chart). */
+  type?: string;
+  /** The configured description of a report. */
+  description?: string;
+  ownerId?: OwnerId;
+  query?: GetTableReportsItemQuery;
+  /** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
+  properties?: Record<string, unknown>;
+  /** The instant at which a report was last used. */
+  usedLast?: string;
+  /** The number of times a report has been used. */
+  usedCount?: number;
+  [key: string]: unknown;
+};
+
+/** The query definition as configured in Quickbase that gets executed when the report is run. */
+export type GetTableReportsItemQuery = {
+  /** The table identifier for the report. */
+  tableId?: string;
+  /** Filter used to query for data. */
+  filter?: string;
+  /** Calculated formula fields. */
+  formulaFields?: ({
+    /** Formula field identifier. */
+    id?: number;
+    /** Formula field label. */
+    label?: string;
+    /** Resulting formula value type. */
+    fieldType?: 'rich-text' | 'text' | 'numeric' | 'currency' | 'percent' | 'rating' | 'date' | 'timestamp' | 'timeofday' | 'duration' | 'checkbox' | 'phone' | 'email' | 'user' | 'multiuser' | 'url';
+    /** Formula text. */
+    formula?: string;
+    /** For numeric formula the number precision. */
+    decimalPrecision?: number;
+    [key: string]: unknown;
+  })[];
+  [key: string]: unknown;
+};
+
+/** The query definition as configured in Quickbase that gets executed when the report is run. */
+export type GetReportQuery = {
+  /** The table identifier for the report. */
+  tableId?: string;
+  /** Filter used to query for data. */
+  filter?: string;
+  /** Calculated formula fields. */
+  formulaFields?: ({
+    /** Formula field identifier. */
+    id?: number;
+    /** Formula field label. */
+    label?: string;
+    /** Resulting formula value type. */
+    fieldType?: 'rich-text' | 'text' | 'numeric' | 'currency' | 'percent' | 'rating' | 'date' | 'timestamp' | 'timeofday' | 'duration' | 'checkbox' | 'phone' | 'email' | 'user' | 'multiuser' | 'url';
+    /** Formula text. */
+    formula?: string;
+    /** For numeric formula the number precision. */
+    decimalPrecision?: number;
+    [key: string]: unknown;
+  })[];
+  [key: string]: unknown;
+};
+
+export type RunReportFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  /** Column heading label override for field in report. */
+  labelOverride?: string;
+  [key: string]: unknown;
+};
+
+/** Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed. */
+export type RunReportMetadata = {
+  /** The number of records to skip */
+  skip?: number;
+  /** The number of fields in each record in the current response object */
+  numFields: number;
+  /** If present, the maximum number of records requested by the caller */
+  top?: number;
+  /** The total number of records in the result set */
+  totalRecords: number;
+  /** The number of records in the current response object */
+  numRecords: number;
+  [key: string]: unknown;
+};
+
+export type GetFieldsItem = {
+  /** The id of the field, unique to this table. */
+  id: number;
+  /** The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html). */
+  fieldType?: string;
+  /** For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank. */
+  mode?: string;
+  /** The label (name) of the field. */
+  label?: string;
+  /** Indicates if the field is configured to not wrap when displayed in the product. */
+  noWrap?: boolean;
+  /** Indicates if the field is configured to display in bold in the product. */
+  bold?: boolean;
+  /** Indicates if the field is marked required. */
+  required?: boolean;
+  /** Indicates if the field is marked as a default in reports. */
+  appearsByDefault?: boolean;
+  /** Indicates if the field is marked as searchable. */
+  findEnabled?: boolean;
+  /** Indicates if the field is marked unique. */
+  unique?: boolean;
+  /** Indicates if the field data will copy when a user copies the record. */
+  doesDataCopy?: boolean;
+  /** The configured help text shown to users within the product. */
+  fieldHelp?: string;
+  /** Indicates if the field is being tracked as part of Quickbase Audit Logs. */
+  audited?: boolean;
+  properties?: GetFieldsItemProperties;
+  /** Field Permissions for different roles. */
+  permissions?: GetFieldsItemPermissionsItem[];
+  [key: string]: unknown;
+};
+
+/** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
+export type GetFieldsItemProperties = {
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
+  /** The comments entered on the field properties by an administrator. */
+  comments?: string;
+  /** Whether this field totals in reports within the product. */
+  doesTotal?: boolean;
+  /** Whether the link field will auto save. */
+  autoSave?: boolean;
+  /** Default user id value. */
+  defaultValueLuid?: number;
+  /** Whether phone numbers should be in E.164 standard international format. */
+  useI18NFormat?: boolean;
+  /** The maximum number of versions configured for a file attachment. */
+  maxVersions?: number;
+  /** Whether the field should carry its multiple choice fields when copied. */
+  carryChoices?: boolean;
+  /** The format to display time. */
+  format?: number;
+  /** The maximum number of characters allowed for entry in Quickbase for this field. */
+  maxLength?: number;
+  /** The configured text value that replaces the URL that users see within the product. */
+  linkText?: string;
+  /** The id of the parent composite field, when applicable. */
+  parentFieldId?: number;
+  /** Indicates whether to display the timezone within the product. */
+  displayTimezone?: boolean;
+  /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
+  summaryTargetFieldId?: number;
+  /** Indicates if users can add new choices to a selection list. */
+  allowNewChoices?: boolean;
+  /** The id of the field that is the reference in the relationship. */
+  masterChoiceFieldId?: number;
+  /** Indicates if the field value is defaulted today for new records. */
+  defaultToday?: boolean;
+  /** The units label. */
+  units?: string;
+  /** The id of the field that is the target on the master table for this lookup. */
+  lookupTargetFieldId?: number;
+  /** The summary accumulation function type. */
+  summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
+  /** The id of the source field. */
+  sourceFieldId?: number;
+  /** The table alias for the master table in the relationship this field is part of. */
+  masterTableTag?: string;
+  /** Whether this field averages in reports within the product. */
+  doesAverage?: boolean;
+  /** The formula of the field as configured in Quickbase. */
+  formula?: string;
+  /** The number of decimal places displayed in the product for this field. */
+  decimalPlaces?: number;
+  /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
+  defaultCountryCode?: string;
+  /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
+  seeVersions?: boolean;
+  /** How to display months. */
+  displayMonth?: string;
+  /** The number of lines shown in Quickbase for this text field. */
+  numLines?: number;
+  /** How the email is displayed. */
+  displayEmail?: string;
+  /** The user default type. */
+  defaultKind?: string;
+  /** An alternate user friendly text that can be used to display a link in the browser. */
+  coverText?: string;
+  /** The current symbol used when displaying field values within the product. */
+  currencySymbol?: string;
+  /** The id of the table that is the master in this relationship. */
+  masterChoiceTableId?: string;
+  /** The id of the target field. */
+  targetFieldId?: number;
+  /** The configured option for how users display within the product. */
+  displayUser?: string;
+  /** Whether a blank value is treated the same as 0 in calculations within the product. */
+  blankIsZero?: boolean;
+  /** Whether an exact match is required for a report link. */
+  exact?: boolean;
+  /** The start field id. */
+  startField?: number;
+  /** Default email domain. */
+  defaultDomain?: string;
+  /** The default value configured for a field when a new record is added. */
+  defaultValue?: string;
+  /** List of user choices. */
+  choicesLuid?: string[];
+  /** Don't show the URL protocol when showing the URL. */
+  abbreviate?: boolean;
+  /** The field's xml tag. */
+  xmlTag?: string;
+  /** The field's target table name. */
+  targetTableName?: string;
+  /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
+  numberFormat?: number;
+  /** The link text, if empty, the url will be used as link text. */
+  appearsAs?: string;
+  /** The field's html input width in the product. */
+  width?: number;
+  /** The currency format used when displaying field values within the product. */
+  currencyFormat?: 'left' | 'right' | 'middle';
+  /** Indicates if the field is a foreign key (or reference field) in a relationship. */
+  foreignKey?: boolean;
+  /** Indicates whether to display the day of the week within the product. */
+  displayDayOfWeek?: boolean;
+  /** The id of the field that is the reference in the relationship for this summary. */
+  summaryReferenceFieldId?: number;
+  /** The number of digits before commas display in the product, when applicable. */
+  commaStart?: number;
+  /** An array of entries that exist for a field that offers choices to the user. */
+  choices?: string[];
+  /** The id of the target table. */
+  targetTableId?: string;
+  /** Whether to display time as relative. */
+  displayRelative?: boolean;
+  /** An array of the fields that make up a composite field (e.g., address). */
+  compositeFields?: (number | Record<string, unknown>)[];
+  /** Indicates whether the checkbox values will be shown as text in reports. */
+  displayCheckboxAsText?: boolean;
+  /** Version modes for files. Keep all versions vs keep last version. */
+  versionMode?: 'keepallversions' | 'keeplastversions';
+  /** Indicates whether to display the time, in addition to the date. */
+  displayTime?: boolean;
+  /** The duration field id. */
+  durationField?: number;
+  /** The id of the field that is used to snapshot values from, when applicable. */
+  snapFieldId?: number;
+  /** Indicates whether or not to display time in the 24-hour format within the product. */
+  hours24?: boolean;
+  /** Whether to sort alphabetically, default sort is by record ID. */
+  sortAlpha?: boolean;
+  /** Indicates if the listed entries sort as entered vs alphabetically. */
+  sortAsGiven?: boolean;
+  /** Whether this field has a phone extension. */
+  hasExtension?: boolean;
+  /** The work week type. */
+  workWeek?: number;
+  /** Indicates if the URL should open a new window when a user clicks it within the product. */
+  useNewWindow?: boolean;
+  /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+  postTempToken?: boolean;
+  /** Whether this field is append only. */
+  appendOnly?: boolean;
+  /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
+  displayAsLink?: boolean;
+  /** Whether this field allows html. */
+  allowHTML?: boolean;
+  /** The id of the field that is the reference in the relationship for this lookup. */
+  lookupReferenceFieldId?: number;
+  /** The summary field's filter (matching criteria) in Quickbase query language, when it has one. */
+  summaryQuery?: string;
+  [key: string]: unknown;
+};
+
+export type GetFieldsItemPermissionsItem = {
+  /** The role associated with a given permission for the field */
+  role?: string;
+  /** The permission given to the role for this field */
+  permissionType?: string;
+  /** The Id of the given role */
+  roleId?: number;
+};
+
+/** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
+export type CreateFieldProperties = {
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
+  /** The comments entered on the field properties by an administrator. */
+  comments?: string;
+  /** Whether this field totals in reports within the product. */
+  doesTotal?: boolean;
+  /** Whether the link field will auto save. */
+  autoSave?: boolean;
+  /** Default user id value. */
+  defaultValueLuid?: number;
+  /** Whether phone numbers should be in E.164 standard international format. */
+  useI18NFormat?: boolean;
+  /** The maximum number of versions configured for a file attachment. */
+  maxVersions?: number;
+  /** Whether the field should carry its multiple choice fields when copied. */
+  carryChoices?: boolean;
+  /** The format to display time. */
+  format?: number;
+  /** The maximum number of characters allowed for entry in Quickbase for this field. */
+  maxLength?: number;
+  /** The configured text value that replaces the URL that users see within the product. */
+  linkText?: string;
+  /** The id of the parent composite field, when applicable. */
+  parentFieldId?: number;
+  /** Indicates whether to display the timezone within the product. */
+  displayTimezone?: boolean;
+  /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
+  summaryTargetFieldId?: number;
+  /** Indicates if users can add new choices to a selection list. */
+  allowNewChoices?: boolean;
+  /** The id of the field that is the reference in the relationship. */
+  masterChoiceFieldId?: number;
+  /** Indicates if the field value is defaulted today for new records. */
+  defaultToday?: boolean;
+  /** The units label. */
+  units?: string;
+  /** The id of the field that is the target on the master table for this lookup. */
+  lookupTargetFieldId?: number;
+  /** The summary accumulation function type. */
+  summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
+  /** The id of the source field. */
+  sourceFieldId?: number;
+  /** The table alias for the master table in the relationship this field is part of. */
+  masterTableTag?: string;
+  /** Whether this field averages in reports within the product. */
+  doesAverage?: boolean;
+  /** The formula of the field as configured in Quickbase. */
+  formula?: string;
+  /** The number of decimal places displayed in the product for this field. */
+  decimalPlaces?: number;
+  /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
+  defaultCountryCode?: string;
+  /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
+  seeVersions?: boolean;
+  /** How to display months. */
+  displayMonth?: string;
+  /** The number of lines shown in Quickbase for this text field. */
+  numLines?: number;
+  /** How the email is displayed. */
+  displayEmail?: string;
+  /** The user default type. */
+  defaultKind?: string;
+  /** An alternate user friendly text that can be used to display a link in the browser. */
+  coverText?: string;
+  /** The current symbol used when displaying field values within the product. */
+  currencySymbol?: string;
+  /** The id of the table that is the master in this relationship. */
+  masterChoiceTableId?: string;
+  /** The id of the target field. */
+  targetFieldId?: number;
+  /** The configured option for how users display within the product. */
+  displayUser?: string;
+  /** Whether a blank value is treated the same as 0 in calculations within the product. */
+  blankIsZero?: boolean;
+  /** Whether an exact match is required for a report link. */
+  exact?: boolean;
+  /** The start field id. */
+  startField?: number;
+  /** Default email domain. */
+  defaultDomain?: string;
+  /** The default value configured for a field when a new record is added. */
+  defaultValue?: string;
+  /** List of user choices. */
+  choicesLuid?: string[];
+  /** Don't show the URL protocol when showing the URL. */
+  abbreviate?: boolean;
+  /** The field's xml tag. */
+  xmlTag?: string;
+  /** The field's target table name. */
+  targetTableName?: string;
+  /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
+  numberFormat?: number;
+  /** The link text, if empty, the url will be used as link text. */
+  appearsAs?: string;
+  /** The field's html input width in the product. */
+  width?: number;
+  /** The currency format used when displaying field values within the product. */
+  currencyFormat?: 'left' | 'right' | 'middle';
+  /** Indicates if the field is a foreign key (or reference field) in a relationship. */
+  foreignKey?: boolean;
+  /** Indicates whether to display the day of the week within the product. */
+  displayDayOfWeek?: boolean;
+  /** The id of the field that is the reference in the relationship for this summary. */
+  summaryReferenceFieldId?: number;
+  /** The number of digits before commas display in the product, when applicable. */
+  commaStart?: number;
+  /** An array of entries that exist for a field that offers choices to the user. */
+  choices?: string[];
+  /** The id of the target table. */
+  targetTableId?: string;
+  /** Whether to display time as relative. */
+  displayRelative?: boolean;
+  /** An array of the fields that make up a composite field (e.g., address). */
+  compositeFields?: (number | Record<string, unknown>)[];
+  /** Indicates whether the checkbox values will be shown as text in reports. */
+  displayCheckboxAsText?: boolean;
+  /** Version modes for files. Keep all versions vs keep last version. */
+  versionMode?: 'keepallversions' | 'keeplastversions';
+  /** Indicates whether to display the time, in addition to the date. */
+  displayTime?: boolean;
+  /** The duration field id. */
+  durationField?: number;
+  /** The id of the field that is used to snapshot values from, when applicable. */
+  snapFieldId?: number;
+  /** Indicates whether or not to display time in the 24-hour format within the product. */
+  hours24?: boolean;
+  /** Whether to sort alphabetically, default sort is by record ID. */
+  sortAlpha?: boolean;
+  /** Indicates if the listed entries sort as entered vs alphabetically. */
+  sortAsGiven?: boolean;
+  /** Whether this field has a phone extension. */
+  hasExtension?: boolean;
+  /** The work week type. */
+  workWeek?: number;
+  /** Indicates if the URL should open a new window when a user clicks it within the product. */
+  useNewWindow?: boolean;
+  /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+  postTempToken?: boolean;
+  /** Whether this field is append only. */
+  appendOnly?: boolean;
+  /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
+  displayAsLink?: boolean;
+  /** Whether this field allows html. */
+  allowHTML?: boolean;
+  /** The id of the field that is the reference in the relationship for this lookup. */
+  lookupReferenceFieldId?: number;
+  [key: string]: unknown;
+};
+
+export type CreateFieldPermissionsItem = {
+  /** The role associated with a given permission for the field */
+  role?: string;
+  /** The permission given to the role for this field */
+  permissionType?: string;
+  /** The Id of the given role */
+  roleId?: number;
+};
+
+/** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
+export type GetFieldProperties = {
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
+  /** The comments entered on the field properties by an administrator. */
+  comments?: string;
+  /** Whether this field totals in reports within the product. */
+  doesTotal?: boolean;
+  /** Whether the link field will auto save. */
+  autoSave?: boolean;
+  /** Default user id value. */
+  defaultValueLuid?: number;
+  /** Whether phone numbers should be in E.164 standard international format. */
+  useI18NFormat?: boolean;
+  /** The maximum number of versions configured for a file attachment. */
+  maxVersions?: number;
+  /** Whether the field should carry its multiple choice fields when copied. */
+  carryChoices?: boolean;
+  /** The format to display time. */
+  format?: number;
+  /** The maximum number of characters allowed for entry in Quickbase for this field. */
+  maxLength?: number;
+  /** The configured text value that replaces the URL that users see within the product. */
+  linkText?: string;
+  /** The id of the parent composite field, when applicable. */
+  parentFieldId?: number;
+  /** Indicates whether to display the timezone within the product. */
+  displayTimezone?: boolean;
+  /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
+  summaryTargetFieldId?: number;
+  /** Indicates if users can add new choices to a selection list. */
+  allowNewChoices?: boolean;
+  /** The id of the field that is the reference in the relationship. */
+  masterChoiceFieldId?: number;
+  /** Indicates if the field value is defaulted today for new records. */
+  defaultToday?: boolean;
+  /** The units label. */
+  units?: string;
+  /** The id of the field that is the target on the master table for this lookup. */
+  lookupTargetFieldId?: number;
+  /** The summary accumulation function type. */
+  summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
+  /** The id of the source field. */
+  sourceFieldId?: number;
+  /** The table alias for the master table in the relationship this field is part of. */
+  masterTableTag?: string;
+  /** Whether this field averages in reports within the product. */
+  doesAverage?: boolean;
+  /** The formula of the field as configured in Quickbase. */
+  formula?: string;
+  /** The number of decimal places displayed in the product for this field. */
+  decimalPlaces?: number;
+  /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
+  defaultCountryCode?: string;
+  /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
+  seeVersions?: boolean;
+  /** How to display months. */
+  displayMonth?: string;
+  /** The number of lines shown in Quickbase for this text field. */
+  numLines?: number;
+  /** How the email is displayed. */
+  displayEmail?: string;
+  /** The user default type. */
+  defaultKind?: string;
+  /** An alternate user friendly text that can be used to display a link in the browser. */
+  coverText?: string;
+  /** The current symbol used when displaying field values within the product. */
+  currencySymbol?: string;
+  /** The id of the table that is the master in this relationship. */
+  masterChoiceTableId?: string;
+  /** The id of the target field. */
+  targetFieldId?: number;
+  /** The configured option for how users display within the product. */
+  displayUser?: string;
+  /** Whether a blank value is treated the same as 0 in calculations within the product. */
+  blankIsZero?: boolean;
+  /** Whether an exact match is required for a report link. */
+  exact?: boolean;
+  /** The start field id. */
+  startField?: number;
+  /** Default email domain. */
+  defaultDomain?: string;
+  /** The default value configured for a field when a new record is added. */
+  defaultValue?: string;
+  /** List of user choices. */
+  choicesLuid?: string[];
+  /** Don't show the URL protocol when showing the URL. */
+  abbreviate?: boolean;
+  /** The field's xml tag. */
+  xmlTag?: string;
+  /** The field's target table name. */
+  targetTableName?: string;
+  /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
+  numberFormat?: number;
+  /** The link text, if empty, the url will be used as link text. */
+  appearsAs?: string;
+  /** The field's html input width in the product. */
+  width?: number;
+  /** The currency format used when displaying field values within the product. */
+  currencyFormat?: 'left' | 'right' | 'middle';
+  /** Indicates if the field is a foreign key (or reference field) in a relationship. */
+  foreignKey?: boolean;
+  /** Indicates whether to display the day of the week within the product. */
+  displayDayOfWeek?: boolean;
+  /** The id of the field that is the reference in the relationship for this summary. */
+  summaryReferenceFieldId?: number;
+  /** The number of digits before commas display in the product, when applicable. */
+  commaStart?: number;
+  /** An array of entries that exist for a field that offers choices to the user. */
+  choices?: string[];
+  /** The id of the target table. */
+  targetTableId?: string;
+  /** Whether to display time as relative. */
+  displayRelative?: boolean;
+  /** An array of the fields that make up a composite field (e.g., address). */
+  compositeFields?: (number | Record<string, unknown>)[];
+  /** Indicates whether the checkbox values will be shown as text in reports. */
+  displayCheckboxAsText?: boolean;
+  /** Version modes for files. Keep all versions vs keep last version. */
+  versionMode?: 'keepallversions' | 'keeplastversions';
+  /** Indicates whether to display the time, in addition to the date. */
+  displayTime?: boolean;
+  /** The duration field id. */
+  durationField?: number;
+  /** The id of the field that is used to snapshot values from, when applicable. */
+  snapFieldId?: number;
+  /** Indicates whether or not to display time in the 24-hour format within the product. */
+  hours24?: boolean;
+  /** Whether to sort alphabetically, default sort is by record ID. */
+  sortAlpha?: boolean;
+  /** Indicates if the listed entries sort as entered vs alphabetically. */
+  sortAsGiven?: boolean;
+  /** Whether this field has a phone extension. */
+  hasExtension?: boolean;
+  /** The work week type. */
+  workWeek?: number;
+  /** Indicates if the URL should open a new window when a user clicks it within the product. */
+  useNewWindow?: boolean;
+  /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+  postTempToken?: boolean;
+  /** Whether this field is append only. */
+  appendOnly?: boolean;
+  /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
+  displayAsLink?: boolean;
+  /** Whether this field allows html. */
+  allowHTML?: boolean;
+  /** The id of the field that is the reference in the relationship for this lookup. */
+  lookupReferenceFieldId?: number;
+  /** The summary field's filter (matching criteria) in Quickbase query language, when it has one. */
+  summaryQuery?: string;
+  [key: string]: unknown;
+};
+
+export type GetFieldPermissionsItem = {
+  /** The role associated with a given permission for the field */
+  role?: string;
+  /** The permission given to the role for this field */
+  permissionType?: string;
+  /** The Id of the given role */
+  roleId?: number;
+};
+
+/** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
+export type UpdateFieldProperties = {
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
+  /** The comments entered on the field properties by an administrator. */
+  comments?: string;
+  /** Whether this field totals in reports within the product. */
+  doesTotal?: boolean;
+  /** Whether the link field will auto save. */
+  autoSave?: boolean;
+  /** Default user id value. */
+  defaultValueLuid?: number;
+  /** Whether phone numbers should be in E.164 standard international format. */
+  useI18NFormat?: boolean;
+  /** The maximum number of versions configured for a file attachment. */
+  maxVersions?: number;
+  /** Whether the field should carry its multiple choice fields when copied. */
+  carryChoices?: boolean;
+  /** The format to display time. */
+  format?: number;
+  /** The maximum number of characters allowed for entry in Quickbase for this field. */
+  maxLength?: number;
+  /** The configured text value that replaces the URL that users see within the product. */
+  linkText?: string;
+  /** The id of the parent composite field, when applicable. */
+  parentFieldId?: number;
+  /** Indicates whether to display the timezone within the product. */
+  displayTimezone?: boolean;
+  /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
+  summaryTargetFieldId?: number;
+  /** Indicates if users can add new choices to a selection list. */
+  allowNewChoices?: boolean;
+  /** The id of the field that is the reference in the relationship. */
+  masterChoiceFieldId?: number;
+  /** Indicates if the field value is defaulted today for new records. */
+  defaultToday?: boolean;
+  /** The units label. */
+  units?: string;
+  /** The id of the field that is the target on the master table for this lookup. */
+  lookupTargetFieldId?: number;
+  /** The summary accumulation function type. */
+  summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
+  /** The id of the source field. */
+  sourceFieldId?: number;
+  /** The table alias for the master table in the relationship this field is part of. */
+  masterTableTag?: string;
+  /** Whether this field averages in reports within the product. */
+  doesAverage?: boolean;
+  /** The formula of the field as configured in Quickbase. */
+  formula?: string;
+  /** The number of decimal places displayed in the product for this field. */
+  decimalPlaces?: number;
+  /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
+  defaultCountryCode?: string;
+  /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
+  seeVersions?: boolean;
+  /** How to display months. */
+  displayMonth?: string;
+  /** The number of lines shown in Quickbase for this text field. */
+  numLines?: number;
+  /** How the email is displayed. */
+  displayEmail?: string;
+  /** The user default type. */
+  defaultKind?: string;
+  /** An alternate user friendly text that can be used to display a link in the browser. */
+  coverText?: string;
+  /** The current symbol used when displaying field values within the product. */
+  currencySymbol?: string;
+  /** The id of the table that is the master in this relationship. */
+  masterChoiceTableId?: string;
+  /** The id of the target field. */
+  targetFieldId?: number;
+  /** The configured option for how users display within the product. */
+  displayUser?: string;
+  /** Whether a blank value is treated the same as 0 in calculations within the product. */
+  blankIsZero?: boolean;
+  /** Whether an exact match is required for a report link. */
+  exact?: boolean;
+  /** The start field id. */
+  startField?: number;
+  /** Default email domain. */
+  defaultDomain?: string;
+  /** The default value configured for a field when a new record is added. */
+  defaultValue?: string;
+  /** List of user choices. */
+  choicesLuid?: string[];
+  /** Don't show the URL protocol when showing the URL. */
+  abbreviate?: boolean;
+  /** The field's xml tag. */
+  xmlTag?: string;
+  /** The field's target table name. */
+  targetTableName?: string;
+  /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
+  numberFormat?: number;
+  /** The link text, if empty, the url will be used as link text. */
+  appearsAs?: string;
+  /** The field's html input width in the product. */
+  width?: number;
+  /** The currency format used when displaying field values within the product. */
+  currencyFormat?: 'left' | 'right' | 'middle';
+  /** Indicates if the field is a foreign key (or reference field) in a relationship. */
+  foreignKey?: boolean;
+  /** Indicates whether to display the day of the week within the product. */
+  displayDayOfWeek?: boolean;
+  /** The id of the field that is the reference in the relationship for this summary. */
+  summaryReferenceFieldId?: number;
+  /** The number of digits before commas display in the product, when applicable. */
+  commaStart?: number;
+  /** An array of entries that exist for a field that offers choices to the user. */
+  choices?: string[];
+  /** The id of the target table. */
+  targetTableId?: string;
+  /** Whether to display time as relative. */
+  displayRelative?: boolean;
+  /** An array of the fields that make up a composite field (e.g., address). */
+  compositeFields?: (number | Record<string, unknown>)[];
+  /** Indicates whether the checkbox values will be shown as text in reports. */
+  displayCheckboxAsText?: boolean;
+  /** Version modes for files. Keep all versions vs keep last version. */
+  versionMode?: 'keepallversions' | 'keeplastversions';
+  /** Indicates whether to display the time, in addition to the date. */
+  displayTime?: boolean;
+  /** The duration field id. */
+  durationField?: number;
+  /** The id of the field that is used to snapshot values from, when applicable. */
+  snapFieldId?: number;
+  /** Indicates whether or not to display time in the 24-hour format within the product. */
+  hours24?: boolean;
+  /** Whether to sort alphabetically, default sort is by record ID. */
+  sortAlpha?: boolean;
+  /** Indicates if the listed entries sort as entered vs alphabetically. */
+  sortAsGiven?: boolean;
+  /** Whether this field has a phone extension. */
+  hasExtension?: boolean;
+  /** The work week type. */
+  workWeek?: number;
+  /** Indicates if the URL should open a new window when a user clicks it within the product. */
+  useNewWindow?: boolean;
+  /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
+  postTempToken?: boolean;
+  /** Whether this field is append only. */
+  appendOnly?: boolean;
+  /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
+  displayAsLink?: boolean;
+  /** Whether this field allows html. */
+  allowHTML?: boolean;
+  /** The id of the field that is the reference in the relationship for this lookup. */
+  lookupReferenceFieldId?: number;
+  [key: string]: unknown;
+};
+
+export type UpdateFieldPermissionsItem = {
+  /** The role associated with a given permission for the field */
+  role?: string;
+  /** The permission given to the role for this field */
+  permissionType?: string;
+  /** The Id of the given role */
+  roleId?: number;
+};
+
+export type GetFieldsUsageItem = {
+  field: GetFieldsUsageItemField;
+  usage: GetFieldsUsageItemUsage;
+  [key: string]: unknown;
+};
+
+/** Basic information about the field. */
+export type GetFieldsUsageItemField = {
+  /** Field name. */
+  name: string;
+  /** Field id. */
+  id: number;
+  /** Field type. */
+  type: string;
+  [key: string]: unknown;
+};
+
+/** Usage Information about the field. */
+export type GetFieldsUsageItemUsage = {
+  /** The number of quickbase actions where the given field is referenced. */
+  actions: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of app home pages where the given field is referenced. */
+  appHomePages: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of dashboards where the given field is referenced. */
+  dashboards: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of default reports where the given field is referenced. */
+  defaultReports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of exact forms where the given field is referenced. */
+  exactForms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of fields where the given field is referenced. */
+  fields: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of forms where the given field is referenced. */
+  forms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of notifications where the given field is referenced. */
+  notifications: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of personal reports where the given field is referenced. */
+  personalReports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of pipelines where the given field is referenced. */
+  pipelines: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of relationships where the given field is referenced. */
+  relationships: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of reminders where the given field is referenced. */
+  reminders: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of reports where the given field is referenced. */
+  reports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of roles where the given field is referenced. */
+  roles: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of table imports where the given field is referenced. */
+  tableImports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of table rules where the given field is referenced. */
+  tableRules: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of webhooks where the given field is referenced. */
+  webhooks: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+export type GetFieldUsageItem = {
+  field: GetFieldUsageItemField;
+  usage: GetFieldUsageItemUsage;
+  [key: string]: unknown;
+};
+
+/** Basic information about the field. */
+export type GetFieldUsageItemField = {
+  /** Field name. */
+  name: string;
+  /** Field id. */
+  id: number;
+  /** Field type. */
+  type: string;
+  [key: string]: unknown;
+};
+
+/** Usage Information about the field. */
+export type GetFieldUsageItemUsage = {
+  /** The number of quickbase actions where the given field is referenced. */
+  actions: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of app home pages where the given field is referenced. */
+  appHomePages: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of dashboards where the given field is referenced. */
+  dashboards: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of default reports where the given field is referenced. */
+  defaultReports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of exact forms where the given field is referenced. */
+  exactForms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of fields where the given field is referenced. */
+  fields: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of forms where the given field is referenced. */
+  forms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of notifications where the given field is referenced. */
+  notifications: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of personal reports where the given field is referenced. */
+  personalReports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of pipelines where the given field is referenced. */
+  pipelines: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of relationships where the given field is referenced. */
+  relationships: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of reminders where the given field is referenced. */
+  reminders: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of reports where the given field is referenced. */
+  reports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of roles where the given field is referenced. */
+  roles: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of table imports where the given field is referenced. */
+  tableImports: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of table rules where the given field is referenced. */
+  tableRules: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+  };
+  /** The number of webhooks where the given field is referenced. */
+  webhooks: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+/** Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed. */
+export type UpsertMetadata = {
+  /** Array containing the created record ids. */
+  createdRecordIds?: number[];
+  /** This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred. */
+  lineErrors?: Record<string, string[]>;
+  /** Array containing the unchanged record ids. */
+  unchangedRecordIds?: number[];
+  /** Array containing the updated record ids. */
+  updatedRecordIds?: number[];
+  /** Number of records processed. Includes successful and failed record updates. */
+  totalNumberOfRecordsProcessed?: number;
+  [key: string]: unknown;
+};
+
+export type RunQueryFieldsItem = {
+  /** Field id. */
+  id?: number;
+  /** Field label. */
+  label?: string;
+  /** Field type. */
+  type?: string;
+  [key: string]: unknown;
+};
+
+/** Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed. */
+export type RunQueryMetadata = {
+  /** The number of records to skip */
+  skip?: number;
+  /** The number of fields in each record in the current response object */
+  numFields: number;
+  /** If present, the maximum number of records requested by the caller */
+  top?: number;
+  /** The total number of records in the result set */
+  totalRecords: number;
+  /** The number of records in the current response object */
+  numRecords: number;
+  [key: string]: unknown;
+};
+
+export type RecordsModifiedSinceChangesItem = {
+  /** A record whose dependencies were found to have been updated after the time provided. */
+  recordId?: number;
+  /** The timestamp that Quickbase found that exceeded the after time. This does not represent the latest date modified in the record graph. */
+  timestamp?: string;
+  /** The type of change that was detected. */
+  changeType?: 'CREATE' | 'MODIFY' | 'DELETE';
+  [key: string]: unknown;
+};
+
+export type CloneUserTokenAppsItem = {
+  /** The unique identifier for this application. */
+  id?: string;
+  /** The application's name. */
+  name?: string;
+  [key: string]: unknown;
+};
+
+export type TransferUserTokenAppsItem = {
+  /** The unique identifier for this application. */
+  id?: string;
+  /** The application's name. */
+  name?: string;
+  [key: string]: unknown;
+};
+
+/** The user that uploaded version. */
+export type DeleteFileCreator = {
+  /** User full name. */
+  name?: string;
+  /** User Id. */
+  id?: string;
+  /** User email. */
+  email?: string;
+  /** User Name as updated in user properties. Optional, appears if not the same as user email. */
+  userName?: string;
+  [key: string]: unknown;
+};
+
+export type GetUsersUsersItem = {
+  userName: string;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  hashId: string;
+  [key: string]: unknown;
+};
+
+/** Additional request information */
+export type GetUsersMetadata = {
+  nextPageToken: string;
+  [key: string]: unknown;
+};
+
+export type AuditEventsItem = {
+  /** Log ID. */
+  id: string;
+  /** User's first name. */
+  firstname: string;
+  /** User's last name. */
+  lastname: string;
+  /** User's email address. */
+  email: string;
+  /** What action was taken, such as log in, create app, report access, or table search. */
+  topic: string;
+  /** Exact time the action was taken, including date, and time with hour, minutes and seconds. Time zone is the browser time zone. */
+  time: string;
+  /** The IP address the action was taken from. */
+  ipaddress: string;
+  /** The browser and OS the action was taken from. */
+  useragent: string;
+  /** UI for user interface or API for an API call. */
+  application: string;
+  /** A brief description of the action that you can click to see additional details. */
+  description: string;
+  /** The data changes that have occured to a field that has been marked as audited. */
+  payloadChanges?: {
+    /** An object describing the changes that occured on record changes. */
+    changes: {
+      /** The current value of the fields that have been changed. */
+      current: unknown[];
+      /** The previous value of the fields that have been changed. */
+      previous: unknown[];
+      /** The list of fields and their types that have been changed. */
+      fields: unknown[];
+      [key: string]: unknown;
+    };
+    /** The recordId that has been edited. */
+    rid: number;
+    /** The change type that occured for a record. Could be one of add, edit, delete. */
+    changeType: string;
+    /** A placeholder for type changes. */
+    type: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+/** The data object containing the read summaries. */
+export type PlatformAnalyticReadsData = {
+  /** Detailed read summaries for a specific date. */
+  dailyDetailedReads: {
+    /** The date of the requested summary. */
+    date: string;
+    /** Total reads for the specified date. */
+    reads: {
+      /** Total user reads for the realm on the specified date. */
+      user: number;
+      /** Total integration reads for the realm on the specified date. */
+      integrations: {
+        /** Total reads by anonymous users for the realm on the specified date. */
+        eoti: number;
+        /** Total API reads for the realm on the specified date. */
+        api: number;
+        /** Total pipeline reads for the realm on the specified date. */
+        pipelines: number;
+        [key: string]: unknown;
+      };
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+export type PlatformAnalyticEventSummariesData = {
+  eventsSummaries: {
+    /** The ID of the account the events are associated with. */
+    accountId: string;
+    /** The start date and time of the requested summaries in ISO 8601 time format. */
+    start: string;
+    /** The end date and time of the requested summaries in ISO 8601 time format. */
+    end: string;
+    /** How the events should be grouped. */
+    groupBy: 'app' | 'user';
+    where: ({
+      /** Id of the item to filter by. */
+      id: string;
+      /** The type of item to filter by. */
+      type: 'app' | 'user';
+    })[];
+    /** An array of objects that contains Application/User information and an events object with summaries by event type. */
+    results: ({
+      /** Id of the Application/User. */
+      id: string;
+      /** Name of the Application/User. */
+      name: string;
+      /** Totals by billing category for the event grouping. */
+      totals: {
+        integration?: number;
+        user?: number;
+        all?: number;
+      };
+      /** An array of events that contains specific information associated with an Application/User broken down by event type. */
+      eventTypes: ({
+        /** Event type */
+        eventType?: string;
+        /** Count of events associated with that event type and Application/User. */
+        count?: number;
+        /** Billing category of the event type. */
+        billingCategory?: 'user' | 'integration';
+      })[];
+    })[];
+    /** Additional information about the results that may be helpful. */
+    metadata: {
+      /** Supply this token in a subsequent request to fetch the next page of results. */
+      nextToken: string;
+    };
+    /** Totals by billing category for all queried events. */
+    totals: {
+      integration?: number;
+      user?: number;
+      all?: number;
+    };
+  };
+};
+
+/** Object used for operations to read, create, or update trustees in an app. */
+export type GetTrusteesItem = {
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+};
+
+export type AddTrusteesFailureItem = {
+  /** The error message associated with the trustee that could not be updated. */
+  error?: string;
+  /** Object used for operations to read, create, or update trustees in an app. */
+  trustee?: {
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  };
+};
+
+/** Object used for operations to read, create, or update trustees in an app. */
+export type AddTrusteesSuccessItem = {
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+};
+
+export type RemoveTrusteesFailureItem = {
+  /** The error message associated with the trustee that could not be updated. */
+  error?: string;
+  /** Object used for operations to read, create, or update trustees in an app. */
+  trustee?: {
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  };
+};
+
+/** Object used for operations to read, create, or update trustees in an app. */
+export type RemoveTrusteesSuccessItem = {
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+};
+
+export type UpdateTrusteesFailureItem = {
+  /** The error message associated with the trustee that could not be updated. */
+  error?: string;
+  /** Object used for operations to read, create, or update trustees in an app. */
+  trustee?: {
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
+    oldRoleId: number;
+    /** The type of trustee being added. This can be a user, group, or email domain group. */
+    type: 'user' | 'group' | 'dom-group';
+  };
+};
+
+/** Object used for operations to read, create, or update trustees in an app. */
+export type UpdateTrusteesSuccessItem = {
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
+  oldRoleId: number;
+  /** The type of trustee being added. This can be a user, group, or email domain group. */
+  type: 'user' | 'group' | 'dom-group';
+};
+
 // createApp
 /** Create an app */
 export interface CreateAppRequest {
@@ -95,43 +1714,16 @@ export interface CreateAppResponse {
   dateFormat?: string;
   /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/docs/set-the-time-zone-for-both-the-application-and-the-account) to set the application's time zone. */
   timeZone?: string;
-  /** Application memory info */
-  memoryInfo?: {
-    /** The estimated memory of this application in gigabytes */
-    estMemory?: number;
-    /** The estimated memory of this application and all dependent applications in gigabytes */
-    estMemoryInclDependentApps?: number;
-  };
+  memoryInfo?: CreateAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/docs/sharing-apps-publicly) */
   hasEveryoneOnTheInternet?: boolean;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
-  variables?: {
-    /** Variable name. */
-    name?: string;
-    /** Variable value. */
-    value?: string;
-    [key: string]: unknown;
-  }[];
+  variables?: CreateAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
-  /** Security properties of the application */
-  securityProperties?: {
-    /** Allow users who are not administrators to copy */
-    allowClone?: boolean;
-    /** Allow users who are not administrators to export data */
-    allowExport?: boolean;
-    /** Hide from public application searches */
-    hideFromPublic?: boolean;
-    /** Require Application Tokens */
-    enableAppTokens?: boolean;
-    /** Only users logging in from "approved" IP addresses may access this application */
-    useIPFilter?: boolean;
-    /** Only "approved" users may access this application */
-    mustBeRealmApproved?: boolean;
-    [key: string]: unknown;
-  };
+  securityProperties?: CreateAppSecurityProperties;
   [key: string]: unknown;
 }
 
@@ -157,43 +1749,16 @@ export interface GetAppResponse {
   dateFormat?: string;
   /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
-  /** Application memory info */
-  memoryInfo?: {
-    /** The estimated memory of this application in gigabytes */
-    estMemory?: number;
-    /** The estimated memory of this application and all dependent applications in gigabytes */
-    estMemoryInclDependentApps?: number;
-  };
+  memoryInfo?: GetAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
   hasEveryoneOnTheInternet?: boolean;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
-  variables?: {
-    /** Variable name. */
-    name?: string;
-    /** Variable value. */
-    value?: string;
-    [key: string]: unknown;
-  }[];
+  variables?: GetAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
-  /** Security properties of the application */
-  securityProperties?: {
-    /** Allow users who are not administrators to copy */
-    allowClone?: boolean;
-    /** Allow users who are not administrators to export data */
-    allowExport?: boolean;
-    /** Hide from public application searches */
-    hideFromPublic?: boolean;
-    /** Require Application Tokens */
-    enableAppTokens?: boolean;
-    /** Only users logging in from "approved" IP addresses may access this application */
-    useIPFilter?: boolean;
-    /** Only "approved" users may access this application */
-    mustBeRealmApproved?: boolean;
-    [key: string]: unknown;
-  };
+  securityProperties?: GetAppSecurityProperties;
   [key: string]: unknown;
 }
 
@@ -248,43 +1813,16 @@ export interface UpdateAppResponse {
   dateFormat?: string;
   /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
-  /** Application memory info */
-  memoryInfo?: {
-    /** The estimated memory of this application in gigabytes */
-    estMemory?: number;
-    /** The estimated memory of this application and all dependent applications in gigabytes */
-    estMemoryInclDependentApps?: number;
-  };
+  memoryInfo?: UpdateAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
   hasEveryoneOnTheInternet?: boolean;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
-  variables?: {
-    /** Variable name. */
-    name?: string;
-    /** Variable value. */
-    value?: string;
-    [key: string]: unknown;
-  }[];
+  variables?: UpdateAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
-  /** Security properties of the application */
-  securityProperties?: {
-    /** Allow users who are not administrators to copy */
-    allowClone?: boolean;
-    /** Allow users who are not administrators to export data */
-    allowExport?: boolean;
-    /** Hide from public application searches */
-    hideFromPublic?: boolean;
-    /** Require Application Tokens */
-    enableAppTokens?: boolean;
-    /** Only users logging in from "approved" IP addresses may access this application */
-    useIPFilter?: boolean;
-    /** Only "approved" users may access this application */
-    mustBeRealmApproved?: boolean;
-    [key: string]: unknown;
-  };
+  securityProperties?: UpdateAppSecurityProperties;
   [key: string]: unknown;
 }
 
@@ -313,31 +1851,7 @@ export interface GetAppEventsParams {
   appId: string;
 }
 
-export type GetAppEventsResponse = ({
-  /** Indication of whether current event is active. */
-  isActive?: boolean;
-  /** Type of an event. */
-  type?: 'webhook' | 'qb-action' | 'email-notification' | 'subscription' | 'reminder' | 'automation';
-  /** The name of the event. This property is not returned for automations. */
-  name?: string;
-  /** The url to automation that can be accessed from the browser. Only returned for automations. */
-  url?: string;
-  /** The user that owns the event. */
-  owner?: {
-    /** User full name. */
-    name?: string;
-    /** User Id. */
-    id?: string;
-    /** User email. */
-    email?: string;
-    /** User Name as updated in user properties. Optional, appears if not the same as user email. */
-    userName?: string;
-    [key: string]: unknown;
-  };
-  /** The unique identifier of the table to which event belongs to. */
-  tableId?: string;
-  [key: string]: unknown;
-})[];
+export type GetAppEventsResponse = GetAppEventsItem[];
 
 // copyApp
 /** Copy an app */
@@ -382,13 +1896,7 @@ export interface CopyAppResponse {
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
   hasEveryoneOnTheInternet?: boolean;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
-  variables?: {
-    /** Variable name. */
-    name?: string;
-    /** Variable value. */
-    value?: string;
-    [key: string]: unknown;
-  }[];
+  variables?: CopyAppVariablesItem[];
   /** The id of the app from which this app was copied */
   ancestorId?: string;
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
@@ -403,21 +1911,7 @@ export interface GetRolesParams {
   appId: string;
 }
 
-export type GetRolesResponse = ({
-  /** The role id. */
-  id?: number;
-  /** The role name. */
-  name?: string;
-  /** The role access properties. */
-  access?: {
-    /** The ID of the access type the role is given. (0 = None, 1 = Administrator, 2 = Basic Access with Share, 3 = Basic Access, 4 = Partial Administrator). */
-    id?: number;
-    /** The type of access the role is given. */
-    type?: 'None' | 'Administrator' | 'Basic Access with Share' | 'Basic Access' | 'Partial Administrator';
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-})[];
+export type GetRolesResponse = GetRolesItem[];
 
 // getAppTables
 /** Get tables for an app */
@@ -426,41 +1920,7 @@ export interface GetAppTablesParams {
   appId: string;
 }
 
-export type GetAppTablesResponse = ({
-  /** The name of the table. */
-  name?: string;
-  /** The unique identifier (dbid) of the table. */
-  id?: string;
-  /** The automatically-created table alias for the table. */
-  alias?: string;
-  /** The description of the table, as configured by an application administrator. */
-  description?: string;
-  /** The time and date when the table was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
-  created?: string;
-  /** The time and date when the table schema or data was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
-  updated?: string;
-  /** The incremental Record ID that will be used when the next record is created, as determined when the API call was ran. */
-  nextRecordId?: number;
-  /** The incremental Field ID that will be used when the next field is created, as determined when the API call was ran. */
-  nextFieldId?: number;
-  /** The id of the field that is configured for default sorting. */
-  defaultSortFieldId?: number;
-  /** The configuration of the default sort order on the table. */
-  defaultSortOrder?: 'ASC' | 'DESC';
-  /** The id of the field that is configured to be the key on this table, which is usually the Quickbase Record ID. */
-  keyFieldId?: number;
-  /** The builder-configured singular noun of the table. */
-  singleRecordName?: string;
-  /** The builder-configured plural noun of the table. */
-  pluralRecordName?: string;
-  /** The size limit for the table. */
-  sizeLimit?: string;
-  /** The amount of space currently being used by the table. */
-  spaceUsed?: string;
-  /** The amount of space remaining for use by the table. */
-  spaceRemaining?: string;
-  [key: string]: unknown;
-})[];
+export type GetAppTablesResponse = GetAppTablesItem[];
 
 // createTable
 /** Create a table */
@@ -645,57 +2105,8 @@ export interface GetRelationshipsParams {
 
 export interface GetRelationshipsResponse {
   /** The relationships in a table. */
-  relationships: {
-    /** The relationship id (foreign key field id). */
-    id: number;
-    /** The parent table id of the relationship. */
-    parentTableId: string;
-    /** The child table id of the relationship. */
-    childTableId: string;
-    /** The foreign key field information. */
-    foreignKeyField?: {
-      /** Field id. */
-      id?: number;
-      /** Field label. */
-      label?: string;
-      /** Field type. */
-      type?: string;
-      [key: string]: unknown;
-    };
-    /** Whether this is a cross-app relationship. */
-    isCrossApp: boolean;
-    /** The lookup fields array. */
-    lookupFields?: {
-      /** Field id. */
-      id?: number;
-      /** Field label. */
-      label?: string;
-      /** Field type. */
-      type?: string;
-      [key: string]: unknown;
-    }[];
-    /** The summary fields array. */
-    summaryFields?: {
-      /** Field id. */
-      id?: number;
-      /** Field label. */
-      label?: string;
-      /** Field type. */
-      type?: string;
-      [key: string]: unknown;
-    }[];
-    [key: string]: unknown;
-  }[];
-  /** Additional information about the results that may be helpful. */
-  metadata?: {
-    /** The number of relationships to skip. */
-    skip?: number;
-    /** The total number of relationships. */
-    totalRelationships?: number;
-    /** The number of relationships in the current response object. */
-    numRelationships?: number;
-    [key: string]: unknown;
-  };
+  relationships: GetRelationshipsRelationshipsItem[];
+  metadata?: GetRelationshipsMetadata;
   [key: string]: unknown;
 }
 
@@ -738,38 +2149,13 @@ export interface CreateRelationshipResponse {
   parentTableId: string;
   /** The child table id of the relationship. */
   childTableId: string;
-  /** The foreign key field information. */
-  foreignKeyField?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  };
+  foreignKeyField?: CreateRelationshipForeignKeyField;
   /** Whether this is a cross-app relationship. */
   isCrossApp: boolean;
   /** The lookup fields array. */
-  lookupFields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  }[];
+  lookupFields?: CreateRelationshipLookupFieldsItem[];
   /** The summary fields array. */
-  summaryFields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  }[];
+  summaryFields?: CreateRelationshipSummaryFieldsItem[];
   [key: string]: unknown;
 }
 
@@ -806,38 +2192,13 @@ export interface UpdateRelationshipResponse {
   parentTableId: string;
   /** The child table id of the relationship. */
   childTableId: string;
-  /** The foreign key field information. */
-  foreignKeyField?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  };
+  foreignKeyField?: UpdateRelationshipForeignKeyField;
   /** Whether this is a cross-app relationship. */
   isCrossApp: boolean;
   /** The lookup fields array. */
-  lookupFields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  }[];
+  lookupFields?: UpdateRelationshipLookupFieldsItem[];
   /** The summary fields array. */
-  summaryFields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  }[];
+  summaryFields?: UpdateRelationshipSummaryFieldsItem[];
   [key: string]: unknown;
 }
 
@@ -863,46 +2224,7 @@ export interface GetTableReportsParams {
   tableId: string;
 }
 
-export type GetTableReportsResponse = ({
-  /** The identifier of the report, unique to the table. */
-  id?: string;
-  /** The configured name of the report. */
-  name?: string;
-  /** The type of report in Quickbase (e.g., chart). */
-  type?: string;
-  /** The configured description of a report. */
-  description?: string;
-  ownerId?: OwnerId;
-  /** The query definition as configured in Quickbase that gets executed when the report is run. */
-  query?: {
-    /** The table identifier for the report. */
-    tableId?: string;
-    /** Filter used to query for data. */
-    filter?: string;
-    /** Calculated formula fields. */
-    formulaFields?: ({
-      /** Formula field identifier. */
-      id?: number;
-      /** Formula field label. */
-      label?: string;
-      /** Resulting formula value type. */
-      fieldType?: 'rich-text' | 'text' | 'numeric' | 'currency' | 'percent' | 'rating' | 'date' | 'timestamp' | 'timeofday' | 'duration' | 'checkbox' | 'phone' | 'email' | 'user' | 'multiuser' | 'url';
-      /** Formula text. */
-      formula?: string;
-      /** For numeric formula the number precision. */
-      decimalPrecision?: number;
-      [key: string]: unknown;
-    })[];
-    [key: string]: unknown;
-  };
-  /** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
-  properties?: Record<string, unknown>;
-  /** The instant at which a report was last used. */
-  usedLast?: string;
-  /** The number of times a report has been used. */
-  usedCount?: number;
-  [key: string]: unknown;
-})[];
+export type GetTableReportsResponse = GetTableReportsItem[];
 
 // getReport
 /** Get a report */
@@ -923,28 +2245,7 @@ export interface GetReportResponse {
   /** The configured description of a report. */
   description?: string;
   ownerId?: OwnerId;
-  /** The query definition as configured in Quickbase that gets executed when the report is run. */
-  query?: {
-    /** The table identifier for the report. */
-    tableId?: string;
-    /** Filter used to query for data. */
-    filter?: string;
-    /** Calculated formula fields. */
-    formulaFields?: ({
-      /** Formula field identifier. */
-      id?: number;
-      /** Formula field label. */
-      label?: string;
-      /** Resulting formula value type. */
-      fieldType?: 'rich-text' | 'text' | 'numeric' | 'currency' | 'percent' | 'rating' | 'date' | 'timestamp' | 'timeofday' | 'duration' | 'checkbox' | 'phone' | 'email' | 'user' | 'multiuser' | 'url';
-      /** Formula text. */
-      formula?: string;
-      /** For numeric formula the number precision. */
-      decimalPrecision?: number;
-      [key: string]: unknown;
-    })[];
-    [key: string]: unknown;
-  };
+  query?: GetReportQuery;
   /** A list of properties specific to the report type. To see a detailed description of the properties for each report type, See [Report Types.](../reportTypes) */
   properties?: Record<string, unknown>;
   /** The instant at which a report was last used. */
@@ -971,33 +2272,10 @@ export type RunReportRequest = unknown;
 
 export interface RunReportResponse {
   /** An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs. */
-  fields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    /** Column heading label override for field in report. */
-    labelOverride?: string;
-    [key: string]: unknown;
-  }[];
+  fields?: RunReportFieldsItem[];
   /** An array of objects that either represents the record data or summarized values, depending on the report type. */
   data?: QuickbaseRecord[];
-  /** Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed. */
-  metadata?: {
-    /** The number of records to skip */
-    skip?: number;
-    /** The number of fields in each record in the current response object */
-    numFields: number;
-    /** If present, the maximum number of records requested by the caller */
-    top?: number;
-    /** The total number of records in the result set */
-    totalRecords: number;
-    /** The number of records in the current response object */
-    numRecords: number;
-    [key: string]: unknown;
-  };
+  metadata?: RunReportMetadata;
   [key: string]: unknown;
 }
 
@@ -1010,194 +2288,7 @@ export interface GetFieldsParams {
   includeFieldPerms?: boolean;
 }
 
-export type GetFieldsResponse = ({
-  /** The id of the field, unique to this table. */
-  id: number;
-  /** The type of field, as described [here](https://help.quickbase.com/user-assistance/field_types.html). */
-  fieldType?: string;
-  /** For derived fields, this will be 'lookup', 'summary', or 'formula', to indicate the type of derived field.  For non-derived fields, this will be blank. */
-  mode?: string;
-  /** The label (name) of the field. */
-  label?: string;
-  /** Indicates if the field is configured to not wrap when displayed in the product. */
-  noWrap?: boolean;
-  /** Indicates if the field is configured to display in bold in the product. */
-  bold?: boolean;
-  /** Indicates if the field is marked required. */
-  required?: boolean;
-  /** Indicates if the field is marked as a default in reports. */
-  appearsByDefault?: boolean;
-  /** Indicates if the field is marked as searchable. */
-  findEnabled?: boolean;
-  /** Indicates if the field is marked unique. */
-  unique?: boolean;
-  /** Indicates if the field data will copy when a user copies the record. */
-  doesDataCopy?: boolean;
-  /** The configured help text shown to users within the product. */
-  fieldHelp?: string;
-  /** Indicates if the field is being tracked as part of Quickbase Audit Logs. */
-  audited?: boolean;
-  /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
-  properties?: {
-    /** If someone can @mention users in the rich text field to generate an email notification. */
-    allowMentions?: boolean;
-    /** The comments entered on the field properties by an administrator. */
-    comments?: string;
-    /** Whether this field totals in reports within the product. */
-    doesTotal?: boolean;
-    /** Whether the link field will auto save. */
-    autoSave?: boolean;
-    /** Default user id value. */
-    defaultValueLuid?: number;
-    /** Whether phone numbers should be in E.164 standard international format. */
-    useI18NFormat?: boolean;
-    /** The maximum number of versions configured for a file attachment. */
-    maxVersions?: number;
-    /** Whether the field should carry its multiple choice fields when copied. */
-    carryChoices?: boolean;
-    /** The format to display time. */
-    format?: number;
-    /** The maximum number of characters allowed for entry in Quickbase for this field. */
-    maxLength?: number;
-    /** The configured text value that replaces the URL that users see within the product. */
-    linkText?: string;
-    /** The id of the parent composite field, when applicable. */
-    parentFieldId?: number;
-    /** Indicates whether to display the timezone within the product. */
-    displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
-    summaryTargetFieldId?: number;
-    /** Indicates if users can add new choices to a selection list. */
-    allowNewChoices?: boolean;
-    /** The id of the field that is the reference in the relationship. */
-    masterChoiceFieldId?: number;
-    /** Indicates if the field value is defaulted today for new records. */
-    defaultToday?: boolean;
-    /** The units label. */
-    units?: string;
-    /** The id of the field that is the target on the master table for this lookup. */
-    lookupTargetFieldId?: number;
-    /** The summary accumulation function type. */
-    summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
-    /** The id of the source field. */
-    sourceFieldId?: number;
-    /** The table alias for the master table in the relationship this field is part of. */
-    masterTableTag?: string;
-    /** Whether this field averages in reports within the product. */
-    doesAverage?: boolean;
-    /** The formula of the field as configured in Quickbase. */
-    formula?: string;
-    /** The number of decimal places displayed in the product for this field. */
-    decimalPlaces?: number;
-    /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
-    defaultCountryCode?: string;
-    /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
-    seeVersions?: boolean;
-    /** How to display months. */
-    displayMonth?: string;
-    /** The number of lines shown in Quickbase for this text field. */
-    numLines?: number;
-    /** How the email is displayed. */
-    displayEmail?: string;
-    /** The user default type. */
-    defaultKind?: string;
-    /** An alternate user friendly text that can be used to display a link in the browser. */
-    coverText?: string;
-    /** The current symbol used when displaying field values within the product. */
-    currencySymbol?: string;
-    /** The id of the table that is the master in this relationship. */
-    masterChoiceTableId?: string;
-    /** The id of the target field. */
-    targetFieldId?: number;
-    /** The configured option for how users display within the product. */
-    displayUser?: string;
-    /** Whether a blank value is treated the same as 0 in calculations within the product. */
-    blankIsZero?: boolean;
-    /** Whether an exact match is required for a report link. */
-    exact?: boolean;
-    /** The start field id. */
-    startField?: number;
-    /** Default email domain. */
-    defaultDomain?: string;
-    /** The default value configured for a field when a new record is added. */
-    defaultValue?: string;
-    /** List of user choices. */
-    choicesLuid?: string[];
-    /** Don't show the URL protocol when showing the URL. */
-    abbreviate?: boolean;
-    /** The field's xml tag. */
-    xmlTag?: string;
-    /** The field's target table name. */
-    targetTableName?: string;
-    /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
-    numberFormat?: number;
-    /** The link text, if empty, the url will be used as link text. */
-    appearsAs?: string;
-    /** The field's html input width in the product. */
-    width?: number;
-    /** The currency format used when displaying field values within the product. */
-    currencyFormat?: 'left' | 'right' | 'middle';
-    /** Indicates if the field is a foreign key (or reference field) in a relationship. */
-    foreignKey?: boolean;
-    /** Indicates whether to display the day of the week within the product. */
-    displayDayOfWeek?: boolean;
-    /** The id of the field that is the reference in the relationship for this summary. */
-    summaryReferenceFieldId?: number;
-    /** The number of digits before commas display in the product, when applicable. */
-    commaStart?: number;
-    /** An array of entries that exist for a field that offers choices to the user. */
-    choices?: string[];
-    /** The id of the target table. */
-    targetTableId?: string;
-    /** Whether to display time as relative. */
-    displayRelative?: boolean;
-    /** An array of the fields that make up a composite field (e.g., address). */
-    compositeFields?: (number | Record<string, unknown>)[];
-    /** Indicates whether the checkbox values will be shown as text in reports. */
-    displayCheckboxAsText?: boolean;
-    /** Version modes for files. Keep all versions vs keep last version. */
-    versionMode?: 'keepallversions' | 'keeplastversions';
-    /** Indicates whether to display the time, in addition to the date. */
-    displayTime?: boolean;
-    /** The duration field id. */
-    durationField?: number;
-    /** The id of the field that is used to snapshot values from, when applicable. */
-    snapFieldId?: number;
-    /** Indicates whether or not to display time in the 24-hour format within the product. */
-    hours24?: boolean;
-    /** Whether to sort alphabetically, default sort is by record ID. */
-    sortAlpha?: boolean;
-    /** Indicates if the listed entries sort as entered vs alphabetically. */
-    sortAsGiven?: boolean;
-    /** Whether this field has a phone extension. */
-    hasExtension?: boolean;
-    /** The work week type. */
-    workWeek?: number;
-    /** Indicates if the URL should open a new window when a user clicks it within the product. */
-    useNewWindow?: boolean;
-    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
-    postTempToken?: boolean;
-    /** Whether this field is append only. */
-    appendOnly?: boolean;
-    /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
-    displayAsLink?: boolean;
-    /** Whether this field allows html. */
-    allowHTML?: boolean;
-    /** The id of the field that is the reference in the relationship for this lookup. */
-    lookupReferenceFieldId?: number;
-    [key: string]: unknown;
-  };
-  /** Field Permissions for different roles. */
-  permissions?: {
-    /** The role associated with a given permission for the field */
-    role?: string;
-    /** The permission given to the role for this field */
-    permissionType?: string;
-    /** The Id of the given role */
-    roleId?: number;
-  }[];
-  [key: string]: unknown;
-})[];
+export type GetFieldsResponse = GetFieldsItem[];
 
 // createField
 /** Create a field */
@@ -1384,165 +2475,9 @@ export interface CreateFieldResponse {
   fieldHelp?: string;
   /** Indicates if the field is being tracked as part of Quickbase Audit Logs. */
   audited?: boolean;
-  /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
-  properties?: {
-    /** If someone can @mention users in the rich text field to generate an email notification. */
-    allowMentions?: boolean;
-    /** The comments entered on the field properties by an administrator. */
-    comments?: string;
-    /** Whether this field totals in reports within the product. */
-    doesTotal?: boolean;
-    /** Whether the link field will auto save. */
-    autoSave?: boolean;
-    /** Default user id value. */
-    defaultValueLuid?: number;
-    /** Whether phone numbers should be in E.164 standard international format. */
-    useI18NFormat?: boolean;
-    /** The maximum number of versions configured for a file attachment. */
-    maxVersions?: number;
-    /** Whether the field should carry its multiple choice fields when copied. */
-    carryChoices?: boolean;
-    /** The format to display time. */
-    format?: number;
-    /** The maximum number of characters allowed for entry in Quickbase for this field. */
-    maxLength?: number;
-    /** The configured text value that replaces the URL that users see within the product. */
-    linkText?: string;
-    /** The id of the parent composite field, when applicable. */
-    parentFieldId?: number;
-    /** Indicates whether to display the timezone within the product. */
-    displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
-    summaryTargetFieldId?: number;
-    /** Indicates if users can add new choices to a selection list. */
-    allowNewChoices?: boolean;
-    /** The id of the field that is the reference in the relationship. */
-    masterChoiceFieldId?: number;
-    /** Indicates if the field value is defaulted today for new records. */
-    defaultToday?: boolean;
-    /** The units label. */
-    units?: string;
-    /** The id of the field that is the target on the master table for this lookup. */
-    lookupTargetFieldId?: number;
-    /** The summary accumulation function type. */
-    summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
-    /** The id of the source field. */
-    sourceFieldId?: number;
-    /** The table alias for the master table in the relationship this field is part of. */
-    masterTableTag?: string;
-    /** Whether this field averages in reports within the product. */
-    doesAverage?: boolean;
-    /** The formula of the field as configured in Quickbase. */
-    formula?: string;
-    /** The number of decimal places displayed in the product for this field. */
-    decimalPlaces?: number;
-    /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
-    defaultCountryCode?: string;
-    /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
-    seeVersions?: boolean;
-    /** How to display months. */
-    displayMonth?: string;
-    /** The number of lines shown in Quickbase for this text field. */
-    numLines?: number;
-    /** How the email is displayed. */
-    displayEmail?: string;
-    /** The user default type. */
-    defaultKind?: string;
-    /** An alternate user friendly text that can be used to display a link in the browser. */
-    coverText?: string;
-    /** The current symbol used when displaying field values within the product. */
-    currencySymbol?: string;
-    /** The id of the table that is the master in this relationship. */
-    masterChoiceTableId?: string;
-    /** The id of the target field. */
-    targetFieldId?: number;
-    /** The configured option for how users display within the product. */
-    displayUser?: string;
-    /** Whether a blank value is treated the same as 0 in calculations within the product. */
-    blankIsZero?: boolean;
-    /** Whether an exact match is required for a report link. */
-    exact?: boolean;
-    /** The start field id. */
-    startField?: number;
-    /** Default email domain. */
-    defaultDomain?: string;
-    /** The default value configured for a field when a new record is added. */
-    defaultValue?: string;
-    /** List of user choices. */
-    choicesLuid?: string[];
-    /** Don't show the URL protocol when showing the URL. */
-    abbreviate?: boolean;
-    /** The field's xml tag. */
-    xmlTag?: string;
-    /** The field's target table name. */
-    targetTableName?: string;
-    /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
-    numberFormat?: number;
-    /** The link text, if empty, the url will be used as link text. */
-    appearsAs?: string;
-    /** The field's html input width in the product. */
-    width?: number;
-    /** The currency format used when displaying field values within the product. */
-    currencyFormat?: 'left' | 'right' | 'middle';
-    /** Indicates if the field is a foreign key (or reference field) in a relationship. */
-    foreignKey?: boolean;
-    /** Indicates whether to display the day of the week within the product. */
-    displayDayOfWeek?: boolean;
-    /** The id of the field that is the reference in the relationship for this summary. */
-    summaryReferenceFieldId?: number;
-    /** The number of digits before commas display in the product, when applicable. */
-    commaStart?: number;
-    /** An array of entries that exist for a field that offers choices to the user. */
-    choices?: string[];
-    /** The id of the target table. */
-    targetTableId?: string;
-    /** Whether to display time as relative. */
-    displayRelative?: boolean;
-    /** An array of the fields that make up a composite field (e.g., address). */
-    compositeFields?: (number | Record<string, unknown>)[];
-    /** Indicates whether the checkbox values will be shown as text in reports. */
-    displayCheckboxAsText?: boolean;
-    /** Version modes for files. Keep all versions vs keep last version. */
-    versionMode?: 'keepallversions' | 'keeplastversions';
-    /** Indicates whether to display the time, in addition to the date. */
-    displayTime?: boolean;
-    /** The duration field id. */
-    durationField?: number;
-    /** The id of the field that is used to snapshot values from, when applicable. */
-    snapFieldId?: number;
-    /** Indicates whether or not to display time in the 24-hour format within the product. */
-    hours24?: boolean;
-    /** Whether to sort alphabetically, default sort is by record ID. */
-    sortAlpha?: boolean;
-    /** Indicates if the listed entries sort as entered vs alphabetically. */
-    sortAsGiven?: boolean;
-    /** Whether this field has a phone extension. */
-    hasExtension?: boolean;
-    /** The work week type. */
-    workWeek?: number;
-    /** Indicates if the URL should open a new window when a user clicks it within the product. */
-    useNewWindow?: boolean;
-    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
-    postTempToken?: boolean;
-    /** Whether this field is append only. */
-    appendOnly?: boolean;
-    /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
-    displayAsLink?: boolean;
-    /** Whether this field allows html. */
-    allowHTML?: boolean;
-    /** The id of the field that is the reference in the relationship for this lookup. */
-    lookupReferenceFieldId?: number;
-    [key: string]: unknown;
-  };
+  properties?: CreateFieldProperties;
   /** Field Permissions for different roles. */
-  permissions?: {
-    /** The role associated with a given permission for the field */
-    role?: string;
-    /** The permission given to the role for this field */
-    permissionType?: string;
-    /** The Id of the given role */
-    roleId?: number;
-  }[];
+  permissions?: CreateFieldPermissionsItem[];
   [key: string]: unknown;
 }
 
@@ -1605,165 +2540,9 @@ export interface GetFieldResponse {
   fieldHelp?: string;
   /** Indicates if the field is being tracked as part of Quickbase Audit Logs. */
   audited?: boolean;
-  /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
-  properties?: {
-    /** If someone can @mention users in the rich text field to generate an email notification. */
-    allowMentions?: boolean;
-    /** The comments entered on the field properties by an administrator. */
-    comments?: string;
-    /** Whether this field totals in reports within the product. */
-    doesTotal?: boolean;
-    /** Whether the link field will auto save. */
-    autoSave?: boolean;
-    /** Default user id value. */
-    defaultValueLuid?: number;
-    /** Whether phone numbers should be in E.164 standard international format. */
-    useI18NFormat?: boolean;
-    /** The maximum number of versions configured for a file attachment. */
-    maxVersions?: number;
-    /** Whether the field should carry its multiple choice fields when copied. */
-    carryChoices?: boolean;
-    /** The format to display time. */
-    format?: number;
-    /** The maximum number of characters allowed for entry in Quickbase for this field. */
-    maxLength?: number;
-    /** The configured text value that replaces the URL that users see within the product. */
-    linkText?: string;
-    /** The id of the parent composite field, when applicable. */
-    parentFieldId?: number;
-    /** Indicates whether to display the timezone within the product. */
-    displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
-    summaryTargetFieldId?: number;
-    /** Indicates if users can add new choices to a selection list. */
-    allowNewChoices?: boolean;
-    /** The id of the field that is the reference in the relationship. */
-    masterChoiceFieldId?: number;
-    /** Indicates if the field value is defaulted today for new records. */
-    defaultToday?: boolean;
-    /** The units label. */
-    units?: string;
-    /** The id of the field that is the target on the master table for this lookup. */
-    lookupTargetFieldId?: number;
-    /** The summary accumulation function type. */
-    summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
-    /** The id of the source field. */
-    sourceFieldId?: number;
-    /** The table alias for the master table in the relationship this field is part of. */
-    masterTableTag?: string;
-    /** Whether this field averages in reports within the product. */
-    doesAverage?: boolean;
-    /** The formula of the field as configured in Quickbase. */
-    formula?: string;
-    /** The number of decimal places displayed in the product for this field. */
-    decimalPlaces?: number;
-    /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
-    defaultCountryCode?: string;
-    /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
-    seeVersions?: boolean;
-    /** How to display months. */
-    displayMonth?: string;
-    /** The number of lines shown in Quickbase for this text field. */
-    numLines?: number;
-    /** How the email is displayed. */
-    displayEmail?: string;
-    /** The user default type. */
-    defaultKind?: string;
-    /** An alternate user friendly text that can be used to display a link in the browser. */
-    coverText?: string;
-    /** The current symbol used when displaying field values within the product. */
-    currencySymbol?: string;
-    /** The id of the table that is the master in this relationship. */
-    masterChoiceTableId?: string;
-    /** The id of the target field. */
-    targetFieldId?: number;
-    /** The configured option for how users display within the product. */
-    displayUser?: string;
-    /** Whether a blank value is treated the same as 0 in calculations within the product. */
-    blankIsZero?: boolean;
-    /** Whether an exact match is required for a report link. */
-    exact?: boolean;
-    /** The start field id. */
-    startField?: number;
-    /** Default email domain. */
-    defaultDomain?: string;
-    /** The default value configured for a field when a new record is added. */
-    defaultValue?: string;
-    /** List of user choices. */
-    choicesLuid?: string[];
-    /** Don't show the URL protocol when showing the URL. */
-    abbreviate?: boolean;
-    /** The field's xml tag. */
-    xmlTag?: string;
-    /** The field's target table name. */
-    targetTableName?: string;
-    /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
-    numberFormat?: number;
-    /** The link text, if empty, the url will be used as link text. */
-    appearsAs?: string;
-    /** The field's html input width in the product. */
-    width?: number;
-    /** The currency format used when displaying field values within the product. */
-    currencyFormat?: 'left' | 'right' | 'middle';
-    /** Indicates if the field is a foreign key (or reference field) in a relationship. */
-    foreignKey?: boolean;
-    /** Indicates whether to display the day of the week within the product. */
-    displayDayOfWeek?: boolean;
-    /** The id of the field that is the reference in the relationship for this summary. */
-    summaryReferenceFieldId?: number;
-    /** The number of digits before commas display in the product, when applicable. */
-    commaStart?: number;
-    /** An array of entries that exist for a field that offers choices to the user. */
-    choices?: string[];
-    /** The id of the target table. */
-    targetTableId?: string;
-    /** Whether to display time as relative. */
-    displayRelative?: boolean;
-    /** An array of the fields that make up a composite field (e.g., address). */
-    compositeFields?: (number | Record<string, unknown>)[];
-    /** Indicates whether the checkbox values will be shown as text in reports. */
-    displayCheckboxAsText?: boolean;
-    /** Version modes for files. Keep all versions vs keep last version. */
-    versionMode?: 'keepallversions' | 'keeplastversions';
-    /** Indicates whether to display the time, in addition to the date. */
-    displayTime?: boolean;
-    /** The duration field id. */
-    durationField?: number;
-    /** The id of the field that is used to snapshot values from, when applicable. */
-    snapFieldId?: number;
-    /** Indicates whether or not to display time in the 24-hour format within the product. */
-    hours24?: boolean;
-    /** Whether to sort alphabetically, default sort is by record ID. */
-    sortAlpha?: boolean;
-    /** Indicates if the listed entries sort as entered vs alphabetically. */
-    sortAsGiven?: boolean;
-    /** Whether this field has a phone extension. */
-    hasExtension?: boolean;
-    /** The work week type. */
-    workWeek?: number;
-    /** Indicates if the URL should open a new window when a user clicks it within the product. */
-    useNewWindow?: boolean;
-    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
-    postTempToken?: boolean;
-    /** Whether this field is append only. */
-    appendOnly?: boolean;
-    /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
-    displayAsLink?: boolean;
-    /** Whether this field allows html. */
-    allowHTML?: boolean;
-    /** The id of the field that is the reference in the relationship for this lookup. */
-    lookupReferenceFieldId?: number;
-    [key: string]: unknown;
-  };
+  properties?: GetFieldProperties;
   /** Field Permissions for different roles. */
-  permissions?: {
-    /** The role associated with a given permission for the field */
-    role?: string;
-    /** The permission given to the role for this field */
-    permissionType?: string;
-    /** The Id of the given role */
-    roleId?: number;
-  }[];
+  permissions?: GetFieldPermissionsItem[];
   [key: string]: unknown;
 }
 
@@ -1970,165 +2749,9 @@ export interface UpdateFieldResponse {
   fieldHelp?: string;
   /** Indicates if the field is being tracked as part of Quickbase Audit Logs. */
   audited?: boolean;
-  /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
-  properties?: {
-    /** If someone can @mention users in the rich text field to generate an email notification. */
-    allowMentions?: boolean;
-    /** The comments entered on the field properties by an administrator. */
-    comments?: string;
-    /** Whether this field totals in reports within the product. */
-    doesTotal?: boolean;
-    /** Whether the link field will auto save. */
-    autoSave?: boolean;
-    /** Default user id value. */
-    defaultValueLuid?: number;
-    /** Whether phone numbers should be in E.164 standard international format. */
-    useI18NFormat?: boolean;
-    /** The maximum number of versions configured for a file attachment. */
-    maxVersions?: number;
-    /** Whether the field should carry its multiple choice fields when copied. */
-    carryChoices?: boolean;
-    /** The format to display time. */
-    format?: number;
-    /** The maximum number of characters allowed for entry in Quickbase for this field. */
-    maxLength?: number;
-    /** The configured text value that replaces the URL that users see within the product. */
-    linkText?: string;
-    /** The id of the parent composite field, when applicable. */
-    parentFieldId?: number;
-    /** Indicates whether to display the timezone within the product. */
-    displayTimezone?: boolean;
-    /** The id of the field that is used to aggregate values from the child, when applicable. This displays 0 if the summary function doesn't require a field selection (like count). */
-    summaryTargetFieldId?: number;
-    /** Indicates if users can add new choices to a selection list. */
-    allowNewChoices?: boolean;
-    /** The id of the field that is the reference in the relationship. */
-    masterChoiceFieldId?: number;
-    /** Indicates if the field value is defaulted today for new records. */
-    defaultToday?: boolean;
-    /** The units label. */
-    units?: string;
-    /** The id of the field that is the target on the master table for this lookup. */
-    lookupTargetFieldId?: number;
-    /** The summary accumulation function type. */
-    summaryFunction?: 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'STD-DEV' | 'COUNT' | 'COMBINED-TEXT' | 'COMBINED-USER' | 'DISTINCT-COUNT';
-    /** The id of the source field. */
-    sourceFieldId?: number;
-    /** The table alias for the master table in the relationship this field is part of. */
-    masterTableTag?: string;
-    /** Whether this field averages in reports within the product. */
-    doesAverage?: boolean;
-    /** The formula of the field as configured in Quickbase. */
-    formula?: string;
-    /** The number of decimal places displayed in the product for this field. */
-    decimalPlaces?: number;
-    /** Controls the default country shown on international phone widgets on forms. Country code should be entered in the ISO 3166-1 alpha-2 format. */
-    defaultCountryCode?: string;
-    /** Indicates if the user can see other versions, aside from the most recent, of a file attachment within the product. */
-    seeVersions?: boolean;
-    /** How to display months. */
-    displayMonth?: string;
-    /** The number of lines shown in Quickbase for this text field. */
-    numLines?: number;
-    /** How the email is displayed. */
-    displayEmail?: string;
-    /** The user default type. */
-    defaultKind?: string;
-    /** An alternate user friendly text that can be used to display a link in the browser. */
-    coverText?: string;
-    /** The current symbol used when displaying field values within the product. */
-    currencySymbol?: string;
-    /** The id of the table that is the master in this relationship. */
-    masterChoiceTableId?: string;
-    /** The id of the target field. */
-    targetFieldId?: number;
-    /** The configured option for how users display within the product. */
-    displayUser?: string;
-    /** Whether a blank value is treated the same as 0 in calculations within the product. */
-    blankIsZero?: boolean;
-    /** Whether an exact match is required for a report link. */
-    exact?: boolean;
-    /** The start field id. */
-    startField?: number;
-    /** Default email domain. */
-    defaultDomain?: string;
-    /** The default value configured for a field when a new record is added. */
-    defaultValue?: string;
-    /** List of user choices. */
-    choicesLuid?: string[];
-    /** Don't show the URL protocol when showing the URL. */
-    abbreviate?: boolean;
-    /** The field's xml tag. */
-    xmlTag?: string;
-    /** The field's target table name. */
-    targetTableName?: string;
-    /** The format used for displaying numeric values in the product (decimal, separators, digit group). */
-    numberFormat?: number;
-    /** The link text, if empty, the url will be used as link text. */
-    appearsAs?: string;
-    /** The field's html input width in the product. */
-    width?: number;
-    /** The currency format used when displaying field values within the product. */
-    currencyFormat?: 'left' | 'right' | 'middle';
-    /** Indicates if the field is a foreign key (or reference field) in a relationship. */
-    foreignKey?: boolean;
-    /** Indicates whether to display the day of the week within the product. */
-    displayDayOfWeek?: boolean;
-    /** The id of the field that is the reference in the relationship for this summary. */
-    summaryReferenceFieldId?: number;
-    /** The number of digits before commas display in the product, when applicable. */
-    commaStart?: number;
-    /** An array of entries that exist for a field that offers choices to the user. */
-    choices?: string[];
-    /** The id of the target table. */
-    targetTableId?: string;
-    /** Whether to display time as relative. */
-    displayRelative?: boolean;
-    /** An array of the fields that make up a composite field (e.g., address). */
-    compositeFields?: (number | Record<string, unknown>)[];
-    /** Indicates whether the checkbox values will be shown as text in reports. */
-    displayCheckboxAsText?: boolean;
-    /** Version modes for files. Keep all versions vs keep last version. */
-    versionMode?: 'keepallversions' | 'keeplastversions';
-    /** Indicates whether to display the time, in addition to the date. */
-    displayTime?: boolean;
-    /** The duration field id. */
-    durationField?: number;
-    /** The id of the field that is used to snapshot values from, when applicable. */
-    snapFieldId?: number;
-    /** Indicates whether or not to display time in the 24-hour format within the product. */
-    hours24?: boolean;
-    /** Whether to sort alphabetically, default sort is by record ID. */
-    sortAlpha?: boolean;
-    /** Indicates if the listed entries sort as entered vs alphabetically. */
-    sortAsGiven?: boolean;
-    /** Whether this field has a phone extension. */
-    hasExtension?: boolean;
-    /** The work week type. */
-    workWeek?: number;
-    /** Indicates if the URL should open a new window when a user clicks it within the product. */
-    useNewWindow?: boolean;
-    /** POSTs a temporary token to the first URL when clicked by a user. [Learn more](https://help.quickbase.com/docs/post-temporary-token-from-a-quickbase-field) */
-    postTempToken?: boolean;
-    /** Whether this field is append only. */
-    appendOnly?: boolean;
-    /** Indicates if a field that is part of the relationship should be shown as a hyperlink to the parent record within the product. */
-    displayAsLink?: boolean;
-    /** Whether this field allows html. */
-    allowHTML?: boolean;
-    /** The id of the field that is the reference in the relationship for this lookup. */
-    lookupReferenceFieldId?: number;
-    [key: string]: unknown;
-  };
+  properties?: UpdateFieldProperties;
   /** Field Permissions for different roles. */
-  permissions?: {
-    /** The role associated with a given permission for the field */
-    role?: string;
-    /** The permission given to the role for this field */
-    permissionType?: string;
-    /** The Id of the given role */
-    roleId?: number;
-  }[];
+  permissions?: UpdateFieldPermissionsItem[];
   [key: string]: unknown;
 }
 
@@ -2143,122 +2766,7 @@ export interface GetFieldsUsageParams {
   top?: number;
 }
 
-export interface GetFieldsUsageResponse {
-  /** Basic information about the field. */
-  field: {
-    /** Field name. */
-    name: string;
-    /** Field id. */
-    id: number;
-    /** Field type. */
-    type: string;
-    [key: string]: unknown;
-  };
-  /** Usage Information about the field. */
-  usage: {
-    /** The number of quickbase actions where the given field is referenced. */
-    actions: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of app home pages where the given field is referenced. */
-    appHomePages: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of dashboards where the given field is referenced. */
-    dashboards: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of default reports where the given field is referenced. */
-    defaultReports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of exact forms where the given field is referenced. */
-    exactForms: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of fields where the given field is referenced. */
-    fields: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of forms where the given field is referenced. */
-    forms: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of notifications where the given field is referenced. */
-    notifications: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of personal reports where the given field is referenced. */
-    personalReports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of pipelines where the given field is referenced. */
-    pipelines: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of relationships where the given field is referenced. */
-    relationships: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of reminders where the given field is referenced. */
-    reminders: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of reports where the given field is referenced. */
-    reports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of roles where the given field is referenced. */
-    roles: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of table imports where the given field is referenced. */
-    tableImports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of table rules where the given field is referenced. */
-    tableRules: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of webhooks where the given field is referenced. */
-    webhooks: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}[]
+export type GetFieldsUsageResponse = GetFieldsUsageItem[];
 
 // getFieldUsage
 /** Get usage for a field */
@@ -2269,122 +2777,7 @@ export interface GetFieldUsageParams {
   fieldId: number;
 }
 
-export interface GetFieldUsageResponse {
-  /** Basic information about the field. */
-  field: {
-    /** Field name. */
-    name: string;
-    /** Field id. */
-    id: number;
-    /** Field type. */
-    type: string;
-    [key: string]: unknown;
-  };
-  /** Usage Information about the field. */
-  usage: {
-    /** The number of quickbase actions where the given field is referenced. */
-    actions: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of app home pages where the given field is referenced. */
-    appHomePages: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of dashboards where the given field is referenced. */
-    dashboards: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of default reports where the given field is referenced. */
-    defaultReports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of exact forms where the given field is referenced. */
-    exactForms: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of fields where the given field is referenced. */
-    fields: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of forms where the given field is referenced. */
-    forms: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of notifications where the given field is referenced. */
-    notifications: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of personal reports where the given field is referenced. */
-    personalReports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of pipelines where the given field is referenced. */
-    pipelines: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of relationships where the given field is referenced. */
-    relationships: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of reminders where the given field is referenced. */
-    reminders: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of reports where the given field is referenced. */
-    reports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of roles where the given field is referenced. */
-    roles: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    /** The number of table imports where the given field is referenced. */
-    tableImports: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of table rules where the given field is referenced. */
-    tableRules: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-    };
-    /** The number of webhooks where the given field is referenced. */
-    webhooks: {
-      /** the number of times a field has been used for the given item. */
-      count: number;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}[]
+export type GetFieldUsageResponse = GetFieldUsageItem[];
 
 // runFormula
 /** Run a formula */
@@ -2418,20 +2811,7 @@ export interface UpsertRequest {
 }
 
 export interface UpsertResponse {
-  /** Information about created records, updated records, referenced but unchanged records, and records having any errors while being processed. */
-  metadata?: {
-    /** Array containing the created record ids. */
-    createdRecordIds?: number[];
-    /** This will only be returned in the case of failed records. It is a collection of errors that occurred when processing the incoming data that resulted in records not being processed. Each object has a key representing the sequence number of the record in the original payload (starting from 1). The value is a list of errors occurred. */
-    lineErrors?: Record<string, string[]>;
-    /** Array containing the unchanged record ids. */
-    unchangedRecordIds?: number[];
-    /** Array containing the updated record ids. */
-    updatedRecordIds?: number[];
-    /** Number of records processed. Includes successful and failed record updates. */
-    totalNumberOfRecordsProcessed?: number;
-    [key: string]: unknown;
-  };
+  metadata?: UpsertMetadata;
   /** The data that is expected to be returned. */
   data?: QuickbaseRecord[];
   [key: string]: unknown;
@@ -2486,31 +2866,10 @@ export interface RunQueryRequest {
 
 export interface RunQueryResponse {
   /** An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs. */
-  fields?: {
-    /** Field id. */
-    id?: number;
-    /** Field label. */
-    label?: string;
-    /** Field type. */
-    type?: string;
-    [key: string]: unknown;
-  }[];
+  fields?: RunQueryFieldsItem[];
   /** An array of objects that either represents the record data or summarized values, depending on the report type. */
   data?: QuickbaseRecord[];
-  /** Additional information about the results that may be helpful. Pagination may be needed if either you specify a smaller number of results to skip than is available, or if the API automatically returns fewer results. numRecords can be compared to totalRecords to determine if further pagination is needed. */
-  metadata?: {
-    /** The number of records to skip */
-    skip?: number;
-    /** The number of fields in each record in the current response object */
-    numFields: number;
-    /** If present, the maximum number of records requested by the caller */
-    top?: number;
-    /** The total number of records in the result set */
-    totalRecords: number;
-    /** The number of records in the current response object */
-    numRecords: number;
-    [key: string]: unknown;
-  };
+  metadata?: RunQueryMetadata;
   [key: string]: unknown;
 }
 
@@ -2531,15 +2890,7 @@ export interface RecordsModifiedSinceResponse {
   /** The count of changes found. */
   count: number;
   /** When includeDetails is true, this array contains the individual record changes. If includeDetails is false, this array will not be returned. */
-  changes?: ({
-    /** A record whose dependencies were found to have been updated after the time provided. */
-    recordId?: number;
-    /** The timestamp that Quickbase found that exceeded the after time. This does not represent the latest date modified in the record graph. */
-    timestamp?: string;
-    /** The type of change that was detected. */
-    changeType?: 'CREATE' | 'MODIFY' | 'DELETE';
-    [key: string]: unknown;
-  })[];
+  changes?: RecordsModifiedSinceChangesItem[];
   /** When true, this indicates that the number of deletes detected exceeded the limit and details could not be returned. */
   deletesTruncated?: boolean;
   [key: string]: unknown;
@@ -2594,13 +2945,7 @@ export interface CloneUserTokenResponse {
   /** Whether the user token is active. */
   active?: boolean;
   /** The list of apps this user token is assigned to. */
-  apps?: {
-    /** The unique identifier for this application. */
-    id?: string;
-    /** The application's name. */
-    name?: string;
-    [key: string]: unknown;
-  }[];
+  apps?: CloneUserTokenAppsItem[];
   /** The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   lastUsed?: string;
   /** User Token description. */
@@ -2629,13 +2974,7 @@ export interface TransferUserTokenResponse {
   /** Whether the user token is active. */
   active?: boolean;
   /** The list of apps this user token is assigned to. */
-  apps?: {
-    /** The unique identifier for this application. */
-    id?: string;
-    /** The application's name. */
-    name?: string;
-    [key: string]: unknown;
-  }[];
+  apps?: TransferUserTokenAppsItem[];
   /** The last date this user token was used, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   lastUsed?: string;
   /** User Token description. */
@@ -2698,18 +3037,7 @@ export interface DeleteFileResponse {
   fileName?: string;
   /** The timestamp when the version was originally uploaded. */
   uploaded?: string;
-  /** The user that uploaded version. */
-  creator?: {
-    /** User full name. */
-    name?: string;
-    /** User Id. */
-    id?: string;
-    /** User email. */
-    email?: string;
-    /** User Name as updated in user properties. Optional, appears if not the same as user email. */
-    userName?: string;
-    [key: string]: unknown;
-  };
+  creator?: DeleteFileCreator;
   [key: string]: unknown;
 }
 
@@ -2732,19 +3060,8 @@ export interface GetUsersRequest {
 
 export interface GetUsersResponse {
   /** A list of users found in an account with the given criterias */
-  users: {
-    userName: string;
-    firstName: string;
-    lastName: string;
-    emailAddress: string;
-    hashId: string;
-    [key: string]: unknown;
-  }[];
-  /** Additional request information */
-  metadata: {
-    nextPageToken: string;
-    [key: string]: unknown;
-  };
+  users: GetUsersUsersItem[];
+  metadata: GetUsersMetadata;
   [key: string]: unknown;
 }
 
@@ -2922,49 +3239,7 @@ export interface AuditResponse {
   /** Query id of the requested audit log. */
   queryId: string;
   /** All events of the audit log. */
-  events?: {
-    /** Log ID. */
-    id: string;
-    /** User's first name. */
-    firstname: string;
-    /** User's last name. */
-    lastname: string;
-    /** User's email address. */
-    email: string;
-    /** What action was taken, such as log in, create app, report access, or table search. */
-    topic: string;
-    /** Exact time the action was taken, including date, and time with hour, minutes and seconds. Time zone is the browser time zone. */
-    time: string;
-    /** The IP address the action was taken from. */
-    ipaddress: string;
-    /** The browser and OS the action was taken from. */
-    useragent: string;
-    /** UI for user interface or API for an API call. */
-    application: string;
-    /** A brief description of the action that you can click to see additional details. */
-    description: string;
-    /** The data changes that have occured to a field that has been marked as audited. */
-    payloadChanges?: {
-      /** An object describing the changes that occured on record changes. */
-      changes: {
-        /** The current value of the fields that have been changed. */
-        current: unknown[];
-        /** The previous value of the fields that have been changed. */
-        previous: unknown[];
-        /** The list of fields and their types that have been changed. */
-        fields: unknown[];
-        [key: string]: unknown;
-      };
-      /** The recordId that has been edited. */
-      rid: number;
-      /** The change type that occured for a record. Could be one of add, edit, delete. */
-      changeType: string;
-      /** A placeholder for type changes. */
-      type: string;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  }[];
+  events?: AuditEventsItem[];
   /** Token to fetch the next 1000 logs. */
   nextToken?: string;
   [key: string]: unknown;
@@ -2978,32 +3253,7 @@ export interface PlatformAnalyticReadsParams {
 }
 
 export interface PlatformAnalyticReadsResponse {
-  /** The data object containing the read summaries. */
-  data: {
-    /** Detailed read summaries for a specific date. */
-    dailyDetailedReads: {
-      /** The date of the requested summary. */
-      date: string;
-      /** Total reads for the specified date. */
-      reads: {
-        /** Total user reads for the realm on the specified date. */
-        user: number;
-        /** Total integration reads for the realm on the specified date. */
-        integrations: {
-          /** Total reads by anonymous users for the realm on the specified date. */
-          eoti: number;
-          /** Total API reads for the realm on the specified date. */
-          api: number;
-          /** Total pipeline reads for the realm on the specified date. */
-          pipelines: number;
-          [key: string]: unknown;
-        };
-        [key: string]: unknown;
-      };
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
+  data: PlatformAnalyticReadsData;
   [key: string]: unknown;
 }
 
@@ -3033,57 +3283,7 @@ export interface PlatformAnalyticEventSummariesRequest {
 }
 
 export interface PlatformAnalyticEventSummariesResponse {
-  data: {
-    eventsSummaries: {
-      /** The ID of the account the events are associated with. */
-      accountId: string;
-      /** The start date and time of the requested summaries in ISO 8601 time format. */
-      start: string;
-      /** The end date and time of the requested summaries in ISO 8601 time format. */
-      end: string;
-      /** How the events should be grouped. */
-      groupBy: 'app' | 'user';
-      where: ({
-        /** Id of the item to filter by. */
-        id: string;
-        /** The type of item to filter by. */
-        type: 'app' | 'user';
-      })[];
-      /** An array of objects that contains Application/User information and an events object with summaries by event type. */
-      results: ({
-        /** Id of the Application/User. */
-        id: string;
-        /** Name of the Application/User. */
-        name: string;
-        /** Totals by billing category for the event grouping. */
-        totals: {
-          integration?: number;
-          user?: number;
-          all?: number;
-        };
-        /** An array of events that contains specific information associated with an Application/User broken down by event type. */
-        eventTypes: ({
-          /** Event type */
-          eventType?: string;
-          /** Count of events associated with that event type and Application/User. */
-          count?: number;
-          /** Billing category of the event type. */
-          billingCategory?: 'user' | 'integration';
-        })[];
-      })[];
-      /** Additional information about the results that may be helpful. */
-      metadata: {
-        /** Supply this token in a subsequent request to fetch the next page of results. */
-        nextToken: string;
-      };
-      /** Totals by billing category for all queried events. */
-      totals: {
-        integration?: number;
-        user?: number;
-        all?: number;
-      };
-    };
-  };
+  data: PlatformAnalyticEventSummariesData;
 }
 
 // exportSolution
@@ -3230,14 +3430,7 @@ export interface GetTrusteesParams {
   appId: string;
 }
 
-export type GetTrusteesResponse = ({
-  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-  id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
-  /** The type of trustee being added. This can be a user, group, or email domain group. */
-  type: 'user' | 'group' | 'dom-group';
-})[];
+export type GetTrusteesResponse = GetTrusteesItem[];
 
 // addTrustees
 /** Add trustees to an app */
@@ -3257,28 +3450,9 @@ export type AddTrusteesRequest = ({
 
 export interface AddTrusteesResponse {
   /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
-  failure: ({
-    /** The error message associated with the trustee that could not be updated. */
-    error?: string;
-    /** Object used for operations to read, create, or update trustees in an app. */
-    trustee?: {
-      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-      id: string;
-      /** The ID of the role to be assigned or currently assigned to the trustee. */
-      roleId: number;
-      /** The type of trustee being added. This can be a user, group, or email domain group. */
-      type: 'user' | 'group' | 'dom-group';
-    };
-  })[];
+  failure: AddTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
-  success: ({
-    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-    id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
-    /** The type of trustee being added. This can be a user, group, or email domain group. */
-    type: 'user' | 'group' | 'dom-group';
-  })[];
+  success: AddTrusteesSuccessItem[];
 }
 
 // removeTrustees
@@ -3299,28 +3473,9 @@ export type RemoveTrusteesRequest = ({
 
 export interface RemoveTrusteesResponse {
   /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
-  failure: ({
-    /** The error message associated with the trustee that could not be updated. */
-    error?: string;
-    /** Object used for operations to read, create, or update trustees in an app. */
-    trustee?: {
-      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-      id: string;
-      /** The ID of the role to be assigned or currently assigned to the trustee. */
-      roleId: number;
-      /** The type of trustee being added. This can be a user, group, or email domain group. */
-      type: 'user' | 'group' | 'dom-group';
-    };
-  })[];
+  failure: RemoveTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
-  success: ({
-    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-    id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
-    /** The type of trustee being added. This can be a user, group, or email domain group. */
-    type: 'user' | 'group' | 'dom-group';
-  })[];
+  success: RemoveTrusteesSuccessItem[];
 }
 
 // updateTrustees
@@ -3343,32 +3498,9 @@ export type UpdateTrusteesRequest = ({
 
 export interface UpdateTrusteesResponse {
   /** A list of trustees that were not updated. This includes invalid IDs or IDs that could not be processed. */
-  failure: ({
-    /** The error message associated with the trustee that could not be updated. */
-    error?: string;
-    /** Object used for operations to read, create, or update trustees in an app. */
-    trustee?: {
-      /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-      id: string;
-      /** The ID of the role to be assigned or currently assigned to the trustee. */
-      roleId: number;
-      /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
-      oldRoleId: number;
-      /** The type of trustee being added. This can be a user, group, or email domain group. */
-      type: 'user' | 'group' | 'dom-group';
-    };
-  })[];
+  failure: UpdateTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
-  success: ({
-    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-    id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
-    /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
-    oldRoleId: number;
-    /** The type of trustee being added. This can be a user, group, or email domain group. */
-    type: 'user' | 'group' | 'dom-group';
-  })[];
+  success: UpdateTrusteesSuccessItem[];
 }
 
 /**

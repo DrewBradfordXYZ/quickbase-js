@@ -362,6 +362,18 @@ function addSharedSchemaTypes(spec: OpenAPISpec, typeDefs: string[]): void {
       typeDefs.push('');
     }
   }
+
+  // Every other component schema, including the ones the spec's
+  // extractInlineSchemas step pulls out of operations (CreateAppMemoryInfo,
+  // GetFieldsItemProperties, ...), which operation types reference by name.
+  for (const [schemaName, schema] of Object.entries(schemas)) {
+    if (SHARED_SCHEMAS.includes(schemaName)) continue;
+    if (schema.description) {
+      typeDefs.push(`/** ${schema.description} */`);
+    }
+    typeDefs.push(`export type ${schemaName} = ${schemaToTypeScript(schema)};`);
+    typeDefs.push('');
+  }
 }
 
 /**
