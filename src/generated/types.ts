@@ -4321,6 +4321,7 @@ export interface QuickbaseAPI {
    *
    * @see https://developer.quickbase.com/operation/denyUsers
    */
+  denyUsers(body: DenyUsersRequest): Promise<DenyUsersResponse>;
   denyUsers(params: DenyUsersParams, body: DenyUsersRequest): Promise<DenyUsersResponse>;
   /**
    * Deny and remove users from groups
@@ -4350,6 +4351,7 @@ export interface QuickbaseAPI {
    *
    * @see https://developer.quickbase.com/operation/undenyUsers
    */
+  undenyUsers(body: UndenyUsersRequest): Promise<UndenyUsersResponse>;
   undenyUsers(params: UndenyUsersParams, body: UndenyUsersRequest): Promise<UndenyUsersResponse>;
   /**
    * Add members

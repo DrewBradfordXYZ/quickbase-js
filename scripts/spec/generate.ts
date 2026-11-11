@@ -280,7 +280,10 @@ function generateOperationTypes(
   const returnType = responseType === 'void' ? 'void' : `${typeName}Response`;
   const isPaginated = isPaginatedOperation(operation.operationId);
   const returnWrapper = isPaginated ? 'PaginatedRequest' : 'Promise';
-  const methodSignature = `${methodName}(${params.join(', ')}): ${returnWrapper}<${returnType}>;`;
+  let methodSignature = `${methodName}(${params.join(', ')}): ${returnWrapper}<${returnType}>;`;
+  if (acceptsBodyAlone(operation)) {
+    methodSignature = `${methodName}(body: ${typeName}Request): ${returnWrapper}<${returnType}>;\n  ${methodSignature}`;
+  }
 
   // Generate comprehensive JSDoc
   const jsDoc = generateJsDoc(operation);
@@ -374,6 +377,24 @@ function addSharedSchemaTypes(spec: OpenAPISpec, typeDefs: string[]): void {
     typeDefs.push(`export type ${schemaName} = ${schemaToTypeScript(schema)};`);
     typeDefs.push('');
   }
+}
+
+/**
+ * True when every parameter is an optional query parameter and the body is
+ * required. Such a method also accepts the body alone: methodName(body).
+ * QuickBase sometimes adds an optional parameter to an operation that had
+ * none (createSolution gained alias), which would otherwise turn
+ * methodName(body) into methodName(params, body) and break callers.
+ * The second argument tells the forms apart, so the body must be required.
+ */
+function acceptsBodyAlone(operation: Operation): boolean {
+  const params = operation.parameters?.filter((p) => p.in === 'path' || p.in === 'query') ?? [];
+  return (
+    params.length > 0 &&
+    params.every((p) => p.in === 'query' && !p.required) &&
+    !!operation.requestBody?.required &&
+    !isPaginatedOperation(operation.operationId)
+  );
 }
 
 /**
@@ -532,6 +553,20 @@ function generateMethodImplementation(
   }
 
   // Generate regular method
+  if (acceptsBodyAlone(operation)) {
+    return [
+      indentedJsDoc,
+      `  ${methodName}(paramsOrBody: ${typeName}Params | ${typeName}Request, maybeBody?: ${typeName}Request): Promise<${returnType}> {`,
+      `    const [params, body] = maybeBody === undefined`,
+      `      ? [{} as ${typeName}Params, paramsOrBody as ${typeName}Request]`,
+      `      : [paramsOrBody as ${typeName}Params, maybeBody];`,
+      `    return request<${returnType}>({`,
+      ...requestOptions.map((opt) => `      ${opt},`),
+      `    });`,
+      `  },`,
+    ].join('\n');
+  }
+
   const lines = [
     indentedJsDoc,
     `  ${methodName}(${funcParams.join(', ')}): Promise<${returnType}> {`,

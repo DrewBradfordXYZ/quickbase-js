@@ -1180,7 +1180,10 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @see https://developer.quickbase.com/operation/denyUsers
    */
-  denyUsers(params: DenyUsersParams, body: DenyUsersRequest): Promise<DenyUsersResponse> {
+  denyUsers(paramsOrBody: DenyUsersParams | DenyUsersRequest, maybeBody?: DenyUsersRequest): Promise<DenyUsersResponse> {
+    const [params, body] = maybeBody === undefined
+      ? [{} as DenyUsersParams, paramsOrBody as DenyUsersRequest]
+      : [paramsOrBody as DenyUsersParams, maybeBody];
     return request<DenyUsersResponse>({
       method: 'PUT',
       path: '/users/deny',
@@ -1225,7 +1228,10 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    *
    * @see https://developer.quickbase.com/operation/undenyUsers
    */
-  undenyUsers(params: UndenyUsersParams, body: UndenyUsersRequest): Promise<UndenyUsersResponse> {
+  undenyUsers(paramsOrBody: UndenyUsersParams | UndenyUsersRequest, maybeBody?: UndenyUsersRequest): Promise<UndenyUsersResponse> {
+    const [params, body] = maybeBody === undefined
+      ? [{} as UndenyUsersParams, paramsOrBody as UndenyUsersRequest]
+      : [paramsOrBody as UndenyUsersParams, maybeBody];
     return request<UndenyUsersResponse>({
       method: 'PUT',
       path: '/users/undeny',
