@@ -136,6 +136,7 @@ import type {
   UpdateSolutionParams,
   UpdateSolutionRequest,
   UpdateSolutionResponse,
+  CreateSolutionParams,
   CreateSolutionRequest,
   CreateSolutionResponse,
   ExportSolutionToRecordParams,
@@ -164,6 +165,8 @@ import type {
   UpdateTrusteesParams,
   UpdateTrusteesRequest,
   UpdateTrusteesResponse,
+  GetUserAppsParams,
+  GetUserAppsResponse,
 } from './types.js';
 
 export type RequestFn = <T>(options: {
@@ -1509,16 +1512,22 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
+   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
+   *
    * @param body - The QBL to be used for the create.
    *
    * @returns Success
    *
    * @see https://developer.quickbase.com/operation/createSolution
    */
-  createSolution(body: CreateSolutionRequest): Promise<CreateSolutionResponse> {
+  createSolution(paramsOrBody: CreateSolutionParams | CreateSolutionRequest, maybeBody?: CreateSolutionRequest): Promise<CreateSolutionResponse> {
+    const [params, body] = maybeBody === undefined
+      ? [{} as CreateSolutionParams, paramsOrBody as CreateSolutionRequest]
+      : [paramsOrBody as CreateSolutionParams, maybeBody];
     return request<CreateSolutionResponse>({
       method: 'POST',
       path: '/solutions',
+      query: { alias: params.alias },
       body,
     });
   },
@@ -1554,6 +1563,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    * @param params.recordId - The unique identifier of the record.
+   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
    *
    * @returns Success
    *
@@ -1563,7 +1573,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
     return request<CreateSolutionFromRecordResponse>({
       method: 'GET',
       path: '/solutions/fromrecord',
-      query: { tableId: params.tableId, fieldId: params.fieldId, recordId: params.recordId },
+      query: { tableId: params.tableId, fieldId: params.fieldId, recordId: params.recordId, alias: params.alias },
     });
   },
 
@@ -1759,6 +1769,26 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
       method: 'PATCH',
       path: `/app/${params.appId}/trustees`,
       body,
+    });
+  },
+
+  /**
+   * Get apps for a user
+   *
+   * Returns a list of applications that a specific user has access to within an account. Only account admins can use this API.
+   *
+   * @param params.userId - The unique identifier of the user, including the hashed value (for example, 59913288.d772).
+   * @param params.accountId - The account id used to scope the request.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getUserApps
+   */
+  getUserApps(params: GetUserAppsParams): Promise<GetUserAppsResponse> {
+    return request<GetUserAppsResponse>({
+      method: 'GET',
+      path: `/users/${params.userId}/apps`,
+      query: { accountId: params.accountId },
     });
   },
   };

@@ -543,7 +543,7 @@
     "operationId": "createSolution",
     "method": "POST",
     "path": "/solutions",
-    "hasParams": false,
+    "hasParams": true,
     "hasBody": true,
     "tags": [
       "Solutions"
@@ -657,6 +657,16 @@
     "hasBody": true,
     "tags": [
       "Trustees"
+    ]
+  },
+  {
+    "operationId": "getUserApps",
+    "method": "GET",
+    "path": "/users/{userId}/apps",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Users"
     ]
   }
 ]

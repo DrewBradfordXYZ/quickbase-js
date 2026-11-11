@@ -1773,6 +1773,26 @@ export type PlatformAnalyticEventSummariesData = {
   };
 };
 
+export type GetSolutionPublicResources = {
+  /** List of applications contained within the solution */
+  apps?: {
+    /** The real ID of the application */
+    id?: string;
+    /** The logical ID of the application */
+    logicalId?: string;
+    [key: string]: unknown;
+  }[];
+  /** List of pipelines contained within the solution */
+  pipelines?: {
+    /** The real ID of the pipeline */
+    id?: string;
+    /** The logical ID of the pipeline */
+    logicalId?: string;
+    [key: string]: unknown;
+  }[];
+  [key: string]: unknown;
+};
+
 /** Object used for operations to read, create, or update trustees in an app. */
 export type GetTrusteesItem = {
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
@@ -1859,6 +1879,24 @@ export type UpdateTrusteesSuccessItem = {
   type: 'user' | 'group' | 'dom-group';
 };
 
+export type GetUserAppsAppsItem = {
+  /** The unique identifier of the application. */
+  id: string;
+  /** The name of the application. */
+  name: string;
+  /** The date and time the user last accessed this application, in ISO 8601 format. */
+  lastAccess: string;
+  /** The manager of the application. */
+  manager: {
+    /** The hashed user ID of the application manager. */
+    id: string;
+    /** The full name of the application manager. */
+    name: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
 // createApp
 /** Create an app */
 export interface CreateAppRequest {
@@ -1915,6 +1953,8 @@ export interface CreateAppResponse {
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
   securityProperties?: CreateAppSecurityProperties;
+  /** The id of the app from which this app was copied */
+  ancestorId?: string;
   [key: string]: unknown;
 }
 
@@ -3500,6 +3540,11 @@ export type UpdateSolutionResponse = unknown;
 
 // createSolution
 /** Create a solution */
+export interface CreateSolutionParams {
+  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
+  alias?: string;
+}
+
 export type CreateSolutionRequest = unknown;
 
 export type CreateSolutionResponse = unknown;
@@ -3526,6 +3571,8 @@ export interface CreateSolutionFromRecordParams {
   fieldId: number;
   /** The unique identifier of the record. */
   recordId: number;
+  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
+  alias?: string;
 }
 
 export type CreateSolutionFromRecordResponse = unknown;
@@ -3693,6 +3740,21 @@ export interface UpdateTrusteesResponse {
   failure: UpdateTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
   success: UpdateTrusteesSuccessItem[];
+}
+
+// getUserApps
+/** Get apps for a user */
+export interface GetUserAppsParams {
+  /** The unique identifier of the user, including the hashed value (for example, 59913288.d772). */
+  userId: string;
+  /** The account id used to scope the request. */
+  accountId: number;
+}
+
+export interface GetUserAppsResponse {
+  /** A list of applications the specified user has access to. */
+  apps: GetUserAppsAppsItem[];
+  [key: string]: unknown;
 }
 
 /**
@@ -4522,6 +4584,8 @@ export interface QuickbaseAPI {
    * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
+   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
+   *
    * @param body - The QBL to be used for the create.
    *
    * @returns Success
@@ -4529,6 +4593,7 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/createSolution
    */
   createSolution(body: CreateSolutionRequest): Promise<CreateSolutionResponse>;
+  createSolution(params: CreateSolutionParams, body: CreateSolutionRequest): Promise<CreateSolutionResponse>;
   /**
    * Export solution to record
    *
@@ -4553,6 +4618,7 @@ export interface QuickbaseAPI {
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    * @param params.recordId - The unique identifier of the record.
+   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
    *
    * @returns Success
    *
@@ -4693,4 +4759,17 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/updateTrustees
    */
   updateTrustees(params: UpdateTrusteesParams, body?: UpdateTrusteesRequest): Promise<UpdateTrusteesResponse>;
+  /**
+   * Get apps for a user
+   *
+   * Returns a list of applications that a specific user has access to within an account. Only account admins can use this API.
+   *
+   * @param params.userId - The unique identifier of the user, including the hashed value (for example, 59913288.d772).
+   * @param params.accountId - The account id used to scope the request.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getUserApps
+   */
+  getUserApps(params: GetUserAppsParams): Promise<GetUserAppsResponse>;
 }
