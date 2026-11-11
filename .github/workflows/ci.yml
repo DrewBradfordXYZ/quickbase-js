@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # Regenerating from the pinned spec must reproduce the committed types
+      - name: Generated code matches the spec
+        run: |
+          npm run spec:build
+          git diff --exit-code
+          git -C spec diff --exit-code
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
