@@ -38,7 +38,7 @@ for (const record of result.data ?? []) {
 
 await qb.upsert({
   to: 'bqtable1',
-  data: [{ '6': { value: 'New project' }, '7': { value: 'Active' } }],
+  data: [{ '6': 'New project', '7': 'Active' }], // plain values are wrapped for you
 });
 ```
 
@@ -103,7 +103,7 @@ const result = await qb.runQuery({
 console.log(result.data?.[0]?.name);
 ```
 
-> In TypeScript, the generated types still describe IDs and `{ value }` records, so aliased requests and results need a cast for now. See [guides/schema-aliases.md](guides/schema-aliases.md), which also covers the schema generator (`npx quickbase-js schema`).
+Requests accept aliases in TypeScript too. Results are typed by field ID, so read an aliased record with a cast. See [guides/schema-aliases.md](guides/schema-aliases.md), which also covers the schema generator (`npx quickbase-js schema`).
 
 ## Authentication
 
@@ -171,7 +171,7 @@ const file = await qb.downloadFile({ tableId: 'bqtable1', recordId: 12, fieldId:
 
 ## Dates
 
-ISO date strings in responses become `Date` objects (`convertDates: false` keeps strings). The generated types still say `string`.
+ISO date strings in responses become `Date` objects. The generated types say `string`, because QuickBase's spec marks few of its date fields as dates; set `convertDates: false` if you want values to match the types exactly.
 
 ## Raw requests
 

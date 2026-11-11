@@ -320,6 +320,26 @@ function generateOperationTypes(
 }
 
 /**
+ * Widen request types to what the client accepts at runtime, which the
+ * shared spec (also used for Go) doesn't describe: field aliases where the
+ * client resolves them (select, groupBy, sortBy; SortField is emitted by
+ * hand), and plain upsert values, which the client wraps in { value }.
+ */
+function widenForClient(spec: OpenAPISpec): void {
+  const fieldRef = { oneOf: [{ type: 'integer' }, { type: 'string' }] } as Schema;
+  const body = (path: string, method: string): Schema | undefined =>
+    (spec.paths[path] as Record<string, Operation> | undefined)?.[method]?.requestBody?.content?.['application/json']?.schema;
+
+  const query = body('/records/query', 'post');
+  if (query?.properties?.select) query.properties.select.items = fieldRef;
+  const groupItem = query?.properties?.groupBy?.items;
+  if (groupItem?.properties?.fieldId) groupItem.properties.fieldId = fieldRef;
+
+  const upsert = body('/records', 'post');
+  if (upsert?.properties?.data) upsert.properties.data.items = { $ref: '#/components/schemas/UpsertRecord' };
+}
+
+/**
  * Shared schema names that should be generated as standalone types
  */
 const SHARED_SCHEMAS = ['FieldValue', 'QuickbaseRecord', 'SortField', 'SortByUnion', 'OwnerId'];
@@ -359,13 +379,21 @@ function addSharedSchemaTypes(spec: OpenAPISpec, typeDefs: string[]): void {
       typeDefs.push('  [fieldId: string]: FieldValue;');
       typeDefs.push('}');
       typeDefs.push('');
+      typeDefs.push('/**');
+      typeDefs.push(' * A record to upsert: keys are field IDs, or field aliases when the client has a schema;');
+      typeDefs.push(' * values are { value } or the plain value, which the client wraps.');
+      typeDefs.push(' */');
+      typeDefs.push('export interface UpsertRecord {');
+      typeDefs.push("  [field: string]: FieldValue | FieldValue['value'];");
+      typeDefs.push('}');
+      typeDefs.push('');
     } else if (schemaName === 'SortField') {
       typeDefs.push('/**');
       typeDefs.push(' * A field to sort by in a query.');
       typeDefs.push(' */');
       typeDefs.push('export interface SortField {');
-      typeDefs.push('  /** The unique identifier of a field in a table. */');
-      typeDefs.push('  fieldId: number;');
+      typeDefs.push('  /** A field ID, or a field alias when the client has a schema. */');
+      typeDefs.push('  fieldId: number | string;');
       typeDefs.push("  /** Sort direction: 'ASC' (ascending), 'DESC' (descending), or 'equal-values'. */");
       typeDefs.push("  order: 'ASC' | 'DESC' | 'equal-values';");
       typeDefs.push('}');
@@ -806,6 +834,7 @@ export async function generate(inputPath?: string): Promise<void> {
 
     // Read spec
     const spec = readJson<OpenAPISpec>(input);
+    widenForClient(spec);
 
     // Output directory
     const outputDir = PATHS.generated;

@@ -49,7 +49,7 @@ const result = await qb.upsert({
 console.log(result.metadata?.createdRecordIds, result.metadata?.updatedRecordIds);
 ```
 
-Values are `{ value: ... }`. With a schema configured, plain values (`{ name: 'Alpha' }`) are wrapped for you; without one they are sent as given, which QuickBase rejects.
+Values can be `{ value: ... }` or plain (`{ '6': 'Alpha' }`); the client wraps plain values. With a schema, keys can be field aliases.
 
 ## Deletes
 

@@ -28,11 +28,19 @@ export interface QuickbaseRecord {
 }
 
 /**
+ * A record to upsert: keys are field IDs, or field aliases when the client has a schema;
+ * values are { value } or the plain value, which the client wraps.
+ */
+export interface UpsertRecord {
+  [field: string]: FieldValue | FieldValue['value'];
+}
+
+/**
  * A field to sort by in a query.
  */
 export interface SortField {
-  /** The unique identifier of a field in a table. */
-  fieldId: number;
+  /** A field ID, or a field alias when the client has a schema. */
+  fieldId: number | string;
   /** Sort direction: 'ASC' (ascending), 'DESC' (descending), or 'equal-values'. */
   order: 'ASC' | 'DESC' | 'equal-values';
 }
@@ -3099,7 +3107,7 @@ export interface UpsertRequest {
   /** The unique identifier (dbid) of the table. */
   to: string;
   /** Record data array, where each record contains key-value mappings of fields to be defined/updated and their values. */
-  data: QuickbaseRecord[];
+  data: UpsertRecord[];
   /** The merge field id. */
   mergeFieldId?: number;
   /** Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. */
@@ -3147,15 +3155,14 @@ export interface RunQueryRequest {
   where?: string | number[];
   /** An array that contains the fields to group the records by. */
   groupBy?: ({
-    /** The unique identifier of a field in a table. */
-    fieldId?: number;
+    fieldId?: number | string;
     /** Group by based on ascending order (ASC), descending order (DESC) or equal values (equal-values) */
     grouping?: 'ASC' | 'DESC' | 'equal-values';
     [key: string]: unknown;
   })[];
   sortBy?: SortByUnion;
   /** An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. */
-  select?: number[];
+  select?: (number | string)[];
   /** The unique identifier (dbid) of the table. */
   from: string;
   [key: string]: unknown;

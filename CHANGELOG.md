@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Methods whose parameters are all optional and whose body is required also take the body alone: `createSolution(body)` alongside `createSolution({ alias }, body)`, and the same for `denyUsers` and `undenyUsers`.
 
 ### Fixed
+- **Plain upsert values without a schema**: `{ '6': 'Alpha' }` was wrapped in `{ value }` only when the client had a schema; without one it went to QuickBase as given and was rejected. Values are now always wrapped.
+- **Types for aliases and plain values**: `select`, `groupBy` and `sortBy` field IDs accept aliases (`number | string`), and upsert records accept plain values (`UpsertRecord`), matching what the client already accepted at runtime. Results stay typed by field ID.
 - **Ticket password kept after a failed sign-in**: the password was cleared only when sign-in succeeded, so after a failure it stayed in memory and the next call sent it again. It is now cleared as soon as the sign-in request is sent; a later call says to create a new client.
 - **Solutions and file downloads**: QBL is YAML and file content isn't JSON, but both went through `JSON.stringify` and `response.json()`, so `exportSolution`, `downloadFile` and `generateDocument` failed on success and the solution create/update/changeset calls sent JSON. They now return text, and send QBL as `application/x-yaml` (`RequestOptions` gains `bodyType` and `responseType: 'text'`).
 

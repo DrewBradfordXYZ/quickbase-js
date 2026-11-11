@@ -1,8 +1,8 @@
 // The code in README.md and guides/*.md comes from this file, which
 // `npm run typecheck` checks against the SDK's types. Change them together.
 //
-// Lines marked "cast" use features that work at runtime but that the
-// generated types (field IDs, wrapped values, date strings) don't describe.
+// The line marked "cast" reads a record keyed by alias: requests accept
+// aliases, but the generated response types describe field IDs.
 
 import {
   createClient,
@@ -41,7 +41,7 @@ export async function quickStart() {
 
   await qb.upsert({
     to: 'bqtable1',
-    data: [{ '6': { value: 'New project' }, '7': { value: 'Active' } }],
+    data: [{ '6': 'New project', '7': 'Active' }], // plain values are wrapped for you
   });
 }
 
@@ -120,14 +120,14 @@ export async function schemaAliases() {
 
   const result = await qb.runQuery({
     from: 'projects',
-    select: ['name', 'status'] as never, // cast
+    select: ['name', 'status'],
     where: "{'status'.EX.'Active'}",
-    sortBy: [{ fieldId: 'dueDate', order: 'ASC' }] as never, // cast
+    sortBy: [{ fieldId: 'dueDate', order: 'ASC' }],
   });
   const first = result.data?.[0] as Record<string, unknown> | undefined; // cast: keyed by alias, unwrapped
   console.log(first?.name, first?.status);
 
-  await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] as never }); // cast
+  await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 }
 
 // guides/authentication.md

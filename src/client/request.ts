@@ -424,9 +424,11 @@ export async function executeRequest<T = unknown>(
   // Extract dbid for temp-token auth (resolves aliases if schema provided)
   const dbid = extractDbid(options, config);
 
-  // Transform request body if schema is configured
+  // Transform the request body: resolve schema aliases when there is a
+  // schema, and wrap plain record values ({ '6': 'x' } -> { '6': { value: 'x' } })
+  // always. Raw (non-JSON) bodies are strings and pass through.
   let transformedOptions = options;
-  if (config.schema && options.body && typeof options.body === 'object') {
+  if (options.body && typeof options.body === 'object' && !Array.isArray(options.body)) {
     const transformedBody = transformRequest(
       options.body as Record<string, unknown>,
       { schema: config.schema, tableId: dbid }

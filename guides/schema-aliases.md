@@ -24,17 +24,17 @@ const qb = createClient({
 ```typescript
 const result = await qb.runQuery({
   from: 'projects',
-  select: ['name', 'status'] as never, // cast
+  select: ['name', 'status'],
   where: "{'status'.EX.'Active'}",
-  sortBy: [{ fieldId: 'dueDate', order: 'ASC' }] as never, // cast
+  sortBy: [{ fieldId: 'dueDate', order: 'ASC' }],
 });
 const first = result.data?.[0] as Record<string, unknown> | undefined; // cast: keyed by alias, unwrapped
 console.log(first?.name, first?.status);
 
-await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] as never }); // cast
+await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 ```
 
-The casts are TypeScript only: the generated types describe field IDs and `{ value }` records, not aliases. In JavaScript, leave them out.
+Requests are typed to accept aliases. Results are typed by field ID with `{ value }` wrappers, so an aliased record needs the cast shown (TypeScript only).
 
 A name the schema doesn't have throws, suggesting the closest one: `... Did you mean 'status'?`
 
