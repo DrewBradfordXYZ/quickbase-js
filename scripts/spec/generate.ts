@@ -188,6 +188,10 @@ function generateParamsType(operation: Operation): string | null {
  * Generate request body type
  */
 function generateRequestBodyType(operation: Operation): string | null {
+  // A body that isn't JSON (QBL is YAML) is sent as given
+  if (rawBodyType(operation)) {
+    return 'string';
+  }
   const content = operation.requestBody?.content?.['application/json'];
   if (!content?.schema) {
     return null;
@@ -196,10 +200,27 @@ function generateRequestBodyType(operation: Operation): string | null {
   return schemaToTypeScript(content.schema);
 }
 
+/** The request content type when the body isn't JSON, else null. */
+function rawBodyType(operation: Operation): string | null {
+  const types = Object.keys(operation.requestBody?.content ?? {});
+  if (types.length === 0 || types.includes('application/json')) return null;
+  return types.sort()[0];
+}
+
+/** True when the success response isn't JSON (QBL, file content): it is returned as text. */
+function hasTextResponse(operation: Operation): boolean {
+  const response = operation.responses?.['200'] || operation.responses?.['201'];
+  const types = Object.keys(response?.content ?? {});
+  return types.length > 0 && !types.includes('application/json');
+}
+
 /**
  * Generate response type for success responses
  */
 function generateResponseType(operation: Operation): string {
+  if (hasTextResponse(operation)) {
+    return 'string';
+  }
   const response = operation.responses?.['200'] || operation.responses?.['201'];
   const content = response?.content?.['application/json'];
 
@@ -527,6 +548,13 @@ function generateMethodImplementation(
 
   if (hasBody) {
     requestOptions.push('body');
+    const bodyType = rawBodyType(operation);
+    if (bodyType) {
+      requestOptions.push(`bodyType: '${bodyType}'`);
+    }
+  }
+  if (hasTextResponse(operation)) {
+    requestOptions.push(`responseType: 'text'`);
   }
 
   // Determine return type
@@ -733,6 +761,8 @@ function generateClientFile(
   lines.push("  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';");
   lines.push('  path: string;');
   lines.push('  body?: unknown;');
+  lines.push('  bodyType?: string;');
+  lines.push("  responseType?: 'json' | 'text';");
   lines.push('  query?: Record<string, string | number | boolean | undefined>;');
   lines.push('}) => Promise<T>;');
   lines.push('');

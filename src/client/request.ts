@@ -195,6 +195,10 @@ export interface RequestOptions {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   body?: unknown;
+  /** Content type of a body that isn't JSON (QBL is application/x-yaml); the body is sent as given */
+  bodyType?: string;
+  /** 'text' returns the response body unparsed (QBL, file content) instead of parsing JSON */
+  responseType?: 'json' | 'text';
   query?: Record<string, string | number | boolean | undefined>;
   /** Database ID for temp token auth */
   dbid?: string;
@@ -333,7 +337,12 @@ async function executeSingleRequest(
   };
 
   if (options.body !== undefined) {
-    fetchOptions.body = JSON.stringify(options.body);
+    if (options.bodyType) {
+      headers['Content-Type'] = options.bodyType;
+      fetchOptions.body = options.body as string;
+    } else {
+      fetchOptions.body = JSON.stringify(options.body);
+    }
   }
 
   // Create abort controller for timeout
@@ -443,6 +452,11 @@ export async function executeRequest<T = unknown>(
       const url = buildUrl(config.baseUrl, options.path, options.query);
 
       await handleResponse(response, url, context, executor);
+
+      // A response that isn't JSON (QBL, file content) comes back as text
+      if (options.responseType === 'text') {
+        return (await response.text()) as T;
+      }
 
       // Parse JSON response
       let data = await response.json();

@@ -173,6 +173,8 @@ export type RequestFn = <T>(options: {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   body?: unknown;
+  bodyType?: string;
+  responseType?: 'json' | 'text';
   query?: Record<string, string | number | boolean | undefined>;
 }) => Promise<T>;
 
