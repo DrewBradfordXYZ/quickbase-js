@@ -48,6 +48,16 @@ function createAuthContext(fetchApi: typeof fetch): AuthContext {
 
 describe('TicketStrategy', () => {
   describe('authentication', () => {
+    it('drops the password after a failed sign-in too', async () => {
+      // It was cleared only on success, so a failed sign-in left it in memory
+      const mockFetch = createMockAuthFetch({ errcode: 20, errtext: 'Unknown username/password' });
+      const strategy = new TicketStrategy('user@example.com', 'wrong', undefined, createAuthContext(mockFetch));
+
+      await expect(strategy.getToken()).rejects.toThrow('Authentication failed');
+      await expect(strategy.getToken()).rejects.toThrow('No password to sign in with');
+      expect(mockFetch).toHaveBeenCalledTimes(1); // the password was never sent again
+    });
+
     it('should authenticate successfully with username and password', async () => {
       const mockFetch = createMockAuthFetch({
         errcode: 0,

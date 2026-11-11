@@ -171,7 +171,9 @@ export class TicketStrategy implements AuthStrategy {
   private async authenticate(): Promise<string> {
     if (!this.password) {
       this.onExpired?.();
-      throw new Error('Ticket expired; create a new client with fresh credentials');
+      throw new Error(
+        'No password to sign in with (the ticket expired, or sign-in failed); create a new client with fresh credentials'
+      );
     }
 
     const url = `https://${this.realm}.quickbase.com/db/main`;
@@ -182,6 +184,10 @@ export class TicketStrategy implements AuthStrategy {
     <password>${this.escapeXml(this.password)}</password>
     <hours>${this.hours}</hours>
 </qdbapi>`;
+
+    // Drop the password now, whether sign-in succeeds or fails: it is only
+    // needed for this one request.
+    this.password = null;
 
     this.logger.debug(`Authenticating via API_Authenticate for ${this.username}`);
 
@@ -214,9 +220,6 @@ export class TicketStrategy implements AuthStrategy {
 
     // Save to storage if persistence is enabled
     this.saveToStorage();
-
-    // Clear password from memory
-    this.password = null;
 
     this.logger.debug(`Authenticated successfully, userId: ${this.userId}`);
 

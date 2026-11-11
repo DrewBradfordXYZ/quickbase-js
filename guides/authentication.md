@@ -37,7 +37,7 @@ createClient({
 });
 ```
 
-A user's email and password, exchanged for a ticket on the first call; the password is dropped from memory once the sign-in succeeds. Records they change show them as the creator or modifier. A ticket lasts `hours` (default 12, up to about six months). `persist` keeps it across page reloads (`'sessionStorage'` or `'localStorage'`), and `onExpired` runs when it lapses.
+A user's email and password, exchanged for a ticket on the first call; the password is dropped from memory as soon as that request is sent, whether sign-in succeeds or not. Records they change show them as the creator or modifier. A ticket lasts `hours` (default 12, up to about six months). `persist` keeps it across page reloads (`'sessionStorage'` or `'localStorage'`), and `onExpired` runs when it lapses.
 
 ## SSO
 

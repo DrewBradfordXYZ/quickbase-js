@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Methods whose parameters are all optional and whose body is required also take the body alone: `createSolution(body)` alongside `createSolution({ alias }, body)`, and the same for `denyUsers` and `undenyUsers`.
 
 ### Fixed
+- **Ticket password kept after a failed sign-in**: the password was cleared only when sign-in succeeded, so after a failure it stayed in memory and the next call sent it again. It is now cleared as soon as the sign-in request is sent; a later call says to create a new client.
 - **Solutions and file downloads**: QBL is YAML and file content isn't JSON, but both went through `JSON.stringify` and `response.json()`, so `exportSolution`, `downloadFile` and `generateDocument` failed on success and the solution create/update/changeset calls sent JSON. They now return text, and send QBL as `application/x-yaml` (`RequestOptions` gains `bodyType` and `responseType: 'text'`).
 
 ### Changed
