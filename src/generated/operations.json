@@ -184,7 +184,7 @@
     "method": "POST",
     "path": "/reports/{reportId}/run",
     "hasParams": true,
-    "hasBody": true,
+    "hasBody": false,
     "tags": [
       "Reports"
     ]
@@ -430,6 +430,16 @@
     ]
   },
   {
+    "operationId": "getUserApps",
+    "method": "GET",
+    "path": "/users/{userId}/apps",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Users"
+    ]
+  },
+  {
     "operationId": "addMembersToGroup",
     "method": "POST",
     "path": "/groups/{gid}/members",
@@ -520,6 +530,16 @@
     ]
   },
   {
+    "operationId": "generateDocument",
+    "method": "GET",
+    "path": "/docTemplates/{templateId}/generate",
+    "hasParams": true,
+    "hasBody": false,
+    "tags": [
+      "Document Templates"
+    ]
+  },
+  {
     "operationId": "exportSolution",
     "method": "GET",
     "path": "/solutions/{solutionId}",
@@ -600,16 +620,6 @@
     ]
   },
   {
-    "operationId": "generateDocument",
-    "method": "GET",
-    "path": "/docTemplates/{templateId}/generate",
-    "hasParams": true,
-    "hasBody": false,
-    "tags": [
-      "Document Templates"
-    ]
-  },
-  {
     "operationId": "getSolutionPublic",
     "method": "GET",
     "path": "/solutions/{solutionId}/resources",
@@ -657,16 +667,6 @@
     "hasBody": true,
     "tags": [
       "Trustees"
-    ]
-  },
-  {
-    "operationId": "getUserApps",
-    "method": "GET",
-    "path": "/users/{userId}/apps",
-    "hasParams": true,
-    "hasBody": false,
-    "tags": [
-      "Users"
     ]
   }
 ]

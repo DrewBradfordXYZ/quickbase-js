@@ -247,9 +247,9 @@ Fixture format:
 
 ## OpenAPI Spec Pipeline
 
-The original QuickBase spec has issues that need fixing:
+The spec starts from the OpenAPI 3 that QuickBase's API portal publishes (`spec/tools/fetch-upstream.ts`) and has issues that need fixing:
 
-1. **Swagger 2.0** - Convert to OpenAPI 3.0
+1. **Portal shape** - Normalize: inline shared schemas, open objects to unlisted keys, keep renamed operations' names
 2. **Internal headers** - Remove QB-Realm-Hostname, Authorization (SDK handles these)
 3. **Loose typing** - Many `any` types, arrays typed as strings
 4. **Missing schemas** - Some responses lack proper definitions
@@ -257,10 +257,9 @@ The original QuickBase spec has issues that need fixing:
 ### Spec Tools
 
 ```bash
-npm run spec:convert   # Swagger 2.0 → OpenAPI 3.0
+npm run spec:normalize # QuickBase's portal spec → our shape
 npm run spec:patch     # Apply fixes from overrides/
 npm run spec:validate  # Check for errors
-npm run spec:split     # Split by tag (for AI editing)
 npm run spec:build     # Full pipeline
 ```
 

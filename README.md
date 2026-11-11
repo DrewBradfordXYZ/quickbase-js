@@ -1228,10 +1228,9 @@ npm run spec:generate
 npm run spec:build
 
 # Individual steps
-npm run spec:convert   # Swagger 2.0 → OpenAPI 3.0
+npm run spec:normalize # QuickBase's portal spec → our shape
 npm run spec:patch     # Apply fixes from overrides
 npm run spec:validate  # Validate spec
-npm run spec:split     # Split by tag (for editing)
 npm run spec:generate  # Generate TypeScript types
 ```
 

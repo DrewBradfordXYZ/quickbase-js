@@ -55,30 +55,31 @@ export type CreateAppMemoryInfo = {
   estMemory?: number;
   /** The estimated memory of this application and all dependent applications in gigabytes */
   estMemoryInclDependentApps?: number;
+  [key: string]: unknown;
 };
 
 export type CreateAppVariablesItem = {
-  /** Variable name. */
-  name?: string;
-  /** Variable value. */
-  value?: string;
+  /** The name for the variable. */
+  name: string;
+  /** The value for the variable. */
+  value: string;
   [key: string]: unknown;
 };
 
 /** Security properties of the application */
 export type CreateAppSecurityProperties = {
-  /** Allow users who are not administrators to copy */
-  allowClone?: boolean;
-  /** Allow users who are not administrators to export data */
-  allowExport?: boolean;
   /** Hide from public application searches */
   hideFromPublic?: boolean;
-  /** Require Application Tokens */
-  enableAppTokens?: boolean;
-  /** Only users logging in from "approved" IP addresses may access this application */
-  useIPFilter?: boolean;
   /** Only "approved" users may access this application */
   mustBeRealmApproved?: boolean;
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
   [key: string]: unknown;
 };
 
@@ -88,30 +89,31 @@ export type GetAppMemoryInfo = {
   estMemory?: number;
   /** The estimated memory of this application and all dependent applications in gigabytes */
   estMemoryInclDependentApps?: number;
+  [key: string]: unknown;
 };
 
 export type GetAppVariablesItem = {
-  /** Variable name. */
-  name?: string;
-  /** Variable value. */
-  value?: string;
+  /** The name for the variable. */
+  name: string;
+  /** The value for the variable. */
+  value: string;
   [key: string]: unknown;
 };
 
 /** Security properties of the application */
 export type GetAppSecurityProperties = {
-  /** Allow users who are not administrators to copy */
-  allowClone?: boolean;
-  /** Allow users who are not administrators to export data */
-  allowExport?: boolean;
   /** Hide from public application searches */
   hideFromPublic?: boolean;
-  /** Require Application Tokens */
-  enableAppTokens?: boolean;
-  /** Only users logging in from "approved" IP addresses may access this application */
-  useIPFilter?: boolean;
   /** Only "approved" users may access this application */
   mustBeRealmApproved?: boolean;
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
   [key: string]: unknown;
 };
 
@@ -121,30 +123,31 @@ export type UpdateAppMemoryInfo = {
   estMemory?: number;
   /** The estimated memory of this application and all dependent applications in gigabytes */
   estMemoryInclDependentApps?: number;
+  [key: string]: unknown;
 };
 
 export type UpdateAppVariablesItem = {
-  /** Variable name. */
-  name?: string;
-  /** Variable value. */
-  value?: string;
+  /** The name for the variable. */
+  name: string;
+  /** The value for the variable. */
+  value: string;
   [key: string]: unknown;
 };
 
 /** Security properties of the application */
 export type UpdateAppSecurityProperties = {
-  /** Allow users who are not administrators to copy */
-  allowClone?: boolean;
-  /** Allow users who are not administrators to export data */
-  allowExport?: boolean;
   /** Hide from public application searches */
   hideFromPublic?: boolean;
-  /** Require Application Tokens */
-  enableAppTokens?: boolean;
-  /** Only users logging in from "approved" IP addresses may access this application */
-  useIPFilter?: boolean;
   /** Only "approved" users may access this application */
   mustBeRealmApproved?: boolean;
+  /** Allow users who are not administrators to copy */
+  allowClone?: boolean;
+  /** Only users logging in from "approved" IP addresses may access this application */
+  useIPFilter?: boolean;
+  /** Allow users who are not administrators to export data */
+  allowExport?: boolean;
+  /** Require Application Tokens */
+  enableAppTokens?: boolean;
   [key: string]: unknown;
 };
 
@@ -177,10 +180,10 @@ export type GetAppEventsItemOwner = {
 };
 
 export type CopyAppVariablesItem = {
-  /** Variable name. */
-  name?: string;
-  /** Variable value. */
-  value?: string;
+  /** The name for the variable. */
+  name: string;
+  /** The value for the variable. */
+  value: string;
   [key: string]: unknown;
 };
 
@@ -632,8 +635,6 @@ export type GetFieldsItem = {
 
 /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
 export type GetFieldsItemProperties = {
-  /** If someone can @mention users in the rich text field to generate an email notification. */
-  allowMentions?: boolean;
   /** The comments entered on the field properties by an administrator. */
   comments?: string;
   /** Whether this field totals in reports within the product. */
@@ -776,6 +777,8 @@ export type GetFieldsItemProperties = {
   displayAsLink?: boolean;
   /** Whether this field allows html. */
   allowHTML?: boolean;
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
   /** Whether the field is the table's key field. */
@@ -800,12 +803,11 @@ export type GetFieldsItemPermissionsItem = {
   permissionType?: string;
   /** The Id of the given role */
   roleId?: number;
+  [key: string]: unknown;
 };
 
 /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
 export type CreateFieldProperties = {
-  /** If someone can @mention users in the rich text field to generate an email notification. */
-  allowMentions?: boolean;
   /** The comments entered on the field properties by an administrator. */
   comments?: string;
   /** Whether this field totals in reports within the product. */
@@ -948,6 +950,8 @@ export type CreateFieldProperties = {
   displayAsLink?: boolean;
   /** Whether this field allows html. */
   allowHTML?: boolean;
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
   [key: string]: unknown;
@@ -960,12 +964,11 @@ export type CreateFieldPermissionsItem = {
   permissionType?: string;
   /** The Id of the given role */
   roleId?: number;
+  [key: string]: unknown;
 };
 
 /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
 export type GetFieldProperties = {
-  /** If someone can @mention users in the rich text field to generate an email notification. */
-  allowMentions?: boolean;
   /** The comments entered on the field properties by an administrator. */
   comments?: string;
   /** Whether this field totals in reports within the product. */
@@ -1108,6 +1111,8 @@ export type GetFieldProperties = {
   displayAsLink?: boolean;
   /** Whether this field allows html. */
   allowHTML?: boolean;
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
   /** Whether the field is the table's key field. */
@@ -1132,12 +1137,11 @@ export type GetFieldPermissionsItem = {
   permissionType?: string;
   /** The Id of the given role */
   roleId?: number;
+  [key: string]: unknown;
 };
 
 /** Additional properties for the field. Please see [Field type details](../fieldInfo) page for more details on the properties for each field type. */
 export type UpdateFieldProperties = {
-  /** If someone can @mention users in the rich text field to generate an email notification. */
-  allowMentions?: boolean;
   /** The comments entered on the field properties by an administrator. */
   comments?: string;
   /** Whether this field totals in reports within the product. */
@@ -1280,6 +1284,8 @@ export type UpdateFieldProperties = {
   displayAsLink?: boolean;
   /** Whether this field allows html. */
   allowHTML?: boolean;
+  /** If someone can @mention users in the rich text field to generate an email notification. */
+  allowMentions?: boolean;
   /** The id of the field that is the reference in the relationship for this lookup. */
   lookupReferenceFieldId?: number;
   [key: string]: unknown;
@@ -1292,6 +1298,7 @@ export type UpdateFieldPermissionsItem = {
   permissionType?: string;
   /** The Id of the given role */
   roleId?: number;
+  [key: string]: unknown;
 };
 
 export type GetFieldsUsageItem = {
@@ -1329,15 +1336,16 @@ export type GetFieldsUsageItemUsage = {
   dashboards: {
     /** the number of times a field has been used for the given item. */
     count: number;
-  };
-  /** The number of default reports where the given field is referenced. */
-  defaultReports: {
-    /** the number of times a field has been used for the given item. */
-    count: number;
     [key: string]: unknown;
   };
   /** The number of exact forms where the given field is referenced. */
   exactForms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of default reports where the given field is referenced. */
+  defaultReports: {
     /** the number of times a field has been used for the given item. */
     count: number;
     [key: string]: unknown;
@@ -1354,12 +1362,6 @@ export type GetFieldsUsageItemUsage = {
     count: number;
     [key: string]: unknown;
   };
-  /** The number of notifications where the given field is referenced. */
-  notifications: {
-    /** the number of times a field has been used for the given item. */
-    count: number;
-    [key: string]: unknown;
-  };
   /** The number of personal reports where the given field is referenced. */
   personalReports: {
     /** the number of times a field has been used for the given item. */
@@ -1368,6 +1370,12 @@ export type GetFieldsUsageItemUsage = {
   };
   /** The number of pipelines where the given field is referenced. */
   pipelines: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of notifications where the given field is referenced. */
+  notifications: {
     /** the number of times a field has been used for the given item. */
     count: number;
     [key: string]: unknown;
@@ -1400,11 +1408,13 @@ export type GetFieldsUsageItemUsage = {
   tableImports: {
     /** the number of times a field has been used for the given item. */
     count: number;
+    [key: string]: unknown;
   };
   /** The number of table rules where the given field is referenced. */
   tableRules: {
     /** the number of times a field has been used for the given item. */
     count: number;
+    [key: string]: unknown;
   };
   /** The number of webhooks where the given field is referenced. */
   webhooks: {
@@ -1460,15 +1470,16 @@ export type GetFieldUsageItemUsage = {
   dashboards: {
     /** the number of times a field has been used for the given item. */
     count: number;
-  };
-  /** The number of default reports where the given field is referenced. */
-  defaultReports: {
-    /** the number of times a field has been used for the given item. */
-    count: number;
     [key: string]: unknown;
   };
   /** The number of exact forms where the given field is referenced. */
   exactForms: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of default reports where the given field is referenced. */
+  defaultReports: {
     /** the number of times a field has been used for the given item. */
     count: number;
     [key: string]: unknown;
@@ -1485,12 +1496,6 @@ export type GetFieldUsageItemUsage = {
     count: number;
     [key: string]: unknown;
   };
-  /** The number of notifications where the given field is referenced. */
-  notifications: {
-    /** the number of times a field has been used for the given item. */
-    count: number;
-    [key: string]: unknown;
-  };
   /** The number of personal reports where the given field is referenced. */
   personalReports: {
     /** the number of times a field has been used for the given item. */
@@ -1499,6 +1504,12 @@ export type GetFieldUsageItemUsage = {
   };
   /** The number of pipelines where the given field is referenced. */
   pipelines: {
+    /** the number of times a field has been used for the given item. */
+    count: number;
+    [key: string]: unknown;
+  };
+  /** The number of notifications where the given field is referenced. */
+  notifications: {
     /** the number of times a field has been used for the given item. */
     count: number;
     [key: string]: unknown;
@@ -1531,11 +1542,13 @@ export type GetFieldUsageItemUsage = {
   tableImports: {
     /** the number of times a field has been used for the given item. */
     count: number;
+    [key: string]: unknown;
   };
   /** The number of table rules where the given field is referenced. */
   tableRules: {
     /** the number of times a field has been used for the given item. */
     count: number;
+    [key: string]: unknown;
   };
   /** The number of webhooks where the given field is referenced. */
   webhooks: {
@@ -1650,6 +1663,24 @@ export type GetUsersMetadata = {
   [key: string]: unknown;
 };
 
+export type GetUserAppsAppsItem = {
+  /** The unique identifier of the application. */
+  id: string;
+  /** The name of the application. */
+  name: string;
+  /** The date and time the user last accessed this application, in ISO 8601 format. */
+  lastAccess: string;
+  /** The manager of the application. */
+  manager: {
+    /** The hashed user ID of the application manager. */
+    id: string;
+    /** The full name of the application manager. */
+    name: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
 export type AuditEventsItem = {
   /** Log ID. */
   id: string;
@@ -1676,11 +1707,35 @@ export type AuditEventsItem = {
     /** An object describing the changes that occured on record changes. */
     changes: {
       /** The current value of the fields that have been changed. */
-      current: unknown[];
+      current?: {
+        /** The id of the field */
+        id: number;
+        /** The value of the field */
+        value: string;
+        /** Optional printable value */
+        printValue?: string;
+        [key: string]: unknown;
+      }[];
       /** The previous value of the fields that have been changed. */
-      previous: unknown[];
+      previous?: {
+        /** The id of the field */
+        id: number;
+        /** The value of the field */
+        value: string;
+        /** Optional printable value */
+        printValue?: string;
+        [key: string]: unknown;
+      }[];
       /** The list of fields and their types that have been changed. */
-      fields: unknown[];
+      fields: {
+        /** The id of the field */
+        id: number;
+        /** The name of the field */
+        name?: string;
+        /** The type of the field */
+        type: string;
+        [key: string]: unknown;
+      }[];
       [key: string]: unknown;
     };
     /** The recordId that has been edited. */
@@ -1725,9 +1780,9 @@ export type PlatformAnalyticEventSummariesData = {
   eventsSummaries: {
     /** The ID of the account the events are associated with. */
     accountId: string;
-    /** The start date and time of the requested summaries in ISO 8601 time format. */
+    /** Reflects the hourly-resolution constraints of the request parameters. See start and end above. */
     start: string;
-    /** The end date and time of the requested summaries in ISO 8601 time format. */
+    /** Reflects the hourly-resolution constraints of the request parameters. See start and end above. */
     end: string;
     /** How the events should be grouped. */
     groupBy: 'app' | 'user';
@@ -1736,6 +1791,7 @@ export type PlatformAnalyticEventSummariesData = {
       id: string;
       /** The type of item to filter by. */
       type: 'app' | 'user';
+      [key: string]: unknown;
     })[];
     /** An array of objects that contains Application/User information and an events object with summaries by event type. */
     results: ({
@@ -1748,6 +1804,7 @@ export type PlatformAnalyticEventSummariesData = {
         integration?: number;
         user?: number;
         all?: number;
+        [key: string]: unknown;
       };
       /** An array of events that contains specific information associated with an Application/User broken down by event type. */
       eventTypes: ({
@@ -1757,20 +1814,26 @@ export type PlatformAnalyticEventSummariesData = {
         count?: number;
         /** Billing category of the event type. */
         billingCategory?: 'user' | 'integration';
+        [key: string]: unknown;
       })[];
+      [key: string]: unknown;
     })[];
     /** Additional information about the results that may be helpful. */
-    metadata: {
+    metadata?: {
       /** Supply this token in a subsequent request to fetch the next page of results. */
       nextToken: string;
+      [key: string]: unknown;
     };
     /** Totals by billing category for all queried events. */
-    totals: {
+    totals?: {
       integration?: number;
       user?: number;
       all?: number;
+      [key: string]: unknown;
     };
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 export type GetSolutionPublicResources = {
@@ -1797,10 +1860,11 @@ export type GetSolutionPublicResources = {
 export type GetTrusteesItem = {
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
   id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 };
 
 export type AddTrusteesFailureItem = {
@@ -1810,21 +1874,24 @@ export type AddTrusteesFailureItem = {
   trustee?: {
     /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
     id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
     /** The type of trustee being added. This can be a user, group, or email domain group. */
     type: 'user' | 'group' | 'dom-group';
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** Object used for operations to read, create, or update trustees in an app. */
 export type AddTrusteesSuccessItem = {
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
   id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 };
 
 export type RemoveTrusteesFailureItem = {
@@ -1834,21 +1901,24 @@ export type RemoveTrusteesFailureItem = {
   trustee?: {
     /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
     id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
     /** The type of trustee being added. This can be a user, group, or email domain group. */
     type: 'user' | 'group' | 'dom-group';
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** Object used for operations to read, create, or update trustees in an app. */
 export type RemoveTrusteesSuccessItem = {
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
   id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 };
 
 export type UpdateTrusteesFailureItem = {
@@ -1856,44 +1926,29 @@ export type UpdateTrusteesFailureItem = {
   error?: string;
   /** Object used for operations to read, create, or update trustees in an app. */
   trustee?: {
-    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-    id: string;
-    /** The ID of the role to be assigned or currently assigned to the trustee. */
-    roleId: number;
     /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
     oldRoleId: number;
+    /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+    id: string;
     /** The type of trustee being added. This can be a user, group, or email domain group. */
     type: 'user' | 'group' | 'dom-group';
+    /** The ID of the role to be assigned or currently assigned to the trustee. */
+    roleId: number;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** Object used for operations to read, create, or update trustees in an app. */
 export type UpdateTrusteesSuccessItem = {
-  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-  id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
   oldRoleId: number;
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
-};
-
-export type GetUserAppsAppsItem = {
-  /** The unique identifier of the application. */
-  id: string;
-  /** The name of the application. */
-  name: string;
-  /** The date and time the user last accessed this application, in ISO 8601 format. */
-  lastAccess: string;
-  /** The manager of the application. */
-  manager: {
-    /** The hashed user ID of the application manager. */
-    id: string;
-    /** The full name of the application manager. */
-    name: string;
-    [key: string]: unknown;
-  };
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
   [key: string]: unknown;
 };
 
@@ -1902,16 +1957,17 @@ export type GetUserAppsAppsItem = {
 export interface CreateAppRequest {
   /** Set to true if you would like to assign the app to the user token you used to create the application. The default is false. */
   assignToken?: boolean;
-  /** The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
+  /** The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
   variables?: {
     /** The name for the variable. */
     name: string;
     /** The value for the variable. */
     value: string;
+    [key: string]: unknown;
   }[];
   /** The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this. */
   name: string;
-  /** Application security properties. */
+  /** Security properties of the application */
   securityProperties?: {
     /** Hide from public application searches */
     hideFromPublic?: boolean;
@@ -1925,12 +1981,16 @@ export interface CreateAppRequest {
     allowExport?: boolean;
     /** Require Application Tokens */
     enableAppTokens?: boolean;
+    [key: string]: unknown;
   };
   /** The description for the app. If this property is left out, the app description will be blank. */
   description?: string;
+  [key: string]: unknown;
 }
 
 export interface CreateAppResponse {
+  /** The id of the app from which this app was copied */
+  ancestorId?: string;
   /** The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this. */
   name: string;
   /** The description for the app. If this property is left out, the app description will be blank. */
@@ -1939,22 +1999,20 @@ export interface CreateAppResponse {
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/docs/how-to-localize-dates) to set the app's date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/docs/set-the-time-zone-for-both-the-application-and-the-account) to set the application's time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
-  memoryInfo?: CreateAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/docs/sharing-apps-publicly) */
   hasEveryoneOnTheInternet?: boolean;
+  memoryInfo?: CreateAppMemoryInfo;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
   variables?: CreateAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
   securityProperties?: CreateAppSecurityProperties;
-  /** The id of the app from which this app was copied */
-  ancestorId?: string;
   [key: string]: unknown;
 }
 
@@ -1980,12 +2038,12 @@ export interface GetAppResponse {
   dateFormat?: string;
   /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
-  memoryInfo?: GetAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
-  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
+  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/docs/sharing-apps-publicly) */
   hasEveryoneOnTheInternet?: boolean;
-  /** The app variables. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
+  memoryInfo?: GetAppMemoryInfo;
+  /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
   variables?: GetAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
   dataClassification?: string;
@@ -2001,12 +2059,13 @@ export interface UpdateAppParams {
 }
 
 export interface UpdateAppRequest {
-  /** The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
+  /** The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
   variables?: {
     /** The name for the variable. */
     name: string;
     /** The value for the variable. */
     value: string;
+    [key: string]: unknown;
   }[];
   /** The name for the app. */
   name?: string;
@@ -2024,9 +2083,11 @@ export interface UpdateAppRequest {
     allowExport?: boolean;
     /** Require Application Tokens */
     enableAppTokens?: boolean;
+    [key: string]: unknown;
   };
   /** The description for the app. */
   description?: string;
+  [key: string]: unknown;
 }
 
 export interface UpdateAppResponse {
@@ -2044,11 +2105,11 @@ export interface UpdateAppResponse {
   dateFormat?: string;
   /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
   timeZone?: string;
-  memoryInfo?: UpdateAppMemoryInfo;
   /** The unique identifier for this application. */
   id?: string;
-  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
+  /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/docs/sharing-apps-publicly) */
   hasEveryoneOnTheInternet?: boolean;
+  memoryInfo?: UpdateAppMemoryInfo;
   /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
   variables?: UpdateAppVariablesItem[];
   /** The Data Classification label assigned to the application. If Data Classification is not turned on, this will not be returned. If Data Classification is turned on, but application is not labeled, we return “None".  Data Classification labels can be added in the Admin Console by a Realm Administrator for Platform+ plans. */
@@ -2067,6 +2128,7 @@ export interface DeleteAppParams {
 export interface DeleteAppRequest {
   /** To confirm application deletion we ask for application name. */
   name: string;
+  [key: string]: unknown;
 }
 
 export interface DeleteAppResponse {
@@ -2106,27 +2168,29 @@ export interface CopyAppRequest {
     keepData?: boolean;
     /** If true, users will be copied along with their assigned roles. If false, users and roles will be copied but roles will not be assigned */
     usersAndRoles?: boolean;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 }
 
 export interface CopyAppResponse {
   /** The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this. */
-  name: string;
+  name?: string;
   /** The description for the app */
   description?: string;
   /** The time and date the app was created, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   created?: string;
   /** The time and date the app was last updated, in the ISO 8601 time format YYYY-MM-DDThh:mm:ss.sssZ (in UTC time zone). */
   updated?: string;
-  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/user-assistance/about_localizing_dates_numbers.html) to set the app's date format. */
+  /** A description of the format used when displaying date values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the API Guide for how time values are returned in API calls. See [About Localizing Dates](https://help.quickbase.com/docs/how-to-localize-dates) to set the app's date format. */
   dateFormat?: string;
-  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/user-assistance/application_local_timezone.html) to set the application's time zone. */
+  /** A description of the time zone used when displaying time values in this app. Note that this is a browser-only parameter - see the [Field type details](../fieldInfo) page in the portal for how time values are returned in API calls. See [Set the Time Zone for Both the Application and the Account](https://help.quickbase.com/docs/set-the-time-zone-for-both-the-application-and-the-account) to set the application's time zone. */
   timeZone?: string;
   /** The unique identifier for this application. */
   id?: string;
   /** Indicates whether app includes Everyone On The Internet access. See [Sharing apps with Everyone on the Internet (EOTI).](https://help.quickbase.com/user-assistance/share_with_everyone_on_internet.html) */
   hasEveryoneOnTheInternet?: boolean;
-  /** The app variables. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) */
+  /** The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) */
   variables?: CopyAppVariablesItem[];
   /** The id of the app from which this app was copied */
   ancestorId?: string;
@@ -2344,12 +2408,20 @@ export interface GetRelationshipsResponse {
 // createRelationship
 /** Create a relationship */
 export interface CreateRelationshipParams {
-  /** The unique identifier (dbid) of the table. This will be the child table. */
+  /** The unique identifier (dbid) of the child table. */
   tableId: string;
 }
 
 export interface CreateRelationshipRequest {
-  /** Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. */
+  /** The parent table id for the relationship. */
+  parentTableId: string;
+  /** This property is optional. If it is not provided, the foreign key field will be created with the label 'Related <record>', where <record> is the name of a record in the parent table. */
+  foreignKeyField?: {
+    /** The label for the foreign key field. */
+    label?: string;
+    [key: string]: unknown;
+  };
+  /** An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. */
   summaryFields?: ({
     /** The field id to summarize. */
     summaryFid?: number;
@@ -2361,16 +2433,9 @@ export interface CreateRelationshipRequest {
     where?: string;
     [key: string]: unknown;
   })[];
-  /** Array of field IDs in the parent table that will become lookup fields in the child table. */
+  /** An array of field IDs in the parent table that will become lookup fields in the child table. */
   lookupFieldIds?: number[];
-  /** The parent table id for the relationship. */
-  parentTableId: string;
-  /** This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>', where <record> is the name of a record in the parent table. */
-  foreignKeyField?: {
-    /** The label for the foreign key field. */
-    label?: string;
-    [key: string]: unknown;
-  };
+  [key: string]: unknown;
 }
 
 export interface CreateRelationshipResponse {
@@ -2393,7 +2458,7 @@ export interface CreateRelationshipResponse {
 // updateRelationship
 /** Update a relationship */
 export interface UpdateRelationshipParams {
-  /** The unique identifier (dbid) of the table. This will be the child table. */
+  /** The unique identifier (dbid) of the child table. */
   tableId: string;
   /** The relationship id. This is the field id of the reference field on the child table. */
   relationshipId: number;
@@ -2412,8 +2477,9 @@ export interface UpdateRelationshipRequest {
     where?: string;
     [key: string]: unknown;
   })[];
-  /** An array of field IDs on the parent table that will become lookup fields on the child table. */
+  /** An array of field IDs in the parent table that will become lookup fields in the child table. */
   lookupFieldIds?: number[];
+  [key: string]: unknown;
 }
 
 export interface UpdateRelationshipResponse {
@@ -2436,7 +2502,7 @@ export interface UpdateRelationshipResponse {
 // deleteRelationship
 /** Delete a relationship */
 export interface DeleteRelationshipParams {
-  /** The unique identifier (dbid) of the table. This will be the child table. */
+  /** The unique identifier (dbid) of the child table. */
   tableId: string;
   /** The relationship id. This is the field id of the reference field on the child table. */
   relationshipId: number;
@@ -2444,14 +2510,14 @@ export interface DeleteRelationshipParams {
 
 export interface DeleteRelationshipResponse {
   /** The relationship id. */
-  relationshipId: number;
+  relationshipId?: number;
   [key: string]: unknown;
 }
 
 // getTableReports
 /** Get reports for a table */
 export interface GetTableReportsParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
 }
 
@@ -2460,7 +2526,7 @@ export type GetTableReportsResponse = GetTableReportsItem[];
 // getReport
 /** Get a report */
 export interface GetReportParams {
-  /** The unique identifier of table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The identifier of the report, unique to the table. */
   reportId: string;
@@ -2490,7 +2556,7 @@ export interface GetReportResponse {
 // runReport
 /** Run a report */
 export interface RunReportParams {
-  /** The identifier of the table for the report. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The number of records to skip. You can set this value when paginating through a set of results. */
   skip?: number;
@@ -2499,8 +2565,6 @@ export interface RunReportParams {
   /** The identifier of the report, unique to the table. */
   reportId: string;
 }
-
-export type RunReportRequest = unknown;
 
 export interface RunReportResponse {
   /** An array of objects that contains limited meta-data of each field displayed in the report. This assists in building logic that depends on field types and IDs. */
@@ -2525,7 +2589,7 @@ export type GetFieldsResponse = GetFieldsItem[];
 // createField
 /** Create a field */
 export interface CreateFieldParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
 }
 
@@ -2716,7 +2780,7 @@ export interface CreateFieldResponse {
 // deleteFields
 /** Delete field(s) */
 export interface DeleteFieldsParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
 }
 
@@ -2781,7 +2845,7 @@ export interface GetFieldResponse {
 // updateField
 /** Update a field */
 export interface UpdateFieldParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The unique identifier (fid) of the field. */
   fieldId: number;
@@ -3020,6 +3084,7 @@ export interface RunFormulaRequest {
   rid?: number;
   /** The unique identifier (dbid) of the table. */
   from: string;
+  [key: string]: unknown;
 }
 
 export interface RunFormulaResponse {
@@ -3031,10 +3096,10 @@ export interface RunFormulaResponse {
 // upsert
 /** Insert/Update record(s) */
 export interface UpsertRequest {
-  /** The table identifier. */
+  /** The unique identifier (dbid) of the table. */
   to: string;
   /** Record data array, where each record contains key-value mappings of fields to be defined/updated and their values. */
-  data?: QuickbaseRecord[];
+  data: QuickbaseRecord[];
   /** The merge field id. */
   mergeFieldId?: number;
   /** Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. */
@@ -3052,7 +3117,7 @@ export interface UpsertResponse {
 // deleteRecords
 /** Delete record(s) */
 export interface DeleteRecordsRequest {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   from: string;
   /** The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. Or supply a JSON array of Record IDs. */
   where: string | number[];
@@ -3072,7 +3137,7 @@ export interface RunQueryRequest {
   options?: {
     /** The number of records to skip. */
     skip?: number;
-    /** Whether to run the query against a date time field with respect to the application's local time. The query is run with UTC time by default.  This parameter is ignored when querying by ISO8601, which is always in UTC. */
+    /** Whether to run the query against a date time field with respect to the application's local time. The query is run with UTC time by default. This parameter is ignored when querying by ISO8601, which is always in UTC. */
     compareWithAppLocalTime?: boolean;
     /** The maximum number of records to display. */
     top?: number;
@@ -3081,17 +3146,17 @@ export interface RunQueryRequest {
   /** The filter, using the Quickbase query language, which determines the records to return. Or supply a JSON array of Record IDs. If this parameter is omitted, the query will return all records. */
   where?: string | number[];
   /** An array that contains the fields to group the records by. */
-  groupBy?: {
+  groupBy?: ({
     /** The unique identifier of a field in a table. */
     fieldId?: number;
-    /** Group by based on equal values (equal-values) */
-    grouping?: 'equal-values';
+    /** Group by based on ascending order (ASC), descending order (DESC) or equal values (equal-values) */
+    grouping?: 'ASC' | 'DESC' | 'equal-values';
     [key: string]: unknown;
-  }[];
+  })[];
   sortBy?: SortByUnion;
   /** An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. */
   select?: number[];
-  /** The table identifier. */
+  /** The unique identifier (dbid) of the table. */
   from: string;
   [key: string]: unknown;
 }
@@ -3114,8 +3179,9 @@ export interface RecordsModifiedSinceRequest {
   fieldList?: number[];
   /** When true, the individual record IDs and timestamps will be returned. If false, only the count of changes will be returned. */
   includeDetails?: boolean;
-  /** The table identifier. */
+  /** The unique identifier (dbid) of the table. */
   from: string;
+  [key: string]: unknown;
 }
 
 export interface RecordsModifiedSinceResponse {
@@ -3152,6 +3218,7 @@ export interface ExchangeSsoTokenRequest {
   subject_token: string;
   /** An identifier that indicates the type of the security token in the `subject_token` parameter. */
   subject_token_type: 'urn:ietf:params:oauth:token-type:saml2';
+  [key: string]: unknown;
 }
 
 export interface ExchangeSsoTokenResponse {
@@ -3171,6 +3238,7 @@ export interface CloneUserTokenRequest {
   name?: string;
   /** The description for the cloned user token. */
   description?: string;
+  [key: string]: unknown;
 }
 
 export interface CloneUserTokenResponse {
@@ -3195,11 +3263,12 @@ export interface CloneUserTokenResponse {
 /** Transfer a user token */
 export interface TransferUserTokenRequest {
   /** The id of the user token to transfer */
-  id?: number;
+  id: number;
   /** The id of the user to transfer the user token from */
-  from?: string;
+  from: string;
   /** The id of the user to transfer the user token to */
-  to?: string;
+  to: string;
+  [key: string]: unknown;
 }
 
 export interface TransferUserTokenResponse {
@@ -3237,28 +3306,28 @@ export interface DeleteUserTokenResponse {
 // downloadFile
 /** Download file */
 export interface DownloadFileParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The unique identifier of the record. */
   recordId: number;
-  /** The unique identifier of the field. */
+  /** The unique identifier (fid) of the field. */
   fieldId: number;
   /** The file attachment version number. */
   versionNumber: number;
 }
 
-export type DownloadFileResponse = unknown;
+export type DownloadFileResponse = string;
 
 // deleteFile
 /** Delete file */
 export interface DeleteFileParams {
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The unique identifier of the record. */
   recordId: number;
-  /** The unique identifier of the field. */
+  /** The unique identifier (fid) of the field. */
   fieldId: number;
-  /** The file attachment version number. */
+  /** The file attachment version number. Passing versionNumber 0 will delete the most recent version. */
   versionNumber: number;
 }
 
@@ -3347,6 +3416,21 @@ export interface UndenyUsersResponse {
   failure: string[];
   /** A list of users that have successfully been undenied. */
   success: string[];
+  [key: string]: unknown;
+}
+
+// getUserApps
+/** Get apps for a user */
+export interface GetUserAppsParams {
+  /** The unique identifier of the user, including the hashed value (for example, 59913288.d772). */
+  userId: string;
+  /** The account id used to scope the request. */
+  accountId: number;
+}
+
+export interface GetUserAppsResponse {
+  /** A list of applications the specified user has access to. */
+  apps: GetUserAppsAppsItem[];
   [key: string]: unknown;
 }
 
@@ -3465,6 +3549,7 @@ export interface AuditRequest {
   date?: string;
   /** An array that may contain up to 20 [topics](https://resources.quickbase.com/nav/app/budurkasx/action/showpage/2b2941e4-f34d-4d41-9b0e-db790d20e9ab?pageIdV2=quickbase.com-DashboardGroup-15760d74-2243-4ce9-9495-7cc8790f12e7) to filter by. If empty, all topics are returned. */
   topics?: string[];
+  [key: string]: unknown;
 }
 
 export interface AuditResponse {
@@ -3481,7 +3566,7 @@ export interface AuditResponse {
 /** Get read summaries */
 export interface PlatformAnalyticReadsParams {
   /** The date for which read summaries need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past. */
-  day?: string;
+  day: string;
 }
 
 export interface PlatformAnalyticReadsResponse {
@@ -3497,9 +3582,9 @@ export interface PlatformAnalyticEventSummariesParams {
 }
 
 export interface PlatformAnalyticEventSummariesRequest {
-  /** The start date and time of the requested summaries in ISO 8601 time format. */
+  /** Supply whole-hour timestamps (YYYY-MM-DDTHH:00:00Z) to ensure the boundary hour is included in results. Summary data is available in hourly chunks only. Timestamps are evaluated in UTC; if your timestamp includes a timezone offset, confirm which UTC hour it maps to. Example: A start of 2:00 PM UTC includes the 2:00 PM bucket. A sub-hour value like 2:15 PM UTC does not. */
   start: string;
-  /** The end date and time of the requested summaries in ISO 8601 time format. */
+  /** Supply whole-hour timestamps (YYYY-MM-DDTHH:00:00Z) to ensure results stop at your intended boundary. Summary data is available in hourly chunks only. Timestamps are evaluated in UTC; if your timestamp includes a timezone offset, confirm which UTC hour it maps to. Example: An end of 3:00 PM UTC returns data through the end of the 3:00 PM bucket. A sub-hour value like 2:33 PM UTC returns the full 2:00 PM bucket instead. */
   end: string;
   /** A pagination token from a previous response made using the same parameters. Used to fetch the next page. */
   nextToken?: string;
@@ -3511,124 +3596,27 @@ export interface PlatformAnalyticEventSummariesRequest {
     id: string;
     /** The type of item to filter by. */
     type: 'app' | 'user';
+    [key: string]: unknown;
   })[];
+  [key: string]: unknown;
 }
 
 export interface PlatformAnalyticEventSummariesResponse {
   data: PlatformAnalyticEventSummariesData;
+  [key: string]: unknown;
 }
-
-// exportSolution
-/** Export a solution */
-export interface ExportSolutionParams {
-  /** The unique identifier (UUID) or the alias of the solution. */
-  solutionId: string;
-}
-
-export type ExportSolutionResponse = unknown;
-
-// updateSolution
-/** Update a solution */
-export interface UpdateSolutionParams {
-  /** The unique identifier (UUID) or the alias of the solution. */
-  solutionId: string;
-}
-
-export type UpdateSolutionRequest = unknown;
-
-export type UpdateSolutionResponse = unknown;
-
-// createSolution
-/** Create a solution */
-export interface CreateSolutionParams {
-  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
-  alias?: string;
-}
-
-export type CreateSolutionRequest = unknown;
-
-export type CreateSolutionResponse = unknown;
-
-// exportSolutionToRecord
-/** Export solution to record */
-export interface ExportSolutionToRecordParams {
-  /** The unique identifier of the solution. */
-  solutionId: string;
-  /** The unique identifier (dbid) of the table. */
-  tableId: string;
-  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
-  fieldId: number;
-}
-
-export type ExportSolutionToRecordResponse = unknown;
-
-// createSolutionFromRecord
-/** Create solution from record */
-export interface CreateSolutionFromRecordParams {
-  /** The unique identifier (dbid) of the table. */
-  tableId: string;
-  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
-  fieldId: number;
-  /** The unique identifier of the record. */
-  recordId: number;
-  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
-  alias?: string;
-}
-
-export type CreateSolutionFromRecordResponse = unknown;
-
-// updateSolutionToRecord
-/** Update solution from record */
-export interface UpdateSolutionToRecordParams {
-  /** The unique identifier of the solution. */
-  solutionId: string;
-  /** The unique identifier (dbid) of the table. */
-  tableId: string;
-  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
-  fieldId: number;
-  /** The unique identifier of the record. */
-  recordId: number;
-}
-
-export type UpdateSolutionToRecordResponse = unknown;
-
-// changesetSolution
-/** List solution changes */
-export interface ChangesetSolutionParams {
-  /** The unique identifier of the solution. */
-  solutionId: string;
-}
-
-export type ChangesetSolutionRequest = unknown;
-
-export type ChangesetSolutionResponse = unknown;
-
-// changesetSolutionFromRecord
-/** List solution changes from record */
-export interface ChangesetSolutionFromRecordParams {
-  /** The unique identifier of the solution. */
-  solutionId: string;
-  /** The unique identifier (dbid) of the table. */
-  tableId: string;
-  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
-  fieldId: number;
-  /** The unique identifier of the record. */
-  recordId: number;
-}
-
-export type ChangesetSolutionFromRecordResponse = unknown;
 
 // generateDocument
 /** Generate a document */
 export interface GenerateDocumentParams {
-  /** This is the ID of document template. */
-  templateId: number;
-  /** The unique identifier of the table. */
+  /** The unique identifier (dbid) of the table. */
   tableId: string;
   /** The ID of the record */
   recordId?: number;
   /** File name for the downloaded file */
-  filename: string;
+  filename?: string;
+  /** This is the ID of document template. */
+  templateId: number;
   /** The format of the file that is returned. Default is "pdf". */
   format?: 'html' | 'pdf' | 'docx';
   /** Margin formatted as top right bottom left, separated by spaces. Add to override the value set in the template builder. */
@@ -3653,6 +3641,116 @@ export interface GenerateDocumentResponse {
   [key: string]: unknown;
 }
 
+// exportSolution
+/** Export a solution */
+export interface ExportSolutionParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+}
+
+export type ExportSolutionResponse = string;
+
+// updateSolution
+/** Update a solution */
+export interface UpdateSolutionParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+}
+
+export type UpdateSolutionRequest = string;
+
+export interface UpdateSolutionResponse {
+  /** The unique identifier (UUID) of the updated solution */
+  solutionId?: string;
+  /** The optional alias for the solution */
+  alias?: string;
+  /** Information about resources created or updated in the solution */
+  createdResources?: Record<string, unknown>;
+  /** Any warnings that occurred during solution update */
+  warnings?: string[];
+  [key: string]: unknown;
+}
+
+// createSolution
+/** Create a solution */
+export interface CreateSolutionParams {
+  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
+  alias?: string;
+}
+
+export type CreateSolutionRequest = string;
+
+export type CreateSolutionResponse = Record<string, unknown>;
+
+// exportSolutionToRecord
+/** Export solution to record */
+export interface ExportSolutionToRecordParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+  /** The unique identifier (dbid) of the table. */
+  tableId: string;
+  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
+  fieldId: number;
+}
+
+export type ExportSolutionToRecordResponse = unknown;
+
+// createSolutionFromRecord
+/** Create solution from record */
+export interface CreateSolutionFromRecordParams {
+  /** An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. */
+  alias?: string;
+  /** The unique identifier (dbid) of the table. */
+  tableId: string;
+  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
+  fieldId: number;
+  /** The unique identifier of the record. */
+  recordId: number;
+}
+
+export type CreateSolutionFromRecordResponse = unknown;
+
+// updateSolutionToRecord
+/** Update solution from record */
+export interface UpdateSolutionToRecordParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+  /** The unique identifier (dbid) of the table. */
+  tableId: string;
+  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
+  fieldId: number;
+  /** The unique identifier of the record. */
+  recordId: number;
+}
+
+export type UpdateSolutionToRecordResponse = unknown;
+
+// changesetSolution
+/** List solution changes */
+export interface ChangesetSolutionParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+}
+
+export type ChangesetSolutionRequest = string;
+
+export type ChangesetSolutionResponse = Record<string, unknown>;
+
+// changesetSolutionFromRecord
+/** List solution changes from record */
+export interface ChangesetSolutionFromRecordParams {
+  /** The unique identifier (UUID) or the alias of the solution. */
+  solutionId: string;
+  /** The unique identifier (dbid) of the table. */
+  tableId: string;
+  /** The unique identifier (fid) of the field. It needs to be a file attachment field. */
+  fieldId: number;
+  /** The unique identifier of the record. */
+  recordId: number;
+}
+
+export type ChangesetSolutionFromRecordResponse = unknown;
+
 // getSolutionPublic
 /** Get solution information */
 export interface GetSolutionPublicParams {
@@ -3660,7 +3758,22 @@ export interface GetSolutionPublicParams {
   solutionId: string;
 }
 
-export type GetSolutionPublicResponse = unknown;
+export interface GetSolutionPublicResponse {
+  /** The unique identifier (UUID) of the solution */
+  uuid?: string;
+  /** The alias of the solution */
+  alias?: string;
+  /** The name of the solution */
+  name?: string;
+  /** The description of the solution */
+  description?: string;
+  /** The date and time when the solution was created */
+  createdAt?: string;
+  /** The date and time when the solution was last updated */
+  updatedAt?: string;
+  resources?: GetSolutionPublicResources;
+  [key: string]: unknown;
+}
 
 // getTrustees
 /** Get trustees for an app */
@@ -3681,10 +3794,11 @@ export interface AddTrusteesParams {
 export type AddTrusteesRequest = ({
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
   id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 })[];
 
 export interface AddTrusteesResponse {
@@ -3692,6 +3806,7 @@ export interface AddTrusteesResponse {
   failure: AddTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
   success: AddTrusteesSuccessItem[];
+  [key: string]: unknown;
 }
 
 // removeTrustees
@@ -3704,10 +3819,11 @@ export interface RemoveTrusteesParams {
 export type RemoveTrusteesRequest = ({
   /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
   id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 })[];
 
 export interface RemoveTrusteesResponse {
@@ -3715,6 +3831,7 @@ export interface RemoveTrusteesResponse {
   failure: RemoveTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
   success: RemoveTrusteesSuccessItem[];
+  [key: string]: unknown;
 }
 
 // updateTrustees
@@ -3725,14 +3842,15 @@ export interface UpdateTrusteesParams {
 }
 
 export type UpdateTrusteesRequest = ({
-  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
-  id: string;
-  /** The ID of the role to be assigned or currently assigned to the trustee. */
-  roleId: number;
   /** The ID of the role to be changed for the trustee. This is used to identify the current role before updating it. */
   oldRoleId: number;
+  /** The ID of the user, group, or email domain group to be added as a trustee. For users and groups, this is the user's or group's ID in Quickbase. For email domain groups, this is the email domain. */
+  id: string;
   /** The type of trustee being added. This can be a user, group, or email domain group. */
   type: 'user' | 'group' | 'dom-group';
+  /** The ID of the role to be assigned or currently assigned to the trustee. */
+  roleId: number;
+  [key: string]: unknown;
 })[];
 
 export interface UpdateTrusteesResponse {
@@ -3740,20 +3858,6 @@ export interface UpdateTrusteesResponse {
   failure: UpdateTrusteesFailureItem[];
   /** A list of trustees that have been successfully updated. */
   success: UpdateTrusteesSuccessItem[];
-}
-
-// getUserApps
-/** Get apps for a user */
-export interface GetUserAppsParams {
-  /** The unique identifier of the user, including the hashed value (for example, 59913288.d772). */
-  userId: string;
-  /** The account id used to scope the request. */
-  accountId: number;
-}
-
-export interface GetUserAppsResponse {
-  /** A list of applications the specified user has access to. */
-  apps: GetUserAppsAppsItem[];
   [key: string]: unknown;
 }
 
@@ -3768,9 +3872,9 @@ export interface QuickbaseAPI {
    *
    * @param body - Request body
    * @param body.assignToken - Set to true if you would like to assign the app to the user token you used to create the application. The default is false. (optional)
-   * @param body.variables - The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) (optional)
+   * @param body.variables - The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) (optional)
    * @param body.name - The app name. You are allowed to create multiple apps with the same name, in the same realm, because they will have different dbid values. We urge you to be careful about doing this.
-   * @param body.securityProperties - Application security properties. (optional)
+   * @param body.securityProperties - Security properties of the application (optional)
    * @param body.description - The description for the app. If this property is left out, the app description will be blank. (optional)
    *
    * @returns Success
@@ -3798,7 +3902,7 @@ export interface QuickbaseAPI {
    * @param params.appId - The unique identifier of an app
    *
    * @param body - Request body (optional)
-   * @param body.variables - The app variables. A maximum of 10 variables can be updated at a time. See [About Application Variables](https://help.quickbase.com/user-assistance/variables.html) (optional)
+   * @param body.variables - The app variables. A maximum of 10 variables can be inserted at a time. See [About Application Variables](https://help.quickbase.com/docs/creating-and-using-application-variables) (optional)
    * @param body.name - The name for the app. (optional)
    * @param body.securityProperties - Security properties of the application (optional)
    * @param body.description - The description for the app. (optional)
@@ -3957,13 +4061,13 @@ export interface QuickbaseAPI {
    *
    * Creates a relationship in a table as well as lookup/summary fields. Relationships can only be created for tables within the same app.
    *
-   * @param params.tableId - The unique identifier (dbid) of the table. This will be the child table.
+   * @param params.tableId - The unique identifier (dbid) of the child table.
    *
    * @param body - Request body
-   * @param body.summaryFields - Array of summary field objects which will turn into summary fields in the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - Array of field IDs in the parent table that will become lookup fields in the child table. (optional)
    * @param body.parentTableId - The parent table id for the relationship.
-   * @param body.foreignKeyField - This property is optional.  If it is not provided, the foreign key field will be created with the label ‘Related <record>', where <record> is the name of a record in the parent table. (optional)
+   * @param body.foreignKeyField - This property is optional. If it is not provided, the foreign key field will be created with the label 'Related <record>', where <record> is the name of a record in the parent table. (optional)
+   * @param body.summaryFields - An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
+   * @param body.lookupFieldIds - An array of field IDs in the parent table that will become lookup fields in the child table. (optional)
    *
    * @returns Success
    *
@@ -3975,12 +4079,12 @@ export interface QuickbaseAPI {
    *
    * Use this endpoint to add lookup fields and summary fields to an existing relationship. Updating a relationship will not delete existing lookup/summary fields.
    *
-   * @param params.tableId - The unique identifier (dbid) of the table. This will be the child table.
+   * @param params.tableId - The unique identifier (dbid) of the child table.
    * @param params.relationshipId - The relationship id. This is the field id of the reference field on the child table.
    *
    * @param body - Request body (optional)
    * @param body.summaryFields - An array of objects, each representing a configuration of one field from the child table, that will become summary fields on the parent table. When you specify the 'COUNT' accumulation type, you have to specify 0 as the summaryFid (or not set it in the request). 'DISTINCT-COUNT' requires that summaryFid be set to an actual fid. (optional)
-   * @param body.lookupFieldIds - An array of field IDs on the parent table that will become lookup fields on the child table. (optional)
+   * @param body.lookupFieldIds - An array of field IDs in the parent table that will become lookup fields in the child table. (optional)
    *
    * @returns Success
    *
@@ -3992,7 +4096,7 @@ export interface QuickbaseAPI {
    *
    * Use this endpoint to delete an entire relationship, including all lookup and summary fields. The reference field in the relationship will not be deleted.
    *
-   * @param params.tableId - The unique identifier (dbid) of the table. This will be the child table.
+   * @param params.tableId - The unique identifier (dbid) of the child table.
    * @param params.relationshipId - The relationship id. This is the field id of the reference field on the child table.
    *
    * @returns Success
@@ -4005,7 +4109,7 @@ export interface QuickbaseAPI {
    *
    * Get the schema (properties) of all reports for a table. If the user running the API is an application administrator, the API will also return all personal reports with owner's user id.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    *
    * @returns Success
    *
@@ -4017,7 +4121,7 @@ export interface QuickbaseAPI {
    *
    * Get the schema (properties) of an individual report.
    *
-   * @param params.tableId - The unique identifier of table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.reportId - The identifier of the report, unique to the table.
    *
    * @returns Success
@@ -4030,18 +4134,16 @@ export interface QuickbaseAPI {
    *
    * Runs a report, based on an ID and returns the underlying data associated with it. The format of the data will vary based on the report type. Reports that focus on record-level data (table, calendar, etc.) return the individual records. Aggregate reports (summary, chart) will return the summarized information as configured in the report. UI-specific elements are not returned, such as totals, averages and visualizations. Returns data with intelligent pagination based on the approximate size of each record. The metadata object will include the necessary information to iterate over the response and gather more data.
    *
-   * @param params.tableId - The identifier of the table for the report.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.skip - The number of records to skip. You can set this value when paginating through a set of results. (optional)
    * @param params.top - The maximum number of records to return. You can override the default Quickbase pagination to get more or fewer results. If your requested value here exceeds the dynamic maximums, we will return a subset of results and the rest can be gathered in subsequent API calls. (optional)
    * @param params.reportId - The identifier of the report, unique to the table.
-   *
-   * @param body - Request body (optional)
    *
    * @returns Success
    *
    * @see https://developer.quickbase.com/operation/runReport
    */
-  runReport(params: RunReportParams, body?: RunReportRequest): PaginatedRequest<RunReportResponse>;
+  runReport(params: RunReportParams): PaginatedRequest<RunReportResponse>;
   /**
    * Get fields for a table
    *
@@ -4060,7 +4162,7 @@ export interface QuickbaseAPI {
    *
    * Creates a field within a table, including the custom permissions of that field.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    *
    * @param body - Request body
    * @param body.audited - Indicates if the field is being tracked as part of Quickbase Audit Logs. You can only set this property to "true" if the app has audit logs enabled. See Enable data change logs under [Quickbase Audit Logs](https://help.quickbase.com/docs/audit-logs). Defaults to false. (optional)
@@ -4085,7 +4187,7 @@ export interface QuickbaseAPI {
    *
    * Deletes one or many fields in a table, based on field id. This will also permanently delete any data or calculations in that field.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    *
    * @param body - Request body
    * @param body.fieldIds - List of field IDs to be deleted.
@@ -4115,7 +4217,7 @@ export interface QuickbaseAPI {
    *
    * Updates the properties and custom permissions of a field. The attempt to update certain properties might cause existing data to no longer obey the field's new properties and may be rejected. See the descriptions of required, unique, and choices, below, for specific situations. Any properties of the field that you do not specify in the request body will remain unchanged.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field.
    *
    * @param body - Request body (optional)
@@ -4186,12 +4288,12 @@ export interface QuickbaseAPI {
   **Note:** This endpoint supports a maximum payload size of 40MB.
    *
    * @param body - Request body
-   * @param body.to - The table identifier.
-   * @param body.data - Record data array, where each record contains key-value mappings of fields to be defined/updated and their values. (optional)
+   * @param body.to - The unique identifier (dbid) of the table.
+   * @param body.data - Record data array, where each record contains key-value mappings of fields to be defined/updated and their values.
    * @param body.mergeFieldId - The merge field id. (optional)
    * @param body.fieldsToReturn - Specify an array of field IDs that will return data for any updates or added record. Record ID (FID 3) is always returned if any field ID is requested. (optional)
    *
-   * @returns Response
+   * @returns The response
    *
    * @see https://developer.quickbase.com/operation/upsert
    */
@@ -4202,7 +4304,7 @@ export interface QuickbaseAPI {
    * Deletes record(s) in a table based on a query. Alternatively, all records in the table can be deleted.
    *
    * @param body - Request body
-   * @param body.from - The unique identifier of the table.
+   * @param body.from - The unique identifier (dbid) of the table.
    * @param body.where - The filter to delete records. To delete all records specify a filter that will include all records, for example {3.GT.0} where 3 is the ID of the Record ID field. Or supply a JSON array of Record IDs.
    *
    * @returns Successful delete records response.
@@ -4221,7 +4323,7 @@ export interface QuickbaseAPI {
    * @param body.groupBy - An array that contains the fields to group the records by. (optional)
    * @param body.sortBy - The sortBy (optional)
    * @param body.select - An array of field IDs for the fields that should be returned in the response. If empty, the default columns on the table will be returned. (optional)
-   * @param body.from - The table identifier.
+   * @param body.from - The unique identifier (dbid) of the table.
    *
    * @returns Success
    *
@@ -4231,7 +4333,7 @@ export interface QuickbaseAPI {
   /**
    * Get records modified since
    *
-   * Checks for record changes on the current table and crawls the record dependency graph based on a provided field list. This determines if records on the table changed after the provided timestamp, when factoring in their dependencies. This API requires app admin permissions and only reviews lookup and summary fields in supported relationships.
+   * Checks for record changes on the current table and crawls the record dependency graph based on a provided field list. This determines if records on the table changed after the provided timestamp, when factoring in their dependencies. This API requires app admin permissions and only reviews lookup and summary fields in [supported relationships](https://helpv2.quickbase.com/hc/en-us/articles/4570306993940-Limits-in-Quickbase#:~:text=on%20scalar%20fields-,Summary%20fields,-Text%20summary%20fields).
   To return deleted records for the current table, 'Index record changes' must be enabled.
   Dependent tables only evaluate current records, and deleted records are not supported.
    *
@@ -4239,7 +4341,7 @@ export interface QuickbaseAPI {
    * @param body.after - A timestamp, formatted in ISO-8601 UTC, representing the date and time to search.
    * @param body.fieldList - List of field IDs. Each field is crawled across the entire record dependency graph to find its source record's date modified. If one is not provided, only the current table will be referenced. (optional)
    * @param body.includeDetails - When true, the individual record IDs and timestamps will be returned. If false, only the count of changes will be returned. (optional)
-   * @param body.from - The table identifier.
+   * @param body.from - The unique identifier (dbid) of the table.
    *
    * @returns Success
    *
@@ -4283,7 +4385,7 @@ export interface QuickbaseAPI {
    * @param body.name - The new name for the cloned user token. (optional)
    * @param body.description - The description for the cloned user token. (optional)
    *
-   * @returns Response
+   * @returns The response
    *
    * @see https://developer.quickbase.com/operation/cloneUserToken
    */
@@ -4291,14 +4393,14 @@ export interface QuickbaseAPI {
   /**
    * Transfer a user token
    *
-   * Transfers the specified user token. Application associations will remain intact. For security, permissions must manually be reconciled.
+   * Transfers the specified user token. Application associations will remain intact. For security, permissions must manually be reconciled. Only realm or account admins can use this API.
    *
    * @param body - Request body
-   * @param body.id - The id of the user token to transfer (optional)
-   * @param body.from - The id of the user to transfer the user token from (optional)
-   * @param body.to - The id of the user to transfer the user token to (optional)
+   * @param body.id - The id of the user token to transfer
+   * @param body.from - The id of the user to transfer the user token from
+   * @param body.to - The id of the user to transfer the user token to
    *
-   * @returns Response
+   * @returns The response
    *
    * @see https://developer.quickbase.com/operation/transferUserToken
    */
@@ -4308,7 +4410,7 @@ export interface QuickbaseAPI {
    *
    * Deactivates the authenticated user token. Once this is done, the user token must be reactivated in the user interface.
    *
-   * @returns Response
+   * @returns The response
    *
    * @see https://developer.quickbase.com/operation/deactivateUserToken
    */
@@ -4318,7 +4420,7 @@ export interface QuickbaseAPI {
    *
    * Deletes the authenticated user token. This is not reversible.
    *
-   * @returns Response
+   * @returns The response
    *
    * @see https://developer.quickbase.com/operation/deleteUserToken
    */
@@ -4328,9 +4430,9 @@ export interface QuickbaseAPI {
    *
    * Downloads the file attachment, with the file attachment content encoded in base64 format. The API response returns the file name in the `Content-Disposition` header. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to fetch files.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.recordId - The unique identifier of the record.
-   * @param params.fieldId - The unique identifier of the field.
+   * @param params.fieldId - The unique identifier (fid) of the field.
    * @param params.versionNumber - The file attachment version number.
    *
    * @returns Success
@@ -4343,10 +4445,10 @@ export interface QuickbaseAPI {
    *
    * Deletes one file attachment version. Meta-data about files can be retrieved from the /records and /reports endpoints, where applicable. Use those endpoints to get the necessary information to delete file versions.
    *
-   * @param params.tableId - The unique identifier of the table.
+   * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.recordId - The unique identifier of the record.
-   * @param params.fieldId - The unique identifier of the field.
-   * @param params.versionNumber - The file attachment version number.
+   * @param params.fieldId - The unique identifier (fid) of the field.
+   * @param params.versionNumber - The file attachment version number. Passing versionNumber 0 will delete the most recent version.
    *
    * @returns Successfully Deleted the File Attachment
    *
@@ -4356,7 +4458,7 @@ export interface QuickbaseAPI {
   /**
    * Get users
    *
-   * Get all users in an account or narrowed down list of users filtered by email(s). The returned users may be paginated depending on the user count. The count of the returned users may vary. When `nextPageToken` value in the response is not empty, that indicates that there are more results to be returned, you can use this value to get the next result set ('page').
+   * Get all users in an account or narrowed down list of users filtered by email(s). The returned users may be paginated depending on the user count. The count of the returned users may vary. When `nextPageToken` value in the response is not empty, that indicates that there are more results to be returned, you can use this value to get the next result set ('page'). Only realm or account admins can use this API.
    *
    * @param params.accountId - The account id being used to get users. If no value is specified, the first account associated with the requesting user token is chosen. (optional)
    *
@@ -4373,11 +4475,11 @@ export interface QuickbaseAPI {
   /**
    * Deny users
    *
-   * Denies users access to the realm but leaves them listed in groups they have been added to.
+   * Denies users access to the realm but leaves them listed in groups they have been added to. Only realm or account admins can use this API.
    *
    * @param params.accountId - The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen. (optional)
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that need to be denied.
    *
    * @returns Success
    *
@@ -4388,12 +4490,12 @@ export interface QuickbaseAPI {
   /**
    * Deny and remove users from groups
    *
-   * Denies users access to the realm and allows you to remove them from groups.
+   * Denies users access to the realm and allows you to remove them from groups. Only realm or account admins can use this API.
    *
    * @param params.accountId - The account id being used to deny users. If no value is specified, the first account associated with the requesting user token is chosen. (optional)
    * @param params.shouldDeleteFromGroups - Specifies if the users should also be removed from all groups.
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that need to be denied.
    *
    * @returns Success
    *
@@ -4403,11 +4505,11 @@ export interface QuickbaseAPI {
   /**
    * Undeny users
    *
-   * Grants users that have previously been denied access to the realm.
+   * Grants users that have previously been denied access to the realm. Only realm or account admins can use this API.
    *
    * @param params.accountId - The account id being used to undeny users. If no value is specified, the first account associated with the requesting user token is chosen. (optional)
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that need to be undenied.
    *
    * @returns Success
    *
@@ -4416,13 +4518,26 @@ export interface QuickbaseAPI {
   undenyUsers(body: UndenyUsersRequest): Promise<UndenyUsersResponse>;
   undenyUsers(params: UndenyUsersParams, body: UndenyUsersRequest): Promise<UndenyUsersResponse>;
   /**
+   * Get apps for a user
+   *
+   * Returns a list of applications that a specific user has access to within an account. Only account admins can use this API.
+   *
+   * @param params.userId - The unique identifier of the user, including the hashed value (for example, 59913288.d772).
+   * @param params.accountId - The account id used to scope the request.
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/getUserApps
+   */
+  getUserApps(params: GetUserAppsParams): Promise<GetUserAppsResponse>;
+  /**
    * Add members
    *
    * Adds a list of users to a given group as members.
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that will be added to a group.
    *
    * @returns Success
    *
@@ -4436,7 +4551,7 @@ export interface QuickbaseAPI {
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that will be removed from a group.
    *
    * @returns Success
    *
@@ -4450,7 +4565,7 @@ export interface QuickbaseAPI {
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that will be added to a group.
    *
    * @returns Success
    *
@@ -4464,7 +4579,7 @@ export interface QuickbaseAPI {
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of user IDs that will be removed from a group.
    *
    * @returns Success
    *
@@ -4478,7 +4593,7 @@ export interface QuickbaseAPI {
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of group IDs that will be added to a group.
    *
    * @returns Success
    *
@@ -4492,7 +4607,7 @@ export interface QuickbaseAPI {
    *
    * @param params.gid - This is the ID of the group being modified.
    *
-   * @param body - Request body
+   * @param body - A list of group IDs that will be removed from a group.
    *
    * @returns Success
    *
@@ -4523,7 +4638,7 @@ export interface QuickbaseAPI {
    * Get user read and integration read summaries for any day in the past.  
   **Note:** This API is available for enterprise users only.
    *
-   * @param params.day - The date for which read summaries need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past. (optional)
+   * @param params.day - The date for which read summaries need to be fetched. This must be date-time only, as YYYY-MM-DD, and a valid date in the past.
    *
    * @returns Summaries returned succesfully
    *
@@ -4534,13 +4649,13 @@ export interface QuickbaseAPI {
    * Get event summaries
    *
    * Get event summaries for any span of days up to one year and excluding future dates.
-  **Note:** This API is available for enterprise users only. Data is updated hourly; to ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
+  **Note:** This API is available for enterprise users only. Data is updated hourly. To ensure accuracy, query dates should be at least one hour in the past. Transactional rate limits are 100 per hour.
    *
    * @param params.accountId - The ID of the account to query. If no value is specified, the first account matching the provided domain is chosen. (optional)
    *
-   * @param body - Request body
-   * @param body.start - The start date and time of the requested summaries in ISO 8601 time format.
-   * @param body.end - The end date and time of the requested summaries in ISO 8601 time format.
+   * @param body - Request body (optional)
+   * @param body.start - Supply whole-hour timestamps (YYYY-MM-DDTHH:00:00Z) to ensure the boundary hour is included in results. Summary data is available in hourly chunks only. Timestamps are evaluated in UTC; if your timestamp includes a timezone offset, confirm which UTC hour it maps to. Example: A start of 2:00 PM UTC includes the 2:00 PM bucket. A sub-hour value like 2:15 PM UTC does not.
+   * @param body.end - Supply whole-hour timestamps (YYYY-MM-DDTHH:00:00Z) to ensure results stop at your intended boundary. Summary data is available in hourly chunks only. Timestamps are evaluated in UTC; if your timestamp includes a timezone offset, confirm which UTC hour it maps to. Example: An end of 3:00 PM UTC returns data through the end of the 3:00 PM bucket. A sub-hour value like 2:33 PM UTC returns the full 2:00 PM bucket instead.
    * @param body.nextToken - A pagination token from a previous response made using the same parameters. Used to fetch the next page. (optional)
    * @param body.groupBy - How the events should be grouped.
    * @param body.where - A list of items to filter events by. Only events which match ALL criteria will be included in the results. (optional)
@@ -4549,12 +4664,33 @@ export interface QuickbaseAPI {
    *
    * @see https://developer.quickbase.com/operation/platformAnalyticEventSummaries
    */
-  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse>;
+  platformAnalyticEventSummaries(params: PlatformAnalyticEventSummariesParams, body?: PlatformAnalyticEventSummariesRequest): PaginatedRequest<PlatformAnalyticEventSummariesResponse>;
+  /**
+   * Generate a document
+   *
+   * Generates a document from a template. After changing a template, allow up to 15 minutes for documents generated via the API to reflect the changes. This feature is only available on business or enterprise plans.
+   *
+   * @param params.tableId - The unique identifier (dbid) of the table.
+   * @param params.recordId - The ID of the record (optional)
+   * @param params.filename - File name for the downloaded file (optional)
+   * @param params.templateId - This is the ID of document template.
+   * @param params.format - The format of the file that is returned. Default is "pdf". (optional)
+   * @param params.margin - Margin formatted as top right bottom left, separated by spaces. Add to override the value set in the template builder. (optional)
+   * @param params.unit - Unit of measurement for the margin. Default is "in". Add to override the value set in the template builder. (optional)
+   * @param params.pageSize - Page size. Default is "A4". Add to override the value set in the template builder. (optional)
+   * @param params.orientation - Page orientation. Default is "portrait". Add to override the value set in the template builder. (optional)
+   * @param params.realm - Your Quickbase domain, for example demo.quickbase.com (optional)
+   *
+   * @returns Success
+   *
+   * @see https://developer.quickbase.com/operation/generateDocument
+   */
+  generateDocument(params: GenerateDocumentParams): Promise<GenerateDocumentResponse>;
   /**
    * Export a solution
    *
    * Returns the QBL for the specified solution. Learn more about [QBL syntax](https://help.quickbase.com/docs/qbl-definition-structure-and-syntax).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://help.quickbase.com/docs/qbl-versions) in our QBL documentation.
+  We are releasing schema coverage for QBL in stages. See [what's supported today](https://help.quickbase.com/docs/qbl-versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
@@ -4567,22 +4703,22 @@ export interface QuickbaseAPI {
    * Update a solution
    *
    * Updates the solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
+  We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
-   * @param body - The QBL to be used for the update. (optional)
+   * @param body - The QBL to be used for the update.
    *
    * @returns Success
    *
    * @see https://developer.quickbase.com/operation/updateSolution
    */
-  updateSolution(params: UpdateSolutionParams, body?: UpdateSolutionRequest): Promise<UpdateSolutionResponse>;
+  updateSolution(params: UpdateSolutionParams, body: UpdateSolutionRequest): Promise<UpdateSolutionResponse>;
   /**
    * Create a solution
    *
    * Creates a solution using the provided QBL. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
+  We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
    * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
    *
@@ -4600,7 +4736,7 @@ export interface QuickbaseAPI {
    * Exports the solution and outputs the resulting QBL in a new record in the specified table. The QBL will be saved to a file in the file attachment field that is specified. The table cannot have any required fields besides the file attachment field.  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of the solution.
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    *
@@ -4615,10 +4751,10 @@ export interface QuickbaseAPI {
    * Creates a solution using the QBL from the specified record.  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
+   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    * @param params.recordId - The unique identifier of the record.
-   * @param params.alias - An optional alias to identify the solution. This can be used instead of the UUID in subsequent API calls. (optional)
    *
    * @returns Success
    *
@@ -4631,7 +4767,7 @@ export interface QuickbaseAPI {
    * Updates a solution using the QBL from the specified record.  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of the solution.
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    * @param params.recordId - The unique identifier of the record.
@@ -4644,10 +4780,10 @@ export interface QuickbaseAPI {
   /**
    * List solution changes
    *
-   * Returns a list of changes that would occur if the provided QBL were to be applied. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
-   We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
+   * Returns a list of changes that would occur if the provided QBL were to be applied to the solution, without actually making those changes. This is useful for validating changes or previewing the impact before updating a solution. Learn more about [QBL syntax](https://help.quickbase.com/hc/en-us/articles/24845511223828-What-is-QBL).  
+  We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of the solution.
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    *
    * @param body - The QBL to be used for the changeset.
    *
@@ -4662,7 +4798,7 @@ export interface QuickbaseAPI {
    * Returns a list of changes that would occur if the QBL from the provided record were to be applied.  
    We are releasing schema coverage for QBL in stages. See [what's supported today](https://helpv2.quickbase.com/hc/en-us/sections/26699387198228-QBL-Versions) in our QBL documentation.
    *
-   * @param params.solutionId - The unique identifier of the solution.
+   * @param params.solutionId - The unique identifier (UUID) or the alias of the solution.
    * @param params.tableId - The unique identifier (dbid) of the table.
    * @param params.fieldId - The unique identifier (fid) of the field. It needs to be a file attachment field.
    * @param params.recordId - The unique identifier of the record.
@@ -4672,27 +4808,6 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/changesetSolutionFromRecord
    */
   changesetSolutionFromRecord(params: ChangesetSolutionFromRecordParams): Promise<ChangesetSolutionFromRecordResponse>;
-  /**
-   * Generate a document
-   *
-   * Generates a document from a template. After changing a template, allow up to 15 minutes for documents generated via the API to reflect the changes. This feature is only available on business or enterprise plans.
-   *
-   * @param params.templateId - This is the ID of document template.
-   * @param params.tableId - The unique identifier of the table.
-   * @param params.recordId - The ID of the record (optional)
-   * @param params.filename - File name for the downloaded file
-   * @param params.format - The format of the file that is returned. Default is "pdf". (optional)
-   * @param params.margin - Margin formatted as top right bottom left, separated by spaces. Add to override the value set in the template builder. (optional)
-   * @param params.unit - Unit of measurement for the margin. Default is "in". Add to override the value set in the template builder. (optional)
-   * @param params.pageSize - Page size. Default is "A4". Add to override the value set in the template builder. (optional)
-   * @param params.orientation - Page orientation. Default is "portrait". Add to override the value set in the template builder. (optional)
-   * @param params.realm - Your Quickbase domain, for example demo.quickbase.com (optional)
-   *
-   * @returns Success
-   *
-   * @see https://developer.quickbase.com/operation/generateDocument
-   */
-  generateDocument(params: GenerateDocumentParams): Promise<GenerateDocumentResponse>;
   /**
    * Get solution information
    *
@@ -4759,17 +4874,4 @@ export interface QuickbaseAPI {
    * @see https://developer.quickbase.com/operation/updateTrustees
    */
   updateTrustees(params: UpdateTrusteesParams, body?: UpdateTrusteesRequest): Promise<UpdateTrusteesResponse>;
-  /**
-   * Get apps for a user
-   *
-   * Returns a list of applications that a specific user has access to within an account. Only account admins can use this API.
-   *
-   * @param params.userId - The unique identifier of the user, including the hashed value (for example, 59913288.d772).
-   * @param params.accountId - The account id used to scope the request.
-   *
-   * @returns Success
-   *
-   * @see https://developer.quickbase.com/operation/getUserApps
-   */
-  getUserApps(params: GetUserAppsParams): Promise<GetUserAppsResponse>;
 }
