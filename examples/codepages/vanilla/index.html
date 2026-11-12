@@ -3,406 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickBase App Explorer - Vanilla Web Components</title>
+  <title>What changed? (vanilla JS)</title>
   <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
   <style>
     :root {
-      --qb-primary: #2196f3;
-      --qb-primary-dark: #1976d2;
-      --qb-error: #f44336;
-      --qb-bg: #f5f5f5;
-      --qb-card-bg: #ffffff;
-      --qb-text: #333333;
-      --qb-text-muted: #666666;
-      --qb-border: #e0e0e0;
-      --qb-radius: 8px;
+      --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #677085;
+      --border: #e3e6ec; --accent: #2563eb; --on-accent: #fff; --accent-soft: #e8efff; --warn: #9a5b00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12151b; --card: #1b1f27; --text: #e6e9ef; --muted: #959db0;
+        --border: #2c323d; --accent: #7aa2ff; --on-accent: #0b1220; --accent-soft: #1f2a44; --warn: #e0a84a;
+      }
     }
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--qb-bg);
-      color: var(--qb-text);
-      margin: 0;
-      padding: 16px;
-      line-height: 1.5;
-    }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .header h1 { margin: 0; font-size: 24px; }
-    .meta { color: var(--qb-text-muted); font-size: 14px; }
-    .card {
-      background: var(--qb-card-bg);
-      border-radius: var(--qb-radius);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      background: var(--qb-bg);
-      border-bottom: 1px solid var(--qb-border);
-      cursor: pointer;
-    }
-    .card-header:hover { background: #eeeeee; }
-    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-    .card-body { padding: 16px; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      background: #e3f2fd;
-      color: var(--qb-primary-dark);
-    }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .data-table th, .data-table td {
-      text-align: left;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .data-table th {
-      background: var(--qb-bg);
-      font-weight: 600;
-      color: var(--qb-text-muted);
-      font-size: 12px;
-      text-transform: uppercase;
-    }
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: var(--qb-text-muted);
-    }
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--qb-border);
-      border-top-color: var(--qb-primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error {
-      background: #ffebee;
-      color: var(--qb-error);
-      padding: 16px;
-      border-radius: var(--qb-radius);
-      margin: 16px 0;
-    }
-    .field-type {
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #eeeeee;
-      color: var(--qb-text-muted);
-    }
-    .stats { display: flex; gap: 32px; margin-bottom: 24px; }
-    .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
-    .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
-    .expand-icon { transition: transform 0.2s; }
-    .expand-icon.expanded { transform: rotate(90deg); }
-    .hidden { display: none; }
-    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
-    .tab {
-      padding: 8px 16px;
-      border: none;
-      background: none;
-      font-size: 14px;
-      color: var(--qb-text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-    .tab:hover { color: var(--qb-text); }
-    .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
-    .record-preview { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    main { max-width: 680px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 22px; }
+    .sub { color: var(--muted); margin: 2px 0 16px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    button, select { font: inherit; color: inherit; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    .toggle button { border: 0; border-radius: 0; }
+    .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+    .banner { width: 100%; margin-bottom: 12px; background: var(--accent-soft); color: var(--accent);
+      border-color: transparent; font-weight: 600; }
+    ul { list-style: none; margin: 0; padding: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px; }
+    li { padding: 12px 16px; border-top: 1px solid var(--border); }
+    li:first-child { border-top: 0; }
+    li a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    li a:hover { text-decoration: underline; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .status { color: var(--muted); padding: 24px 0; text-align: center; }
+    .notice { color: var(--warn); font-size: 13px; margin-top: 12px; }
+    .error { color: #c62828; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <qb-app-explorer></qb-app-explorer>
-  </div>
+  <main>
+    <h1>What changed?</h1>
+    <p class="sub" id="sub">Loading…</p>
+    <div class="controls">
+      <div class="toggle">
+        <button id="everyone" aria-pressed="true">Everyone</button>
+        <button id="mine" aria-pressed="false">Just me</button>
+      </div>
+      <select id="table-filter"><option value="">All tables</option></select>
+      <button id="refresh">Refresh</button>
+    </div>
+    <button class="banner" id="banner" hidden></button>
+    <div id="feed"><p class="status">Loading…</p></div>
+    <p class="notice" id="notice" hidden></p>
+  </main>
 
   <script>
-    // ============================================
-    // QuickBase Client Context (Shared Singleton)
-    // ============================================
-    const QBContext = {
-      client: null,
-      realm: null,
-      appId: null,
+    // ---- QuickBase: the same in every example ----------------------------
+    // Everything QuickBase-specific is here; the next script is the page.
 
-      init() {
-        this.realm = window.location.hostname.split('.')[0];
-        this.appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+    const realm = location.hostname.split('.')[0];
+    const appId = location.pathname.match(/\/(?:db|nav\/app)\/([a-z0-9]+)/i)?.[1];
 
-        if (!this.realm || !this.appId) {
-          throw new Error('Could not detect realm/appId from URL. This page must run in a QuickBase Code Page.');
-        }
+    const qb = QuickBase.createClient({
+      realm,
+      auth: { type: 'temp-token' }, // the signed-in user's session: no token in the page
+      readOnly: true,               // the client refuses every write before sending it
+      rateLimit: { proactiveThrottle: { enabled: true } }, // big apps stay under 100 requests / 10 s
+    });
 
-        this.client = QuickBase.createClient({
-          realm: this.realm,
-          auth: { type: 'temp-token' }
-        });
+    // Built-in fields every QuickBase table has.
+    const F = { created: 1, modified: 2, recordId: 3, modifiedBy: 5 };
+    const PER_TABLE = 5;
+    const FEED_SIZE = 30;
 
-        return this;
-      }
-    };
-
-    // ============================================
-    // <qb-app-explorer> - Main App Component
-    // ============================================
-    class QBAppExplorer extends HTMLElement {
-      constructor() {
-        super();
-        this.app = null;
-        this.tables = [];
-        this.error = null;
-        this.loading = true;
-      }
-
-      connectedCallback() {
-        this.render();
-        this.loadApp();
-      }
-
-      async loadApp() {
+    // The latest changes in each table, merged into one feed, newest first.
+    async function loadFeed(tables, { mine }) {
+      const blocked = [];
+      const perTable = await Promise.all(tables.map(async (table) => {
         try {
-          QBContext.init();
-
-          const [app, tables] = await Promise.all([
-            QBContext.client.getApp({ appId: QBContext.appId }),
-            QBContext.client.getAppTables({ appId: QBContext.appId })
-          ]);
-
-          this.app = app;
-          this.tables = tables;
-          this.loading = false;
-          this.render();
-        } catch (e) {
-          this.error = e.message;
-          this.loading = false;
-          this.render();
-        }
-      }
-
-      render() {
-        if (this.loading) {
-          this.innerHTML = `<div class="loading"><div class="spinner"></div>Loading app...</div>`;
-          return;
-        }
-
-        if (this.error) {
-          this.innerHTML = `<div class="error">${this.error}</div>`;
-          return;
-        }
-
-        this.innerHTML = `
-          <div class="header">
-            <div>
-              <h1>${this.app.name}</h1>
-              <div class="meta">${QBContext.realm}.quickbase.com</div>
-              <div class="meta">Vanilla Web Components</div>
-            </div>
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-value">${this.tables.length}</div>
-                <div class="stat-label">Tables</div>
-              </div>
-            </div>
-          </div>
-
-          <div id="tables-container">
-            ${this.tables.map(table => `
-              <qb-table-card table-id="${table.id}" table-name="${table.name}"></qb-table-card>
-            `).join('')}
-          </div>
-        `;
-      }
-    }
-
-    // ============================================
-    // <qb-table-card> - Expandable Table Card
-    // ============================================
-    class QBTableCard extends HTMLElement {
-      constructor() {
-        super();
-        this.expanded = false;
-        this.fields = null;
-        this.records = null;
-        this.loading = false;
-        this.activeTab = 'fields';
-      }
-
-      connectedCallback() {
-        this.tableId = this.getAttribute('table-id');
-        this.tableName = this.getAttribute('table-name');
-        this.render();
-      }
-
-      async toggle() {
-        this.expanded = !this.expanded;
-
-        if (this.expanded && !this.fields) {
-          this.loading = true;
-          this.render();
-
-          try {
-            const [fields, queryResult] = await Promise.all([
-              QBContext.client.getFields({ tableId: this.tableId }),
-              QBContext.client.runQuery({
-                from: this.tableId,
-                select: [3, 1, 2],
-                sortBy: [{ fieldId: 2, order: 'DESC' }],
-                options: { top: 5 }
-              })
-            ]);
-
-            this.fields = fields;
-            this.records = queryResult.data || [];
-            this.loading = false;
-          } catch (e) {
-            this.error = e.message;
-            this.loading = false;
+          const { data = [] } = await qb.runQuery({
+            from: table.id,
+            select: Object.values(F),
+            where: mine ? `{${F.modifiedBy}.EX._curuser_}` : undefined,
+            sortBy: [{ fieldId: F.modified, order: 'DESC' }],
+            options: { top: PER_TABLE },
+          });
+          return data.map((record) => toItem(table, record));
+        } catch (error) {
+          // A table this user can't read is skipped, not fatal.
+          if (error instanceof QuickBase.AuthorizationError || error instanceof QuickBase.AuthenticationError) {
+            blocked.push(table.name);
+            return [];
           }
+          throw error;
         }
+      }));
+      const items = perTable.flat().sort((a, b) => b.when - a.when).slice(0, FEED_SIZE);
+      return { items, blocked };
+    }
 
-        this.render();
-      }
+    function toItem(table, record) {
+      const rid = record[F.recordId]?.value;
+      const created = new Date(record[F.created]?.value);
+      const when = new Date(record[F.modified]?.value);
+      const user = record[F.modifiedBy]?.value;
+      return {
+        key: `${table.id}:${rid}`,
+        tableId: table.id,
+        title: `${table.singleRecordName || table.name} #${rid}`,
+        action: when - created < 1000 ? 'created' : 'updated',
+        when,
+        who: user?.name || user?.email || 'someone',
+        url: `/db/${table.id}?a=dr&rid=${rid}`,
+      };
+    }
 
-      setTab(tab) {
-        this.activeTab = tab;
-        this.render();
-      }
+    function timeAgo(date) {
+      const s = (Date.now() - date) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+      if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+      if (s < 7 * 86400) return `${Math.floor(s / 86400)} d ago`;
+      return date.toLocaleDateString();
+    }
 
-      render() {
-        const fieldCount = this.fields?.length || '...';
-        const recordCount = this.records?.length || 0;
+    // How many items are newer than the newest one on screen.
+    const countNewer = (items, newest) => items.filter((i) => !newest || i.when > newest).length;
 
-        this.innerHTML = `
-          <div class="card">
-            <div class="card-header" onclick="this.parentElement.parentElement.toggle()">
-              <h2>
-                <span class="expand-icon ${this.expanded ? 'expanded' : ''}">▶</span>
-                ${this.tableName}
-              </h2>
-              <span class="badge">${fieldCount} fields</span>
-            </div>
-            ${this.expanded ? `
-              <div class="card-body">
-                ${this.loading ? `
-                  <div class="loading"><div class="spinner"></div>Loading...</div>
-                ` : this.error ? `
-                  <div class="error">${this.error}</div>
-                ` : `
-                  <div class="tabs">
-                    <button class="tab ${this.activeTab === 'fields' ? 'active' : ''}"
-                            onclick="this.closest('qb-table-card').setTab('fields')">
-                      Fields (${this.fields.length})
-                    </button>
-                    <button class="tab ${this.activeTab === 'records' ? 'active' : ''}"
-                            onclick="this.closest('qb-table-card').setTab('records')">
-                      Recent Records (${recordCount})
-                    </button>
-                  </div>
-                  ${this.activeTab === 'fields' ? this.renderFields() : this.renderRecords()}
-                `}
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }
+    function errorMessage(error) {
+      if (error instanceof QuickBase.RateLimitError) return 'QuickBase is busy. Try again in a minute.';
+      if (error instanceof QuickBase.AuthenticationError) return 'Sign in to QuickBase to see this page.';
+      if (error instanceof TypeError) return 'Can’t reach QuickBase. Check your connection.'; // fetch failed
+      return error.message;
+    }
 
-      renderFields() {
-        if (!this.fields?.length) {
-          return '<p class="meta">No fields found</p>';
+  </script>
+
+  <script>
+    // ---- The page: plain DOM ---------------------------------------------
+
+    const $ = (id) => document.getElementById(id);
+    const state = { tables: [], items: [], blocked: [], pending: null, mine: false, tableId: '' };
+
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+    function render() {
+      const shown = state.items.filter((i) => !state.tableId || i.tableId === state.tableId);
+      $('feed').innerHTML = shown.length
+        ? `<ul>${shown.map((i) => `
+            <li>
+              <a href="${esc(i.url)}" target="_top">${esc(i.title)}</a>
+              <div class="meta">${i.action} ${timeAgo(i.when)} by ${esc(i.who)}</div>
+            </li>`).join('')}</ul>`
+        : '<p class="status">No changes yet.</p>';
+
+      $('notice').hidden = !state.blocked.length;
+      $('notice').textContent = `No access to: ${state.blocked.join(', ')}`;
+
+      const count = state.pending ? countNewer(state.pending.items, state.items[0]?.when) : 0;
+      $('banner').hidden = !count;
+      $('banner').textContent = `${count} new change${count === 1 ? '' : 's'}, show`;
+
+      $('everyone').setAttribute('aria-pressed', String(!state.mine));
+      $('mine').setAttribute('aria-pressed', String(state.mine));
+    }
+
+    function apply(feed) {
+      Object.assign(state, feed, { pending: null });
+      render();
+    }
+
+    // background: the timer's refresh, which holds new changes behind the banner.
+    async function refresh({ spinner = false, background = false } = {}) {
+      if (spinner) $('feed').innerHTML = '<p class="status">Loading…</p>';
+      try {
+        const feed = await loadFeed(state.tables, { mine: state.mine });
+        if (background && state.items.length && countNewer(feed.items, state.items[0].when)) {
+          state.pending = feed; // wait for a click, like a social feed
+          render();
+        } else {
+          apply(feed);
         }
-
-        return `
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Label</th>
-                <th>Type</th>
-                <th>Properties</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${this.fields.map(f => `
-                <tr>
-                  <td>${f.id}</td>
-                  <td>${f.label}</td>
-                  <td><span class="field-type">${f.fieldType}</span></td>
-                  <td>
-                    ${f.required ? '<span class="badge">required</span>' : ''}
-                    ${f.unique ? '<span class="badge">unique</span>' : ''}
-                    ${f.properties?.formula ? '<span class="badge">formula</span>' : ''}
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
-      }
-
-      renderRecords() {
-        if (!this.records?.length) {
-          return '<p class="meta">No records found</p>';
-        }
-
-        return `
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Record ID</th>
-                <th>Created</th>
-                <th>Modified</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${this.records.map(r => `
-                <tr>
-                  <td>${r['3']?.value || '-'}</td>
-                  <td>${this.formatDate(r['1']?.value)}</td>
-                  <td>${this.formatDate(r['2']?.value)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
-      }
-
-      formatDate(dateStr) {
-        if (!dateStr) return '-';
-        const date = new Date(dateStr);
-        const now = new Date();
-        const diff = now - date;
-
-        if (diff < 60000) return 'Just now';
-        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-        if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
-
-        return date.toLocaleDateString();
+      } catch (error) {
+        $('feed').innerHTML = `<p class="status error">${esc(errorMessage(error))}</p>`;
       }
     }
 
-    // Register custom elements
-    customElements.define('qb-app-explorer', QBAppExplorer);
-    customElements.define('qb-table-card', QBTableCard);
+    async function start() {
+      if (!appId) {
+        $('sub').textContent = 'Open this page as a code page inside a QuickBase app.';
+        $('feed').innerHTML = '';
+        return;
+      }
+      try {
+        state.tables = await qb.getAppTables({ appId });
+      } catch (error) {
+        $('feed').innerHTML = `<p class="status error">${esc(errorMessage(error))}</p>`;
+        return;
+      }
+      $('sub').textContent = `Latest changes across ${state.tables.length} tables`;
+      for (const t of state.tables) $('table-filter').add(new Option(t.name, t.id));
+
+      $('everyone').onclick = () => { state.mine = false; refresh({ spinner: true }); };
+      $('mine').onclick = () => { state.mine = true; refresh({ spinner: true }); };
+      $('table-filter').onchange = (e) => { state.tableId = e.target.value; render(); };
+      $('refresh').onclick = () => refresh();
+      $('banner').onclick = () => apply(state.pending);
+
+      await refresh();
+      setInterval(() => refresh({ background: true }), 60_000);
+    }
+
+    start();
   </script>
 </body>
 </html>

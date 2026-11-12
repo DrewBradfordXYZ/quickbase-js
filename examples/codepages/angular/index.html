@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What changed? (Angular)</title>
+  <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "@angular/core": "https://esm.sh/@angular/core@22",
+        "@angular/compiler": "https://esm.sh/@angular/compiler@22",
+        "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@22"
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #677085;
+      --border: #e3e6ec; --accent: #2563eb; --on-accent: #fff; --accent-soft: #e8efff; --warn: #9a5b00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12151b; --card: #1b1f27; --text: #e6e9ef; --muted: #959db0;
+        --border: #2c323d; --accent: #7aa2ff; --on-accent: #0b1220; --accent-soft: #1f2a44; --warn: #e0a84a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    main { max-width: 680px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 22px; }
+    .sub { color: var(--muted); margin: 2px 0 16px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    button, select { font: inherit; color: inherit; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    .toggle button { border: 0; border-radius: 0; }
+    .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+    .banner { width: 100%; margin-bottom: 12px; background: var(--accent-soft); color: var(--accent);
+      border-color: transparent; font-weight: 600; }
+    ul { list-style: none; margin: 0; padding: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px; }
+    li { padding: 12px 16px; border-top: 1px solid var(--border); }
+    li:first-child { border-top: 0; }
+    li a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    li a:hover { text-decoration: underline; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .status { color: var(--muted); padding: 24px 0; text-align: center; }
+    .notice { color: var(--warn); font-size: 13px; margin-top: 12px; }
+    .error { color: #c62828; }
+  </style>
+</head>
+<body>
+  <app-root></app-root>
+
+  <script>
+    // ---- QuickBase: the same in every example ----------------------------
+    // Everything QuickBase-specific is here; the next script is the page.
+
+    const realm = location.hostname.split('.')[0];
+    const appId = location.pathname.match(/\/(?:db|nav\/app)\/([a-z0-9]+)/i)?.[1];
+
+    const qb = QuickBase.createClient({
+      realm,
+      auth: { type: 'temp-token' }, // the signed-in user's session: no token in the page
+      readOnly: true,               // the client refuses every write before sending it
+      rateLimit: { proactiveThrottle: { enabled: true } }, // big apps stay under 100 requests / 10 s
+    });
+
+    // Built-in fields every QuickBase table has.
+    const F = { created: 1, modified: 2, recordId: 3, modifiedBy: 5 };
+    const PER_TABLE = 5;
+    const FEED_SIZE = 30;
+
+    // The latest changes in each table, merged into one feed, newest first.
+    async function loadFeed(tables, { mine }) {
+      const blocked = [];
+      const perTable = await Promise.all(tables.map(async (table) => {
+        try {
+          const { data = [] } = await qb.runQuery({
+            from: table.id,
+            select: Object.values(F),
+            where: mine ? `{${F.modifiedBy}.EX._curuser_}` : undefined,
+            sortBy: [{ fieldId: F.modified, order: 'DESC' }],
+            options: { top: PER_TABLE },
+          });
+          return data.map((record) => toItem(table, record));
+        } catch (error) {
+          // A table this user can't read is skipped, not fatal.
+          if (error instanceof QuickBase.AuthorizationError || error instanceof QuickBase.AuthenticationError) {
+            blocked.push(table.name);
+            return [];
+          }
+          throw error;
+        }
+      }));
+      const items = perTable.flat().sort((a, b) => b.when - a.when).slice(0, FEED_SIZE);
+      return { items, blocked };
+    }
+
+    function toItem(table, record) {
+      const rid = record[F.recordId]?.value;
+      const created = new Date(record[F.created]?.value);
+      const when = new Date(record[F.modified]?.value);
+      const user = record[F.modifiedBy]?.value;
+      return {
+        key: `${table.id}:${rid}`,
+        tableId: table.id,
+        title: `${table.singleRecordName || table.name} #${rid}`,
+        action: when - created < 1000 ? 'created' : 'updated',
+        when,
+        who: user?.name || user?.email || 'someone',
+        url: `/db/${table.id}?a=dr&rid=${rid}`,
+      };
+    }
+
+    function timeAgo(date) {
+      const s = (Date.now() - date) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+      if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+      if (s < 7 * 86400) return `${Math.floor(s / 86400)} d ago`;
+      return date.toLocaleDateString();
+    }
+
+    // How many items are newer than the newest one on screen.
+    const countNewer = (items, newest) => items.filter((i) => !newest || i.when > newest).length;
+
+    function errorMessage(error) {
+      if (error instanceof QuickBase.RateLimitError) return 'QuickBase is busy. Try again in a minute.';
+      if (error instanceof QuickBase.AuthenticationError) return 'Sign in to QuickBase to see this page.';
+      if (error instanceof TypeError) return 'Can’t reach QuickBase. Check your connection.'; // fetch failed
+      return error.message;
+    }
+
+  </script>
+
+  <script type="module">
+    // ---- The page: Angular, compiled in the browser (no build step) ----
+    // With a build (ng new), this class takes the @Component decorator and the
+    // template moves to its own file; the code inside stays the same.
+    import '@angular/compiler';
+    import { Component, signal, computed } from '@angular/core';
+    import { bootstrapApplication } from '@angular/platform-browser';
+
+    class App {
+      hasApp = Boolean(appId);
+      tables = signal([]);
+      feed = signal(null);    // { items, blocked }
+      pending = signal(null); // a newer feed, waiting for a click
+      mine = signal(false);
+      tableId = signal('');
+      error = signal(null);
+      timeAgo = timeAgo;
+
+      shown = computed(() => this.feed()?.items.filter((i) => !this.tableId() || i.tableId === this.tableId()) ?? []);
+      newer = computed(() => this.pending() ? countNewer(this.pending().items, this.feed()?.items[0]?.when) : 0);
+
+      async ngOnInit() {
+        if (!appId) return;
+        try {
+          this.tables.set(await qb.getAppTables({ appId }));
+        } catch (e) {
+          this.error.set(errorMessage(e));
+          return;
+        }
+        await this.refresh({ spinner: true });
+        this.timer = setInterval(() => this.refresh({ background: true }), 60_000);
+      }
+
+      ngOnDestroy() {
+        clearInterval(this.timer);
+      }
+
+      setMine(value) {
+        if (value === this.mine()) return;
+        this.mine.set(value);
+        this.refresh({ spinner: true });
+      }
+
+      // background: the timer's refresh, which holds new changes behind the banner.
+      async refresh({ spinner = false, background = false } = {}) {
+        if (spinner) this.feed.set(null);
+        try {
+          const next = await loadFeed(this.tables(), { mine: this.mine() });
+          const shown = this.feed();
+          if (background && shown?.items.length && countNewer(next.items, shown.items[0].when)) {
+            this.pending.set(next);
+          } else {
+            this.feed.set(next);
+            this.pending.set(null);
+          }
+          this.error.set(null);
+        } catch (e) {
+          this.error.set(errorMessage(e));
+        }
+      }
+
+      showPending() {
+        this.feed.set(this.pending());
+        this.pending.set(null);
+      }
+    }
+
+    Component({
+      selector: 'app-root',
+      template: `
+        <main>
+          <h1>What changed?</h1>
+          @if (!hasApp) {
+            <p class="sub">Open this page as a code page inside a QuickBase app.</p>
+          } @else {
+            <p class="sub">{{ tables().length ? 'Latest changes across ' + tables().length + ' tables' : 'Loading…' }}</p>
+            <div class="controls">
+              <div class="toggle">
+                <button [attr.aria-pressed]="!mine()" (click)="setMine(false)">Everyone</button>
+                <button [attr.aria-pressed]="mine()" (click)="setMine(true)">Just me</button>
+              </div>
+              <select #filter (change)="tableId.set(filter.value)">
+                <option value="">All tables</option>
+                @for (t of tables(); track t.id) {
+                  <option [value]="t.id">{{ t.name }}</option>
+                }
+              </select>
+              <button (click)="refresh()">Refresh</button>
+            </div>
+            @if (newer()) {
+              <button class="banner" (click)="showPending()">
+                {{ newer() }} new change{{ newer() === 1 ? '' : 's' }}, show
+              </button>
+            }
+            @if (error()) {
+              <p class="status error">{{ error() }}</p>
+            } @else if (!feed()) {
+              <p class="status">Loading…</p>
+            } @else if (shown().length) {
+              <ul>
+                @for (i of shown(); track i.key) {
+                  <li>
+                    <a [href]="i.url" target="_top">{{ i.title }}</a>
+                    <div class="meta">{{ i.action }} {{ timeAgo(i.when) }} by {{ i.who }}</div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="status">No changes yet.</p>
+            }
+            @if (feed()?.blocked?.length) {
+              <p class="notice">No access to: {{ feed().blocked.join(', ') }}</p>
+            }
+          }
+        </main>`,
+    })(App);
+
+    bootstrapApplication(App);
+  </script>
+</body>
+</html>

@@ -69,7 +69,7 @@ Load the browser bundle and use temporary-token auth. Calls run as the signed-in
 
 As a module: `import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js'`.
 
-[`examples/codepages`](examples/codepages) has a complete code page for each of vanilla web components, Alpine, Lit, Preact, Solid, React and Vue. Paste one into a new code page and it explores the app it's in.
+[`examples/codepages`](examples/codepages) has a complete, read-only code page in plain JavaScript, Preact, React, Vue and Angular: a live feed of what changed across every table in the app. Paste one into a new code page; there's nothing to configure.
 
 ## Common tasks
 

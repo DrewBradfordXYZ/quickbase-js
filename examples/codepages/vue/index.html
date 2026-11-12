@@ -3,455 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickBase App Explorer - Vue</title>
+  <title>What changed? (Vue)</title>
   <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <style>[v-cloak] { display: none; }</style>
   <style>
     :root {
-      --qb-primary: #2196f3;
-      --qb-primary-dark: #1976d2;
-      --qb-error: #f44336;
-      --qb-bg: #f5f5f5;
-      --qb-card-bg: #ffffff;
-      --qb-text: #333333;
-      --qb-text-muted: #666666;
-      --qb-border: #e0e0e0;
-      --qb-radius: 8px;
+      --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #677085;
+      --border: #e3e6ec; --accent: #2563eb; --on-accent: #fff; --accent-soft: #e8efff; --warn: #9a5b00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12151b; --card: #1b1f27; --text: #e6e9ef; --muted: #959db0;
+        --border: #2c323d; --accent: #7aa2ff; --on-accent: #0b1220; --accent-soft: #1f2a44; --warn: #e0a84a;
+      }
     }
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--qb-bg);
-      color: var(--qb-text);
-      margin: 0;
-      padding: 16px;
-      line-height: 1.5;
-    }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .header h1 { margin: 0; font-size: 24px; }
-    .meta { color: var(--qb-text-muted); font-size: 14px; }
-    .card {
-      background: var(--qb-card-bg);
-      border-radius: var(--qb-radius);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      background: var(--qb-bg);
-      border-bottom: 1px solid var(--qb-border);
-      cursor: pointer;
-    }
-    .card-header:hover { background: #eeeeee; }
-    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-    .card-body { padding: 16px; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      background: #e3f2fd;
-      color: var(--qb-primary-dark);
-      margin-left: 4px;
-    }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .data-table th, .data-table td {
-      text-align: left;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .data-table th {
-      background: var(--qb-bg);
-      font-weight: 600;
-      color: var(--qb-text-muted);
-      font-size: 12px;
-      text-transform: uppercase;
-    }
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: var(--qb-text-muted);
-    }
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--qb-border);
-      border-top-color: var(--qb-primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error {
-      background: #ffebee;
-      color: var(--qb-error);
-      padding: 16px;
-      border-radius: var(--qb-radius);
-      margin: 16px 0;
-    }
-    .field-type {
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #eeeeee;
-      color: var(--qb-text-muted);
-    }
-    .stats { display: flex; gap: 32px; }
-    .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
-    .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
-    .expand-icon {
-      display: inline-block;
-      transition: transform 0.2s;
-      margin-right: 8px;
-    }
-    .expand-icon.expanded { transform: rotate(90deg); }
-    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
-    .tab {
-      padding: 8px 16px;
-      border: none;
-      background: none;
-      font-size: 14px;
-      color: var(--qb-text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-    .tab:hover { color: var(--qb-text); }
-    .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
+    body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    main { max-width: 680px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 22px; }
+    .sub { color: var(--muted); margin: 2px 0 16px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    button, select { font: inherit; color: inherit; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    .toggle button { border: 0; border-radius: 0; }
+    .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+    .banner { width: 100%; margin-bottom: 12px; background: var(--accent-soft); color: var(--accent);
+      border-color: transparent; font-weight: 600; }
+    ul { list-style: none; margin: 0; padding: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px; }
+    li { padding: 12px 16px; border-top: 1px solid var(--border); }
+    li:first-child { border-top: 0; }
+    li a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    li a:hover { text-decoration: underline; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .status { color: var(--muted); padding: 24px 0; text-align: center; }
+    .notice { color: var(--warn); font-size: 13px; margin-top: 12px; }
+    .error { color: #c62828; }
   </style>
 </head>
 <body>
-  <div id="app" class="container"></div>
+  <main id="app" v-cloak>
+    <h1>What changed?</h1>
+    <p class="sub" v-if="!appId">Open this page as a code page inside a QuickBase app.</p>
+    <template v-else>
+      <p class="sub">{{ tables.length ? `Latest changes across ${tables.length} tables` : 'Loading…' }}</p>
+      <div class="controls">
+        <div class="toggle">
+          <button :aria-pressed="String(!mine)" @click="mine = false">Everyone</button>
+          <button :aria-pressed="String(mine)" @click="mine = true">Just me</button>
+        </div>
+        <select v-model="tableId">
+          <option value="">All tables</option>
+          <option v-for="t in tables" :key="t.id" :value="t.id">{{ t.name }}</option>
+        </select>
+        <button @click="refresh()">Refresh</button>
+      </div>
+      <button class="banner" v-if="newer" @click="showPending">
+        {{ newer }} new change{{ newer === 1 ? '' : 's' }}, show
+      </button>
+      <p class="status error" v-if="error">{{ error }}</p>
+      <p class="status" v-else-if="!feed">Loading…</p>
+      <ul v-else-if="shown.length">
+        <li v-for="i in shown" :key="i.key">
+          <a :href="i.url" target="_top">{{ i.title }}</a>
+          <div class="meta">{{ i.action }} {{ timeAgo(i.when) }} by {{ i.who }}</div>
+        </li>
+      </ul>
+      <p class="status" v-else>No changes yet.</p>
+      <p class="notice" v-if="feed?.blocked.length">No access to: {{ feed.blocked.join(', ') }}</p>
+    </template>
+  </main>
 
   <script>
-    const { createApp, ref, reactive, computed, onMounted, provide, inject, watch } = Vue;
+    // ---- QuickBase: the same in every example ----------------------------
+    // Everything QuickBase-specific is here; the next script is the page.
 
-    // ============================================
-    // QuickBase Composables
-    // ============================================
-    const QBClientKey = Symbol('qb-client');
+    const realm = location.hostname.split('.')[0];
+    const appId = location.pathname.match(/\/(?:db|nav\/app)\/([a-z0-9]+)/i)?.[1];
 
-    function createQBClient() {
-      const realm = window.location.hostname.split('.')[0];
-      const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+    const qb = QuickBase.createClient({
+      realm,
+      auth: { type: 'temp-token' }, // the signed-in user's session: no token in the page
+      readOnly: true,               // the client refuses every write before sending it
+      rateLimit: { proactiveThrottle: { enabled: true } }, // big apps stay under 100 requests / 10 s
+    });
 
-      if (!realm || !appId) {
-        throw new Error('Could not detect realm/appId from URL');
-      }
+    // Built-in fields every QuickBase table has.
+    const F = { created: 1, modified: 2, recordId: 3, modifiedBy: 5 };
+    const PER_TABLE = 5;
+    const FEED_SIZE = 30;
 
-      const client = QuickBase.createClient({
-        realm,
-        auth: { type: 'temp-token' }
-      });
-
-      return { client, realm, appId };
-    }
-
-    function useQB() {
-      return inject(QBClientKey);
-    }
-
-    function useApp() {
-      const { client, appId } = useQB();
-      const app = ref(null);
-      const loading = ref(true);
-      const error = ref(null);
-
-      onMounted(async () => {
+    // The latest changes in each table, merged into one feed, newest first.
+    async function loadFeed(tables, { mine }) {
+      const blocked = [];
+      const perTable = await Promise.all(tables.map(async (table) => {
         try {
-          app.value = await client.getApp({ appId });
-        } catch (e) {
-          error.value = e.message;
-        } finally {
-          loading.value = false;
+          const { data = [] } = await qb.runQuery({
+            from: table.id,
+            select: Object.values(F),
+            where: mine ? `{${F.modifiedBy}.EX._curuser_}` : undefined,
+            sortBy: [{ fieldId: F.modified, order: 'DESC' }],
+            options: { top: PER_TABLE },
+          });
+          return data.map((record) => toItem(table, record));
+        } catch (error) {
+          // A table this user can't read is skipped, not fatal.
+          if (error instanceof QuickBase.AuthorizationError || error instanceof QuickBase.AuthenticationError) {
+            blocked.push(table.name);
+            return [];
+          }
+          throw error;
         }
-      });
-
-      return { app, loading, error };
+      }));
+      const items = perTable.flat().sort((a, b) => b.when - a.when).slice(0, FEED_SIZE);
+      return { items, blocked };
     }
 
-    function useTables() {
-      const { client, appId } = useQB();
-      const tables = ref([]);
-      const loading = ref(true);
-      const error = ref(null);
-
-      onMounted(async () => {
-        try {
-          tables.value = await client.getAppTables({ appId });
-        } catch (e) {
-          error.value = e.message;
-        } finally {
-          loading.value = false;
-        }
-      });
-
-      return { tables, loading, error };
+    function toItem(table, record) {
+      const rid = record[F.recordId]?.value;
+      const created = new Date(record[F.created]?.value);
+      const when = new Date(record[F.modified]?.value);
+      const user = record[F.modifiedBy]?.value;
+      return {
+        key: `${table.id}:${rid}`,
+        tableId: table.id,
+        title: `${table.singleRecordName || table.name} #${rid}`,
+        action: when - created < 1000 ? 'created' : 'updated',
+        when,
+        who: user?.name || user?.email || 'someone',
+        url: `/db/${table.id}?a=dr&rid=${rid}`,
+      };
     }
 
-    function useTableDetails(tableId, enabled) {
-      const { client } = useQB();
-      const fields = ref(null);
-      const records = ref(null);
-      const loading = ref(false);
-      const error = ref(null);
-      const loaded = ref(false);
-
-      watch(enabled, async (isEnabled) => {
-        if (!isEnabled || loaded.value) return;
-
-        loading.value = true;
-        try {
-          const [fieldsData, queryResult] = await Promise.all([
-            client.getFields({ tableId }),
-            client.runQuery({
-              from: tableId,
-              select: [3, 1, 2],
-              sortBy: [{ fieldId: 2, order: 'DESC' }],
-              options: { top: 5 }
-            })
-          ]);
-
-          fields.value = fieldsData;
-          records.value = queryResult.data || [];
-          loaded.value = true;
-        } catch (e) {
-          error.value = e.message;
-        } finally {
-          loading.value = false;
-        }
-      }, { immediate: true });
-
-      return { fields, records, loading, error };
-    }
-
-    // ============================================
-    // Utility Functions
-    // ============================================
-    function formatDate(dateStr) {
-      if (!dateStr) return '-';
-      const date = new Date(dateStr);
-      const now = new Date();
-      const diff = now - date;
-
-      if (diff < 60000) return 'Just now';
-      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-      if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
-
+    function timeAgo(date) {
+      const s = (Date.now() - date) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+      if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+      if (s < 7 * 86400) return `${Math.floor(s / 86400)} d ago`;
       return date.toLocaleDateString();
     }
 
-    // ============================================
-    // Components
-    // ============================================
-    const LoadingSpinner = {
-      props: ['message'],
-      template: `
-        <div class="loading">
-          <div class="spinner"></div>
-          {{ message || 'Loading...' }}
-        </div>
-      `
-    };
+    // How many items are newer than the newest one on screen.
+    const countNewer = (items, newest) => items.filter((i) => !newest || i.when > newest).length;
 
-    const ErrorMessage = {
-      props: ['message'],
-      template: `<div class="error">{{ message }}</div>`
-    };
+    function errorMessage(error) {
+      if (error instanceof QuickBase.RateLimitError) return 'QuickBase is busy. Try again in a minute.';
+      if (error instanceof QuickBase.AuthenticationError) return 'Sign in to QuickBase to see this page.';
+      if (error instanceof TypeError) return 'Can’t reach QuickBase. Check your connection.'; // fetch failed
+      return error.message;
+    }
 
-    const FieldsTable = {
-      props: ['fields'],
-      template: `
-        <p v-if="!fields?.length" class="meta">No fields found</p>
-        <table v-else class="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Label</th>
-              <th>Type</th>
-              <th>Properties</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="f in fields" :key="f.id">
-              <td>{{ f.id }}</td>
-              <td>{{ f.label }}</td>
-              <td><span class="field-type">{{ f.fieldType }}</span></td>
-              <td>
-                <span v-if="f.required" class="badge">required</span>
-                <span v-if="f.unique" class="badge">unique</span>
-                <span v-if="f.properties?.formula" class="badge">formula</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      `
-    };
+  </script>
 
-    const RecordsTable = {
-      props: ['records'],
+  <script>
+    // ---- The page: Vue, with the template in the HTML above (no build step) ----
+    const { createApp, ref, computed, watch, onMounted, onUnmounted } = Vue;
+
+    createApp({
       setup() {
-        return { formatDate };
-      },
-      template: `
-        <p v-if="!records?.length" class="meta">No records found</p>
-        <table v-else class="data-table">
-          <thead>
-            <tr>
-              <th>Record ID</th>
-              <th>Created</th>
-              <th>Modified</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="r in records" :key="r['3']?.value">
-              <td>{{ r['3']?.value || '-' }}</td>
-              <td>{{ formatDate(r['1']?.value) }}</td>
-              <td>{{ formatDate(r['2']?.value) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      `
-    };
-
-    const TableCard = {
-      props: ['table'],
-      components: { LoadingSpinner, ErrorMessage, FieldsTable, RecordsTable },
-      setup(props) {
-        const expanded = ref(false);
-        const activeTab = ref('fields');
-        const { fields, records, loading, error } = useTableDetails(
-          props.table.id,
-          expanded
-        );
-
-        const fieldCount = computed(() => fields.value?.length || '...');
-
-        const toggle = () => {
-          expanded.value = !expanded.value;
-        };
-
-        return {
-          expanded,
-          activeTab,
-          fields,
-          records,
-          loading,
-          error,
-          fieldCount,
-          toggle
-        };
-      },
-      template: `
-        <div class="card">
-          <div class="card-header" @click="toggle">
-            <h2>
-              <span :class="['expand-icon', { expanded }]">▶</span>
-              {{ table.name }}
-            </h2>
-            <span class="badge">{{ fieldCount }} fields</span>
-          </div>
-
-          <div v-if="expanded" class="card-body">
-            <LoadingSpinner v-if="loading" message="Loading table details..." />
-            <ErrorMessage v-else-if="error" :message="error" />
-            <template v-else>
-              <div class="tabs">
-                <button
-                  :class="['tab', { active: activeTab === 'fields' }]"
-                  @click="activeTab = 'fields'"
-                >
-                  Fields ({{ fields?.length || 0 }})
-                </button>
-                <button
-                  :class="['tab', { active: activeTab === 'records' }]"
-                  @click="activeTab = 'records'"
-                >
-                  Recent Records ({{ records?.length || 0 }})
-                </button>
-              </div>
-              <FieldsTable v-if="activeTab === 'fields'" :fields="fields" />
-              <RecordsTable v-else :records="records" />
-            </template>
-          </div>
-        </div>
-      `
-    };
-
-    const AppExplorer = {
-      components: { LoadingSpinner, ErrorMessage, TableCard },
-      setup() {
-        const qb = useQB();
-        const { app, loading: appLoading, error: appError } = useApp();
-        const { tables, loading: tablesLoading, error: tablesError } = useTables();
-
-        const loading = computed(() => appLoading.value || tablesLoading.value);
-        const error = computed(() => appError.value || tablesError.value);
-
-        return { qb, app, tables, loading, error };
-      },
-      template: `
-        <LoadingSpinner v-if="loading" message="Loading app..." />
-        <ErrorMessage v-else-if="error" :message="error" />
-        <template v-else>
-          <div class="header">
-            <div>
-              <h1>{{ app.name }}</h1>
-              <div class="meta">{{ qb.realm }}.quickbase.com</div>
-              <div class="meta">Vue 3</div>
-            </div>
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-value">{{ tables.length }}</div>
-                <div class="stat-label">Tables</div>
-              </div>
-            </div>
-          </div>
-
-          <TableCard v-for="table in tables" :key="table.id" :table="table" />
-        </template>
-      `
-    };
-
-    // ============================================
-    // App Root
-    // ============================================
-    const App = {
-      components: { AppExplorer, ErrorMessage },
-      setup() {
+        const tables = ref([]);
+        const feed = ref(null);    // { items, blocked }
+        const pending = ref(null); // a newer feed, waiting for a click
+        const mine = ref(false);
+        const tableId = ref('');
         const error = ref(null);
 
-        try {
-          const qbClient = createQBClient();
-          provide(QBClientKey, qbClient);
-        } catch (e) {
-          error.value = e.message;
+        const shown = computed(() => feed.value?.items.filter((i) => !tableId.value || i.tableId === tableId.value) ?? []);
+        const newer = computed(() => pending.value ? countNewer(pending.value.items, feed.value?.items[0]?.when) : 0);
+
+        // background: the timer's refresh, which holds new changes behind the banner.
+        async function refresh({ spinner = false, background = false } = {}) {
+          if (spinner) feed.value = null;
+          try {
+            const next = await loadFeed(tables.value, { mine: mine.value });
+            if (background && feed.value?.items.length && countNewer(next.items, feed.value.items[0].when)) {
+              pending.value = next;
+            } else {
+              feed.value = next;
+              pending.value = null;
+            }
+            error.value = null;
+          } catch (e) {
+            error.value = errorMessage(e);
+          }
         }
 
-        return { error };
-      },
-      template: `
-        <ErrorMessage v-if="error" :message="error" />
-        <AppExplorer v-else />
-      `
-    };
+        function showPending() {
+          feed.value = pending.value;
+          pending.value = null;
+        }
 
-    createApp(App).mount('#app');
+        let timer;
+        onMounted(async () => {
+          if (!appId) return;
+          try {
+            tables.value = await qb.getAppTables({ appId });
+          } catch (e) {
+            error.value = errorMessage(e);
+            return;
+          }
+          await refresh({ spinner: true });
+          timer = setInterval(() => refresh({ background: true }), 60_000);
+        });
+        onUnmounted(() => clearInterval(timer));
+        watch(mine, () => refresh({ spinner: true }));
+
+        return { appId, tables, feed, mine, tableId, error, shown, newer, refresh, showPending, timeAgo };
+      },
+    }).mount('#app');
   </script>
 </body>
 </html>

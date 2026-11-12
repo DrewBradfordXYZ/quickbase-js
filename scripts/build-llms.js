@@ -70,7 +70,7 @@ ${guides.map(([file, title, desc]) => `- [${title}](${SITE}/guides/${file}): ${d
 
 ## Optional
 
-- [Code page examples](https://github.com/DrewBradfordXYZ/quickbase-js/tree/main/examples/codepages): one complete code page per framework (vanilla, Alpine, Lit, Preact, Solid, React, Vue)
+- [Code page examples](https://github.com/DrewBradfordXYZ/quickbase-js/tree/main/examples/codepages): a read-only activity feed code page in plain JavaScript, Preact, React, Vue and Angular
 - [CHANGELOG](https://github.com/DrewBradfordXYZ/quickbase-js/blob/main/CHANGELOG.md)
 `;
 

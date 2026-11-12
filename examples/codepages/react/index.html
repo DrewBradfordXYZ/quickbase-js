@@ -3,445 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickBase App Explorer - React</title>
+  <title>What changed? (React)</title>
   <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@19",
+        "react-dom/client": "https://esm.sh/react-dom@19/client",
+        "htm": "https://esm.sh/htm@3"
+      }
+    }
+  </script>
   <style>
     :root {
-      --qb-primary: #2196f3;
-      --qb-primary-dark: #1976d2;
-      --qb-error: #f44336;
-      --qb-bg: #f5f5f5;
-      --qb-card-bg: #ffffff;
-      --qb-text: #333333;
-      --qb-text-muted: #666666;
-      --qb-border: #e0e0e0;
-      --qb-radius: 8px;
+      --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #677085;
+      --border: #e3e6ec; --accent: #2563eb; --on-accent: #fff; --accent-soft: #e8efff; --warn: #9a5b00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12151b; --card: #1b1f27; --text: #e6e9ef; --muted: #959db0;
+        --border: #2c323d; --accent: #7aa2ff; --on-accent: #0b1220; --accent-soft: #1f2a44; --warn: #e0a84a;
+      }
     }
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--qb-bg);
-      color: var(--qb-text);
-      margin: 0;
-      padding: 16px;
-      line-height: 1.5;
-    }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .header h1 { margin: 0; font-size: 24px; }
-    .meta { color: var(--qb-text-muted); font-size: 14px; }
-    .card {
-      background: var(--qb-card-bg);
-      border-radius: var(--qb-radius);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      background: var(--qb-bg);
-      border-bottom: 1px solid var(--qb-border);
-      cursor: pointer;
-    }
-    .card-header:hover { background: #eeeeee; }
-    .card-header h2 { margin: 0; font-size: 16px; font-weight: 600; }
-    .card-body { padding: 16px; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      background: #e3f2fd;
-      color: var(--qb-primary-dark);
-      margin-left: 4px;
-    }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .data-table th, .data-table td {
-      text-align: left;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--qb-border);
-    }
-    .data-table th {
-      background: var(--qb-bg);
-      font-weight: 600;
-      color: var(--qb-text-muted);
-      font-size: 12px;
-      text-transform: uppercase;
-    }
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: var(--qb-text-muted);
-    }
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--qb-border);
-      border-top-color: var(--qb-primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error {
-      background: #ffebee;
-      color: var(--qb-error);
-      padding: 16px;
-      border-radius: var(--qb-radius);
-      margin: 16px 0;
-    }
-    .field-type {
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #eeeeee;
-      color: var(--qb-text-muted);
-    }
-    .stats { display: flex; gap: 32px; }
-    .stat-value { font-size: 32px; font-weight: 700; color: var(--qb-primary); }
-    .stat-label { font-size: 12px; color: var(--qb-text-muted); text-transform: uppercase; }
-    .expand-icon {
-      display: inline-block;
-      transition: transform 0.2s;
-      margin-right: 8px;
-    }
-    .expand-icon.expanded { transform: rotate(90deg); }
-    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--qb-border); margin-bottom: 16px; }
-    .tab {
-      padding: 8px 16px;
-      border: none;
-      background: none;
-      font-size: 14px;
-      color: var(--qb-text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-    .tab:hover { color: var(--qb-text); }
-    .tab.active { color: var(--qb-primary); border-bottom-color: var(--qb-primary); }
+    body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    main { max-width: 680px; margin: 0 auto; }
+    h1 { margin: 0; font-size: 22px; }
+    .sub { color: var(--muted); margin: 2px 0 16px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    button, select { font: inherit; color: inherit; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    .toggle button { border: 0; border-radius: 0; }
+    .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+    .banner { width: 100%; margin-bottom: 12px; background: var(--accent-soft); color: var(--accent);
+      border-color: transparent; font-weight: 600; }
+    ul { list-style: none; margin: 0; padding: 0; background: var(--card);
+      border: 1px solid var(--border); border-radius: 12px; }
+    li { padding: 12px 16px; border-top: 1px solid var(--border); }
+    li:first-child { border-top: 0; }
+    li a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    li a:hover { text-decoration: underline; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .status { color: var(--muted); padding: 24px 0; text-align: center; }
+    .notice { color: var(--warn); font-size: 13px; margin-top: 12px; }
+    .error { color: #c62828; }
   </style>
 </head>
 <body>
-  <div id="root" class="container"></div>
+  <div id="app"></div>
 
-  <script type="text/babel">
-    const { createContext, useContext, useState, useEffect, useMemo } = React;
+  <script>
+    // ---- QuickBase: the same in every example ----------------------------
+    // Everything QuickBase-specific is here; the next script is the page.
 
-    // ============================================
-    // QuickBase Context
-    // ============================================
-    const QBContext = createContext(null);
+    const realm = location.hostname.split('.')[0];
+    const appId = location.pathname.match(/\/(?:db|nav\/app)\/([a-z0-9]+)/i)?.[1];
 
-    function QBProvider({ children }) {
-      const [error, setError] = useState(null);
+    const qb = QuickBase.createClient({
+      realm,
+      auth: { type: 'temp-token' }, // the signed-in user's session: no token in the page
+      readOnly: true,               // the client refuses every write before sending it
+      rateLimit: { proactiveThrottle: { enabled: true } }, // big apps stay under 100 requests / 10 s
+    });
 
-      const ctx = useMemo(() => {
-        const realm = window.location.hostname.split('.')[0];
-        const appId = window.location.pathname.match(/\/db\/([^/?]+)/)?.[1];
+    // Built-in fields every QuickBase table has.
+    const F = { created: 1, modified: 2, recordId: 3, modifiedBy: 5 };
+    const PER_TABLE = 5;
+    const FEED_SIZE = 30;
 
-        if (!realm || !appId) {
-          setError('Could not detect realm/appId from URL');
-          return null;
+    // The latest changes in each table, merged into one feed, newest first.
+    async function loadFeed(tables, { mine }) {
+      const blocked = [];
+      const perTable = await Promise.all(tables.map(async (table) => {
+        try {
+          const { data = [] } = await qb.runQuery({
+            from: table.id,
+            select: Object.values(F),
+            where: mine ? `{${F.modifiedBy}.EX._curuser_}` : undefined,
+            sortBy: [{ fieldId: F.modified, order: 'DESC' }],
+            options: { top: PER_TABLE },
+          });
+          return data.map((record) => toItem(table, record));
+        } catch (error) {
+          // A table this user can't read is skipped, not fatal.
+          if (error instanceof QuickBase.AuthorizationError || error instanceof QuickBase.AuthenticationError) {
+            blocked.push(table.name);
+            return [];
+          }
+          throw error;
         }
-
-        const client = QuickBase.createClient({
-          realm,
-          auth: { type: 'temp-token' }
-        });
-
-        return { client, realm, appId };
-      }, []);
-
-      if (error) {
-        return <div className="error">{error}</div>;
-      }
-
-      return (
-        <QBContext.Provider value={ctx}>
-          {children}
-        </QBContext.Provider>
-      );
+      }));
+      const items = perTable.flat().sort((a, b) => b.when - a.when).slice(0, FEED_SIZE);
+      return { items, blocked };
     }
 
-    function useQB() {
-      return useContext(QBContext);
+    function toItem(table, record) {
+      const rid = record[F.recordId]?.value;
+      const created = new Date(record[F.created]?.value);
+      const when = new Date(record[F.modified]?.value);
+      const user = record[F.modifiedBy]?.value;
+      return {
+        key: `${table.id}:${rid}`,
+        tableId: table.id,
+        title: `${table.singleRecordName || table.name} #${rid}`,
+        action: when - created < 1000 ? 'created' : 'updated',
+        when,
+        who: user?.name || user?.email || 'someone',
+        url: `/db/${table.id}?a=dr&rid=${rid}`,
+      };
     }
 
-    // ============================================
-    // Custom Hooks
-    // ============================================
-    function useApp() {
-      const { client, appId } = useQB();
-      const [app, setApp] = useState(null);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
-
-      useEffect(() => {
-        client.getApp({ appId })
-          .then(setApp)
-          .catch(e => setError(e.message))
-          .finally(() => setLoading(false));
-      }, [client, appId]);
-
-      return { app, loading, error };
-    }
-
-    function useTables() {
-      const { client, appId } = useQB();
-      const [tables, setTables] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
-
-      useEffect(() => {
-        client.getAppTables({ appId })
-          .then(setTables)
-          .catch(e => setError(e.message))
-          .finally(() => setLoading(false));
-      }, [client, appId]);
-
-      return { tables, loading, error };
-    }
-
-    function useTableDetails(tableId, enabled) {
-      const { client } = useQB();
-      const [fields, setFields] = useState(null);
-      const [records, setRecords] = useState(null);
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState(null);
-
-      useEffect(() => {
-        if (!enabled || fields) return;
-
-        setLoading(true);
-        Promise.all([
-          client.getFields({ tableId }),
-          client.runQuery({
-            from: tableId,
-            select: [3, 1, 2],
-            sortBy: [{ fieldId: 2, order: 'DESC' }],
-            options: { top: 5 }
-          })
-        ])
-          .then(([fieldsData, queryResult]) => {
-            setFields(fieldsData);
-            setRecords(queryResult.data || []);
-          })
-          .catch(e => setError(e.message))
-          .finally(() => setLoading(false));
-      }, [client, tableId, enabled, fields]);
-
-      return { fields, records, loading, error };
-    }
-
-    // ============================================
-    // Utility Functions
-    // ============================================
-    function formatDate(dateStr) {
-      if (!dateStr) return '-';
-      const date = new Date(dateStr);
-      const now = new Date();
-      const diff = now - date;
-
-      if (diff < 60000) return 'Just now';
-      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-      if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
-
+    function timeAgo(date) {
+      const s = (Date.now() - date) / 1000;
+      if (s < 60) return 'just now';
+      if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+      if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+      if (s < 7 * 86400) return `${Math.floor(s / 86400)} d ago`;
       return date.toLocaleDateString();
     }
 
-    // ============================================
-    // Components
-    // ============================================
-    function Loading({ message = 'Loading...' }) {
-      return (
-        <div className="loading">
-          <div className="spinner"></div>
-          {message}
-        </div>
-      );
+    // How many items are newer than the newest one on screen.
+    const countNewer = (items, newest) => items.filter((i) => !newest || i.when > newest).length;
+
+    function errorMessage(error) {
+      if (error instanceof QuickBase.RateLimitError) return 'QuickBase is busy. Try again in a minute.';
+      if (error instanceof QuickBase.AuthenticationError) return 'Sign in to QuickBase to see this page.';
+      if (error instanceof TypeError) return 'Can’t reach QuickBase. Check your connection.'; // fetch failed
+      return error.message;
     }
 
-    function Error({ message }) {
-      return <div className="error">{message}</div>;
-    }
+  </script>
 
-    function FieldsTable({ fields }) {
-      if (!fields?.length) {
-        return <p className="meta">No fields found</p>;
-      }
+  <script type="module">
+    // ---- The page: React, with htm for JSX-like templates (no build step) ----
+    import { createElement, useState, useEffect, useRef } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import htm from 'htm';
 
-      return (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Label</th>
-              <th>Type</th>
-              <th>Properties</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fields.map(f => (
-              <tr key={f.id}>
-                <td>{f.id}</td>
-                <td>{f.label}</td>
-                <td><span className="field-type">{f.fieldType}</span></td>
-                <td>
-                  {f.required && <span className="badge">required</span>}
-                  {f.unique && <span className="badge">unique</span>}
-                  {f.properties?.formula && <span className="badge">formula</span>}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    }
-
-    function RecordsTable({ records }) {
-      if (!records?.length) {
-        return <p className="meta">No records found</p>;
-      }
-
-      return (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Record ID</th>
-              <th>Created</th>
-              <th>Modified</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map(r => (
-              <tr key={r['3']?.value}>
-                <td>{r['3']?.value || '-'}</td>
-                <td>{formatDate(r['1']?.value)}</td>
-                <td>{formatDate(r['2']?.value)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    }
-
-    function TableCard({ table }) {
-      const [expanded, setExpanded] = useState(false);
-      const [activeTab, setActiveTab] = useState('fields');
-      const { fields, records, loading, error } = useTableDetails(table.id, expanded);
-
-      const fieldCount = fields?.length || '...';
-
-      return (
-        <div className="card">
-          <div className="card-header" onClick={() => setExpanded(!expanded)}>
-            <h2>
-              <span className={`expand-icon ${expanded ? 'expanded' : ''}`}>▶</span>
-              {table.name}
-            </h2>
-            <span className="badge">{fieldCount} fields</span>
-          </div>
-
-          {expanded && (
-            <div className="card-body">
-              {loading ? (
-                <Loading message="Loading table details..." />
-              ) : error ? (
-                <Error message={error} />
-              ) : (
-                <>
-                  <div className="tabs">
-                    <button
-                      className={`tab ${activeTab === 'fields' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('fields')}
-                    >
-                      Fields ({fields?.length || 0})
-                    </button>
-                    <button
-                      className={`tab ${activeTab === 'records' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('records')}
-                    >
-                      Recent Records ({records?.length || 0})
-                    </button>
-                  </div>
-                  {activeTab === 'fields' ? (
-                    <FieldsTable fields={fields} />
-                  ) : (
-                    <RecordsTable records={records} />
-                  )}
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    function AppExplorer() {
-      const { realm } = useQB();
-      const { app, loading: appLoading, error: appError } = useApp();
-      const { tables, loading: tablesLoading, error: tablesError } = useTables();
-
-      const loading = appLoading || tablesLoading;
-      const error = appError || tablesError;
-
-      if (loading) {
-        return <Loading message="Loading app..." />;
-      }
-
-      if (error) {
-        return <Error message={error} />;
-      }
-
-      return (
-        <>
-          <div className="header">
-            <div>
-              <h1>{app.name}</h1>
-              <div className="meta">{realm}.quickbase.com</div>
-              <div className="meta">React</div>
-            </div>
-            <div className="stats">
-              <div className="stat">
-                <div className="stat-value">{tables.length}</div>
-                <div className="stat-label">Tables</div>
-              </div>
-            </div>
-          </div>
-
-          {tables.map(table => (
-            <TableCard key={table.id} table={table} />
-          ))}
-        </>
-      );
-    }
+    const html = htm.bind(createElement);
 
     function App() {
-      return (
-        <QBProvider>
-          <AppExplorer />
-        </QBProvider>
-      );
+      const [tables, setTables] = useState([]);
+      const [feed, setFeed] = useState(null);       // { items, blocked }
+      const [pending, setPending] = useState(null); // a newer feed, waiting for a click
+      const [mine, setMine] = useState(false);
+      const [tableId, setTableId] = useState('');
+      const [error, setError] = useState(null);
+      const shownFeed = useRef(null);
+      shownFeed.current = feed;
+
+      // background: the timer's refresh, which holds new changes behind the banner.
+      async function refresh({ spinner = false, background = false } = {}) {
+        if (spinner) setFeed(null);
+        try {
+          const next = await loadFeed(tables, { mine });
+          const shown = shownFeed.current;
+          if (background && shown?.items.length && countNewer(next.items, shown.items[0].when)) {
+            setPending(next);
+          } else {
+            setFeed(next);
+            setPending(null);
+          }
+          setError(null);
+        } catch (e) {
+          setError(errorMessage(e));
+        }
+      }
+
+      useEffect(() => {
+        if (appId) qb.getAppTables({ appId }).then(setTables, (e) => setError(errorMessage(e)));
+      }, []);
+
+      useEffect(() => {
+        if (!tables.length) return;
+        refresh({ spinner: true });
+        const timer = setInterval(() => refresh({ background: true }), 60_000);
+        return () => clearInterval(timer);
+      }, [tables, mine]);
+
+      if (!appId) {
+        return html`<main><h1>What changed?</h1><p className="sub">Open this page as a code page inside a QuickBase app.</p></main>`;
+      }
+
+      const shown = feed?.items.filter((i) => !tableId || i.tableId === tableId) ?? [];
+      const newer = pending ? countNewer(pending.items, feed?.items[0]?.when) : 0;
+
+      return html`
+        <main>
+          <h1>What changed?</h1>
+          <p className="sub">${tables.length ? `Latest changes across ${tables.length} tables` : 'Loading…'}</p>
+          <div className="controls">
+            <div className="toggle">
+              <button aria-pressed=${String(!mine)} onClick=${() => setMine(false)}>Everyone</button>
+              <button aria-pressed=${String(mine)} onClick=${() => setMine(true)}>Just me</button>
+            </div>
+            <select value=${tableId} onChange=${(e) => setTableId(e.target.value)}>
+              <option value="">All tables</option>
+              ${tables.map((t) => html`<option key=${t.id} value=${t.id}>${t.name}</option>`)}
+            </select>
+            <button onClick=${() => refresh()}>Refresh</button>
+          </div>
+          ${newer > 0 && html`
+            <button className="banner" onClick=${() => { setFeed(pending); setPending(null); }}>
+              ${newer} new change${newer === 1 ? '' : 's'}, show
+            </button>`}
+          ${error ? html`<p className="status error">${error}</p>`
+            : !feed ? html`<p className="status">Loading…</p>`
+            : shown.length ? html`
+              <ul>
+                ${shown.map((i) => html`
+                  <li key=${i.key}>
+                    <a href=${i.url} target="_top">${i.title}</a>
+                    <div className="meta">${i.action} ${timeAgo(i.when)} by ${i.who}</div>
+                  </li>`)}
+              </ul>`
+            : html`<p className="status">No changes yet.</p>`}
+          ${feed?.blocked.length > 0 && html`<p className="notice">No access to: ${feed.blocked.join(', ')}</p>`}
+        </main>`;
     }
 
-    // Render
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    createRoot(document.getElementById('app')).render(html`<${App} />`);
   </script>
 </body>
 </html>
