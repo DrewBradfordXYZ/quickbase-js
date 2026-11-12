@@ -1,24 +1,25 @@
 {
   "name": "quickbase-js",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "TypeScript client for the QuickBase JSON and XML APIs: every endpoint, pagination, retries, code-page temp tokens",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "browser": "dist/quickbase.min.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
       "types": "./dist/index.d.ts",
-      "browser": "./dist/quickbase.min.js"
-    }
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "bin": {
     "quickbase-js": "./bin/quickbase-js.js"
   },
   "files": [
     "dist",
+    "src",
     "bin",
     "README.md",
     "LICENSE"
@@ -57,7 +58,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DrewBradfordXYZ/quickbase-js.git"
+    "url": "git+https://github.com/DrewBradfordXYZ/quickbase-js.git"
   },
   "bugs": {
     "url": "https://github.com/DrewBradfordXYZ/quickbase-js/issues"
@@ -75,5 +76,8 @@
     "typescript": "^5.4.0",
     "vitest": "^1.4.0",
     "yaml": "^2.4.0"
-  }
+  },
+  "unpkg": "dist/quickbase.min.js",
+  "jsdelivr": "dist/quickbase.min.js",
+  "sideEffects": false
 }

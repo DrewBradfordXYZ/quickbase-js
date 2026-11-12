@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-11-12
+
+### Fixed
+- **`require('quickbase-js')` in browser bundles** returned the code-page bundle, which only sets a global, so `createClient` was `undefined`. The `browser` entries are gone: bundlers use the ES module for both `import` and `require`, and `exports` has a `default` condition, so `require` also works in Node 20.19+ and 22.12+. CDN links without a file path still serve `dist/quickbase.min.js` (`unpkg` and `jsdelivr` fields).
+- **Source maps** pointed to `src/`, which wasn't published; the package now includes it, so debuggers and "Go to definition" reach the TypeScript source.
+- `types` comes first in `exports`, as TypeScript requires, and `"sideEffects": false` lets bundlers drop unused code.
+
+### Changed
+- README rewritten around common tasks; the docs site publishes `llms.txt` and `llms-full.txt`.
+
 ## [2.4.0] - 2026-11-12
 
 ### Added
