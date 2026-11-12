@@ -1,14 +1,22 @@
-# QuickBase JS SDK
+# quickbase-js
 
-A TypeScript client for the [QuickBase JSON API](https://developer.quickbase.com/), for Node.js and the browser (including QuickBase code pages), with the legacy XML API for what JSON lacks.
+[![npm](https://img.shields.io/npm/v/quickbase-js)](https://www.npmjs.com/package/quickbase-js)
+[![CI](https://github.com/DrewBradfordXYZ/quickbase-js/actions/workflows/ci.yml/badge.svg)](https://github.com/DrewBradfordXYZ/quickbase-js/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/quickbase-js)](LICENSE)
 
-- **Every operation** as a typed method, generated from a spec checked against live responses
-- **Pagination** with `.all()` and `.paginate()`, and readable **schema aliases** instead of IDs
-- **Temporary tokens in code pages**, fetched and refreshed for you from the user's session
-- **Retries and throttling** for QuickBase's rate limits
-- **Read-only mode** for tools that must never write
+The QuickBase API for TypeScript and JavaScript, in Node.js, the browser and QuickBase code pages.
 
-**[API reference →](https://drewbradfordxyz.github.io/quickbase-js/)**
+```typescript
+const projects = await qb.runQuery({ from: 'bqtable1', where: "{7.EX.'Active'}" }).all();
+```
+
+- **Every endpoint** in QuickBase's API as a typed method, generated from QuickBase's published spec and checked against live responses.
+- **Every page of results** with `.all()`, so you never write a `skip` loop.
+- **Field names instead of IDs**: `select: ['name', 'status']`, with a generator that writes the names from your app.
+- **No token in code pages**: the client signs in with the user's QuickBase session and renews its tokens.
+- **Rate limits handled**: 429s and server errors are retried with backoff, and the client can pace itself to stay under the limit.
+- **The XML API too**, for roles, groups, code pages, app variables and CSV imports.
+- **No dependencies**, a read-only mode for tools that must never write, and typed errors.
 
 ```bash
 npm install quickbase-js
@@ -16,11 +24,13 @@ npm install quickbase-js
 
 ## Quick start
 
+Create a [user token](https://help.quickbase.com/docs/user-tokens) in QuickBase, then:
+
 ```typescript
 import { createClient } from 'quickbase-js';
 
 const qb = createClient({
-  realm: 'mycompany',
+  realm: 'mycompany', // mycompany.quickbase.com
   auth: { type: 'user-token', userToken: process.env.QB_USER_TOKEN! },
 });
 
@@ -44,7 +54,7 @@ await qb.upsert({
 
 ## In a code page
 
-In the browser, temporary-token auth uses the signed-in user's QuickBase session: no token in your code, and every call has that user's permissions.
+Load the browser bundle and use temporary-token auth. Calls run as the signed-in user, with that user's permissions, and there is no token in your page.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
@@ -57,36 +67,65 @@ In the browser, temporary-token auth uses the signed-in user's QuickBase session
 </script>
 ```
 
-Or as a module: `import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js'`.
+As a module: `import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js'`.
 
-## Typed methods for every operation
+[`examples/codepages`](examples/codepages) has a complete code page for each of vanilla web components, Alpine, Lit, Preact, Solid, React and Vue. Paste one into a new code page and it explores the app it's in.
 
-Each QuickBase operation is a method on the client, typed from [quickbase-spec](https://github.com/DrewBradfordXYZ/quickbase-spec), including properties QuickBase returns but doesn't document. Path and query parameters come first, then the body:
+## Common tasks
 
-```typescript
-await qb.getFields({ tableId: 'bqtable1' });
-await qb.runQuery({ from: 'bqtable1', select: [3, 6], sortBy: [{ fieldId: 3, order: 'ASC' }] });
-await qb.deleteRecords({ from: 'bqtable1', where: '{3.EX.123}' });
-await qb.updateApp({ appId: 'bpqe82s1' }, { name: 'Renamed' });
-```
-
-All of them, with QuickBase's descriptions: the [API reference](https://drewbradfordxyz.github.io/quickbase-js/interfaces/QuickbaseAPI.html).
-
-## Pagination
-
-QuickBase returns a page of records at a time. Paginated methods (`runQuery`, `runReport`, `getUsers`, ...) return one page when awaited, or follow the pages:
+### Get every record from a table
 
 ```typescript
-const page = await qb.runQuery({ from: 'bqtable1' });                          // one page
-const all = await qb.runQuery({ from: 'bqtable1' }).all();                     // every page
+const all = await qb.runQuery({ from: 'bqtable1' }).all();
 const first500 = await qb.runQuery({ from: 'bqtable1' }).paginate({ limit: 500 });
+const page = await qb.runQuery({ from: 'bqtable1' }); // one page
 ```
 
-`autoPaginate: true` makes a plain `await` fetch every page. See [guides/queries.md](guides/queries.md).
+QuickBase returns a page at a time. `runQuery`, `runReport`, `getUsers` and the other paginated methods return one page when awaited, and follow the pages with `.all()` or `.paginate()`. Set `autoPaginate: true` on the client to make a plain `await` fetch them all.
 
-## Schema aliases
+### Filter and sort
 
-Give the client names for your tables and fields, and use them instead of IDs. Requests are translated to IDs; responses come back keyed by name, with values unwrapped.
+```typescript
+await qb.runQuery({
+  from: 'bqtable1',
+  select: [3, 6, 7],
+  where: '{6.GT.100}',
+  sortBy: [{ fieldId: 3, order: 'ASC' }],
+  options: { top: 100, skip: 0 },
+});
+```
+
+`where` uses QuickBase's [query syntax](https://help.quickbase.com/docs/components-of-a-query): `{field.OPERATOR.'value'}`, joined with `AND` and `OR`.
+
+### Run a report
+
+```typescript
+const reportRows = await qb.runReport({ reportId: '7', tableId: 'bqtable1' }).all();
+```
+
+### Add or update records
+
+`upsert` adds records, or updates the one whose merge field matches (the key field, usually Record ID#, when you don't name one):
+
+```typescript
+const result = await qb.upsert({
+  to: 'bqtable1',
+  mergeFieldId: 9,
+  data: [{ '9': { value: 'EXT-001' }, '6': { value: 'Alpha' } }],
+  fieldsToReturn: [6],
+});
+console.log(result.metadata?.createdRecordIds, result.metadata?.updatedRecordIds);
+```
+
+### Delete records
+
+```typescript
+await qb.deleteRecords({ from: 'bqtable1', where: '{3.EX.123}' });
+```
+
+### Use field names instead of IDs
+
+Give the client a schema and use your names anywhere an ID goes. Records come back keyed by name, with plain values:
 
 ```typescript
 const qb = createClient({
@@ -100,10 +139,63 @@ const result = await qb.runQuery({
   select: ['name', 'status'],
   where: "{'status'.EX.'Active'}",
 });
-console.log(result.data?.[0]?.name);
+const first = result.data?.[0] as Record<string, unknown> | undefined; // TypeScript: keyed by name
+console.log(first?.name, first?.status);
+
+await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 ```
 
-Requests accept aliases in TypeScript too. Results are typed by field ID, so read an aliased record with a cast. See [guides/schema-aliases.md](guides/schema-aliases.md), which also covers the schema generator (`npx quickbase-js schema`).
+Generate the schema from your app instead of writing it, and regenerate with `--merge` when the app changes (your renamed aliases are kept):
+
+```bash
+npx quickbase-js schema -r mycompany -a bpqe82s1 -t "$QB_USER_TOKEN" -o schema.ts
+```
+
+A misspelled name throws with a suggestion (`Did you mean 'status'?`). Results are typed by field ID, which is why TypeScript needs the cast; the [schema guide](guides/schema-aliases.md) has the details.
+
+### Read an app's tables and fields
+
+```typescript
+const tables = await qb.getAppTables({ appId: 'bpqe82s1' });
+console.log(tables.map((t) => `${t.id} ${t.name}`));
+
+const fields = await qb.getFields({ tableId: 'bqtable1' });
+console.log(fields.map((f) => `${f.id} ${f.label} (${f.fieldType})`));
+```
+
+### Export and update a solution, download a file
+
+Solutions are QBL (YAML) and files are raw content, so these take and return text:
+
+```typescript
+const qbl = await qb.exportSolution({ solutionId: 'solution-id' });
+await qb.updateSolution({ solutionId: 'solution-id' }, qbl);
+const file = await qb.downloadFile({ tableId: 'bqtable1', recordId: 12, fieldId: 8, versionNumber: 0 }); // base64
+```
+
+### Manage roles, groups and code pages
+
+The JSON API doesn't cover these, so `createXmlClient(qb)` calls the XML API with the same authentication, retries, read-only mode and schema:
+
+```typescript
+import { createXmlClient } from 'quickbase-js';
+
+const xml = createXmlClient(qb);
+const roles = await xml.getRoleInfo(appId);
+for (const role of roles.roles) {
+  console.log(role.name, role.access.description);
+}
+```
+
+Every method is in the [XML API guide](guides/xml-api.md).
+
+### Call any endpoint directly
+
+```typescript
+const result = await qb.request<{ id: string }>({ method: 'GET', path: '/apps/bpqe82s1' });
+```
+
+`request` uses the client's authentication, retries and throttling.
 
 ## Authentication
 
@@ -114,11 +206,11 @@ Requests accept aliases in TypeScript too. Results are typed by field ID, so rea
 | `'ticket'` | A user signing in with their QuickBase email and password |
 | `'sso'` | A user signed in through your identity provider (SAML) |
 
-Details: [guides/authentication.md](guides/authentication.md).
+Details are in the [authentication guide](guides/authentication.md).
 
 ## Rate limits and retries
 
-QuickBase allows 100 requests per 10 seconds per user token. The client retries 429s and server errors with exponential backoff (honoring `Retry-After`) and can throttle itself so it never hits the limit:
+QuickBase allows 100 requests per 10 seconds per user token. The client retries 429s and server errors with exponential backoff, honoring `Retry-After`, and can throttle itself so it never hits the limit:
 
 ```typescript
 createClient({
@@ -131,13 +223,11 @@ createClient({
 });
 ```
 
-See [guides/reliability.md](guides/reliability.md).
-
-## Read-only mode
-
-`readOnly: true` makes the client refuse every write before it is sent, for the JSON API and the XML client made from it. Reads that use POST, like `runQuery`, `runReport` and `audit`, still work. A blocked call throws `ReadOnlyError`.
+Timeouts, backoff settings and a rate-limit callback are in the [reliability guide](guides/reliability.md).
 
 ## Errors
+
+Every error extends `QuickbaseError`, with a class for each kind of failure:
 
 ```typescript
 import { RateLimitError, NotFoundError, ReadOnlyError, QuickbaseError } from 'quickbase-js';
@@ -157,51 +247,29 @@ try {
 }
 ```
 
-The classes are `RateLimitError` (429), `AuthenticationError` (401), `AuthorizationError` (403), `NotFoundError` (404), `ValidationError` (400), `ServerError` (5xx) and `ReadOnlyError`, all extending `QuickbaseError`; the XML API adds `QuickbaseTicketError`, `QuickbaseAppTokenError` and `QuickbaseXmlError`.
+| Class | Status |
+|---|---|
+| `ValidationError` | 400 |
+| `AuthenticationError` | 401 |
+| `AuthorizationError` | 403 |
+| `NotFoundError` | 404 |
+| `RateLimitError` | 429 |
+| `ServerError` | 5xx |
+| `ReadOnlyError` | a write blocked by `readOnly: true` |
 
-## Solutions and files
+The XML API adds `QuickbaseTicketError`, `QuickbaseAppTokenError` and `QuickbaseXmlError`.
 
-Solutions are QBL (YAML) and file downloads are raw content, so these methods take and return text:
+## Other options
 
-```typescript
-const qbl = await qb.exportSolution({ solutionId: 'solution-id' });
-await qb.updateSolution({ solutionId: 'solution-id' }, qbl);
-const file = await qb.downloadFile({ tableId: 'bqtable1', recordId: 12, fieldId: 8, versionNumber: 0 }); // base64
-```
+- **`readOnly: true`** refuses every write before it is sent, in both APIs. Reads sent as POST (`runQuery`, `runReport`, `audit`) still work.
+- **Dates**: ISO date strings in responses become `Date` objects. The types say `string`, because QuickBase's spec marks few date fields; set `convertDates: false` to keep strings.
+- **Requirements**: Node.js 18 or later, or any modern browser. The package is ES modules; the browser bundle also defines a `QuickBase` global.
 
-## Dates
+## Documentation
 
-ISO date strings in responses become `Date` objects. The generated types say `string`, because QuickBase's spec marks few of its date fields as dates; set `convertDates: false` if you want values to match the types exactly.
-
-## Raw requests
-
-`qb.request<T>({ method, path, body, query })` calls any endpoint with the client's authentication, retries and throttling.
-
-## The legacy XML API
-
-`createXmlClient(qb)` reaches what the JSON API doesn't: roles, groups, code pages, app variables, webhooks, CSV imports. It shares the client's authentication, retries, read-only mode and schema.
-
-```typescript
-import { createXmlClient } from 'quickbase-js';
-
-const xml = createXmlClient(qb);
-const roles = await xml.getRoleInfo(appId);
-for (const role of roles.roles) {
-  console.log(role.name, role.access.description);
-}
-```
-
-Every method: [guides/xml-api.md](guides/xml-api.md).
-
-## Guides
-
-- [Queries, pagination and records](guides/queries.md)
-- [Schema aliases](guides/schema-aliases.md)
-- [Authentication](guides/authentication.md)
-- [Rate limits and retries](guides/reliability.md)
-- [The XML API](guides/xml-api.md)
-- [Migrating from v1](guides/migration.md)
-- [API reference](https://drewbradfordxyz.github.io/quickbase-js/) and [CHANGELOG](CHANGELOG.md)
+- Guides: [queries and pagination](guides/queries.md), [schema aliases](guides/schema-aliases.md), [authentication](guides/authentication.md), [rate limits and retries](guides/reliability.md), [the XML API](guides/xml-api.md), [migrating from v1](guides/migration.md)
+- [API reference](https://drewbradfordxyz.github.io/quickbase-js/): every method, with QuickBase's descriptions
+- [CHANGELOG](CHANGELOG.md)
 
 ## Development
 
@@ -213,7 +281,7 @@ npm run typecheck  # the library, and the docs' examples
 npm run spec:build # regenerate the types from the pinned spec in spec/
 ```
 
-`spec/` is a submodule of [quickbase-spec](https://github.com/DrewBradfordXYZ/quickbase-spec). CI requires the generated types to match it. The code in this README and `guides/` comes from `examples/docs.ts`, which `npm run typecheck` checks (aliased examples there carry the casts TypeScript needs).
+`spec/` is a submodule of [quickbase-spec](https://github.com/DrewBradfordXYZ/quickbase-spec), and CI fails when the generated types don't match it. The code in this README and `guides/` comes from `examples/docs.ts`, which `npm run typecheck` checks; change them together.
 
 ## Related
 

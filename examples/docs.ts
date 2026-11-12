@@ -20,10 +20,17 @@ declare const appId: string;
 declare const userId: string;
 declare const roleId: number;
 
+// README: the opening line
+export async function hero() {
+  const qb = createClient({ realm: 'mycompany', auth: { type: 'user-token', userToken: 'token' } });
+  const projects = await qb.runQuery({ from: 'bqtable1', where: "{7.EX.'Active'}" }).all();
+  console.log(projects.data?.length);
+}
+
 // README: quick start
 export async function quickStart() {
   const qb = createClient({
-    realm: 'mycompany',
+    realm: 'mycompany', // mycompany.quickbase.com
     auth: { type: 'user-token', userToken: process.env.QB_USER_TOKEN! },
   });
 
@@ -52,6 +59,17 @@ export function codePage() {
     auth: { type: 'temp-token' },
   });
   return qb.getApp({ appId: 'bpqe82s1' });
+}
+
+// README: read an app's tables and fields
+export async function readSchema() {
+  const qb = createClient({ realm: 'mycompany', auth: { type: 'user-token', userToken: 'token' } });
+
+  const tables = await qb.getAppTables({ appId: 'bpqe82s1' });
+  console.log(tables.map((t) => `${t.id} ${t.name}`));
+
+  const fields = await qb.getFields({ tableId: 'bqtable1' });
+  console.log(fields.map((f) => `${f.id} ${f.label} (${f.fieldType})`));
 }
 
 // guides/queries.md: pagination
@@ -100,6 +118,25 @@ export async function records() {
   await qb.deleteRecords({ from: 'bqtable1', where: '{3.EX.123}' });
   await qb.getFields({ tableId: 'bqtable1' });
   await qb.updateApp({ appId: 'bpqe82s1' }, { name: 'Renamed' });
+}
+
+// README: field names instead of IDs
+export async function readmeFieldNames() {
+  const qb = createClient({
+    realm: 'mycompany',
+    auth: { type: 'user-token', userToken: 'token' },
+    schema: { tables: { projects: { id: 'bqw3ryzab', fields: { id: 3, name: 6, status: 7 } } } },
+  });
+
+  const result = await qb.runQuery({
+    from: 'projects',
+    select: ['name', 'status'],
+    where: "{'status'.EX.'Active'}",
+  });
+  const first = result.data?.[0] as Record<string, unknown> | undefined; // TypeScript: keyed by name
+  console.log(first?.name, first?.status);
+
+  await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 }
 
 // guides/schema-aliases.md
