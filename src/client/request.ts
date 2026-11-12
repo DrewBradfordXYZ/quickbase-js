@@ -82,9 +82,17 @@ const jsonWriteEndpoints: Record<string, boolean> = {
   // Document generation (GET but writes)
   'GET /docTemplates/': true, // GenerateDocument (prefix)
 
-  // Solution from record (GET but writes)
-  'GET /solutions/fromrecord': true, // CreateSolutionFromRecord
+  // Solutions to and from records are GETs that write: see SOLUTION_RECORD_WRITE_PATH
 };
+
+/**
+ * Solution endpoints that are GETs but write: createSolutionFromRecord
+ * (/solutions/fromrecord) and updateSolutionToRecord (/solutions/{id}/fromrecord)
+ * change apps, and exportSolutionToRecord (/solutions/{id}/torecord) writes a
+ * record. changesetSolutionFromRecord (/solutions/{id}/changeset/fromrecord)
+ * only reads, and doesn't match.
+ */
+const SOLUTION_RECORD_WRITE_PATH = /\/solutions\/(fromrecord|[^/]+\/(fromrecord|torecord))$/;
 
 /**
  * POST endpoints that are actually read-only (allowlist).
@@ -113,6 +121,10 @@ function isWriteMethod(method: string): boolean {
  * Uses both exact matching and prefix matching for paths with IDs.
  */
 function isJSONWriteEndpoint(method: string, path: string): boolean {
+  if (method === 'GET' && SOLUTION_RECORD_WRITE_PATH.test(path)) {
+    return true;
+  }
+
   const key = `${method} ${path}`;
 
   // Exact match
@@ -473,6 +485,17 @@ export async function executeRequest<T = unknown>(
     } catch (error) {
       lastError = error as Error;
 
+      // A 401 retries once the strategy has a new token (temp token, SSO).
+      // It isn't a retryable error otherwise, so this comes first.
+      if (error instanceof QuickbaseError && error.statusCode === 401 && attempt < maxAttempts) {
+        const refreshed = await auth.handleAuthError(dbid);
+        if (!refreshed) {
+          throw error;
+        }
+        logger.debug('Token refreshed, retrying request');
+        continue;
+      }
+
       // Check if error is retryable
       if (!isRetryableError(error)) {
         throw error;
@@ -481,16 +504,6 @@ export async function executeRequest<T = unknown>(
       // Don't retry if we've exhausted attempts
       if (attempt >= maxAttempts) {
         throw error;
-      }
-
-      // Handle auth errors specially - try to refresh token
-      if (error instanceof QuickbaseError && error.statusCode === 401) {
-        const refreshed = await auth.handleAuthError(dbid);
-        if (!refreshed) {
-          throw error;
-        }
-        logger.debug('Token refreshed, retrying request');
-        continue;
       }
 
       // Calculate retry delay

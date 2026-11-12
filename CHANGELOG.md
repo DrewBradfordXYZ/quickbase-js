@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Read-only mode let two solution writes through**: `updateSolutionToRecord` (`GET /solutions/{id}/fromrecord`, which changes apps) and `exportSolutionToRecord` (`GET /solutions/{id}/torecord`, which writes a record) are GETs, and only `/solutions/fromrecord` was blocked. Both now throw `ReadOnlyError`. `changesetSolutionFromRecord` only reads and is still allowed.
+- **A 401 never fetched a new token**: the retry loop gave up on errors that aren't retryable before reaching the token refresh, and a 401 isn't one. An expired or revoked temp token now gets one new token and one retry; a user token's 401 still fails at once.
+
 ## [2.4.1] - 2026-11-12
 
 ### Fixed

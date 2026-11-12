@@ -207,6 +207,32 @@ describe('JSON API Read-Only Mode', () => {
       }
     });
 
+    // Only /solutions/fromrecord was blocked: updating a solution from a
+    // record (changes apps) and exporting one to a record (writes the
+    // record) went through.
+    it.each([
+      ['/solutions/sol123/fromrecord', 'updateSolutionToRecord'],
+      ['/solutions/sol123/torecord', 'exportSolutionToRecord'],
+    ])('should block GET %s (%s)', async (path) => {
+      const { client, getCalls } = createReadOnlyClient();
+
+      await expect(
+        client.request({ method: 'GET', path, query: { tableId: 'bqxyz123', fieldId: 7, recordId: 1 } })
+      ).rejects.toBeInstanceOf(ReadOnlyError);
+      expect(getCalls()).toHaveLength(0);
+    });
+
+    it('should allow GET /solutions/{id}/changeset/fromrecord (read-only)', async () => {
+      const { client, getCalls } = createReadOnlyClient();
+
+      await client.request({
+        method: 'GET',
+        path: '/solutions/sol123/changeset/fromrecord',
+        query: { tableId: 'bqxyz123', fieldId: 7, recordId: 1 },
+      });
+      expect(getCalls()).toHaveLength(1);
+    });
+
     it('should block GET /docTemplates/{id}/generate', async () => {
       const { client } = createReadOnlyClient();
 
