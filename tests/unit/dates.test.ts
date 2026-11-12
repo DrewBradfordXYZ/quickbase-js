@@ -61,6 +61,50 @@ describe('QuickbaseDate', () => {
     expect(new QuickbaseDate(50, 6, 1).toISODate()).toBe('0050-06-01');
   });
 
+  // A server in UTC formatting for a user in New York showed Jan 14: local
+  // midnight, formatted in an earlier zone, is the evening before
+  it.each(ZONES)('formats the day whatever timeZone it is given, in %s', (zone) => {
+    inZone(zone);
+    const d = QuickbaseDate.fromValue('2024-01-15');
+    for (const timeZone of ['America/New_York', 'Asia/Tokyo', 'Pacific/Kiritimati', 'Pacific/Pago_Pago']) {
+      expect(d.toLocaleDateString('en-US', { timeZone })).toBe('1/15/2024');
+      expect(d.toLocaleString('en-US', { timeZone })).toBe('1/15/2024, 12:00:00 AM');
+    }
+    expect(new Intl.DateTimeFormat('en-US', { timeZone: 'UTC' }).format(d.toUTCDay())).toBe('1/15/2024');
+  });
+
+  it('is the day in a template string, such as a query filter', () => {
+    const d = QuickbaseDate.fromValue('2024-01-15');
+    expect(`{7.AF.'${d}'}`).toBe("{7.AF.'2024-01-15'}");
+    expect(String(d)).toBe('2024-01-15');
+  });
+
+  it('refuses a day that does not exist instead of rolling it over', () => {
+    expect(() => QuickbaseDate.fromValue('2024-02-30')).toThrow(RangeError);
+    expect(() => new QuickbaseDate(2024, 13, 1)).toThrow(RangeError);
+    expect(new QuickbaseDate(2024, 2, 29).toISODate()).toBe('2024-02-29');
+  });
+
+  it('has no own keys, so it compares and spreads like a Date', () => {
+    expect(Object.keys(QuickbaseDate.fromValue('2024-01-15'))).toEqual([]);
+    expect(Object.keys(QuickbaseDateTime.current())).toEqual([]);
+    expect(QuickbaseDate.fromValue('2024-01-15').kind).toBe('date');
+  });
+
+  // Chile skips midnight when daylight saving starts: 2024-09-08 begins at 01:00
+  it('keeps the day when local midnight does not exist', () => {
+    inZone('America/Santiago');
+    const d = QuickbaseDate.fromValue('2024-09-08');
+    expect(d.toISODate()).toBe('2024-09-08');
+    expect(d.getDate()).toBe(8);
+  });
+
+  it('comes back from structuredClone as a plain Date, which from() restores', () => {
+    const copy = structuredClone(QuickbaseDate.fromValue('2024-01-15'));
+    expect(copy).not.toBeInstanceOf(QuickbaseDate);
+    expect(QuickbaseDate.from(copy).toISODate()).toBe('2024-01-15');
+  });
+
   it('rejects anything but YYYY-MM-DD', () => {
     for (const bad of ['2024-01-15T00:00:00Z', '01-15-2024', '2024-1-5', '']) {
       expect(() => QuickbaseDate.fromValue(bad)).toThrow(RangeError);

@@ -29,26 +29,42 @@ function pad(n: number, width = 2): string {
  *
  * Read it with local methods (`getDate()`, `toLocaleDateString()`), which give
  * the stored day in any time zone, in a browser or on a server. It serializes
- * as the day ("2024-01-15"), so `JSON.stringify` carries the day rather than a
- * moment: sent from a server to a browser in another time zone, or upserted
- * back to QuickBase, it stays the same day.
+ * as the day ("2024-01-15"), and so does `String(date)`, so `JSON.stringify`
+ * and template strings carry the day rather than a moment: sent from a server
+ * to a browser in another time zone, or upserted back, it stays the same day.
+ *
+ * `toLocaleDateString()` and `toLocaleString()` show the day whatever
+ * `timeZone` option they are given: a day has no time zone, and formatting
+ * local midnight in another zone would show the day before or after. A
+ * separate `Intl.DateTimeFormat(...).format(date)` doesn't go through them and
+ * does shift the day; pass `{ timeZone: 'UTC' }` and `date.toUTCDay()` to it.
  *
  * `toISOString()` is still a moment (local midnight in UTC), and its date part
  * is the day before east of UTC. Use {@link QuickbaseDate.toISODate} instead.
+ *
+ * `structuredClone` and `postMessage` copy it as a plain Date; make it a
+ * QuickbaseDate again with {@link QuickbaseDate.from} before upserting it.
  */
 export class QuickbaseDate extends Date {
-  /** Which kind of QuickBase date this is */
-  readonly kind = 'date' as const;
+  /** Which kind of QuickBase date this is (on the prototype, so not an own key) */
+  get kind(): 'date' {
+    return 'date';
+  }
 
   /**
    * @param year - Full year (2024)
    * @param month - Month, 1-12 (unlike Date's 0-11)
    * @param day - Day of the month, 1-31
+   * @throws RangeError for a day that doesn't exist (2024-02-30), which a Date
+   *   would quietly roll over (to March 1)
    */
   constructor(year: number, month: number, day: number) {
     super(year, month - 1, day);
     // Date(y, m, d) maps years 0-99 to 1900-1999
     if (year >= 0 && year < 100) this.setFullYear(year);
+    if (this.getFullYear() !== year || this.getMonth() !== month - 1 || this.getDate() !== day) {
+      throw new RangeError(`No such day: ${year}-${pad(month)}-${pad(day)}`);
+    }
   }
 
   /** A Date field's value as QuickBase sends it ("2024-01-15"). */
@@ -79,6 +95,28 @@ export class QuickbaseDate extends Date {
   override toJSON(): string {
     return this.toISODate();
   }
+
+  /** The day, "2024-01-15", so a template string or query filter gets the day. */
+  override toString(): string {
+    return this.toISODate();
+  }
+
+  /** The same day at UTC midnight, for formatting with `timeZone: 'UTC'`. */
+  toUTCDay(): Date {
+    const utc = new Date(0);
+    utc.setUTCFullYear(this.getFullYear(), this.getMonth(), this.getDate());
+    return utc;
+  }
+
+  /** The day in the given locale, whatever `timeZone` the options name. */
+  override toLocaleDateString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string {
+    return this.toUTCDay().toLocaleDateString(locales, { ...options, timeZone: 'UTC' });
+  }
+
+  /** The day (at midnight) in the given locale, whatever `timeZone` the options name. */
+  override toLocaleString(locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions): string {
+    return this.toUTCDay().toLocaleString(locales, { ...options, timeZone: 'UTC' });
+  }
 }
 
 /**
@@ -86,8 +124,10 @@ export class QuickbaseDate extends Date {
  * a Date/Time field accepts (QuickBase keeps whole seconds).
  */
 export class QuickbaseDateTime extends Date {
-  /** Which kind of QuickBase date this is */
-  readonly kind = 'datetime' as const;
+  /** Which kind of QuickBase date this is (on the prototype, so not an own key) */
+  get kind(): 'datetime' {
+    return 'datetime';
+  }
 
   /** @param time - Milliseconds since the epoch */
   constructor(time: number) {

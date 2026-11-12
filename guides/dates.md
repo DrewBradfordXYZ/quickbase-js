@@ -28,7 +28,13 @@ closed.toLocaleString();    // the moment, in local time
 
 Both are `Date`s, so every `Date` method works. Which fields are dates comes from the field types QuickBase sends with every query and report result, never from what a string looks like: a Text field holding `"2024-01-15"` stays a string. Blank dates are `""`.
 
-`QuickbaseDate` is the day at local midnight, so local methods (`getDate()`, `toLocaleDateString()`) give the stored day wherever the code runs. It serializes as the day (`JSON.stringify` gives `"2024-01-15"`), so a server can send it to a browser in another time zone and the day doesn't move. `toISOString()` is still a moment: east of UTC its date part is the day before, so use `toISODate()`.
+`QuickbaseDate` is the day at local midnight, so local methods (`getDate()`, `getMonth()`) give the stored day wherever the code runs. As text it is the day:
+
+- `JSON.stringify` and `String(date)` give `"2024-01-15"`, so a server can send it to a browser in another time zone and the day doesn't move, and `` `{7.AF.'${date}'}` `` filters on that day.
+- `toLocaleDateString()` and `toLocaleString()` show the day whatever `timeZone` option they get. A server in UTC formatting for a user with `{ timeZone: 'America/New_York' }` would otherwise show the day before.
+- `toISOString()` is still a moment: east of UTC its date part is the day before, so use `toISODate()`. A separate `Intl.DateTimeFormat(...).format(date)` also formats the moment; give it `date.toUTCDay()` and `{ timeZone: 'UTC' }`.
+
+`structuredClone` and `postMessage` (Web Workers, IndexedDB) copy it as a plain `Date`; `QuickbaseDate.from(copy)` restores it.
 
 Upsert responses don't include field types, so their values stay strings. So do the timestamps in app, table and field metadata (`created`, `updated`): those are UTC, and `new Date(value)` reads them exactly.
 
