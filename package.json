@@ -1,7 +1,7 @@
 {
   "name": "quickbase-js",
   "version": "2.4.0",
-  "description": "TypeScript/JavaScript client for the QuickBase JSON RESTful API",
+  "description": "TypeScript client for the QuickBase JSON and XML APIs: every endpoint, pagination, retries, code-page temp tokens",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -41,7 +41,7 @@
     "spec:validate": "tsx spec/tools/cli.ts validate",
     "spec:generate": "tsx scripts/spec/generate.ts",
     "spec:build": "npm run spec:normalize && npm run spec:patch && npm run spec:validate && npm run spec:generate",
-    "docs": "typedoc",
+    "docs": "typedoc && node scripts/build-llms.js",
     "docs:watch": "typedoc --watch",
     "prepublishOnly": "npm run clean && npm run build && npm run test"
   },
