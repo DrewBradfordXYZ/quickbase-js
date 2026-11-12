@@ -296,21 +296,6 @@ export async function parseErrorResponse(
   }
 }
 
-/**
- * Check if an error is retryable
- */
-export function isRetryableError(error: unknown): boolean {
-  if (error instanceof RateLimitError) {
-    return true;
-  }
-  if (error instanceof ServerError) {
-    return true;
-  }
-  if (error instanceof TimeoutError) {
-    return true;
-  }
-  return false;
-}
 
 /**
  * Error thrown when a write operation is attempted in read-only mode.
@@ -345,5 +330,49 @@ export class ReadOnlyError extends Error {
       path: this.path,
       action: this.action,
     };
+  }
+}
+
+/**
+ * A request that failed before QuickBase answered: DNS, a refused or reset
+ * connection, the network going away. `cause` is the error fetch threw.
+ */
+export class NetworkError extends Error {
+  /**
+   * True when the connection never opened (DNS failure, connection refused),
+   * so QuickBase can't have received the request.
+   */
+  readonly neverSent: boolean;
+
+  constructor(cause: unknown) {
+    super(`Network error: ${cause instanceof Error ? cause.message : String(cause)}`, { cause });
+    this.name = 'NetworkError';
+    const code = (cause as { cause?: { code?: string } } | undefined)?.cause?.code;
+    this.neverSent = code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'EAI_AGAIN';
+  }
+}
+
+/**
+ * Values QuickBase rejected in an upsert, thrown when the client has
+ * `throwOnLineErrors: true`. QuickBase still saved those records with the
+ * rejected fields blank: `response.metadata` lists the created and updated
+ * records.
+ */
+export class LineErrorsError extends Error {
+  /** Each record's 1-based position in the request, mapped to its errors */
+  readonly lineErrors: Record<string, string[]>;
+  /** The upsert's response */
+  readonly response: unknown;
+
+  constructor(lineErrors: Record<string, string[]>, response: unknown) {
+    const lines = Object.keys(lineErrors).sort((a, b) => Number(a) - Number(b));
+    const first = lines[0] ?? '';
+    super(
+      `Upsert: QuickBase rejected values in ${lines.length} record(s), saved with those fields blank; ` +
+        `record ${first}: ${(lineErrors[first] ?? []).join('; ')}`
+    );
+    this.name = 'LineErrorsError';
+    this.lineErrors = lineErrors;
+    this.response = response;
   }
 }

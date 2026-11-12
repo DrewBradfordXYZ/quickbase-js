@@ -40,6 +40,7 @@ export function resolveConfig(config: QuickbaseConfig): ResolvedConfig {
     convertDates: config.convertDates ?? DEFAULT_CONFIG.convertDates,
     schema: resolveSchema(config.schema),
     readOnly: config.readOnly ?? false,
+    throwOnLineErrors: config.throwOnLineErrors ?? false,
     appToken: config.appToken,
   };
 }

@@ -9,14 +9,7 @@ export type { Throttle } from './throttle.js';
 export { SlidingWindowThrottle, NoOpThrottle, createThrottle } from './throttle.js';
 
 export type { RetryOptions } from './retry.js';
-export {
-  calculateBackoffDelay,
-  getRetryDelay,
-  extractRateLimitInfo,
-  sleep,
-  isRetryableStatus,
-  executeWithRetry,
-} from './retry.js';
+export { calculateBackoffDelay, extractRateLimitInfo, sleep } from './retry.js';
 
 export type {
   PaginationOptions,

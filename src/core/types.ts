@@ -80,6 +80,15 @@ export interface QuickbaseConfig {
   readOnly?: boolean;
 
   /**
+   * Throw a LineErrorsError when an upsert's values are rejected (default:
+   * false). QuickBase still saves those records, with the rejected fields
+   * blank, and answers 207; without this the rejections are only in the
+   * response's `metadata.lineErrors`. The error carries the response, so the
+   * saved records' IDs aren't lost.
+   */
+  throwOnLineErrors?: boolean;
+
+  /**
    * Application token for XML API calls.
    *
    * App tokens are only needed for the XML API when:
@@ -316,6 +325,8 @@ export interface ResolvedConfig {
   schema?: ResolvedSchema;
   /** Read-only mode - blocks all write operations */
   readOnly: boolean;
+  /** Throw LineErrorsError when an upsert's values are rejected */
+  throwOnLineErrors: boolean;
   /** App token for XML API calls (optional) */
   appToken?: string;
 }

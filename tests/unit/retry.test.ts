@@ -5,12 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  calculateBackoffDelay,
-  getRetryDelay,
-  isRetryableStatus,
-} from '../../src/client/retry.js';
-import { isRetryableError, RateLimitError, ServerError, ValidationError, NotFoundError } from '../../src/core/errors.js';
+import { calculateBackoffDelay } from '../../src/client/retry.js';
 
 describe('Retry Logic', () => {
   describe('calculateBackoffDelay', () => {
@@ -57,113 +52,6 @@ describe('Retry Logic', () => {
       const delay = calculateBackoffDelay(2, tripleOptions);
       expect(delay).toBeGreaterThanOrEqual(270);
       expect(delay).toBeLessThanOrEqual(330);
-    });
-  });
-
-  describe('getRetryDelay', () => {
-    const options = {
-      maxAttempts: 3,
-      initialDelayMs: 100,
-      maxDelayMs: 1000,
-      multiplier: 2,
-    };
-
-    it('should use Retry-After header in seconds', () => {
-      const response = new Response(null, {
-        status: 429,
-        headers: { 'Retry-After': '5' },
-      });
-
-      const delay = getRetryDelay(response, 1, options);
-      expect(delay).toBe(5000); // 5 seconds in ms
-    });
-
-    it('should fall back to backoff when no Retry-After', () => {
-      const response = new Response(null, { status: 429 });
-      const delay = getRetryDelay(response, 1, options);
-      // Should use calculated backoff
-      expect(delay).toBeGreaterThanOrEqual(90);
-      expect(delay).toBeLessThanOrEqual(110);
-    });
-
-    it('should handle null response', () => {
-      const delay = getRetryDelay(null, 1, options);
-      // Should use calculated backoff
-      expect(delay).toBeGreaterThanOrEqual(90);
-      expect(delay).toBeLessThanOrEqual(110);
-    });
-
-    it('should parse Retry-After as date string', () => {
-      const futureDate = new Date(Date.now() + 3000);
-      const response = new Response(null, {
-        status: 429,
-        headers: { 'Retry-After': futureDate.toUTCString() },
-      });
-
-      const delay = getRetryDelay(response, 1, options);
-      // Should be approximately 3 seconds (with generous tolerance for CI/execution time)
-      expect(delay).toBeGreaterThan(1500);
-      expect(delay).toBeLessThan(3500);
-    });
-  });
-
-  describe('isRetryableStatus', () => {
-    it('should return true for 429', () => {
-      expect(isRetryableStatus(429)).toBe(true);
-    });
-
-    it('should return true for 5xx errors', () => {
-      expect(isRetryableStatus(500)).toBe(true);
-      expect(isRetryableStatus(502)).toBe(true);
-      expect(isRetryableStatus(503)).toBe(true);
-      expect(isRetryableStatus(504)).toBe(true);
-      expect(isRetryableStatus(599)).toBe(true);
-    });
-
-    it('should return false for 4xx errors (except 429)', () => {
-      expect(isRetryableStatus(400)).toBe(false);
-      expect(isRetryableStatus(401)).toBe(false);
-      expect(isRetryableStatus(403)).toBe(false);
-      expect(isRetryableStatus(404)).toBe(false);
-      expect(isRetryableStatus(422)).toBe(false);
-    });
-
-    it('should return false for success codes', () => {
-      expect(isRetryableStatus(200)).toBe(false);
-      expect(isRetryableStatus(201)).toBe(false);
-      expect(isRetryableStatus(204)).toBe(false);
-    });
-  });
-
-  describe('isRetryableError', () => {
-    it('should return true for RateLimitError', () => {
-      const error = new RateLimitError({
-        timestamp: new Date(),
-        requestUrl: 'https://test.com',
-        httpStatus: 429,
-        attempt: 1,
-      });
-      expect(isRetryableError(error)).toBe(true);
-    });
-
-    it('should return true for ServerError', () => {
-      const error = new ServerError('Server error', { statusCode: 500 });
-      expect(isRetryableError(error)).toBe(true);
-    });
-
-    it('should return false for ValidationError', () => {
-      const error = new ValidationError('Bad request');
-      expect(isRetryableError(error)).toBe(false);
-    });
-
-    it('should return false for NotFoundError', () => {
-      const error = new NotFoundError('Not found');
-      expect(isRetryableError(error)).toBe(false);
-    });
-
-    it('should return false for generic Error', () => {
-      const error = new Error('Generic error');
-      expect(isRetryableError(error)).toBe(false);
     });
   });
 });

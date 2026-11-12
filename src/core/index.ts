@@ -39,8 +39,9 @@ export {
   QuickbaseAppTokenError,
   QuickbaseXmlError,
   ReadOnlyError,
+  NetworkError,
+  LineErrorsError,
   parseErrorResponse,
-  isRetryableError,
 } from './errors.js';
 
 export { Logger, createLogger } from './logger.js';

@@ -17,10 +17,11 @@ import {
   RateLimitError,
   TimeoutError,
   ReadOnlyError,
+  NetworkError,
+  LineErrorsError,
   parseErrorResponse,
-  isRetryableError,
 } from '../core/errors.js';
-import { extractRateLimitInfo, sleep } from './retry.js';
+import { calculateBackoffDelay, extractRateLimitInfo, sleep } from './retry.js';
 import { getRealmHostname } from '../core/config.js';
 import { convertRecordDates } from '../core/dates.js';
 import {
@@ -29,6 +30,7 @@ import {
   extractTableIdFromRequest,
 } from '../core/transform.js';
 import { resolveTableAlias } from '../core/schema.js';
+import { injectAppToken, injectUserToken } from '../xml/request.js';
 
 // =============================================================================
 // Read-Only Mode - Defense-in-Depth
@@ -180,23 +182,22 @@ function checkReadOnly(config: ResolvedConfig, method: string, path: string): vo
     return;
   }
 
-  // Layer 1: Explicit blocklist check (defense-in-depth)
-  if (isJSONWriteEndpoint(method, path)) {
-    // Exception: Some POST endpoints are read-only (RunQuery, RunReport, etc.)
-    if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
-      return;
-    }
+  if (isJSONWrite(method, path)) {
     throw new ReadOnlyError(method, path);
   }
+}
 
-  // Layer 2: HTTP method check (catch-all for any endpoints not in blocklist)
-  if (isWriteMethod(method)) {
-    // Exception: Some POST endpoints are read-only
-    if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
-      return;
-    }
-    throw new ReadOnlyError(method, path);
+/**
+ * Whether a request can change data: a known write endpoint (including GETs
+ * that write), or any POST, PUT, DELETE or PATCH that isn't a known read sent
+ * as POST (runQuery, runReport, ...). Read-only mode refuses these, and they
+ * aren't retried after a timeout or 5xx.
+ */
+function isJSONWrite(method: string, path: string): boolean {
+  if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
+    return false;
   }
+  return isJSONWriteEndpoint(method, path) || isWriteMethod(method);
 }
 
 // =============================================================================
@@ -216,6 +217,8 @@ export interface RequestOptions {
   dbid?: string;
   /** Custom headers */
   headers?: Record<string, string>;
+  /** Cancels the request, and any retry wait, when it aborts */
+  signal?: AbortSignal;
 }
 
 export interface RequestExecutorOptions {
@@ -357,9 +360,12 @@ async function executeSingleRequest(
     }
   }
 
-  // Create abort controller for timeout
+  // One controller for our timeout and the caller's signal
+  options.signal?.throwIfAborted();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+  const onAbort = () => controller.abort();
+  options.signal?.addEventListener('abort', onAbort, { once: true });
   fetchOptions.signal = controller.signal;
 
   const startTime = Date.now();
@@ -372,12 +378,17 @@ async function executeSingleRequest(
 
     return response;
   } catch (error) {
+    // The caller cancelled: their reason, not a timeout of ours
+    if (options.signal?.aborted) {
+      throw options.signal.reason;
+    }
     if (error instanceof Error && error.name === 'AbortError') {
       throw new TimeoutError(config.timeout);
     }
-    throw error;
+    throw new NetworkError(error);
   } finally {
     clearTimeout(timeoutId);
+    options.signal?.removeEventListener('abort', onAbort);
   }
 }
 
@@ -421,17 +432,25 @@ async function handleResponse(
 }
 
 /**
- * Execute a request with full retry logic
+ * Execute a request, retrying it with backoff:
+ * - after a 429, always (QuickBase didn't process it), waiting Retry-After
+ *   when given;
+ * - after a 401 the auth strategy has a new token for;
+ * - after a timeout, a network error or a 5xx only when the request can't
+ *   change data. A write (an upsert, a create) that timed out or got a 502
+ *   may have been applied, and sending it again could, for example, add its
+ *   records twice. A write whose connection never opened is retried.
  */
 export async function executeRequest<T = unknown>(
   options: RequestOptions,
   executor: RequestExecutorOptions
 ): Promise<T> {
-  const { config, auth, logger } = executor;
+  const { config } = executor;
   const maxAttempts = config.retry.maxAttempts;
 
   // Check read-only mode before making any request
   checkReadOnly(config, options.method, options.path);
+  const retrySafe = !isJSONWrite(options.method, options.path);
 
   // Extract dbid for temp-token auth (resolves aliases if schema provided)
   const dbid = extractDbid(options, config);
@@ -456,44 +475,71 @@ export async function executeRequest<T = unknown>(
     startTime: Date.now(),
   };
 
-  let lastError: Error | null = null;
+  return withRetries(context, retrySafe, options.signal, executor, async () => {
+    const response = await executeSingleRequest(transformedOptions, executor, context);
+    const url = buildUrl(config.baseUrl, options.path, options.query);
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await handleResponse(response, url, context, executor);
+
+    // A response that isn't JSON (QBL, file content) comes back as text
+    if (options.responseType === 'text') {
+      return (await response.text()) as T;
+    }
+
+    // Parse JSON response
+    let data = await response.json();
+
+    // An upsert's rejected values (QuickBase saved the records anyway)
+    if (config.throwOnLineErrors && options.method === 'POST' && options.path === '/records') {
+      const lineErrors = (data as { metadata?: { lineErrors?: Record<string, string[]> } })?.metadata?.lineErrors;
+      if (lineErrors && Object.keys(lineErrors).length > 0) {
+        throw new LineErrorsError(lineErrors, data);
+      }
+    }
+
+    // Date and Date/Time values by the result's field types; first, while
+    // records are still keyed by field ID
+    if (config.convertDates) {
+      data = convertRecordDates(data);
+    }
+
+    // Transform response if schema is configured
+    if (config.schema && dbid) {
+      data = transformResponse(data, { schema: config.schema, tableId: dbid });
+    }
+
+    return data as T;
+  });
+}
+
+/**
+ * Run attempts until one succeeds, retrying as described on executeRequest.
+ * `context.attempt` is the current attempt.
+ */
+async function withRetries<T>(
+  context: RequestContext,
+  retrySafe: boolean,
+  signal: AbortSignal | undefined,
+  executor: RequestExecutorOptions,
+  attemptOnce: () => Promise<T>
+): Promise<T> {
+  const { config, auth, logger } = executor;
+  const maxAttempts = context.maxAttempts;
+
+  for (let attempt = 1; ; attempt++) {
     context.attempt = attempt;
-
     try {
-      const response = await executeSingleRequest(transformedOptions, executor, context);
-      const url = buildUrl(config.baseUrl, options.path, options.query);
-
-      await handleResponse(response, url, context, executor);
-
-      // A response that isn't JSON (QBL, file content) comes back as text
-      if (options.responseType === 'text') {
-        return (await response.text()) as T;
-      }
-
-      // Parse JSON response
-      let data = await response.json();
-
-      // Date and Date/Time values by the result's field types; first, while
-      // records are still keyed by field ID
-      if (config.convertDates) {
-        data = convertRecordDates(data);
-      }
-
-      // Transform response if schema is configured
-      if (config.schema && dbid) {
-        data = transformResponse(data, { schema: config.schema, tableId: dbid });
-      }
-
-      return data as T;
+      return await attemptOnce();
     } catch (error) {
-      lastError = error as Error;
+      if (signal?.aborted) {
+        throw error;
+      }
+      const last = attempt >= maxAttempts;
 
       // A 401 retries once the strategy has a new token (temp token, SSO).
       // It isn't a retryable error otherwise, so this comes first.
-      if (error instanceof QuickbaseError && error.statusCode === 401 && attempt < maxAttempts) {
-        const refreshed = await auth.handleAuthError(dbid);
+      if (error instanceof QuickbaseError && error.statusCode === 401 && !last) {
+        const refreshed = await auth.handleAuthError(context.dbid);
         if (!refreshed) {
           throw error;
         }
@@ -501,54 +547,121 @@ export async function executeRequest<T = unknown>(
         continue;
       }
 
-      // Check if error is retryable
-      if (!isRetryableError(error)) {
+      if (last) {
         throw error;
       }
 
-      // Don't retry if we've exhausted attempts
-      if (attempt >= maxAttempts) {
-        throw error;
-      }
-
-      // Calculate retry delay
       let delayMs: number;
       let reason: string;
-
       if (error instanceof RateLimitError) {
         delayMs = error.retryAfter
           ? error.retryAfter * 1000
-          : calculateBackoff(attempt, config.retry);
+          : calculateBackoffDelay(attempt, config.retry);
         reason = 'Rate limited (429)';
+      } else if (!retrySafe && !(error instanceof NetworkError && error.neverSent)) {
+        // A write that may have been applied
+        throw error;
       } else if (error instanceof TimeoutError) {
-        delayMs = calculateBackoff(attempt, config.retry);
+        delayMs = calculateBackoffDelay(attempt, config.retry);
         reason = 'Timeout';
       } else if (error instanceof QuickbaseError && error.statusCode >= 500) {
-        delayMs = calculateBackoff(attempt, config.retry);
+        delayMs = calculateBackoffDelay(attempt, config.retry);
         reason = `Server error (${error.statusCode})`;
+      } else if (error instanceof NetworkError) {
+        delayMs = calculateBackoffDelay(attempt, config.retry);
+        reason = 'Network error';
       } else {
-        delayMs = calculateBackoff(attempt, config.retry);
-        reason = 'Retryable error';
+        throw error;
       }
 
       logger.retry(attempt, maxAttempts, delayMs, reason);
-      await sleep(delayMs);
+      await sleep(delayMs, signal);
     }
   }
-
-  throw lastError || new Error('Request failed');
 }
 
+// XML-API: remove when QuickBase discontinues the XML API
 /**
- * Calculate exponential backoff delay with jitter
+ * Send an XML API request (body without app token or auth) through the same
+ * auth, throttle, timeout, retry and errors as JSON requests. A write action
+ * (isXmlWrite) retries only after a 429, like a JSON write. Returns the
+ * response body; the XML client reads errcode from it.
  */
-function calculateBackoff(
-  attempt: number,
-  config: { initialDelayMs: number; maxDelayMs: number; multiplier: number }
-): number {
-  const delay = config.initialDelayMs * Math.pow(config.multiplier, attempt - 1);
-  const jitter = delay * 0.1 * (Math.random() * 2 - 1);
-  return Math.min(delay + jitter, config.maxDelayMs);
+export interface XmlRequestOptions {
+  dbid: string;
+  action: string;
+  /** The request body, without app token or auth */
+  body: string;
+  /** Whether the action changes data (it isn't retried after a timeout or 5xx) */
+  write: boolean;
+  /** Overrides the client's appToken */
+  appToken?: string;
+  signal?: AbortSignal;
+}
+
+export async function executeXmlRequest(
+  { dbid, action, body, write, appToken = undefined, signal }: XmlRequestOptions,
+  executor: RequestExecutorOptions
+): Promise<string> {
+  const { config, auth, throttle } = executor;
+  const xmlAppToken = appToken ?? config.appToken;
+  const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
+  const context: RequestContext = {
+    methodName: `XML ${action}`,
+    attempt: 1,
+    maxAttempts: config.retry.maxAttempts,
+    dbid,
+    startTime: Date.now(),
+  };
+
+  return withRetries(context, !write, signal, executor, async () => {
+    signal?.throwIfAborted();
+    const token = await auth.getToken(dbid);
+    const authHeader = auth.getAuthorizationHeader(token);
+    let finalBody = xmlAppToken ? injectAppToken(body, xmlAppToken) : body;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/xml',
+      'QUICKBASE-ACTION': action,
+    };
+    // The XML API takes a user token as a body element; other tokens
+    // (ticket, temp token) go in the Authorization header
+    if (authHeader.startsWith('QB-USER-TOKEN ')) {
+      finalBody = injectUserToken(finalBody, token);
+    } else {
+      headers['Authorization'] = authHeader;
+    }
+
+    await throttle.acquire();
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+    const onAbort = () => controller.abort();
+    signal?.addEventListener('abort', onAbort, { once: true });
+    let response: Response;
+    try {
+      response = await config.fetchApi(url, {
+        method: 'POST',
+        headers,
+        body: finalBody,
+        signal: controller.signal,
+        credentials: 'omit',
+      });
+    } catch (error) {
+      if (signal?.aborted) {
+        throw signal.reason;
+      }
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new TimeoutError(config.timeout);
+      }
+      throw new NetworkError(error);
+    } finally {
+      clearTimeout(timeoutId);
+      signal?.removeEventListener('abort', onAbort);
+    }
+
+    await handleResponse(response, url, context, executor);
+    return response.text();
+  });
 }
 
 /**

@@ -1,20 +1,11 @@
 /**
  * Retry logic with exponential backoff
  *
- * Handles:
- * - HTTP 429 (Rate Limited) - uses Retry-After header
- * - HTTP 5xx (Server Errors) - exponential backoff
- * - Timeout errors - exponential backoff
+ * The retry loop itself, and which failures it retries, is withRetries in
+ * request.ts.
  */
 
-import type { RequestContext, RateLimitInfo, ResolvedConfig } from '../core/types.js';
-import type { Logger } from '../core/logger.js';
-import {
-  RateLimitError,
-  ServerError,
-  TimeoutError,
-  isRetryableError,
-} from '../core/errors.js';
+import type { RateLimitInfo } from '../core/types.js';
 
 export interface RetryOptions {
   maxAttempts: number;
@@ -40,34 +31,6 @@ export function calculateBackoffDelay(
 }
 
 /**
- * Get delay from Retry-After header or fall back to backoff calculation
- */
-export function getRetryDelay(
-  response: Response | null,
-  attempt: number,
-  options: RetryOptions
-): number {
-  if (response) {
-    const retryAfter = response.headers.get('Retry-After');
-    if (retryAfter) {
-      // Retry-After can be seconds or a date string
-      const seconds = parseInt(retryAfter, 10);
-      if (!isNaN(seconds)) {
-        return seconds * 1000;
-      }
-
-      // Try parsing as a date
-      const date = Date.parse(retryAfter);
-      if (!isNaN(date)) {
-        return Math.max(0, date - Date.now());
-      }
-    }
-  }
-
-  return calculateBackoffDelay(attempt, options);
-}
-
-/**
  * Extract rate limit info from response headers
  */
 export function extractRateLimitInfo(
@@ -90,80 +53,23 @@ export function extractRateLimitInfo(
 }
 
 /**
- * Sleep for a given duration
+ * Sleep for a given duration, or until the signal aborts (rejecting with its
+ * reason), so cancelling a request also cancels a retry's wait.
  */
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Determine if a response status is retryable
- */
-export function isRetryableStatus(status: number): boolean {
-  return status === 429 || (status >= 500 && status < 600);
-}
-
-/**
- * Execute a request with retry logic
- */
-export async function executeWithRetry<T>(
-  fn: (context: RequestContext) => Promise<T>,
-  context: RequestContext,
-  config: ResolvedConfig,
-  logger: Logger
-): Promise<T> {
-  const options: RetryOptions = config.retry;
-  let lastError: Error | null = null;
-
-  for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
-    context.attempt = attempt;
-
-    try {
-      return await fn(context);
-    } catch (error) {
-      lastError = error as Error;
-
-      // Check if error is retryable
-      if (!isRetryableError(error)) {
-        throw error;
-      }
-
-      // Don't retry if we've exhausted attempts
-      if (attempt >= options.maxAttempts) {
-        throw error;
-      }
-
-      // Calculate retry delay
-      let delayMs: number;
-      let reason: string;
-
-      if (error instanceof RateLimitError) {
-        delayMs = error.retryAfter
-          ? error.retryAfter * 1000
-          : calculateBackoffDelay(attempt, options);
-        reason = `Rate limited (429)`;
-
-        // Notify callback
-        if (config.onRateLimit) {
-          config.onRateLimit(error.rateLimitInfo);
-        }
-      } else if (error instanceof ServerError) {
-        delayMs = calculateBackoffDelay(attempt, options);
-        reason = `Server error (${error.statusCode})`;
-      } else if (error instanceof TimeoutError) {
-        delayMs = calculateBackoffDelay(attempt, options);
-        reason = `Timeout`;
-      } else {
-        delayMs = calculateBackoffDelay(attempt, options);
-        reason = `Unknown retryable error`;
-      }
-
-      logger.retry(attempt, options.maxAttempts, delayMs, reason);
-
-      await sleep(delayMs);
+export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason);
+      return;
     }
-  }
-
-  // This should never be reached, but TypeScript needs it
-  throw lastError || new Error('Retry loop exited unexpectedly');
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal!.reason);
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
 }

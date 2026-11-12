@@ -60,6 +60,8 @@ export {
   QuickbaseAppTokenError,
   QuickbaseXmlError,
   ReadOnlyError,
+  NetworkError,
+  LineErrorsError,
 } from './core/index.js';
 
 // Auth exports (for advanced usage)
@@ -75,6 +77,7 @@ import type { AuthStrategy } from './auth/index.js';
 
 // Client exports
 export type { RequestOptions } from './client/index.js';
+export type { XmlRequestOptions } from './client/request.js';
 export { SlidingWindowThrottle, NoOpThrottle } from './client/index.js';
 
 // Generated types and client
@@ -90,7 +93,8 @@ import { createAuthStrategy } from './auth/index.js';
 import { createThrottle } from './client/throttle.js';
 import { createRequestExecutor } from './client/request.js';
 import type { QuickbaseAPI } from './generated/types.js';
-import { createApiMethods } from './generated/client.js';
+import { createApiMethods, type RequestFn } from './generated/client.js';
+import { executeXmlRequest, type XmlRequestOptions } from './client/request.js';
 
 /**
  * QuickBase client with typed API methods
@@ -103,10 +107,30 @@ export interface QuickbaseClient extends QuickbaseAPI {
     body?: unknown;
     query?: Record<string, string | number | boolean | undefined>;
     dbid?: string;
+    signal?: AbortSignal;
   }) => Promise<T>;
+
+  /**
+   * The same client with every request tied to `signal`: aborting it cancels
+   * requests in flight and retry waits, which reject with the signal's reason.
+   *
+   * @example
+   * ```typescript
+   * const controller = new AbortController();
+   * const records = qb.withSignal(controller.signal).runQuery({ from: tableId }).all();
+   * controller.abort(); // records rejects
+   * ```
+   */
+  withSignal: (signal: AbortSignal) => QuickbaseClient;
 
   /** Get the resolved configuration */
   getConfig: () => ResolvedConfig;
+
+  /**
+   * XML-API: send an XML API request through the client's auth, throttle,
+   * retry and errors. Used by createXmlClient(); returns the response body.
+   */
+  requestXml: (options: Omit<XmlRequestOptions, 'signal'>) => Promise<string>;
 
   /**
    * Get the auth strategy for advanced usage (e.g., XML API client).
@@ -168,23 +192,30 @@ export function createClient(config: QuickbaseConfig): QuickbaseClient {
   const auth = createAuthStrategy(resolvedConfig.auth, authContext);
   const throttle = createThrottle(resolvedConfig.proactiveThrottle);
 
-  const executor = createRequestExecutor({
+  const executorOptions = {
     config: resolvedConfig,
     auth,
     throttle,
     logger,
-  });
-
-  // Create typed API methods
-  const apiMethods = createApiMethods(executor.execute, resolvedConfig.autoPaginate);
-
-  return {
-    ...apiMethods,
-    request: executor.execute,
-    getConfig: () => resolvedConfig,
-    // XML-API: Expose auth strategy for XML client
-    getAuthStrategy: () => auth,
   };
+  const executor = createRequestExecutor(executorOptions);
+
+  const build = (signal?: AbortSignal): QuickbaseClient => {
+    const request: RequestFn = signal
+      ? (options) => executor.execute({ ...options, signal })
+      : executor.execute;
+    return {
+      // Typed API methods
+      ...createApiMethods(request, resolvedConfig.autoPaginate),
+      request,
+      withSignal: (next: AbortSignal) => build(next),
+      requestXml: (options) => executeXmlRequest({ ...options, signal }, executorOptions),
+      getConfig: () => resolvedConfig,
+      // XML-API: Expose auth strategy for XML client
+      getAuthStrategy: () => auth,
+    };
+  };
+  return build();
 }
 
 // XML-API: XML API exports - remove when QuickBase discontinues XML API

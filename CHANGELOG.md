@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Version 3.0.0: dates change type. See [guides/dates.md](guides/dates.md), which has an upgrade section.
+## [3.0.0] - 2026-11-12
+
+Dates change type, writes stop retrying after failures that may have been applied, and XML API calls share the JSON API's retries and errors. See [guides/dates.md](guides/dates.md) (with an upgrade section) and [guides/reliability.md](guides/reliability.md).
+
+### Added
+- **`withSignal(signal)`**: a client whose requests, and retry waits, stop when the `AbortSignal` aborts; they reject with its reason.
+- **`throwOnLineErrors: true`**: an upsert whose values QuickBase rejects throws `LineErrorsError` (`lineErrors`, and `response` with the saved records' IDs). QuickBase saves those records with the rejected fields blank and answers 207; without the option the rejections are only in `metadata.lineErrors`.
+- **`NetworkError`** for a request that got no answer (DNS, a refused or lost connection); `neverSent` says whether the connection opened. Reads are retried after one; fetch's raw `TypeError` was thrown and never retried.
+- ESLint with typescript-eslint's recommended rules; CI runs `npm run lint` (the script existed, but neither ESLint nor a config did).
 
 ### Changed
 - **BREAKING: Date and Date/Time fields are typed by field, not guessed from the string.** 2.x turned every string that looked like a date into a `Date`. A Date field's `"2024-01-15"` became UTC midnight, which shows Jan 14 anywhere west of UTC; Text fields holding a date became Dates; and a Date field read and written back was sent as a timestamp, which QuickBase rejects, leaving the field blank. Now, in query and report results, by the field types QuickBase sends with them:
@@ -16,6 +24,9 @@ Version 3.0.0: dates change type. See [guides/dates.md](guides/dates.md), which 
   - Everything else stays as QuickBase sends it: Text, Time of Day, blank dates (`""`), upsert responses (which carry no field types), and app, table and field metadata (`created`, `updated`).
 - **BREAKING: upserting a plain `Date` throws**, before anything is sent, naming the field. A Date field accepts only `"2024-01-15"` and a Date/Time field only a timestamp, so a `Date` has to say which it is: `QuickbaseDate.from(d)`, `QuickbaseDate.today()`, `QuickbaseDateTime.from(d)` or `QuickbaseDateTime.current()`, or the string. TypeScript refuses a plain `Date` in upsert data too.
 - **BREAKING:** `transformDates` and `isIsoDateString` are removed. `convertDates: false` still keeps the strings.
+- **BREAKING: writes retry only after a 429.** An upsert or other write that timed out or got a 5xx may have been applied, and sending it again could add its records twice. Writes still retry after a 429 (QuickBase didn't process it), after a 401 with a refreshed token, and when the connection never opened. Reads, including `runQuery` and `runReport` (POSTs), retry after timeouts, 5xx and network errors.
+- **BREAKING: XML API calls go through the client's request path**: its auth, proactive throttle, timeout, retries (write actions as writes) and errors. A 429 or 5xx was a plain `Error`, with no retry and no throttle; it is now `RateLimitError` or `ServerError`. `createXmlClient` needs a client from this version's `createClient` (it uses the client's `requestXml`).
+- Removed internal helpers that nothing used: a second retry loop (`executeWithRetry`), `getRetryDelay`, `isRetryableStatus` and `isRetryableError`.
 
 
 ### Fixed

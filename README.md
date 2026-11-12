@@ -57,7 +57,7 @@ await qb.upsert({
 Load the browser bundle and use temporary-token auth. Calls run as the signed-in user, with that user's permissions, and there is no token in your page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quickbase-js@3/dist/quickbase.min.js"></script>
 <script>
   const qb = QuickBase.createClient({
     realm: window.location.hostname.split('.')[0],
@@ -67,7 +67,7 @@ Load the browser bundle and use temporary-token auth. Calls run as the signed-in
 </script>
 ```
 
-As a module: `import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@2/dist/quickbase.esm.js'`.
+As a module: `import { createClient } from 'https://cdn.jsdelivr.net/npm/quickbase-js@3/dist/quickbase.esm.js'`.
 
 [`examples/codepages`](examples/codepages) has a complete, read-only code page in plain JavaScript, Preact, React, Vue and Angular: a live feed of what changed across every table in the app. Paste one into a new code page; there's nothing to configure.
 
@@ -210,7 +210,7 @@ Details are in the [authentication guide](guides/authentication.md).
 
 ## Rate limits and retries
 
-QuickBase allows 100 requests per 10 seconds per user token. The client retries 429s and server errors with exponential backoff, honoring `Retry-After`, and can throttle itself so it never hits the limit:
+QuickBase allows 100 requests per 10 seconds per user token. The client retries 429s with exponential backoff, honoring `Retry-After`, and retries timeouts and server errors for reads; a write that may have been applied isn't sent twice. It can throttle itself so it never hits the limit:
 
 ```typescript
 createClient({
@@ -223,7 +223,7 @@ createClient({
 });
 ```
 
-Timeouts, backoff settings and a rate-limit callback are in the [reliability guide](guides/reliability.md).
+Timeouts, backoff settings, a rate-limit callback, cancelling with `withSignal`, and `throwOnLineErrors` are in the [reliability guide](guides/reliability.md).
 
 ## Errors
 
@@ -256,6 +256,9 @@ try {
 | `RateLimitError` | 429 |
 | `ServerError` | 5xx |
 | `ReadOnlyError` | a write blocked by `readOnly: true` |
+| `TimeoutError` | no answer within `timeout` |
+| `NetworkError` | no answer at all (DNS, connection) |
+| `LineErrorsError` | an upsert's rejected values, with `throwOnLineErrors: true` |
 
 The XML API adds `QuickbaseTicketError`, `QuickbaseAppTokenError` and `QuickbaseXmlError`.
 

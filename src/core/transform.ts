@@ -135,7 +135,7 @@ function transformWhereClause(
 ): string {
   // Match patterns like {'fieldAlias' or {fieldAlias. at the start of conditions
   // The pattern captures the field reference between { and .
-  return where.replace(/\{['"]?([^.'"\}]+)['"]?\./g, (match, fieldRef: string) => {
+  return where.replace(/\{['"]?([^.'"}]+)['"]?\./g, (match, fieldRef: string) => {
     try {
       const fieldId = resolveFieldAlias(schema, tableId, fieldRef);
       return `{${fieldId}.`;

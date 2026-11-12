@@ -2,11 +2,10 @@
  * Client unit tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createClient } from '../../src/index.js';
 import {
   loadResponse,
-  createMockResponse,
   createTrackedMockFetch,
   withHeaders,
 } from '../helpers/fixtures.js';

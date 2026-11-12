@@ -26,5 +26,6 @@ jobs:
           git -C spec diff --exit-code
 
       - run: npm run typecheck
+      - run: npm run lint
       - run: npm test
       - run: npm run build

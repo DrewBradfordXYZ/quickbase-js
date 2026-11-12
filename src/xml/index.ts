@@ -32,7 +32,7 @@ export { XmlError, XmlErrorCode, checkError, isUnauthorized, isNotFound, isInval
 import { ReadOnlyError } from '../core/errors.js';
 import type { ResolvedSchema } from '../core/types.js';
 import { resolveTableAlias, resolveFieldAlias } from '../core/schema.js';
-import { buildRequest, escapeXml, injectAppToken, injectUserToken } from './request.js';
+import { buildRequest, escapeXml } from './request.js';
 
 // Import response transformation functions and types
 import {
@@ -1059,30 +1059,23 @@ export interface XmlExecutor {
 }
 
 /**
- * Adapter to create an XmlCaller from a QuickbaseClient.
- * This bridges the main client to the XML API client.
+ * The parts of a QuickBase client the XML client uses.
  */
 interface QuickbaseClientLike {
   getConfig(): {
     realm: string;
     fetchApi: typeof fetch;
-    timeout: number;
     readOnly?: boolean;
     schema?: ResolvedSchema;
-    appToken?: string;
   };
-  /**
-   * Get the auth strategy for XML requests.
-   * This is exposed via getAuthStrategy() method added to the client.
-   */
-  getAuthStrategy?: () => {
-    getToken(dbid?: string): Promise<string>;
-    getAuthorizationHeader(token: string): string;
-  };
+  /** Sends an XML API request through the client's auth, throttle, retry and errors */
+  requestXml?: (options: { dbid: string; action: string; body: string; write: boolean; appToken?: string }) => Promise<string>;
 }
 
 /**
- * Create an XML API client from a QuickBase client.
+ * Create an XML API client from a QuickBase client. Requests go through the
+ * client's auth, proactive throttle, timeout, retries and error types; write
+ * actions retry only after a 429, like JSON writes.
  *
  * @param client - The main QuickBase client
  * @param options - Options for the XML client
@@ -1101,88 +1094,17 @@ export function createXmlClient(
   options?: XmlClientOptions
 ): XmlClient {
   const config = client.getConfig();
-
-  // Get auth strategy if available
-  const getAuth = client.getAuthStrategy;
-  if (!getAuth) {
+  const requestXml = client.requestXml;
+  if (!requestXml) {
     throw new Error(
-      'XML client requires access to auth strategy. ' +
-      'Make sure you are using a compatible version of the QuickBase client.'
+      'XML client requires a QuickBase client from createClient() in this version of quickbase-js.'
     );
   }
-  const auth = getAuth();
 
-  // Resolve app token: explicit option > config
-  const appToken = options?.appToken ?? config.appToken;
-
-  // Create an XmlCaller adapter that makes XML requests
   const caller: XmlCaller = {
     realm: () => config.realm,
-    doXml: async (dbid: string, action: string, body: string): Promise<string> => {
-      const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
-
-      // Inject app token if configured
-      let finalBody = appToken ? injectAppToken(body, appToken) : body;
-
-      // Get auth token for this dbid
-      const token = await auth.getToken(dbid);
-      const authHeader = auth.getAuthorizationHeader(token);
-
-      // Build headers - XML API requires tokens in body, not Authorization header
-      // Check if using user token auth (QB-USER-TOKEN prefix)
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/xml',
-        'QUICKBASE-ACTION': action,
-      };
-
-      if (authHeader.startsWith('QB-USER-TOKEN ')) {
-        // User token auth: inject token into XML body instead of header
-        // The XML API requires <usertoken> element, not Authorization header
-        // See: https://help.quickbase.com/docs/api-getdbpage
-        finalBody = injectUserToken(finalBody, token);
-      } else {
-        // Other auth types (temp token, SSO): fall back to header auth
-        // Note: These may not work with XML API endpoints that require body auth
-        headers['Authorization'] = authHeader;
-      }
-
-      // Create abort controller for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), config.timeout);
-
-      try {
-        const response = await config.fetchApi(url, {
-          method: 'POST',
-          headers,
-          body: finalBody,
-          signal: controller.signal,
-          credentials: 'omit',
-        });
-
-        const text = await response.text();
-
-        // Check for HTTP-level errors (429, 5xx)
-        if (response.status === 429) {
-          const retryAfter = response.headers.get('Retry-After');
-          throw new Error(
-            `Rate limited (429). Retry after: ${retryAfter ?? 'unknown'} seconds`
-          );
-        }
-
-        if (response.status >= 500) {
-          throw new Error(`Server error: ${response.status} ${response.statusText}`);
-        }
-
-        return text;
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          throw new Error(`Request timeout after ${config.timeout}ms`);
-        }
-        throw error;
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    },
+    doXml: (dbid: string, action: string, body: string): Promise<string> =>
+      requestXml({ dbid, action, body, write: isXmlWriteAction(action), appToken: options?.appToken }),
   };
 
   // Inherit readOnly and schema from main client if not explicitly set in options
