@@ -29,5 +29,17 @@
     "guides/dates.md",
     "guides/xml-api.md",
     "guides/migration.md"
+  ],
+  "intentionallyNotExported": [
+    "Tables",
+    "Fields",
+    "TypeOf",
+    "IdOf",
+    "NamesOf",
+    "ComputedNames",
+    "TextType",
+    "NumberType",
+    "SortOrder",
+    "IsTypedSchema"
   ]
 }

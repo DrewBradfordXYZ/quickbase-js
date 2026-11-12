@@ -1,6 +1,6 @@
 {
   "name": "quickbase-js",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "TypeScript client for the QuickBase JSON and XML APIs: every endpoint, pagination, retries, code-page temp tokens",
   "type": "module",
   "main": "dist/index.js",
@@ -36,7 +36,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src tests",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.examples.json",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.examples.json && tsc -p tsconfig.types.json",
     "spec:normalize": "tsx spec/tools/cli.ts normalize",
     "spec:patch": "tsx spec/tools/cli.ts patch",
     "spec:validate": "tsx spec/tools/cli.ts validate",

@@ -6,6 +6,7 @@
 
 import {
   createClient,
+  QuickbaseDate,
   createXmlClient,
   ReadOnlyError,
   RateLimitError,
@@ -133,22 +134,21 @@ export async function readmeFieldNames() {
     select: ['name', 'status'],
     where: "{'status'.EX.'Active'}",
   });
-  const first = result.data?.[0] as Record<string, unknown> | undefined; // TypeScript: keyed by name
-  console.log(first?.name, first?.status);
+  console.log(result.data[0]?.name, result.data[0]?.status);
 
   await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 }
 
 // guides/schema-aliases.md
 export async function schemaAliases() {
-  const schema: Schema = {
+  const schema = {
     tables: {
       projects: {
         id: 'bqw3ryzab',
         fields: { id: 3, name: 6, status: 7, dueDate: 12 },
       },
     },
-  };
+  } as const satisfies Schema;
   const qb = createClient({
     realm: 'mycompany',
     auth: { type: 'user-token', userToken: 'token' },
@@ -161,10 +161,34 @@ export async function schemaAliases() {
     where: "{'status'.EX.'Active'}",
     sortBy: [{ fieldId: 'dueDate', order: 'ASC' }],
   });
-  const first = result.data?.[0] as Record<string, unknown> | undefined; // cast: keyed by alias, unwrapped
-  console.log(first?.name, first?.status);
+  console.log(result.data[0]?.name, result.data[0]?.status);
 
   await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
+}
+
+// guides/schema-aliases.md: typed results
+export async function typedResults() {
+  const schema = {
+    tables: {
+      projects: {
+        id: 'bqw3ryzab',
+        fields: {
+          name: { id: 6, type: 'text' },
+          dueDate: { id: 12, type: 'date' },
+          budget: { id: 14, type: 'currency' },
+          taskCount: { id: 18, type: 'numeric', mode: 'summary' },
+        },
+      },
+    },
+  } as const satisfies Schema;
+  const qb = createClient({ realm: 'mycompany', auth: { type: 'user-token', userToken: 'token' }, schema });
+
+  const result = await qb.runQuery({ from: 'projects', select: ['name', 'dueDate'] });
+  const name: string = result.data[0]!.name;
+  const due: QuickbaseDate | '' = result.data[0]!.dueDate;
+  console.log(name, due);
+
+  await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', dueDate: QuickbaseDate.today() }] });
 }
 
 // guides/authentication.md

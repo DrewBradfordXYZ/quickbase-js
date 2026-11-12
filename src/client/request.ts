@@ -466,6 +466,13 @@ export async function executeRequest<T = unknown>(
     );
     transformedOptions = { ...options, body: transformedBody };
   }
+  // A table alias in the query string (runReport's tableId) goes as its ID
+  if (config.schema && typeof options.query?.tableId === 'string') {
+    transformedOptions = {
+      ...transformedOptions,
+      query: { ...options.query, tableId: resolveTableAlias(config.schema, options.query.tableId) },
+    };
+  }
 
   const context: RequestContext = {
     methodName: `${options.method} ${options.path}`,

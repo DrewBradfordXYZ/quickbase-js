@@ -139,8 +139,7 @@ const result = await qb.runQuery({
   select: ['name', 'status'],
   where: "{'status'.EX.'Active'}",
 });
-const first = result.data?.[0] as Record<string, unknown> | undefined; // TypeScript: keyed by name
-console.log(first?.name, first?.status);
+console.log(result.data[0]?.name, result.data[0]?.status);
 
 await qb.upsert({ to: 'projects', data: [{ name: 'Alpha', status: 'Active' }] });
 ```
@@ -151,7 +150,7 @@ Generate the schema from your app instead of writing it, and regenerate with `--
 npx quickbase-js schema -r mycompany -a bpqe82s1 -t "$QB_USER_TOKEN" -o schema.ts
 ```
 
-A misspelled name throws with a suggestion (`Did you mean 'status'?`). Results are typed by field ID, which is why TypeScript needs the cast; the [schema guide](guides/schema-aliases.md) has the details.
+The generated schema also records each field's QuickBase type, which types results and upserts by name: `result.data[0].dueDate` is a `QuickbaseDate`, and a misspelled field, a wrong value type or a write to a formula field is a compile error. A misspelled name in plain JavaScript throws with a suggestion (`Did you mean 'status'?`). The [schema guide](guides/schema-aliases.md#typed-results) has the details.
 
 ### Read an app's tables and fields
 

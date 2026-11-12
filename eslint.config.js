@@ -15,6 +15,11 @@ export default tseslint.config(
     },
   },
   {
+    // Type tests compile, never run: values exist for their types
+    files: ['tests/types/**/*.ts'],
+    rules: { '@typescript-eslint/no-unused-vars': 'off' },
+  },
+  {
     files: ['tests/**/*.ts'],
     rules: {
       // Tests reach into responses and mocks

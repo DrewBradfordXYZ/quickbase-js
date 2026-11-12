@@ -21,6 +21,7 @@ export type {
   Schema,
   TableSchema,
   FieldSchema,
+  FieldDefinition,
   ResolvedSchema,
 } from './types.js';
 

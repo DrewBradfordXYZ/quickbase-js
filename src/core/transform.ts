@@ -72,6 +72,16 @@ export function transformRequest<T extends Record<string, unknown>>(
         }));
       }
 
+      // Resolve upsert's fieldsToReturn and mergeFieldId
+      if ('fieldsToReturn' in result && Array.isArray(result.fieldsToReturn)) {
+        result.fieldsToReturn = (result.fieldsToReturn as (string | number)[]).map((field) =>
+          resolveFieldAlias(ctx.schema!, tableId!, field)
+        );
+      }
+      if ('mergeFieldId' in result && typeof result.mergeFieldId === 'string') {
+        result.mergeFieldId = resolveFieldAlias(ctx.schema, tableId, result.mergeFieldId);
+      }
+
       // Resolve where clause (string replacement)
       if ('where' in result && typeof result.where === 'string') {
         result.where = transformWhereClause(result.where, ctx.schema, tableId);

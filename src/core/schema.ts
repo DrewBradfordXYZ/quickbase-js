@@ -36,7 +36,8 @@ export function resolveSchema(schema?: Schema): ResolvedSchema | undefined {
     const aliasToId = new Map<string, number>();
     const idToAlias = new Map<number, string>();
 
-    for (const [fieldAlias, fieldId] of Object.entries(tableSchema.fields)) {
+    for (const [fieldAlias, field] of Object.entries(tableSchema.fields)) {
+      const fieldId = typeof field === 'number' ? field : field.id;
       aliasToId.set(fieldAlias, fieldId);
       idToAlias.set(fieldId, fieldAlias);
     }

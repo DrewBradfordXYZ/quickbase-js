@@ -18,7 +18,7 @@
  */
 
 import { createClient } from '../index.js';
-import type { Schema, TableSchema } from '../core/types.js';
+import type { FieldDefinition, Schema, TableSchema } from '../core/types.js';
 
 interface CliOptions {
   realm?: string;
@@ -186,7 +186,7 @@ async function fetchSchema(
     const fields = await client.getFields({ tableId: table.id });
 
     const fieldAliases = new Set<string>();
-    const fieldMap: Record<string, number> = {};
+    const fieldMap: Record<string, FieldDefinition> = {};
 
     for (const field of fields) {
       if (!field.label) continue;
@@ -195,7 +195,12 @@ async function fetchSchema(
       let alias = labelToAlias(field.label);
       alias = makeUnique(alias, fieldAliases);
 
-      fieldMap[alias] = field.id;
+      // The type types query results and upserts; a computed field (formula,
+      // lookup, summary) can't be written
+      const definition: FieldDefinition = { id: field.id };
+      if (field.fieldType) definition.type = field.fieldType;
+      if (field.mode === 'formula' || field.mode === 'lookup' || field.mode === 'summary') definition.mode = field.mode;
+      fieldMap[alias] = definition;
     }
 
     schema.tables[tableAlias] = {
@@ -210,7 +215,7 @@ async function fetchSchema(
 /**
  * Format schema as TypeScript
  */
-function formatAsTypeScript(schema: Schema): string {
+export function formatAsTypeScript(schema: Schema): string {
   const lines: string[] = [
     '/**',
     ' * QuickBase Schema Definition',
@@ -220,7 +225,9 @@ function formatAsTypeScript(schema: Schema): string {
     '',
     "import type { Schema } from 'quickbase-js';",
     '',
-    'export const schema: Schema = {',
+    '// `as const` keeps table and field names and types as literals, which type',
+    '// query results and upserts by field name',
+    'export const schema = {',
     '  tables: {',
   ];
 
@@ -237,10 +244,10 @@ function formatAsTypeScript(schema: Schema): string {
     const fieldAliases = Object.keys(table.fields);
     for (let f = 0; f < fieldAliases.length; f++) {
       const fieldAlias = fieldAliases[f]!;
-      const fieldId = table.fields[fieldAlias]!;
+      const field = table.fields[fieldAlias]!;
       const isLastField = f === fieldAliases.length - 1;
       const comma = isLastField ? '' : ',';
-      lines.push(`        ${fieldAlias}: ${fieldId}${comma}`);
+      lines.push(`        ${fieldAlias}: ${formatField(field)}${comma}`);
     }
 
     lines.push('      },');
@@ -248,10 +255,24 @@ function formatAsTypeScript(schema: Schema): string {
   }
 
   lines.push('  },');
-  lines.push('};');
+  lines.push('} as const satisfies Schema;');
   lines.push('');
 
   return lines.join('\n');
+}
+
+/** A field as TypeScript: its ID, or { id, type, mode } */
+function formatField(field: number | FieldDefinition): string {
+  if (typeof field === 'number') return String(field);
+  const parts = [`id: ${field.id}`];
+  if (field.type) parts.push(`type: '${field.type}'`);
+  if (field.mode) parts.push(`mode: '${field.mode}'`);
+  return `{ ${parts.join(', ')} }`;
+}
+
+/** A schema field's ID */
+function fieldIdOf(field: number | FieldDefinition): number {
+  return typeof field === 'number' ? field : field.id;
 }
 
 /**
@@ -264,7 +285,7 @@ function formatAsJson(schema: Schema): string {
 /**
  * Load existing schema from a file
  */
-async function loadExistingSchema(filePath: string, format: 'ts' | 'json'): Promise<Schema | null> {
+export async function loadExistingSchema(filePath: string, format: 'ts' | 'json'): Promise<Schema | null> {
   const fs = await import('fs');
 
   if (!fs.existsSync(filePath)) {
@@ -283,8 +304,11 @@ async function loadExistingSchema(filePath: string, format: 'ts' | 'json'): Prom
   }
 
   // Parse TypeScript format - extract the schema object
-  // Look for pattern: export const schema: Schema = { ... }
-  const schemaMatch = content.match(/export\s+const\s+schema[^=]*=\s*(\{[\s\S]*\});?\s*$/m);
+  // Look for pattern: export const schema = { ... } as const satisfies Schema;
+  // (or the older: export const schema: Schema = { ... };)
+  const schemaMatch = content.match(
+    /export\s+const\s+schema[^=]*=\s*(\{[\s\S]*\})\s*(?:as\s+const\s*)?(?:satisfies\s+\w+\s*)?;?\s*$/m
+  );
   if (!schemaMatch) {
     console.error(`Warning: Could not parse existing TypeScript schema at ${filePath}`);
     return null;
@@ -307,8 +331,8 @@ async function loadExistingSchema(filePath: string, format: 'ts' | 'json'): Prom
  */
 function buildFieldIdToAlias(table: TableSchema): Map<number, string> {
   const map = new Map<number, string>();
-  for (const [alias, id] of Object.entries(table.fields)) {
-    map.set(id, alias);
+  for (const [alias, field] of Object.entries(table.fields)) {
+    map.set(fieldIdOf(field), alias);
   }
   return map;
 }
@@ -327,7 +351,7 @@ function buildTableIdToAlias(schema: Schema): Map<string, string> {
 /**
  * Merge new schema with existing schema, preserving custom aliases
  */
-function mergeSchemas(existing: Schema, fresh: Schema): { merged: Schema; stats: MergeStats } {
+export function mergeSchemas(existing: Schema, fresh: Schema): { merged: Schema; stats: MergeStats } {
   const stats: MergeStats = {
     tablesAdded: 0,
     tablesRemoved: 0,
@@ -360,15 +384,17 @@ function mergeSchemas(existing: Schema, fresh: Schema): { merged: Schema; stats:
 
     // Track which existing fields we've seen (by ID)
     const seenFieldIds = new Set<number>();
-    const mergedFields: Record<string, number> = {};
+    const mergedFields: Record<string, number | FieldDefinition> = {};
 
-    // Process each field from fresh schema
-    for (const [freshFieldAlias, fieldId] of Object.entries(freshTable.fields)) {
+    // Process each field from fresh schema: its alias from the existing
+    // schema, its type from QuickBase
+    for (const [freshFieldAlias, freshField] of Object.entries(freshTable.fields)) {
+      const fieldId = fieldIdOf(freshField);
       seenFieldIds.add(fieldId);
 
       // Use existing alias if available, otherwise use fresh alias
       const fieldAlias = existingFieldMap?.get(fieldId) ?? freshFieldAlias;
-      mergedFields[fieldAlias] = fieldId;
+      mergedFields[fieldAlias] = freshField;
 
       if (existingFieldMap?.has(fieldId)) {
         stats.fieldsPreserved++;

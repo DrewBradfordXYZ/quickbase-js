@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-12
+
+### Added
+- **Results and upserts typed from the schema.** `npx quickbase-js schema` now records each field's QuickBase type (`{ id: 12, type: 'date' }`, with `mode` for formula, lookup and summary fields) and writes the schema `as const satisfies Schema`. With it, `createClient({ schema })` types `runQuery`, `runReport` and `upsert` by table and field name: a query's result has exactly the selected fields, each typed (`string`, `number | null`, `QuickbaseDate | ''`, `QuickbaseUser | null`, ...); an upsert takes writable fields with values of the right type. A misspelled field, a value of the wrong type, a plain `Date`, or a write to a formula, lookup or summary field is a compile error. Types for each field type, blanks included, were checked against a live realm. See [the schema guide](guides/schema-aliases.md#typed-results).
+- Schemas in the older form (fields as bare IDs) work as before, and `--merge` turns them into the typed form, keeping your aliases.
+
+### Fixed
+- **`runReport` with a schema sent the table alias to QuickBase**: the alias was resolved to pick a temp token, but the URL kept `tableId=projects`. It now sends the table ID.
+- `upsert`'s `fieldsToReturn` and `mergeFieldId` take field aliases, resolved like `select`.
+
 ## [3.0.0] - 2026-11-12
 
 Dates change type, writes stop retrying after failures that may have been applied, and XML API calls share the JSON API's retries and errors. See [guides/dates.md](guides/dates.md) (with an upgrade section) and [guides/reliability.md](guides/reliability.md).

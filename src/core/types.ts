@@ -118,7 +118,22 @@ export interface QuickbaseConfig {
  * @example { name: 6, status: 7, dueDate: 12 }
  */
 export interface FieldSchema {
-  [alias: string]: number;
+  [alias: string]: number | FieldDefinition;
+}
+
+/**
+ * A field with the type QuickBase reports for it, as `npx quickbase-js schema`
+ * writes it. Declared `as const`, field types type query results and upsert
+ * data by field name.
+ * @example { id: 12, type: 'date' }
+ */
+export interface FieldDefinition {
+  /** QuickBase field ID */
+  id: number;
+  /** QuickBase field type, as getFields reports it: 'text', 'numeric', 'date', 'timestamp', ... */
+  type?: string;
+  /** 'formula', 'lookup' or 'summary': QuickBase computes the value, so upserts can't set it */
+  mode?: string;
 }
 
 /**
