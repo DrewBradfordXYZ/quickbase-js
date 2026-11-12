@@ -262,12 +262,12 @@ The XML API adds `QuickbaseTicketError`, `QuickbaseAppTokenError` and `Quickbase
 ## Other options
 
 - **`readOnly: true`** refuses every write before it is sent, in both APIs. Reads sent as POST (`runQuery`, `runReport`, `audit`) still work.
-- **Dates**: ISO date strings in responses become `Date` objects. The types say `string`, because QuickBase's spec marks few date fields; set `convertDates: false` to keep strings.
+- **Dates**: in query and report results, Date fields are `QuickbaseDate` and Date/Time fields `QuickbaseDateTime`, both `Date`s that show the stored day in any time zone and write back as their field expects. Upserting a plain `Date` throws: say which kind it is. See [dates](guides/dates.md); `convertDates: false` keeps the strings.
 - **Requirements**: Node.js 18 or later, or any modern browser. The package is ES modules; the browser bundle also defines a `QuickBase` global.
 
 ## Documentation
 
-- Guides: [queries and pagination](guides/queries.md), [schema aliases](guides/schema-aliases.md), [authentication](guides/authentication.md), [rate limits and retries](guides/reliability.md), [the XML API](guides/xml-api.md), [migrating from v1](guides/migration.md)
+- Guides: [queries and pagination](guides/queries.md), [schema aliases](guides/schema-aliases.md), [authentication](guides/authentication.md), [rate limits and retries](guides/reliability.md), [dates](guides/dates.md), [the XML API](guides/xml-api.md), [migrating from v1](guides/migration.md)
 - [API reference](https://drewbradfordxyz.github.io/quickbase-js/): every method, with QuickBase's descriptions
 - [CHANGELOG](CHANGELOG.md)
 

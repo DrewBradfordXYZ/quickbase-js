@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { existsSync, readFileSync } from 'fs';
-import { createClient } from '../../src/index.js';
+import { createClient, QuickbaseDate, QuickbaseDateTime } from '../../src/index.js';
 import { skipIfNoCredentials, createTestClient, TEST_CONTEXT_PATH, TestContext, QB_REALM, QB_USER_TOKEN } from './setup.js';
 
 describe.skipIf(skipIfNoCredentials())('Date Handling Integration', () => {
@@ -35,7 +35,7 @@ describe.skipIf(skipIfNoCredentials())('Date Handling Integration', () => {
   });
 
   describe('Date conversion enabled (default)', () => {
-    it('should convert date strings to Date objects', async () => {
+    it('should make Date fields QuickbaseDate, holding the stored day', async () => {
       await client.upsert({
         to: tableId,
         data: [{ [textFieldId]: { value: 'DateTest' }, [dateFieldId]: { value: '2024-06-15' } }],
@@ -47,10 +47,13 @@ describe.skipIf(skipIfNoCredentials())('Date Handling Integration', () => {
       });
 
       const dateValue = result.data![0][dateFieldId].value;
-      expect(dateValue).toBeInstanceOf(Date);
+      expect(dateValue).toBeInstanceOf(QuickbaseDate);
+      // Local methods give the stored day in this machine's time zone
+      expect((dateValue as QuickbaseDate).getDate()).toBe(15);
+      expect((dateValue as QuickbaseDate).toISODate()).toBe('2024-06-15');
     });
 
-    it('should convert created/modified timestamps to Date objects', async () => {
+    it('should make Date/Time fields (Date Created, Date Modified) QuickbaseDateTime', async () => {
       await client.upsert({
         to: tableId,
         data: [{ [textFieldId]: { value: 'TimestampTest' } }],
@@ -61,27 +64,58 @@ describe.skipIf(skipIfNoCredentials())('Date Handling Integration', () => {
         select: [1, 2, 3], // Date Created, Date Modified, Record ID#
       });
 
-      // Field 1 = Date Created, Field 2 = Date Modified
-      const createdValue = result.data![0][1].value;
-      const modifiedValue = result.data![0][2].value;
-
-      expect(createdValue).toBeInstanceOf(Date);
-      expect(modifiedValue).toBeInstanceOf(Date);
+      expect(result.data![0][1].value).toBeInstanceOf(QuickbaseDateTime);
+      expect(result.data![0][2].value).toBeInstanceOf(QuickbaseDateTime);
     });
 
-    it('should handle various date formats from API', async () => {
-      // Insert a record and query back metadata dates
-      await client.upsert({
-        to: tableId,
-        data: [{ [textFieldId]: { value: 'FormatTest' } }],
-      });
-
-      // Query table metadata which has dates
+    it('should keep app and table metadata timestamps as strings', async () => {
       const table = await client.getTable({ appId: (await readContext()).appId, tableId });
 
-      // created/updated should be Date objects
-      expect(table.created).toBeInstanceOf(Date);
-      expect(table.updated).toBeInstanceOf(Date);
+      expect(typeof table.created).toBe('string');
+      expect(Number.isNaN(Date.parse(table.created!))).toBe(false);
+    });
+
+    it('should write back a record it read, dates unchanged', async () => {
+      await client.upsert({
+        to: tableId,
+        data: [{ [textFieldId]: { value: 'RoundTrip' }, [dateFieldId]: { value: '2024-07-20' } }],
+      });
+      const read = await client.runQuery({ from: tableId, select: [3, dateFieldId] });
+
+      const written = await client.upsert({ to: tableId, data: read.data!, fieldsToReturn: [dateFieldId] });
+      expect(written.metadata?.lineErrors).toBeUndefined();
+
+      const again = await client.runQuery({ from: tableId, select: [3, dateFieldId] });
+      expect((again.data![0][dateFieldId].value as QuickbaseDate).toISODate()).toBe('2024-07-20');
+    });
+
+    it('should write QuickbaseDate.from() and today()', async () => {
+      await client.upsert({
+        to: tableId,
+        data: [
+          { [textFieldId]: { value: 'From' }, [dateFieldId]: QuickbaseDate.from(new Date(2024, 1, 29, 23, 30)) },
+          { [textFieldId]: { value: 'Today' }, [dateFieldId]: QuickbaseDate.today() },
+        ],
+      });
+
+      const result = await client.runQuery({
+        from: tableId,
+        select: [textFieldId, dateFieldId],
+        sortBy: [{ fieldId: dateFieldId, order: 'ASC' }],
+      });
+
+      expect((result.data![0][dateFieldId].value as QuickbaseDate).toISODate()).toBe('2024-02-29');
+      expect((result.data![1][dateFieldId].value as QuickbaseDate).toISODate()).toBe(QuickbaseDate.today().toISODate());
+    });
+
+    it('should refuse a plain Date before sending', async () => {
+      await expect(
+        // @ts-expect-error: the types refuse a plain Date too
+        client.upsert({ to: tableId, data: [{ [textFieldId]: 'Plain', [dateFieldId]: new Date() }] })
+      ).rejects.toThrow(/plain Date/);
+
+      const result = await client.runQuery({ from: tableId, select: [3] });
+      expect(result.data).toHaveLength(0);
     });
   });
 
@@ -148,38 +182,9 @@ describe.skipIf(skipIfNoCredentials())('Date Handling Integration', () => {
         sortBy: [{ fieldId: dateFieldId, order: 'ASC' }],
       });
 
-      expect(result.data).toHaveLength(3);
-
-      // All should be valid Date objects
-      result.data!.forEach((record) => {
-        expect(record[dateFieldId].value).toBeInstanceOf(Date);
-      });
-
-      // Verify order (NewYear < LeapDay < YearEnd) using UTC methods
-      const dates = result.data!.map((r) => r[dateFieldId].value as Date);
-      expect(dates[0].getUTCMonth()).toBe(0); // January
-      expect(dates[1].getUTCMonth()).toBe(1); // February
-      expect(dates[2].getUTCMonth()).toBe(11); // December
-    });
-
-    it('should preserve date precision through round-trip', async () => {
-      const testDate = '2024-07-20';
-
-      await client.upsert({
-        to: tableId,
-        data: [{ [textFieldId]: { value: 'RoundTrip' }, [dateFieldId]: { value: testDate } }],
-      });
-
-      const result = await client.runQuery({
-        from: tableId,
-        select: [3, dateFieldId],
-      });
-
-      const dateValue = result.data![0][dateFieldId].value as Date;
-      // Use UTC methods to avoid timezone issues
-      expect(dateValue.getUTCFullYear()).toBe(2024);
-      expect(dateValue.getUTCMonth()).toBe(6); // July (0-indexed)
-      expect(dateValue.getUTCDate()).toBe(20);
+      // Local days, with no time zone arithmetic
+      const days = result.data!.map((r) => (r[dateFieldId].value as QuickbaseDate).toISODate());
+      expect(days).toEqual(['2024-01-01', '2024-02-29', '2024-12-31']);
     });
   });
 });

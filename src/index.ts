@@ -44,6 +44,9 @@ export type {
 // Schema utilities
 export { SchemaError } from './core/schema.js';
 
+// Date and Date/Time field values
+export { QuickbaseDate, QuickbaseDateTime } from './core/dates.js';
+
 export {
   QuickbaseError,
   RateLimitError,

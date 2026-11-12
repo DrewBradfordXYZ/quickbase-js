@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Version 3.0.0: dates change type. See [guides/dates.md](guides/dates.md), which has an upgrade section.
+
+### Changed
+- **BREAKING: Date and Date/Time fields are typed by field, not guessed from the string.** 2.x turned every string that looked like a date into a `Date`. A Date field's `"2024-01-15"` became UTC midnight, which shows Jan 14 anywhere west of UTC; Text fields holding a date became Dates; and a Date field read and written back was sent as a timestamp, which QuickBase rejects, leaving the field blank. Now, in query and report results, by the field types QuickBase sends with them:
+  - Date fields are `QuickbaseDate`: a `Date` at local midnight, so `getDate()` and `toLocaleDateString()` give the stored day in any time zone, in a browser or on a server. It serializes as `"2024-01-15"`, so it keeps its day across time zones and upserts back as the only form a Date field accepts. `toISODate()` gives that string.
+  - Date/Time fields are `QuickbaseDateTime`, the same moment as before.
+  - Everything else stays as QuickBase sends it: Text, Time of Day, blank dates (`""`), upsert responses (which carry no field types), and app, table and field metadata (`created`, `updated`).
+- **BREAKING: upserting a plain `Date` throws**, before anything is sent, naming the field. A Date field accepts only `"2024-01-15"` and a Date/Time field only a timestamp, so a `Date` has to say which it is: `QuickbaseDate.from(d)`, `QuickbaseDate.today()`, `QuickbaseDateTime.from(d)` or `QuickbaseDateTime.current()`, or the string. TypeScript refuses a plain `Date` in upsert data too.
+- **BREAKING:** `transformDates` and `isIsoDateString` are removed. `convertDates: false` still keeps the strings.
+
+
 ### Fixed
 - **Read-only mode let two solution writes through**: `updateSolutionToRecord` (`GET /solutions/{id}/fromrecord`, which changes apps) and `exportSolutionToRecord` (`GET /solutions/{id}/torecord`, which writes a record) are GETs, and only `/solutions/fromrecord` was blocked. Both now throw `ReadOnlyError`. `changesetSolutionFromRecord` only reads and is still allowed.
 - **A 401 never fetched a new token**: the retry loop gave up on errors that aren't retryable before reaching the token refresh, and a 401 isn't one. An expired or revoked temp token now gets one new token and one retry; a user token's 401 still fails at once.

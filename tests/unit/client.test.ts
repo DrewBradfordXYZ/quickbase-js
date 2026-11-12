@@ -281,7 +281,10 @@ describe('typed API methods', () => {
     expect(result.id).toBe('bpqe82s1');
   });
 
-  it('should convert date strings to Date objects by default', async () => {
+  // Dates are converted by field type in query and report results only.
+  // App metadata keeps the strings its types say (it was converted by
+  // pattern, which also turned date-like text into Dates).
+  it('should keep app metadata timestamps as strings', async () => {
     const fixture = loadResponse('apps', 'get-app', 200);
     const { fetch: mockFetch } = createTrackedMockFetch([fixture]);
 
@@ -292,20 +295,13 @@ describe('typed API methods', () => {
         userToken: 'test-token',
       },
       fetchApi: mockFetch,
-      // convertDates defaults to true
     });
 
     const result = await client.getApp({ appId: 'bpqe82s1' });
 
-    // Date fields should be converted to Date objects
-    expect(result.created).toBeInstanceOf(Date);
-    expect(result.updated).toBeInstanceOf(Date);
-    expect((result.created as unknown as Date).toISOString()).toBe('2024-01-15T10:30:00.000Z');
-    expect((result.updated as unknown as Date).toISOString()).toBe('2024-03-20T14:45:00.000Z');
-
-    // Non-date fields should remain as-is
+    expect(result.created).toBe('2024-01-15T10:30:00.000Z');
+    expect(result.updated).toBe('2024-03-20T14:45:00.000Z');
     expect(result.name).toBe('Test Application');
-    expect(result.id).toBe('bpqe82s1');
   });
 
   it('should have typed createApp method with body', async () => {

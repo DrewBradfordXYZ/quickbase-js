@@ -26,6 +26,7 @@
     "guides/schema-aliases.md",
     "guides/authentication.md",
     "guides/reliability.md",
+    "guides/dates.md",
     "guides/xml-api.md",
     "guides/migration.md"
   ]

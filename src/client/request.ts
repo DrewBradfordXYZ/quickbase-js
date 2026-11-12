@@ -22,7 +22,7 @@ import {
 } from '../core/errors.js';
 import { extractRateLimitInfo, sleep } from './retry.js';
 import { getRealmHostname } from '../core/config.js';
-import { transformDates } from '../core/dates.js';
+import { convertRecordDates } from '../core/dates.js';
 import {
   transformRequest,
   transformResponse,
@@ -475,13 +475,18 @@ export async function executeRequest<T = unknown>(
       // Parse JSON response
       let data = await response.json();
 
+      // Date and Date/Time values by the result's field types; first, while
+      // records are still keyed by field ID
+      if (config.convertDates) {
+        data = convertRecordDates(data);
+      }
+
       // Transform response if schema is configured
       if (config.schema && dbid) {
         data = transformResponse(data, { schema: config.schema, tableId: dbid });
       }
 
-      // Optionally transform dates
-      return transformDates(data, config.convertDates) as T;
+      return data as T;
     } catch (error) {
       lastError = error as Error;
 

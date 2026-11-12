@@ -47,4 +47,4 @@ export { Logger, createLogger } from './logger.js';
 
 export { resolveConfig, getRealmHostname } from './config.js';
 
-export { transformDates, isIsoDateString } from './dates.js';
+export { QuickbaseDate, QuickbaseDateTime } from './dates.js';

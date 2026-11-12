@@ -1,190 +1,150 @@
 /**
- * Date conversion unit tests
+ * Date and Date/Time field values
+ *
+ * A Date field's day must survive every time zone, in a browser or on a
+ * server, and the trip between them. The old conversion made "2024-01-15" a
+ * Date at UTC midnight, which is Jan 14 anywhere west of UTC.
+ *
+ * These tests run in a forked process (vitest.config.ts) so that changing
+ * process.env.TZ takes effect.
  */
 
-import { describe, it, expect } from 'vitest';
-import { transformDates, isIsoDateString } from '../../src/core/dates.js';
+import { describe, it, expect, afterAll } from 'vitest';
+import { QuickbaseDate, QuickbaseDateTime, convertRecordDates, assertNoPlainDate } from '../../src/core/dates.js';
 
-describe('isIsoDateString', () => {
-  it('should match date-only strings', () => {
-    expect(isIsoDateString('2024-01-15')).toBe(true);
-    expect(isIsoDateString('2024-12-31')).toBe(true);
+const originalTZ = process.env.TZ;
+afterAll(() => {
+  process.env.TZ = originalTZ;
+});
+
+// From the far west (UTC-11) to the far east (UTC+14)
+const ZONES = ['Pacific/Pago_Pago', 'America/Los_Angeles', 'America/New_York', 'UTC', 'Europe/Berlin', 'Asia/Tokyo', 'Pacific/Kiritimati'];
+
+function inZone(zone: string): void {
+  process.env.TZ = zone;
+  // Guard: a TZ change that didn't take would make every zone test the same zone
+  const offset = new Date(2024, 0, 15).getTimezoneOffset();
+  const expected = { UTC: 0, 'Asia/Tokyo': -540, 'America/New_York': 300 }[zone as 'UTC'];
+  if (expected !== undefined) expect(offset, `TZ=${zone} did not take effect`).toBe(expected);
+}
+
+describe('QuickbaseDate', () => {
+  it.each(ZONES)('keeps the stored day in %s', (zone) => {
+    inZone(zone);
+    const d = QuickbaseDate.fromValue('2024-01-15');
+
+    expect(d).toBeInstanceOf(Date);
+    expect([d.getFullYear(), d.getMonth(), d.getDate()]).toEqual([2024, 0, 15]);
+    expect(d.toLocaleDateString('en-US')).toBe('1/15/2024');
+    expect(d.toISODate()).toBe('2024-01-15');
+    expect(JSON.stringify({ d })).toBe('{"d":"2024-01-15"}');
   });
 
-  it('should match date-time strings', () => {
-    expect(isIsoDateString('2024-01-15T10:30:00')).toBe(true);
-    expect(isIsoDateString('2024-01-15T10:30:00Z')).toBe(true);
-    expect(isIsoDateString('2024-01-15T10:30:00.000Z')).toBe(true);
-    expect(isIsoDateString('2024-01-15T10:30:00.123Z')).toBe(true);
+  it('keeps the day from a server in one zone to a browser in another', () => {
+    inZone('UTC');
+    const json = JSON.stringify({ due: QuickbaseDate.fromValue('2024-01-15') });
+
+    inZone('America/Los_Angeles');
+    const { due } = JSON.parse(json) as { due: string };
+    expect(due).toBe('2024-01-15');
+    expect(QuickbaseDate.fromValue(due).getDate()).toBe(15);
   });
 
-  it('should match date-time with timezone offset', () => {
-    expect(isIsoDateString('2024-01-15T10:30:00+00:00')).toBe(true);
-    expect(isIsoDateString('2024-01-15T10:30:00-05:00')).toBe(true);
-    expect(isIsoDateString('2024-01-15T10:30:00+0530')).toBe(true);
+  it.each(ZONES)('from() takes the local day of a Date in %s', (zone) => {
+    inZone(zone);
+    expect(QuickbaseDate.from(new Date(2024, 0, 15, 23, 59)).toISODate()).toBe('2024-01-15');
+    expect(QuickbaseDate.from(new Date(2024, 0, 15, 0, 0)).toISODate()).toBe('2024-01-15');
   });
 
-  it('should not match non-date strings', () => {
-    expect(isIsoDateString('hello world')).toBe(false);
-    expect(isIsoDateString('2024')).toBe(false);
-    expect(isIsoDateString('2024-01')).toBe(false);
-    expect(isIsoDateString('01-15-2024')).toBe(false);
-    expect(isIsoDateString('')).toBe(false);
+  it('takes months 1-12 and keeps years before 100', () => {
+    expect(new QuickbaseDate(2024, 12, 31).toISODate()).toBe('2024-12-31');
+    expect(new QuickbaseDate(50, 6, 1).toISODate()).toBe('0050-06-01');
+  });
+
+  it('rejects anything but YYYY-MM-DD', () => {
+    for (const bad of ['2024-01-15T00:00:00Z', '01-15-2024', '2024-1-5', '']) {
+      expect(() => QuickbaseDate.fromValue(bad)).toThrow(RangeError);
+    }
   });
 });
 
-describe('transformDates', () => {
-  it('should convert ISO date strings to Date objects', () => {
-    const input = {
-      created: '2024-01-15T10:30:00.000Z',
-      updated: '2024-03-20T14:45:00.000Z',
-    };
+describe('QuickbaseDateTime', () => {
+  it.each(ZONES)('is the same moment in %s', (zone) => {
+    inZone(zone);
+    const t = QuickbaseDateTime.fromValue('2024-01-15T15:30:00Z');
 
-    const result = transformDates(input, true);
-
-    expect(result.created).toBeInstanceOf(Date);
-    expect(result.updated).toBeInstanceOf(Date);
-    expect((result.created as Date).toISOString()).toBe('2024-01-15T10:30:00.000Z');
-    expect((result.updated as Date).toISOString()).toBe('2024-03-20T14:45:00.000Z');
+    expect(t.getTime()).toBe(Date.UTC(2024, 0, 15, 15, 30));
+    expect(JSON.stringify({ t })).toBe('{"t":"2024-01-15T15:30:00.000Z"}');
   });
 
-  it('should preserve non-date strings', () => {
-    const input = {
-      name: 'Test Application',
-      id: 'bpqe82s1',
-    };
-
-    const result = transformDates(input, true);
-
-    expect(result.name).toBe('Test Application');
-    expect(result.id).toBe('bpqe82s1');
+  it('rejects a bare date and non-dates', () => {
+    expect(() => QuickbaseDateTime.fromValue('2024-01-15')).toThrow(RangeError);
+    expect(() => QuickbaseDateTime.fromValue('soon')).toThrow(RangeError);
   });
 
-  it('should handle nested objects', () => {
-    const input = {
-      app: {
-        name: 'Test App',
-        created: '2024-01-15T10:30:00.000Z',
-        metadata: {
-          updated: '2024-03-20T14:45:00.000Z',
-        },
-      },
-    };
-
-    const result = transformDates(input, true);
-
-    expect(result.app.name).toBe('Test App');
-    expect(result.app.created).toBeInstanceOf(Date);
-    expect(result.app.metadata.updated).toBeInstanceOf(Date);
-  });
-
-  it('should handle arrays', () => {
-    const input = {
-      items: [
-        { id: 1, created: '2024-01-01T00:00:00Z' },
-        { id: 2, created: '2024-02-01T00:00:00Z' },
-      ],
-    };
-
-    const result = transformDates(input, true);
-
-    expect(result.items).toHaveLength(2);
-    expect(result.items[0].created).toBeInstanceOf(Date);
-    expect(result.items[1].created).toBeInstanceOf(Date);
-  });
-
-  it('should skip transformation when disabled', () => {
-    const input = {
-      created: '2024-01-15T10:30:00.000Z',
-      name: 'Test',
-    };
-
-    const result = transformDates(input, false);
-
-    expect(result.created).toBe('2024-01-15T10:30:00.000Z');
-    expect(typeof result.created).toBe('string');
-  });
-
-  it('should handle null and undefined values', () => {
-    expect(transformDates(null, true)).toBe(null);
-    expect(transformDates(undefined, true)).toBe(undefined);
-  });
-
-  it('should preserve existing Date objects', () => {
-    const date = new Date('2024-01-15T10:30:00.000Z');
-    const input = { created: date };
-
-    const result = transformDates(input, true);
-
-    expect(result.created).toBe(date);
-  });
-
-  it('should handle primitive values', () => {
-    expect(transformDates('hello', true)).toBe('hello');
-    expect(transformDates(123, true)).toBe(123);
-    expect(transformDates(true, true)).toBe(true);
-  });
-
-  it('should convert date-only strings', () => {
-    const input = {
-      date: '2024-01-15',
-    };
-
-    const result = transformDates(input, true);
-
-    expect(result.date).toBeInstanceOf(Date);
+  it('from() and current() are moments', () => {
+    const d = new Date(Date.UTC(2024, 0, 15, 15, 30));
+    expect(QuickbaseDateTime.from(d).getTime()).toBe(d.getTime());
+    expect(Math.abs(QuickbaseDateTime.current().getTime() - Date.now())).toBeLessThan(1000);
   });
 });
 
-describe('transformDates with QuickBase response', () => {
-  it('should transform a typical getApp response', () => {
-    const response = {
-      id: 'bpqe82s1',
-      name: 'Test Application',
-      description: 'A test application',
-      created: '2024-01-15T10:30:00.000Z',
-      updated: '2024-03-20T14:45:00.000Z',
-      dateFormat: 'MM-DD-YYYY',
-      variables: [
-        { name: 'AppVersion', value: '1.0.0' },
-      ],
-    };
+describe('convertRecordDates', () => {
+  const response = {
+    fields: [
+      { id: 3, label: 'Record ID#', type: 'recordid' },
+      { id: 7, label: 'Due', type: 'date' },
+      { id: 8, label: 'Closed', type: 'timestamp' },
+      { id: 9, label: 'Code', type: 'text' },
+      { id: 10, label: 'Start', type: 'timeofday' },
+    ],
+    data: [
+      { 3: { value: 1 }, 7: { value: '2024-01-15' }, 8: { value: '2024-01-15T15:30:00Z' }, 9: { value: '2024-01-15' }, 10: { value: '15:30:00' } },
+      { 3: { value: 2 }, 7: { value: '' }, 8: { value: '' }, 9: { value: '' }, 10: { value: '' } },
+    ],
+    metadata: { totalRecords: 2 },
+  };
 
-    const result = transformDates(response, true);
+  it('converts by field type and leaves everything else', () => {
+    const result = convertRecordDates(response);
+    const [first, blank] = result.data as Array<Record<string, { value: unknown }>>;
 
-    expect(result.id).toBe('bpqe82s1');
-    expect(result.name).toBe('Test Application');
-    expect(result.created).toBeInstanceOf(Date);
-    expect(result.updated).toBeInstanceOf(Date);
-    expect(result.dateFormat).toBe('MM-DD-YYYY'); // Not a date
-    expect(result.variables[0].name).toBe('AppVersion');
+    expect(first[7].value).toBeInstanceOf(QuickbaseDate);
+    expect((first[7].value as QuickbaseDate).toISODate()).toBe('2024-01-15');
+    expect(first[8].value).toBeInstanceOf(QuickbaseDateTime);
+    expect(first[9].value).toBe('2024-01-15'); // text that looks like a date
+    expect(first[10].value).toBe('15:30:00');
+    expect(blank[7].value).toBe('');
+    expect(blank[8].value).toBe('');
+    expect(result.metadata).toEqual(response.metadata);
   });
 
-  it('should transform a runQuery response with record data', () => {
-    const response = {
-      data: [
-        {
-          '3': { value: 1 },
-          '6': { value: 'Test Record' },
-          '7': { value: '2024-01-15T10:30:00.000Z' },
-        },
-      ],
-      fields: [
-        { id: 3, label: 'Record ID#', type: 'recordid' },
-        { id: 6, label: 'Name', type: 'text' },
-        { id: 7, label: 'Created', type: 'timestamp' },
-      ],
-      metadata: {
-        totalRecords: 1,
-        numRecords: 1,
-        skip: 0,
-      },
-    };
+  it('does not change its input', () => {
+    convertRecordDates(response);
+    expect(response.data[0][7].value).toBe('2024-01-15');
+  });
 
-    const result = transformDates(response, true);
+  it('leaves responses without field types (upserts) alone', () => {
+    const upsert = { data: [{ 7: { value: '2024-01-15' } }], metadata: {} };
+    expect(convertRecordDates(upsert)).toBe(upsert);
+  });
 
-    // The date value inside the record should be converted
-    expect(result.data[0]['7'].value).toBeInstanceOf(Date);
-    expect(result.data[0]['6'].value).toBe('Test Record');
+  it('round-trips: a converted record serializes as QuickBase sends it', () => {
+    const result = convertRecordDates(response);
+    const sent = JSON.parse(JSON.stringify(result.data[0]));
+    expect(sent[7].value).toBe('2024-01-15');
+    expect(sent[8].value).toBe('2024-01-15T15:30:00.000Z');
+  });
+});
+
+describe('assertNoPlainDate', () => {
+  it('refuses a plain Date and names the field and both fixes', () => {
+    expect(() => assertNoPlainDate(new Date(), '7', 0)).toThrow(/Field "7" in record 1 is a plain Date.*QuickbaseDate\.from.*QuickbaseDateTime\.from/);
+  });
+
+  it('allows the date classes and everything else', () => {
+    for (const ok of [QuickbaseDate.today(), QuickbaseDateTime.current(), '2024-01-15', 5, null, undefined]) {
+      expect(() => assertNoPlainDate(ok, '7', 0)).not.toThrow();
+    }
   });
 });

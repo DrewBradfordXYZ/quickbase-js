@@ -17,6 +17,7 @@ const guides = [
   ['schema-aliases.md', 'Schema aliases', 'table and field names instead of IDs, and the schema generator'],
   ['authentication.md', 'Authentication', 'user tokens, temporary tokens in code pages, tickets and SSO'],
   ['reliability.md', 'Rate limits and retries', 'throttling, retry and backoff settings, timeouts'],
+  ['dates.md', 'Dates', 'Date and Date/Time fields: QuickbaseDate, QuickbaseDateTime, what QuickBase accepts, upgrading from 2.x'],
   ['xml-api.md', 'The XML API', 'roles, groups, code pages, app variables, webhooks and CSV imports'],
   ['migration.md', 'Migrating from v1', 'changes from the v1 API of this package'],
 ];

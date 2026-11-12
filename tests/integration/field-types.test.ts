@@ -4,6 +4,7 @@
  * Tests date, checkbox, and other field types beyond basic text/numeric.
  */
 
+import { QuickbaseDate } from '../../src/index.js';
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { existsSync, readFileSync } from 'fs';
 import { skipIfNoCredentials, createTestClient, TEST_CONTEXT_PATH, TestContext } from './setup.js';
@@ -63,12 +64,9 @@ describe.skipIf(skipIfNoCredentials())('Field Types Integration', () => {
     });
 
     expect(query.data).toHaveLength(1);
-    // Date may come back as ISO string or Date object depending on convertDates setting
     const dateValue = query.data![0][dateFieldId].value;
-    expect(dateValue).toBeTruthy();
-    // Check that it contains the date we sent
-    const dateStr = dateValue instanceof Date ? dateValue.toISOString() : String(dateValue);
-    expect(dateStr).toContain('2024-06-15');
+    expect(dateValue).toBeInstanceOf(QuickbaseDate);
+    expect((dateValue as QuickbaseDate).toISODate()).toBe('2024-06-15');
   });
 
   it('should handle checkbox fields', async () => {

@@ -7,17 +7,21 @@
 
 import type { PaginatedRequest } from '../client/pagination.js';
 
+import type { QuickbaseDate, QuickbaseDateTime } from '../core/dates.js';
+
 /**
  * A field value in a QuickBase record.
  * The value type depends on the field type:
- * - string: text, email, URL, date/time (ISO format)
+ * - QuickbaseDate: date fields, in query and report results ("2024-01-15" elsewhere)
+ * - QuickbaseDateTime: date/time fields, in query and report results (ISO 8601 elsewhere)
+ * - string: text, email, URL, time of day; blank date fields ("")
  * - number: numeric fields, record IDs
  * - boolean: checkbox fields
  * - string[]: multi-select text lists
  * - { id: string }[]: file attachments
  */
 export interface FieldValue {
-  value: string | number | boolean | string[] | { id: string }[];
+  value: string | number | boolean | string[] | { id: string }[] | QuickbaseDate | QuickbaseDateTime;
 }
 
 /**

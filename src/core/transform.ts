@@ -3,6 +3,7 @@
  */
 
 import type { ResolvedSchema } from './types.js';
+import { assertNoPlainDate } from './dates.js';
 import {
   resolveTableAlias,
   resolveFieldAlias,
@@ -80,8 +81,8 @@ export function transformRequest<T extends Record<string, unknown>>(
 
   // Auto-wrap data values (always runs, no schema required)
   if ('data' in result && Array.isArray(result.data)) {
-    result.data = (result.data as Record<string, unknown>[]).map((record) =>
-      wrapRecordValues(record, ctx.schema, tableId)
+    result.data = (result.data as Record<string, unknown>[]).map((record, index) =>
+      wrapRecordValues(record, ctx.schema, tableId, index)
     );
   }
 
@@ -96,7 +97,8 @@ export function transformRequest<T extends Record<string, unknown>>(
 function wrapRecordValues(
   record: Record<string, unknown>,
   schema: ResolvedSchema | undefined,
-  tableId: string | undefined
+  tableId: string | undefined,
+  recordIndex: number
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
@@ -113,7 +115,9 @@ function wrapRecordValues(
     }
 
     // Always auto-wrap values
-    result[outputKey] = wrapFieldValue(value);
+    const wrapped = wrapFieldValue(value);
+    assertNoPlainDate(wrapped.value, key, recordIndex);
+    result[outputKey] = wrapped;
   }
 
   return result;

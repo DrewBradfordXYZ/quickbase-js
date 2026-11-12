@@ -31,7 +31,11 @@ export interface QuickbaseConfig {
   /** Automatically paginate all paginated requests when awaited (default: false) */
   autoPaginate?: boolean;
 
-  /** Convert ISO date strings in responses to JavaScript Date objects (default: true) */
+  /**
+   * In query and report results, make Date field values QuickbaseDate and
+   * Date/Time field values QuickbaseDateTime, by the result's field types
+   * (default: true). False keeps the strings QuickBase sends.
+   */
   convertDates?: boolean;
 
   /**

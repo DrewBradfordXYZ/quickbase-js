@@ -14,6 +14,8 @@ export default defineConfig({
     },
     // Unit tests use default timeout
     testTimeout: 10000,
+    // Date tests change process.env.TZ, which worker threads ignore
+    poolMatchGlobs: [['**/dates.test.ts', 'forks']],
     // Integration tests have longer timeouts configured per-test
   },
 });

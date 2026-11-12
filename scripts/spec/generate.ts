@@ -361,14 +361,16 @@ function addSharedSchemaTypes(spec: OpenAPISpec, typeDefs: string[]): void {
       typeDefs.push('/**');
       typeDefs.push(' * A field value in a QuickBase record.');
       typeDefs.push(' * The value type depends on the field type:');
-      typeDefs.push(' * - string: text, email, URL, date/time (ISO format)');
+      typeDefs.push(' * - QuickbaseDate: date fields, in query and report results ("2024-01-15" elsewhere)');
+      typeDefs.push(' * - QuickbaseDateTime: date/time fields, in query and report results (ISO 8601 elsewhere)');
+      typeDefs.push(' * - string: text, email, URL, time of day; blank date fields ("")');
       typeDefs.push(' * - number: numeric fields, record IDs');
       typeDefs.push(' * - boolean: checkbox fields');
       typeDefs.push(' * - string[]: multi-select text lists');
       typeDefs.push(' * - { id: string }[]: file attachments');
       typeDefs.push(' */');
       typeDefs.push('export interface FieldValue {');
-      typeDefs.push('  value: string | number | boolean | string[] | { id: string }[];');
+      typeDefs.push('  value: string | number | boolean | string[] | { id: string }[] | QuickbaseDate | QuickbaseDateTime;');
       typeDefs.push('}');
       typeDefs.push('');
     } else if (schemaName === 'QuickbaseRecord') {
@@ -881,6 +883,10 @@ export async function generate(inputPath?: string): Promise<void> {
       allTypeDefs.push("import type { PaginatedRequest } from '../client/pagination.js';");
       allTypeDefs.push('');
     }
+
+    // FieldValue's date classes
+    allTypeDefs.push("import type { QuickbaseDate, QuickbaseDateTime } from '../core/dates.js';");
+    allTypeDefs.push('');
 
     // Add shared schema types (FieldValue, QuickbaseRecord)
     addSharedSchemaTypes(spec, allTypeDefs);
