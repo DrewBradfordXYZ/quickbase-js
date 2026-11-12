@@ -77,10 +77,12 @@ describe.skipIf(skipIfNoCredentials())('XML API Integration', () => {
     it('lists accessible apps', async () => {
       const result = await xml.grantedDBs({ realmAppsOnly: true });
 
-      expect(result.databases.length).toBeGreaterThan(0);
+      // Keyed by dbid, or alias with a schema
+      const databases = Object.values(result.databases);
+      expect(databases.length).toBeGreaterThan(0);
 
       // Our test app should be in the list
-      const found = result.databases.some((db) => db.dbid === appId);
+      const found = databases.some((db) => db.dbid === appId);
       expect(found).toBe(true);
     });
 
@@ -91,7 +93,7 @@ describe.skipIf(skipIfNoCredentials())('XML API Integration', () => {
       });
 
       // Just verify the call works - returns tables only
-      expect(Array.isArray(result.databases)).toBe(true);
+      expect(typeof result.databases).toBe('object');
     });
   });
 
@@ -181,10 +183,12 @@ describe.skipIf(skipIfNoCredentials())('XML API Integration', () => {
 
       expect(result.table.name).toBeTruthy();
       expect(result.table.fields).toBeDefined();
-      expect(result.table.fields!.length).toBeGreaterThan(0);
+      // Keyed by field ID, or alias with a schema
+      const fields = Object.values(result.table.fields!);
+      expect(fields.length).toBeGreaterThan(0);
 
       // Verify our test fields exist
-      const fieldIds = new Set(result.table.fields!.map((f) => f.id));
+      const fieldIds = new Set(fields.map((f) => f.id));
       expect(fieldIds.has(textFieldId)).toBe(true);
       expect(fieldIds.has(numberFieldId)).toBe(true);
     });
@@ -201,10 +205,12 @@ describe.skipIf(skipIfNoCredentials())('XML API Integration', () => {
       const result = await xml.getRecordInfo(tableId, recordId);
 
       expect(result.recordId).toBe(recordId);
-      expect(result.fields.length).toBeGreaterThan(0);
+      // Keyed by field ID, or alias with a schema
+      const fields = Object.values(result.fields);
+      expect(fields.length).toBeGreaterThan(0);
 
       // Each field should have id, name, type, value
-      for (const field of result.fields) {
+      for (const field of fields) {
         expect(field.id).toBeDefined();
         expect(field.name).toBeTruthy();
         expect(field.type).toBeTruthy();
@@ -306,7 +312,8 @@ describe.skipIf(!hasTicketCredentials)('XML API - Ticket Auth Required', () => {
       const result = await xml.getAppDTMInfo(appId);
 
       expect(result.appId).toBe(appId);
-      expect(Array.isArray(result.tables)).toBe(true);
+      // Keyed by table ID, or alias with a schema
+      expect(Object.values(result.tables).length).toBeGreaterThan(0);
     });
   });
 
