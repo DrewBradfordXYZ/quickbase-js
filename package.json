@@ -1,6 +1,6 @@
 {
   "name": "quickbase-js",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "TypeScript client for the QuickBase JSON and XML APIs: every endpoint, pagination, retries, code-page temp tokens",
   "type": "module",
   "main": "dist/index.js",

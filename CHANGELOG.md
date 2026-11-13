@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-11-13
+
+Write scope, and read-only mode that fails closed.
+
 ### Added
 - **`writeScope`**: a client may write only to what it names; any other write throws a `WriteScopeError` before it is sent. Lists: `appIds` (an app and every table in it, found with `getAppTables`), `solutionIds`, `groupIds`. Switches: `createApps`, `createSolutions`, `createGroups`, `manageUsers`, `manageTokens`. Reads are never limited, and `readOnly` wins over a scope.
 - **`WriteBlockedError`**: the base class of `ReadOnlyError` and `WriteScopeError`.
