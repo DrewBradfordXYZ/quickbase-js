@@ -247,6 +247,8 @@ Fixture format:
 
 ## OpenAPI Spec Pipeline
 
+The `spec/` submodule is the shared OpenAPI spec. `git pull` doesn't move it unless `submodule.recurse` is set (`git config submodule.recurse true`); after pulling, run `git submodule update --init spec`. Generating from a checkout behind the commit this repo records writes a client for an old API, so the generate commands stop first (`scripts/check-spec.sh`). A checkout ahead of it (working on a newer spec) is allowed. `git status` showing ` M spec` means the checkout isn't on the recorded commit.
+
 The spec starts from the OpenAPI 3 that QuickBase's API portal publishes (`spec/tools/fetch-upstream.ts`) and has issues that need fixing:
 
 1. **Portal shape** - Normalize: inline shared schemas, open objects to unlisted keys, keep renamed operations' names
