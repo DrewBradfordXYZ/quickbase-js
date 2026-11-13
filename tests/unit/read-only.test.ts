@@ -6,6 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { createClient, ReadOnlyError } from '../../src/index.js';
+import { WRITE_BLOCKED_NOTE } from '../../src/core/errors.js';
 import { createTrackedMockFetch, loadResponse } from '../helpers/fixtures.js';
 
 describe('JSON API Read-Only Mode', () => {
@@ -367,7 +368,7 @@ describe('ReadOnlyError', () => {
     expect(err.method).toBe('POST');
     expect(err.path).toBe('/v1/records');
     expect(err.action).toBeUndefined();
-    expect(err.message).toBe('Read-only mode: write operation blocked (POST /v1/records)');
+    expect(err.message).toBe(`Read-only mode: write operation blocked (POST /v1/records)${WRITE_BLOCKED_NOTE}`);
   });
 
   it('should create error with action for XML API', () => {
@@ -375,7 +376,7 @@ describe('ReadOnlyError', () => {
     expect(err.method).toBe('POST');
     expect(err.path).toBe('/db/realm');
     expect(err.action).toBe('API_SetDBVar');
-    expect(err.message).toBe('Read-only mode: write operation blocked (XML action: API_SetDBVar)');
+    expect(err.message).toBe(`Read-only mode: write operation blocked (XML action: API_SetDBVar)${WRITE_BLOCKED_NOTE}`);
   });
 
   it('should serialize to JSON', () => {

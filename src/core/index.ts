@@ -40,6 +40,8 @@ export {
   QuickbaseAppTokenError,
   QuickbaseXmlError,
   ReadOnlyError,
+  WriteScopeError,
+  WriteBlockedError,
   NetworkError,
   LineErrorsError,
   parseErrorResponse,

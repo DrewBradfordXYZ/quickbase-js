@@ -255,6 +255,8 @@ try {
 | `RateLimitError` | 429 |
 | `ServerError` | 5xx |
 | `ReadOnlyError` | a write blocked by `readOnly: true` |
+| `WriteScopeError` | a write outside `writeScope` |
+| `WriteBlockedError` | either of the two above (their base class) |
 | `TimeoutError` | no answer within `timeout` |
 | `NetworkError` | no answer at all (DNS, connection) |
 | `LineErrorsError` | an upsert's rejected values, with `throwOnLineErrors: true` |
@@ -263,7 +265,25 @@ The XML API adds `QuickbaseTicketError`, `QuickbaseAppTokenError` and `Quickbase
 
 ## Other options
 
-- **`readOnly: true`** refuses every write before it is sent, in both APIs. Reads sent as POST (`runQuery`, `runReport`, `audit`) still work.
+- **Path parameters are URL-encoded** by every typed method, so an ID stays one path segment: `getApp({ appId: '../x' })` asks for an app named `../x`, not another endpoint.
+- **`readOnly: true`** refuses every write before it is sent, in both APIs. Reads sent as POST (`runQuery`, `runReport`, `recordsModifiedSince`, `audit`) still work. It, and `writeScope`, fail closed: an XML action counts as a write unless it is known to only read, in any letter case (`isXmlWriteAction('API_DeleteDatabase')` is true); a path a server could read as another path (`..`, `\`, `%`, `?` or `//` in a path given to `request()`) is refused, read or write; an XML call's dbid must be a plain ID; a request with a method-override header is refused; write endpoints are matched without regard to letter case; and a body is checked and sent as one plain copy, so a `toJSON` can't change it in between. `getConfig()` returns a frozen copy, so neither setting can be changed after the client is created.
+- **`writeScope`** limits writes to what it names, in both APIs; anything else throws `WriteScopeError` before it is sent. Reads are never limited, and with `readOnly: true` as well nothing is written. A write whose target can be checked is allowed when the target is listed; a write that creates something, or acts on the realm's users or your own credentials, is allowed by a switch:
+
+  ```ts
+  writeScope: {
+    appIds: [appId],      // the apps, and every table in them (including new ones)
+    createApps: false,    // createApp, copyApp; XML create and clone database
+    solutionIds: [],      // updateSolution, updateSolutionToRecord
+    createSolutions: false, // createSolution, createSolutionFromRecord
+    groupIds: [],         // members, managers, subgroups; XML rename and delete (matched as written: '1217', '1217.dgpt')
+    createGroups: false,  // XML create and copy group
+    manageUsers: false,   // deny and undeny users; XML provision user (with the app in appIds)
+    manageTokens: false,  // clone, transfer, deactivate, delete user tokens; XML sign-out
+  }
+  ```
+
+  The client lists the scope's apps' tables (`getAppTables`) to tell which app a table is in, and refuses the write if that fails. A relationship's parent table must be in scope too. XML writes are checked by dbid, or by the one `<gid>` for group actions (a comment, CDATA or second `<gid>` is refused). A relationship's parent is required on create and looked up on update and delete. A body or query that has a checked key in two letter cases (`to` and `To`) is refused. `changesetSolution` only lists what an update would change, so `readOnly` and `writeScope` let it through.
+- **What `readOnly` and `writeScope` are for.** They stop writes a caller didn't mean to allow: a mistake, a careless call, or an AI agent working through your tool that tries something it shouldn't. A refused write's error says so plainly, so whoever reads it (a person or an agent) knows not to retry it or route around it. They don't stop code in the same program that sets out to get around them: such code holds the token and can call `fetch` without this client. To protect a realm from that, give the token's user only the permissions it needs in QuickBase.
 - **Dates**: in query and report results, Date fields are `QuickbaseDate` and Date/Time fields `QuickbaseDateTime`, both `Date`s that show the stored day in any time zone and write back as their field expects. Upserting a plain `Date` throws: say which kind it is. See [dates](guides/dates.md); `convertDates: false` keeps the strings.
 - **Requirements**: Node.js 18 or later, or any modern browser. The package is ES modules; the browser bundle also defines a `QuickBase` global.
 

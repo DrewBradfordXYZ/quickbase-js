@@ -61,6 +61,8 @@ export {
   QuickbaseAppTokenError,
   QuickbaseXmlError,
   ReadOnlyError,
+  WriteScopeError,
+  WriteBlockedError,
   NetworkError,
   LineErrorsError,
 } from './core/index.js';
@@ -286,6 +288,24 @@ export function createClient<const C extends QuickbaseConfig>(
   };
   const executor = createRequestExecutor(executorOptions);
 
+  // getConfig returns a frozen copy: the client's own settings, read-only and
+  // the write scope among them, can't be changed after it is created
+  const publicConfig: typeof resolvedConfig = Object.freeze({
+    ...resolvedConfig,
+    // A copy: changing it can't change how the client resolves aliases
+    schema: resolvedConfig.schema && structuredClone(resolvedConfig.schema),
+    retry: Object.freeze({ ...resolvedConfig.retry }),
+    proactiveThrottle: Object.freeze({ ...resolvedConfig.proactiveThrottle }),
+    writeScope: resolvedConfig.writeScope && {
+      ...resolvedConfig.writeScope,
+      apps: new Set(resolvedConfig.writeScope.apps),
+      solutions: new Set(resolvedConfig.writeScope.solutions),
+      groups: new Set(resolvedConfig.writeScope.groups),
+      tableApp: new Map(),
+      loading: undefined,
+    },
+  });
+
   type Client = QuickbaseClient<C['schema'], C extends { convertDates: false } ? false : true>;
   const build = (signal?: AbortSignal): Client => {
     const request: RequestFn = signal
@@ -298,7 +318,7 @@ export function createClient<const C extends QuickbaseConfig>(
       withSignal: (next: AbortSignal) => build(next),
       requestXml: (options: Omit<XmlRequestOptions, 'signal'>) =>
         executeXmlRequest({ ...options, signal }, executorOptions),
-      getConfig: () => resolvedConfig,
+      getConfig: () => publicConfig,
       // XML-API: Expose auth strategy for XML client
       getAuthStrategy: () => auth,
     } as unknown as Client;

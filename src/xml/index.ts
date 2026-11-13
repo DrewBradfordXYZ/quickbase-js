@@ -183,68 +183,44 @@ import {
 } from './metadata.js';
 
 /**
- * Set of XML API actions that modify data.
- * Used to enforce read-only mode.
+ * XML API actions known to only read, in lower case: QuickBase matches action
+ * names without regard to case. Every other action counts as a write, so
+ * read-only mode and a write scope refuse an action they don't know
+ * (API_DeleteDatabase, API_AddField, ...) rather than let it through.
  */
-const xmlWriteActions = new Set([
-  // User/Role management
-  'API_AddUserToRole',
-  'API_RemoveUserFromRole',
-  'API_ChangeUserRole',
-  'API_ProvisionUser',
-  'API_SendInvitation',
-  'API_ChangeManager',
-  'API_ChangeRecordOwner',
-
-  // Group management
-  'API_CreateGroup',
-  'API_DeleteGroup',
-  'API_AddUserToGroup',
-  'API_RemoveUserFromGroup',
-  'API_AddGroupToRole',
-  'API_RemoveGroupFromRole',
-  'API_CopyGroup',
-  'API_ChangeGroupInfo',
-  'API_AddSubgroup',
-  'API_RemoveSubgroup',
-
-  // Variables
-  'API_SetDBVar',
-
-  // Code pages
-  'API_AddReplaceDBPage',
-
-  // Fields
-  'API_FieldAddChoices',
-  'API_FieldRemoveChoices',
-  'API_SetKeyField',
-
-  // Webhooks
-  'API_Webhooks_Create',
-  'API_Webhooks_Edit',
-  'API_Webhooks_Delete',
-  'API_Webhooks_Activate',
-  'API_Webhooks_Deactivate',
-  'API_Webhooks_Copy',
-
-  // Records/Import
-  'API_ImportFromCSV',
-  'API_RunImport',
-  'API_CopyMasterDetail',
-  'API_PurgeRecords',
-  'API_AddRecord',
-  'API_EditRecord',
-  'API_DeleteRecord',
-
-  // Auth (clears session state)
-  'API_SignOut',
+const xmlReadActions = new Set([
+  'api_authenticate',
+  'api_doquery',
+  'api_doquerycount',
+  'api_finddbbyname',
+  'api_genaddrecordform',
+  'api_genresultstable',
+  'api_getancestorinfo',
+  'api_getappdtminfo',
+  'api_getdbinfo',
+  'api_getdbpage',
+  'api_getdbvar',
+  'api_getgrouprole',
+  'api_getnumrecords',
+  'api_getrecordashtml',
+  'api_getrecordinfo',
+  'api_getroleinfo',
+  'api_getschema',
+  'api_getuserinfo',
+  'api_getuserrole',
+  'api_getusersingroup',
+  'api_granteddbs',
+  'api_granteddbsforgroup',
+  'api_grantedgroups',
+  'api_listdbpages',
+  'api_userroles',
 ]);
 
 /**
- * Check if an XML API action modifies data.
+ * Whether an XML API action can change data: any action not known to only read.
  */
 export function isXmlWriteAction(action: string): boolean {
-  return xmlWriteActions.has(action);
+  return !xmlReadActions.has(action.trim().toLowerCase());
 }
 
 /**
@@ -1107,7 +1083,9 @@ export function createXmlClient(
       requestXml({ dbid, action, body, write: isXmlWriteAction(action), appToken: options?.appToken }),
   };
 
-  // Inherit readOnly and schema from main client if not explicitly set in options
+  // Inherit readOnly and schema from main client if not explicitly set in options.
+  // A read-only main client stays read-only: its requests are checked where
+  // every XML request passes, so `readOnly: false` here can't turn that off.
   const resolvedOptions: XmlClientOptions = {
     readOnly: options?.readOnly ?? config.readOnly ?? false,
     schema: options?.schema ?? config.schema,

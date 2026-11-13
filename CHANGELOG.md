@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **`writeScope`**: a client may write only to what it names; any other write throws a `WriteScopeError` before it is sent. Lists: `appIds` (an app and every table in it, found with `getAppTables`), `solutionIds`, `groupIds`. Switches: `createApps`, `createSolutions`, `createGroups`, `manageUsers`, `manageTokens`. Reads are never limited, and `readOnly` wins over a scope.
+- **`WriteBlockedError`**: the base class of `ReadOnlyError` and `WriteScopeError`.
+- `scripts/check-spec.sh`: `npm run spec:generate` and `spec:build` stop when the `spec` submodule is behind the commit this repo records.
+
+### Changed
+- **Read-only mode fails closed, and can't be bypassed through the XML client.** It is checked where every XML request passes, so `createXmlClient(qb, { readOnly: false })` and `qb.requestXml(...)` no longer get around it. An XML action counts as a write unless it is known to only read (any letter case; `isXmlWriteAction('API_DeleteDatabase')` is now true); every HTTP method but GET, HEAD and OPTIONS is a write; methods and write endpoints match without regard to letter case. Refused when guarded: a path a server could read as another path (`..`, `\`, `%`, `?`, `#`, `//` or a trailing slash), a method-override header, a header naming another realm or host, a query value that isn't plain, an object body with `bodyType`, and an XML dbid that isn't a plain ID. A body is checked and sent as one plain JSON copy.
+- **`getConfig()` returns a frozen copy**, so read-only mode and the write scope can't be changed after the client is created.
+- **Typed methods URL-encode path parameters**, so an ID stays one path segment.
+- A refused write's message ends by saying the refusal is intentional and not to retry it or send it another way.
+
+### Fixed
+- With a schema, list responses (`getAppTables`, `getFields`, ...) came back as objects keyed `"0"`, `"1"`, ... They are lists again.
+- `changesetSolution` and `recordsModifiedSince` are reads: read-only mode refused them.
+
 ## [3.1.0] - 2026-11-12
 
 ### Added

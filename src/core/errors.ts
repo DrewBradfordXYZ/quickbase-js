@@ -298,18 +298,34 @@ export async function parseErrorResponse(
 
 
 /**
+ * Base class of every write the client refused before sending it, whether
+ * read-only mode (ReadOnlyError) or a write scope (WriteScopeError) blocked
+ * it: `err instanceof WriteBlockedError` matches both.
+ */
+export class WriteBlockedError extends Error {}
+
+/**
+ * Ends every refused write's message. Whoever, or whatever, reads the error
+ * should know the refusal is the client's configuration working, not a fault
+ * to work around.
+ */
+export const WRITE_BLOCKED_NOTE =
+  ". This is intentional, not a temporary failure: don't retry it or send it another way. " +
+  'Whoever configured this client decides what it may change.';
+
+/**
  * Error thrown when a write operation is attempted in read-only mode.
  * Provides defense-in-depth for both JSON API and XML API requests.
  */
-export class ReadOnlyError extends Error {
+export class ReadOnlyError extends WriteBlockedError {
   readonly method: string;
   readonly path: string;
   readonly action?: string; // For XML API actions
 
   constructor(method: string, path: string, action?: string) {
     const msg = action
-      ? `Read-only mode: write operation blocked (XML action: ${action})`
-      : `Read-only mode: write operation blocked (${method} ${path})`;
+      ? `Read-only mode: write operation blocked (XML action: ${action})${WRITE_BLOCKED_NOTE}`
+      : `Read-only mode: write operation blocked (${method} ${path})${WRITE_BLOCKED_NOTE}`;
     super(msg);
     this.name = 'ReadOnlyError';
     this.method = method;
@@ -374,5 +390,44 @@ export class LineErrorsError extends Error {
     this.name = 'LineErrorsError';
     this.lineErrors = lineErrors;
     this.response = response;
+  }
+}
+
+/**
+ * Error thrown when a client with a write scope is asked to write outside
+ * it. Nothing was sent. `target` is the app or table refused, when the
+ * request named one; `reason` says why.
+ */
+export class WriteScopeError extends WriteBlockedError {
+  readonly method: string;
+  readonly path: string;
+  readonly reason: string;
+  readonly target?: string;
+  readonly action?: string; // For XML API actions
+
+  constructor(method: string, path: string, reason: string, target?: string, action?: string) {
+    const op = action ? `XML action ${action}` : `${method} ${path}`;
+    super(`Write scope: ${op} blocked: ${reason}${target ? ` (${target})` : ''}${WRITE_BLOCKED_NOTE}`);
+    this.name = 'WriteScopeError';
+    this.method = method;
+    this.path = path;
+    this.reason = reason;
+    this.target = target;
+    this.action = action;
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, WriteScopeError);
+    }
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      method: this.method,
+      path: this.path,
+      reason: this.reason,
+      target: this.target,
+      action: this.action,
+    };
   }
 }

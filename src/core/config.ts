@@ -40,6 +40,19 @@ export function resolveConfig(config: QuickbaseConfig): ResolvedConfig {
     convertDates: config.convertDates ?? DEFAULT_CONFIG.convertDates,
     schema: resolveSchema(config.schema),
     readOnly: config.readOnly ?? false,
+    writeScope: config.writeScope
+      ? {
+          apps: new Set((config.writeScope.appIds ?? []).map((id) => id.trim()).filter((id) => id !== '')),
+          createApps: config.writeScope.createApps ?? false,
+          solutions: new Set((config.writeScope.solutionIds ?? []).map((id) => id.trim()).filter((id) => id !== '')),
+          createSolutions: config.writeScope.createSolutions ?? false,
+          groups: new Set((config.writeScope.groupIds ?? []).map((id) => String(id).trim()).filter((id) => id !== '')),
+          createGroups: config.writeScope.createGroups ?? false,
+          manageUsers: config.writeScope.manageUsers ?? false,
+          manageTokens: config.writeScope.manageTokens ?? false,
+          tableApp: new Map(),
+        }
+      : undefined,
     throwOnLineErrors: config.throwOnLineErrors ?? false,
     appToken: config.appToken,
   };

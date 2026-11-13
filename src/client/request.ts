@@ -17,6 +17,7 @@ import {
   RateLimitError,
   TimeoutError,
   ReadOnlyError,
+  WriteScopeError,
   NetworkError,
   LineErrorsError,
   parseErrorResponse,
@@ -31,6 +32,8 @@ import {
 } from '../core/transform.js';
 import { resolveTableAlias } from '../core/schema.js';
 import { injectAppToken, injectUserToken } from '../xml/request.js';
+import { checkWriteScope, checkXmlWriteScope, type ScopeLookups } from './write-scope.js';
+import { isXmlWriteAction } from '../xml/index.js';
 
 // =============================================================================
 // Read-Only Mode - Defense-in-Depth
@@ -94,7 +97,7 @@ const jsonWriteEndpoints: Record<string, boolean> = {
  * record. changesetSolutionFromRecord (/solutions/{id}/changeset/fromrecord)
  * only reads, and doesn't match.
  */
-const SOLUTION_RECORD_WRITE_PATH = /\/solutions\/(fromrecord|[^/]+\/(fromrecord|torecord))$/;
+const SOLUTION_RECORD_WRITE_PATH = /\/solutions\/(fromrecord|[^/]+\/(fromrecord|torecord))$/i;
 
 /**
  * POST endpoints that are actually read-only (allowlist).
@@ -103,6 +106,7 @@ const SOLUTION_RECORD_WRITE_PATH = /\/solutions\/(fromrecord|[^/]+\/(fromrecord|
  */
 const jsonReadOnlyPOSTEndpoints: Record<string, boolean> = {
   'POST /records/query': true, // RunQuery - read-only
+  'POST /records/modifiedSince': true, // RecordsModifiedSince - read-only
   'POST /reports/': true, // RunReport - read-only (prefix)
   'POST /formula/run': true, // RunFormula - read-only
   'POST /audit': true, // Audit logs - read-only
@@ -114,23 +118,40 @@ const jsonReadOnlyPOSTEndpoints: Record<string, boolean> = {
  * Check if HTTP method is a write operation.
  */
 function isWriteMethod(method: string): boolean {
+  // Every method but GET, HEAD and OPTIONS, so an unusual one (PROPPATCH) isn't taken for a read
   const upper = method.toUpperCase();
-  return upper === 'POST' || upper === 'PUT' || upper === 'DELETE' || upper === 'PATCH';
+  return upper !== 'GET' && upper !== 'HEAD' && upper !== 'OPTIONS';
 }
 
 /**
  * Check if request matches a known write endpoint.
  * Uses both exact matching and prefix matching for paths with IDs.
  */
+/** An endpoint list with lower-case paths, for matching without regard to case. */
+function lowerKeys(m: Record<string, boolean>): Record<string, boolean> {
+  const out: Record<string, boolean> = {};
+  for (const [key, value] of Object.entries(m)) {
+    const space = key.indexOf(' ');
+    out[`${key.slice(0, space)} ${key.slice(space + 1).toLowerCase()}`] = value;
+  }
+  return out;
+}
+
+const jsonWriteEndpointsLower = lowerKeys(jsonWriteEndpoints);
+const jsonReadOnlyPOSTEndpointsLower = lowerKeys(jsonReadOnlyPOSTEndpoints);
+
 function isJSONWriteEndpoint(method: string, path: string): boolean {
   if (method === 'GET' && SOLUTION_RECORD_WRITE_PATH.test(path)) {
     return true;
   }
 
+  // Paths are compared without regard to letter case: a server that routes
+  // /Records like /records mustn't get a write judged as something else
+  path = path.toLowerCase();
   const key = `${method} ${path}`;
 
   // Exact match
-  if (jsonWriteEndpoints[key]) {
+  if (jsonWriteEndpointsLower[key]) {
     return true;
   }
 
@@ -138,7 +159,7 @@ function isJSONWriteEndpoint(method: string, path: string): boolean {
   for (let i = path.length - 1; i >= 0; i--) {
     if (path[i] === '/') {
       const prefixKey = `${method} ${path.slice(0, i + 1)}`;
-      if (jsonWriteEndpoints[prefixKey]) {
+      if (jsonWriteEndpointsLower[prefixKey]) {
         return true;
       }
     }
@@ -151,10 +172,11 @@ function isJSONWriteEndpoint(method: string, path: string): boolean {
  * Check if a POST request is actually read-only (allowlist).
  */
 function isJSONReadOnlyPOSTEndpoint(path: string): boolean {
+  path = path.toLowerCase();
   const key = `POST ${path}`;
 
   // Exact match
-  if (jsonReadOnlyPOSTEndpoints[key]) {
+  if (jsonReadOnlyPOSTEndpointsLower[key]) {
     return true;
   }
 
@@ -162,7 +184,7 @@ function isJSONReadOnlyPOSTEndpoint(path: string): boolean {
   for (let i = path.length - 1; i >= 0; i--) {
     if (path[i] === '/') {
       const prefixKey = `POST ${path.slice(0, i + 1)}`;
-      if (jsonReadOnlyPOSTEndpoints[prefixKey]) {
+      if (jsonReadOnlyPOSTEndpointsLower[prefixKey]) {
         return true;
       }
     }
@@ -194,7 +216,12 @@ function checkReadOnly(config: ResolvedConfig, method: string, path: string): vo
  * aren't retried after a timeout or 5xx.
  */
 function isJSONWrite(method: string, path: string): boolean {
+  method = method.toUpperCase();
   if (method === 'POST' && isJSONReadOnlyPOSTEndpoint(path)) {
+    return false;
+  }
+  // changesetSolution is a PUT that only lists what a QBL update would change
+  if (method === 'PUT' && /\/solutions\/[^/]+\/changeset$/i.test(path)) {
     return false;
   }
   return isJSONWriteEndpoint(method, path) || isWriteMethod(method);
@@ -282,6 +309,33 @@ export function extractDbid(
 /**
  * Build URL with query parameters
  */
+/**
+ * Whether a path could reach the server as a different path: it has a dot
+ * segment, a backslash, an empty segment, a query or fragment, or an escape
+ * (path parameters go in unencoded, so "../apps/x" or "x?" in an ID changes
+ * the URL), or the URL it builds doesn't keep it as given.
+ */
+function ambiguousPath(baseUrl: string, path: string): boolean {
+  if (/[\\?#%]/.test(path) || path.includes('//')) return true;
+  // A server may ignore a trailing slash: /solutions/fromrecord/ could act as /solutions/fromrecord
+  if (path.length > 1 && path.endsWith('/')) return true;
+  if (path.split('/').some((seg) => seg === '.' || seg === '..')) return true;
+  try {
+    const base = new URL(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
+    const built = new URL(buildUrl(baseUrl, path));
+    const expected = base.pathname.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${path}`);
+    return built.pathname !== expected || built.origin !== base.origin;
+  } catch {
+    return true;
+  }
+}
+
+/** Whether headers ask the server to treat a request as another method. */
+function hasMethodOverride(headers?: Record<string, string>): boolean {
+  const names = new Set(['x-http-method-override', 'x-http-method', 'x-method-override']);
+  return Object.keys(headers ?? {}).some((name) => names.has(name.toLowerCase()));
+}
+
 function buildUrl(
   baseUrl: string,
   path: string,
@@ -447,6 +501,51 @@ export async function executeRequest<T = unknown>(
 ): Promise<T> {
   const { config } = executor;
   const maxAttempts = config.retry.maxAttempts;
+  // One letter case for the method, so a lowercase 'get' that writes is
+  // judged; and a leading slash, so 'solutions/fromrecord' matches the lists
+  options = {
+    ...options,
+    method: options.method.toUpperCase() as RequestOptions['method'],
+    path: options.path.startsWith('/') ? options.path : `/${options.path}`,
+  };
+  const guarded = config.readOnly || config.writeScope !== undefined;
+  const refuseUnjudgeable = (reason: string): never => {
+    if (config.readOnly) throw new ReadOnlyError(options.method, options.path);
+    throw new WriteScopeError(options.method, options.path, reason);
+  };
+
+  // A path a server could read as another path can't be judged
+  if (guarded && ambiguousPath(config.baseUrl, options.path)) {
+    refuseUnjudgeable("the path can't be checked: a server could read it as another path");
+  }
+  // Nor can a request that asks the server to act as another method
+  if (guarded && hasMethodOverride(options.headers)) {
+    refuseUnjudgeable('a method-override header would make the server act as another method');
+  }
+  if (guarded) {
+    // Nor a header that sends the request to another realm or host
+    if (Object.keys(options.headers ?? {}).some((h) => ['qb-realm-hostname', 'host'].includes(h.toLowerCase()))) {
+      refuseUnjudgeable('a header would send the request to another realm or host');
+    }
+    // Read each query value once, into a plain copy that is both checked and
+    // sent: a getter could return one ID to the check and another to the send
+    if (options.query) {
+      const query: Record<string, string | number | boolean | undefined> = {};
+      for (const key of Object.keys(options.query)) {
+        const value: unknown = options.query[key];
+        if (value !== undefined && typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+          refuseUnjudgeable(`the ${key} parameter isn't a plain value`);
+        }
+        query[key] = value as string | number | boolean | undefined;
+      }
+      options = { ...options, query };
+    }
+    // A body sent as given (bodyType) must already be the text that is sent:
+    // an object would be turned into text by its own toString
+    if (options.bodyType && options.body !== undefined && typeof options.body !== 'string') {
+      refuseUnjudgeable('a body with a bodyType must be a string');
+    }
+  }
 
   // Check read-only mode before making any request
   checkReadOnly(config, options.method, options.path);
@@ -473,6 +572,15 @@ export async function executeRequest<T = unknown>(
       query: { ...options.query, tableId: resolveTableAlias(config.schema, options.query.tableId) },
     };
   }
+
+  // Judge the body that will be sent: a body's toJSON (or a getter) could
+  // serialize differently from how it reads, so check and send one plain copy
+  if (guarded && transformedOptions.body !== undefined && !transformedOptions.bodyType) {
+    transformedOptions = { ...transformedOptions, body: JSON.parse(JSON.stringify(transformedOptions.body)) };
+  }
+
+  // Write scope, on the IDs the request will send
+  await checkWriteScope(config, transformedOptions, !retrySafe, scopeTables(executor));
 
   const context: RequestContext = {
     methodName: `${options.method} ${options.path}`,
@@ -606,11 +714,53 @@ export interface XmlRequestOptions {
   signal?: AbortSignal;
 }
 
+/** What the write scope reads to judge a write: getAppTables and getRelationships, both reads. */
+function scopeTables(executor: RequestExecutorOptions): ScopeLookups {
+  return {
+    listTables: async (appId) => {
+      const tables = await executeRequest<Array<{ id?: string }>>(
+        { method: 'GET', path: '/tables', query: { appId } },
+        executor
+      );
+      return (tables ?? []).map((t) => t.id ?? '').filter((id) => id !== '');
+    },
+    relationshipParent: async (childTableId, relationshipId) => {
+      // At most 100 pages, in case a server ignores skip
+      for (let skip = 0, pages = 0; pages < 100; pages++) {
+        const page = await executeRequest<{
+          relationships?: Array<{ id?: number; parentTableId?: string }>;
+          metadata?: { totalRelationships?: number };
+        }>({ method: 'GET', path: `/tables/${encodeURIComponent(childTableId)}/relationships`, query: { skip } }, executor);
+        const rels = page?.relationships ?? [];
+        const match = rels.find((r) => String(r.id) === relationshipId);
+        if (match?.parentTableId) return match.parentTableId;
+        skip += rels.length;
+        const total = page?.metadata?.totalRelationships ?? 0;
+        if (rels.length === 0 || skip >= total) {
+          throw new Error(`table ${childTableId} has no relationship ${relationshipId}`);
+        }
+      }
+      throw new Error(`table ${childTableId}: relationship ${relationshipId} not found in 100 pages`);
+    },
+  };
+}
+
 export async function executeXmlRequest(
   { dbid, action, body, write, appToken = undefined, signal }: XmlRequestOptions,
   executor: RequestExecutorOptions
 ): Promise<string> {
   const { config, auth, throttle } = executor;
+  // Read-only and the write scope are checked here, where every XML request
+  // passes, so neither the XML client's options nor a direct requestXml call
+  // can get around them
+  if ((config.readOnly || config.writeScope) && !/^[A-Za-z0-9_]+$/.test(dbid)) {
+    if (config.readOnly) throw new ReadOnlyError('POST', `/db/${dbid}`, action);
+    throw new WriteScopeError('POST', `/db/${dbid}`, "the dbid isn't a plain ID", dbid, action);
+  }
+  if (config.readOnly && (write || isXmlWriteAction(action))) {
+    throw new ReadOnlyError('POST', `/db/${dbid}`, action);
+  }
+  await checkXmlWriteScope(config, dbid, action, body, write, scopeTables(executor));
   const xmlAppToken = appToken ?? config.appToken;
   const url = `https://${config.realm}.quickbase.com/db/${encodeURIComponent(dbid)}`;
   const context: RequestContext = {

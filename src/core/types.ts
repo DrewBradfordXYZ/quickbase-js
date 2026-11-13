@@ -80,6 +80,22 @@ export interface QuickbaseConfig {
   readOnly?: boolean;
 
   /**
+   * Limit writes to the apps named here. Any other write throws a
+   * WriteScopeError before it is sent; reads are never limited. With
+   * `readOnly` as well, nothing is written.
+   *
+   * @example
+   * ```typescript
+   * const qb = createClient({
+   *   realm: 'myrealm',
+   *   auth: { type: 'user-token', userToken: '...' },
+   *   writeScope: { appIds: [appId] },
+   * });
+   * ```
+   */
+  writeScope?: WriteScope;
+
+  /**
    * Throw a LineErrorsError when an upsert's values are rejected (default:
    * false). QuickBase still saves those records, with the rejected fields
    * blank, and answers 207; without this the rejections are only in the
@@ -340,6 +356,8 @@ export interface ResolvedConfig {
   schema?: ResolvedSchema;
   /** Read-only mode - blocks all write operations */
   readOnly: boolean;
+  /** Write scope, with the tables known to be in its apps (undefined: no limit) */
+  writeScope?: WriteScopeState;
   /** Throw LineErrorsError when an upsert's values are rejected */
   throwOnLineErrors: boolean;
   /** App token for XML API calls (optional) */
@@ -365,3 +383,55 @@ export const DEFAULT_CONFIG = {
   autoPaginate: false,
   convertDates: true,
 } as const;
+
+/**
+ * What a client may write to. See QuickbaseConfig.writeScope. A write whose
+ * target can be checked is allowed when the target is listed; a write that
+ * creates something, or acts on the realm's users or your own credentials,
+ * is allowed by a switch. Nothing is allowed unless it is named.
+ */
+export interface WriteScope {
+  /**
+   * Apps the client may change: the apps themselves (update, delete,
+   * trustees, roles, variables, code pages), and every table in them,
+   * including tables created later (fields, relationships, records, files,
+   * document generation).
+   */
+  appIds?: string[];
+  /** Allow createApp, copyApp, and XML API_CreateDatabase and API_CloneDatabase. A new app isn't added to appIds. */
+  createApps?: boolean;
+  /** Solutions the client may update (updateSolution, updateSolutionToRecord). Updating a solution changes its apps. */
+  solutionIds?: string[];
+  /** Allow createSolution and createSolutionFromRecord, which create their apps. */
+  createSolutions?: boolean;
+  /**
+   * Groups whose members, managers and subgroups the client may change, and
+   * that it may rename or delete (XML). Matched exactly, as the request writes
+   * them: the JSON API writes a group's ID as a number ('1217'), and the XML
+   * API's examples write one with a suffix ('1217.dgpt'); list each form the
+   * client will use.
+   */
+  groupIds?: Array<string | number>;
+  /** Allow creating and copying groups (XML). */
+  createGroups?: boolean;
+  /** Allow denying and undenying users in the account, and, with the app in appIds, XML API_ProvisionUser (which can create the realm user). */
+  manageUsers?: boolean;
+  /** Allow changing your own credentials: clone, transfer, deactivate and delete user tokens, and sign out (XML). */
+  manageTokens?: boolean;
+}
+
+/** A client's write scope, resolved. */
+export interface WriteScopeState {
+  apps: Set<string>;
+  createApps: boolean;
+  solutions: Set<string>;
+  createSolutions: boolean;
+  groups: Set<string>;
+  createGroups: boolean;
+  manageUsers: boolean;
+  manageTokens: boolean;
+  /** Table ID -> app ID, for the scope's apps; filled on demand */
+  tableApp: Map<string, string>;
+  /** The listing in progress, shared by requests that miss at the same time */
+  loading?: Promise<void>;
+}
