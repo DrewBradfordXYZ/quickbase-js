@@ -202,7 +202,9 @@ export function transformResponse<T>(
   response: T,
   ctx: ResponseTransformContext
 ): T {
-  if (!response || typeof response !== 'object') return response;
+  // A list (getAppTables, getFields, ...) has no records to transform; copying
+  // it with {...} would turn it into an object keyed "0", "1", ...
+  if (!response || typeof response !== 'object' || Array.isArray(response)) return response;
 
   const result = { ...response } as Record<string, unknown>;
 
