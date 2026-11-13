@@ -222,7 +222,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getApp(params: GetAppParams): Promise<GetAppResponse> {
     return request<GetAppResponse>({
       method: 'GET',
-      path: `/apps/${params.appId}`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}`,
     });
   },
 
@@ -246,7 +246,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateApp(params: UpdateAppParams, body?: UpdateAppRequest): Promise<UpdateAppResponse> {
     return request<UpdateAppResponse>({
       method: 'POST',
-      path: `/apps/${params.appId}`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}`,
       body,
     });
   },
@@ -268,7 +268,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   deleteApp(params: DeleteAppParams, body: DeleteAppRequest): Promise<DeleteAppResponse> {
     return request<DeleteAppResponse>({
       method: 'DELETE',
-      path: `/apps/${params.appId}`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}`,
       body,
     });
   },
@@ -287,7 +287,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getAppEvents(params: GetAppEventsParams): Promise<GetAppEventsResponse> {
     return request<GetAppEventsResponse>({
       method: 'GET',
-      path: `/apps/${params.appId}/events`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}/events`,
     });
   },
 
@@ -310,7 +310,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   copyApp(params: CopyAppParams, body: CopyAppRequest): Promise<CopyAppResponse> {
     return request<CopyAppResponse>({
       method: 'POST',
-      path: `/apps/${params.appId}/copy`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}/copy`,
       body,
     });
   },
@@ -329,7 +329,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getRoles(params: GetRolesParams): Promise<GetRolesResponse> {
     return request<GetRolesResponse>({
       method: 'GET',
-      path: `/apps/${params.appId}/roles`,
+      path: `/apps/${encodeURIComponent(String(params.appId))}/roles`,
     });
   },
 
@@ -393,7 +393,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getTable(params: GetTableParams): Promise<GetTableResponse> {
     return request<GetTableResponse>({
       method: 'GET',
-      path: `/tables/${params.tableId}`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}`,
       query: { appId: params.appId },
     });
   },
@@ -419,7 +419,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateTable(params: UpdateTableParams, body?: UpdateTableRequest): Promise<UpdateTableResponse> {
     return request<UpdateTableResponse>({
       method: 'POST',
-      path: `/tables/${params.tableId}`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}`,
       query: { appId: params.appId },
       body,
     });
@@ -440,7 +440,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   deleteTable(params: DeleteTableParams): Promise<DeleteTableResponse> {
     return request<DeleteTableResponse>({
       method: 'DELETE',
-      path: `/tables/${params.tableId}`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}`,
       query: { appId: params.appId },
     });
   },
@@ -461,14 +461,14 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
     const executor = () => {
       return request<GetRelationshipsResponse>({
         method: 'GET',
-        path: `/tables/${params.tableId}/relationships`,
+        path: `/tables/${encodeURIComponent(String(params.tableId))}/relationships`,
         query: { skip: params.skip },
       });
     };
     const paginatedExecutor = (paginationParams: { skip?: number; nextPageToken?: string; nextToken?: string }) => {
       return request<GetRelationshipsResponse>({
         method: 'GET',
-        path: `/tables/${params.tableId}/relationships`,
+        path: `/tables/${encodeURIComponent(String(params.tableId))}/relationships`,
         query: { skip: params.skip, ...paginationParams },
       });
     };
@@ -495,7 +495,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   createRelationship(params: CreateRelationshipParams, body: CreateRelationshipRequest): Promise<CreateRelationshipResponse> {
     return request<CreateRelationshipResponse>({
       method: 'POST',
-      path: `/tables/${params.tableId}/relationship`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}/relationship`,
       body,
     });
   },
@@ -519,7 +519,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateRelationship(params: UpdateRelationshipParams, body?: UpdateRelationshipRequest): Promise<UpdateRelationshipResponse> {
     return request<UpdateRelationshipResponse>({
       method: 'POST',
-      path: `/tables/${params.tableId}/relationship/${params.relationshipId}`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}/relationship/${encodeURIComponent(String(params.relationshipId))}`,
       body,
     });
   },
@@ -539,7 +539,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   deleteRelationship(params: DeleteRelationshipParams): Promise<DeleteRelationshipResponse> {
     return request<DeleteRelationshipResponse>({
       method: 'DELETE',
-      path: `/tables/${params.tableId}/relationship/${params.relationshipId}`,
+      path: `/tables/${encodeURIComponent(String(params.tableId))}/relationship/${encodeURIComponent(String(params.relationshipId))}`,
     });
   },
 
@@ -577,7 +577,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getReport(params: GetReportParams): Promise<GetReportResponse> {
     return request<GetReportResponse>({
       method: 'GET',
-      path: `/reports/${params.reportId}`,
+      path: `/reports/${encodeURIComponent(String(params.reportId))}`,
       query: { tableId: params.tableId },
     });
   },
@@ -600,14 +600,14 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
     const executor = () => {
       return request<RunReportResponse>({
         method: 'POST',
-        path: `/reports/${params.reportId}/run`,
+        path: `/reports/${encodeURIComponent(String(params.reportId))}/run`,
         query: { tableId: params.tableId, skip: params.skip, top: params.top },
       });
     };
     const paginatedExecutor = (paginationParams: { skip?: number; nextPageToken?: string; nextToken?: string }) => {
       return request<RunReportResponse>({
         method: 'POST',
-        path: `/reports/${params.reportId}/run`,
+        path: `/reports/${encodeURIComponent(String(params.reportId))}/run`,
         query: { tableId: params.tableId, skip: params.skip, top: params.top, ...paginationParams },
       });
     };
@@ -707,7 +707,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getField(params: GetFieldParams): Promise<GetFieldResponse> {
     return request<GetFieldResponse>({
       method: 'GET',
-      path: `/fields/${params.fieldId}`,
+      path: `/fields/${encodeURIComponent(String(params.fieldId))}`,
       query: { tableId: params.tableId, includeFieldPerms: params.includeFieldPerms },
     });
   },
@@ -741,7 +741,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateField(params: UpdateFieldParams, body?: UpdateFieldRequest): Promise<UpdateFieldResponse> {
     return request<UpdateFieldResponse>({
       method: 'POST',
-      path: `/fields/${params.fieldId}`,
+      path: `/fields/${encodeURIComponent(String(params.fieldId))}`,
       query: { tableId: params.tableId },
       body,
     });
@@ -783,7 +783,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getFieldUsage(params: GetFieldUsageParams): Promise<GetFieldUsageResponse> {
     return request<GetFieldUsageResponse>({
       method: 'GET',
-      path: `/fields/usage/${params.fieldId}`,
+      path: `/fields/usage/${encodeURIComponent(String(params.fieldId))}`,
       query: { tableId: params.tableId },
     });
   },
@@ -963,7 +963,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getTempTokenDBID(params: GetTempTokenDBIDParams): Promise<GetTempTokenDBIDResponse> {
     return request<GetTempTokenDBIDResponse>({
       method: 'GET',
-      path: `/auth/temporary/${params.dbid}`,
+      path: `/auth/temporary/${encodeURIComponent(String(params.dbid))}`,
     });
   },
 
@@ -1082,7 +1082,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   downloadFile(params: DownloadFileParams): Promise<DownloadFileResponse> {
     return request<DownloadFileResponse>({
       method: 'GET',
-      path: `/files/${params.tableId}/${params.recordId}/${params.fieldId}/${params.versionNumber}`,
+      path: `/files/${encodeURIComponent(String(params.tableId))}/${encodeURIComponent(String(params.recordId))}/${encodeURIComponent(String(params.fieldId))}/${encodeURIComponent(String(params.versionNumber))}`,
       responseType: 'text',
     });
   },
@@ -1104,7 +1104,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   deleteFile(params: DeleteFileParams): Promise<DeleteFileResponse> {
     return request<DeleteFileResponse>({
       method: 'DELETE',
-      path: `/files/${params.tableId}/${params.recordId}/${params.fieldId}/${params.versionNumber}`,
+      path: `/files/${encodeURIComponent(String(params.tableId))}/${encodeURIComponent(String(params.recordId))}/${encodeURIComponent(String(params.fieldId))}/${encodeURIComponent(String(params.versionNumber))}`,
     });
   },
 
@@ -1198,7 +1198,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   denyUsersAndGroups(params: DenyUsersAndGroupsParams, body: DenyUsersAndGroupsRequest): Promise<DenyUsersAndGroupsResponse> {
     return request<DenyUsersAndGroupsResponse>({
       method: 'PUT',
-      path: `/users/deny/${params.shouldDeleteFromGroups}`,
+      path: `/users/deny/${encodeURIComponent(String(params.shouldDeleteFromGroups))}`,
       query: { accountId: params.accountId },
       body,
     });
@@ -1244,7 +1244,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getUserApps(params: GetUserAppsParams): Promise<GetUserAppsResponse> {
     return request<GetUserAppsResponse>({
       method: 'GET',
-      path: `/users/${params.userId}/apps`,
+      path: `/users/${encodeURIComponent(String(params.userId))}/apps`,
       query: { accountId: params.accountId },
     });
   },
@@ -1265,7 +1265,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   addMembersToGroup(params: AddMembersToGroupParams, body: AddMembersToGroupRequest): Promise<AddMembersToGroupResponse> {
     return request<AddMembersToGroupResponse>({
       method: 'POST',
-      path: `/groups/${params.gid}/members`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/members`,
       body,
     });
   },
@@ -1286,7 +1286,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   removeMembersFromGroup(params: RemoveMembersFromGroupParams, body: RemoveMembersFromGroupRequest): Promise<RemoveMembersFromGroupResponse> {
     return request<RemoveMembersFromGroupResponse>({
       method: 'DELETE',
-      path: `/groups/${params.gid}/members`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/members`,
       body,
     });
   },
@@ -1307,7 +1307,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   addManagersToGroup(params: AddManagersToGroupParams, body: AddManagersToGroupRequest): Promise<AddManagersToGroupResponse> {
     return request<AddManagersToGroupResponse>({
       method: 'POST',
-      path: `/groups/${params.gid}/managers`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/managers`,
       body,
     });
   },
@@ -1328,7 +1328,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   removeManagersFromGroup(params: RemoveManagersFromGroupParams, body: RemoveManagersFromGroupRequest): Promise<RemoveManagersFromGroupResponse> {
     return request<RemoveManagersFromGroupResponse>({
       method: 'DELETE',
-      path: `/groups/${params.gid}/managers`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/managers`,
       body,
     });
   },
@@ -1349,7 +1349,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   addSubgroupsToGroup(params: AddSubgroupsToGroupParams, body: AddSubgroupsToGroupRequest): Promise<AddSubgroupsToGroupResponse> {
     return request<AddSubgroupsToGroupResponse>({
       method: 'POST',
-      path: `/groups/${params.gid}/subgroups`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/subgroups`,
       body,
     });
   },
@@ -1370,7 +1370,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   removeSubgroupsFromGroup(params: RemoveSubgroupsFromGroupParams, body: RemoveSubgroupsFromGroupRequest): Promise<RemoveSubgroupsFromGroupResponse> {
     return request<RemoveSubgroupsFromGroupResponse>({
       method: 'DELETE',
-      path: `/groups/${params.gid}/subgroups`,
+      path: `/groups/${encodeURIComponent(String(params.gid))}/subgroups`,
       body,
     });
   },
@@ -1494,7 +1494,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   generateDocument(params: GenerateDocumentParams): Promise<GenerateDocumentResponse> {
     return request<GenerateDocumentResponse>({
       method: 'GET',
-      path: `/docTemplates/${params.templateId}/generate`,
+      path: `/docTemplates/${encodeURIComponent(String(params.templateId))}/generate`,
       query: { tableId: params.tableId, recordId: params.recordId, filename: params.filename, format: params.format, margin: params.margin, unit: params.unit, pageSize: params.pageSize, orientation: params.orientation, realm: params.realm },
     });
   },
@@ -1514,7 +1514,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   exportSolution(params: ExportSolutionParams): Promise<ExportSolutionResponse> {
     return request<ExportSolutionResponse>({
       method: 'GET',
-      path: `/solutions/${params.solutionId}`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}`,
       responseType: 'text',
     });
   },
@@ -1536,7 +1536,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateSolution(params: UpdateSolutionParams, body: UpdateSolutionRequest): Promise<UpdateSolutionResponse> {
     return request<UpdateSolutionResponse>({
       method: 'PUT',
-      path: `/solutions/${params.solutionId}`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}`,
       body,
       bodyType: 'application/x-yaml',
     });
@@ -1586,7 +1586,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   exportSolutionToRecord(params: ExportSolutionToRecordParams): Promise<ExportSolutionToRecordResponse> {
     return request<ExportSolutionToRecordResponse>({
       method: 'GET',
-      path: `/solutions/${params.solutionId}/torecord`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}/torecord`,
       query: { tableId: params.tableId, fieldId: params.fieldId },
     });
   },
@@ -1632,7 +1632,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateSolutionToRecord(params: UpdateSolutionToRecordParams): Promise<UpdateSolutionToRecordResponse> {
     return request<UpdateSolutionToRecordResponse>({
       method: 'GET',
-      path: `/solutions/${params.solutionId}/fromrecord`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}/fromrecord`,
       query: { tableId: params.tableId, fieldId: params.fieldId, recordId: params.recordId },
     });
   },
@@ -1654,7 +1654,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   changesetSolution(params: ChangesetSolutionParams, body: ChangesetSolutionRequest): Promise<ChangesetSolutionResponse> {
     return request<ChangesetSolutionResponse>({
       method: 'PUT',
-      path: `/solutions/${params.solutionId}/changeset`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}/changeset`,
       body,
       bodyType: 'application/x-yaml',
     });
@@ -1678,7 +1678,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   changesetSolutionFromRecord(params: ChangesetSolutionFromRecordParams): Promise<ChangesetSolutionFromRecordResponse> {
     return request<ChangesetSolutionFromRecordResponse>({
       method: 'GET',
-      path: `/solutions/${params.solutionId}/changeset/fromrecord`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}/changeset/fromrecord`,
       query: { tableId: params.tableId, fieldId: params.fieldId, recordId: params.recordId },
     });
   },
@@ -1697,7 +1697,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getSolutionPublic(params: GetSolutionPublicParams): Promise<GetSolutionPublicResponse> {
     return request<GetSolutionPublicResponse>({
       method: 'GET',
-      path: `/solutions/${params.solutionId}/resources`,
+      path: `/solutions/${encodeURIComponent(String(params.solutionId))}/resources`,
     });
   },
 
@@ -1715,7 +1715,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   getTrustees(params: GetTrusteesParams): Promise<GetTrusteesResponse> {
     return request<GetTrusteesResponse>({
       method: 'GET',
-      path: `/app/${params.appId}/trustees`,
+      path: `/app/${encodeURIComponent(String(params.appId))}/trustees`,
     });
   },
 
@@ -1735,7 +1735,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   addTrustees(params: AddTrusteesParams, body?: AddTrusteesRequest): Promise<AddTrusteesResponse> {
     return request<AddTrusteesResponse>({
       method: 'POST',
-      path: `/app/${params.appId}/trustees`,
+      path: `/app/${encodeURIComponent(String(params.appId))}/trustees`,
       body,
     });
   },
@@ -1756,7 +1756,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   removeTrustees(params: RemoveTrusteesParams, body?: RemoveTrusteesRequest): Promise<RemoveTrusteesResponse> {
     return request<RemoveTrusteesResponse>({
       method: 'DELETE',
-      path: `/app/${params.appId}/trustees`,
+      path: `/app/${encodeURIComponent(String(params.appId))}/trustees`,
       body,
     });
   },
@@ -1777,7 +1777,7 @@ export function createApiMethods(request: RequestFn, autoPaginate: boolean = fal
   updateTrustees(params: UpdateTrusteesParams, body?: UpdateTrusteesRequest): Promise<UpdateTrusteesResponse> {
     return request<UpdateTrusteesResponse>({
       method: 'PATCH',
-      path: `/app/${params.appId}/trustees`,
+      path: `/app/${encodeURIComponent(String(params.appId))}/trustees`,
       body,
     });
   },

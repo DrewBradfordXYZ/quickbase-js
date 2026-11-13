@@ -557,9 +557,10 @@ function generateMethodImplementation(
     funcParams.push(`body${optional}: ${typeName}Request`);
   }
 
-  // Build the path with interpolation
-  // Replace {paramName} with ${params.paramName}
-  const interpolatedPath = path.replace(/\{(\w+)\}/g, '${params.$1}');
+  // Build the path with interpolation. Each path parameter is URL-encoded,
+  // so an ID can't add path segments, a query or a fragment ("../apps/x",
+  // "x?a=b"): it reaches QuickBase as one segment.
+  const interpolatedPath = path.replace(/\{(\w+)\}/g, '${encodeURIComponent(String(params.$1))}');
 
   // Determine if we need template literal or regular string
   const pathString = hasPathParams ? `\`${interpolatedPath}\`` : `'${path}'`;
