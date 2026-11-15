@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `getDBPage` finds a page by name. A name is now sent as `pagename`; in `pageID`, as before, QuickBase answers "Page not found" (errcode 81) for a page that exists. A number, or a string of digits only, is still sent as `pageID`.
+
 ## [3.2.0] - 2026-11-13
 
 Write scope, and read-only mode that fails closed.

@@ -29,7 +29,15 @@ import {
  *
  * @see https://help.quickbase.com/docs/api-getdbpage
  *
- * @param pageIdOrName - Page ID (number) or page name (string)
+ * @param pageIdOrName - Page ID (number) or page name (string). A number,
+ *   or a string of digits only, is sent as the page ID; anything else as the
+ *   page name.
+ *
+ * QuickBase's reference lists one parameter, pageID ("The ID of the page.
+ * You can also use the pagename."). A name sent in pageID is not found
+ * (errcode 81, "Page not found"); sent in a pagename parameter, as
+ * API_AddReplaceDBPage takes it, the page is returned. Observed against a
+ * live realm in November 2026.
  *
  * @example
  * ```typescript
@@ -45,7 +53,10 @@ export async function getDBPage(
   appId: string,
   pageIdOrName: string | number
 ): Promise<string> {
-  const inner = `<pageID>${escapeXml(String(pageIdOrName))}</pageID>`;
+  const value = String(pageIdOrName);
+  const inner = /^[0-9]+$/.test(value)
+    ? `<pageID>${escapeXml(value)}</pageID>`
+    : `<pagename>${escapeXml(value)}</pagename>`;
   const body = buildRequest(inner);
   const xml = await caller.doXml(appId, 'API_GetDBPage', body);
 

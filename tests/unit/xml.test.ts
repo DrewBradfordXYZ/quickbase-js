@@ -761,6 +761,21 @@ describe('XmlClient code pages', () => {
     expect(content).toBe('<html><body>Hello World</body></html>');
   });
 
+  it('sends an ID as pageID and a name as pagename', async () => {
+    const cases: Array<[string | number, string]> = [
+      [3, '<pageID>3</pageID>'],
+      ['3', '<pageID>3</pageID>'],
+      ['dashboard.html', '<pagename>dashboard.html</pagename>'],
+      ['3.js', '<pagename>3.js</pagename>'],
+      ['a & b', '<pagename>a &amp; b</pagename>'],
+    ];
+    for (const [input, want] of cases) {
+      const mock = createMockCaller({ response: 'x' });
+      await new XmlClient(mock).getDBPage('bqxyz123', input);
+      expect(mock.lastBody).toContain(want);
+    }
+  });
+
   it('should handle error response for page not found', async () => {
     const mock = createMockCaller({
       response: `<?xml version="1.0" ?>
