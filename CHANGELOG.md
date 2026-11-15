@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.1] - 2026-11-14
+
+Finding a code page by name.
+
 ### Fixed
 - `getDBPage` finds a page by name. A name is now sent as `pagename`; in `pageID`, as before, QuickBase answers "Page not found" (errcode 81) for a page that exists. A number, or a string of digits only, is still sent as `pageID`.
 
